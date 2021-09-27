@@ -34,5 +34,65 @@ def NotFound():
     return render_template('404.html')
 
 
+@app.route('/blank')
+def blank():
+    return render_template('blank.html')
+
+
+@app.route('/buttons')
+def buttons():
+    return render_template('buttons.html')
+
+
+@app.route('/cards')
+def cards():
+    return render_template('cards.html')
+
+
+@app.route('/charts')
+def charts():
+    return render_template('charts.html')
+
+
+@app.route('/forgot_password')
+def forgot_password():
+    return render_template('forgot-password.html')
+
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
+
+@app.route('/tables')
+def tables():
+    return render_template('tables.html')
+
+
+@app.route('/utilities_animation')
+def utilities_animation():
+    return render_template('utilities-animation.html')
+
+
+@app.route('/utilities_border')
+def utilities_border():
+    return render_template('utilities-border.html')
+
+
+@app.route('/utilities_color')
+def utilities_color():
+    return render_template('utilities-color.html')
+
+
+@app.route('/utilities_other')
+def utilities_other():
+    return render_template('utilities-other.html')
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
