@@ -3,7 +3,10 @@
 
 import os
 from models import db
-from flask import Flask, render_template
+from flask import (
+    Flask, render_template,
+    url_for
+)
 
 app = Flask(__name__)
 
@@ -20,17 +23,16 @@ db.app = app
 db.create_all()
 
 
+@app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html')
 
 
-@app.route('/')
-def main():
-    return render_template('index.html')
+@app.route('/404')
+def NotFound():
+    return render_template('404.html')
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
-
-
+    app.run(host='0.0.0.0', port=5000, debug=True)
