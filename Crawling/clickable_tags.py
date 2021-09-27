@@ -13,7 +13,7 @@ import time
 
 # 1. Selenium을 이용한 태그 클릭
 def seleniumCrawling(url):
-    driver = webdriver.Chrome('/Users/dohunny/Downloads/chromedriver')
+    driver = webdriver.Chrome('./chromedriver')
     driver.get(url)
 
     WebDriverWait(driver, 10).until(
@@ -79,6 +79,10 @@ def bs4Crawling(url):
                 print("false")
 
     print(a_href_list)
+
+
+
+
 
 if __name__ == "__main__":
     url = "https://www.naver.com/"
