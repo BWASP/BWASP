@@ -22,6 +22,13 @@ db.init_app(app)
 db.app = app
 db.create_all()
 
+@app.route('/start')
+def mode_selection():
+    return render_template('./common/mode_selection.html')
+
+@app.route('/automation/options')
+def manual_options():
+    return render_template('./automation/options.html')
 
 @app.route('/')
 @app.route('/index')
