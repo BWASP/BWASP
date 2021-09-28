@@ -1,0 +1,6 @@
+
+.idea/*
+Web/__pycache__/*
+Web/BWASP/*
+.DS_store
+*.pyc
