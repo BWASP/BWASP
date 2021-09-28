@@ -28,6 +28,11 @@ def mode_selection():
     return render_template('./common/mode_selection.html')
 
 
+@app.route('/common/export')
+def CommonExport():
+    return render_template('./common/export.html')
+
+
 @app.route('/automation/options')
 def manual_options():
     return render_template('./automation/options.html')
