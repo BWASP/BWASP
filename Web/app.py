@@ -30,6 +30,10 @@ def mode_selection():
 def manual_options():
     return render_template('./automation/options.html')
 
+@app.route('/AttackVector')
+def attack_Vector():
+    return render_template('./AttackVector.html')
+
 @app.route('/')
 @app.route('/index')
 def index():
