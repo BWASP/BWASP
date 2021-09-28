@@ -9,7 +9,6 @@ def webdriverSetting():
         'disable_encoding': True,
         "detach" : True
     }
-
     driver = webdriver.Chrome("./chromedriver.exe", seleniumwire_options = options)
     return driver
 
@@ -19,7 +18,7 @@ def packetCapture(driver):
         if data.response:
             network_packet.append({"request" : {}, "response" : {}})
             network_packet[i]["request"] = getRequestPacket(data)
-            # network_packet[i]["response"] = getResponsePacket(data.response)
+            network_packet[i]["response"] = getResponsePacket(data.response)
         else:
             print("[!] Something Wrong.")
 
