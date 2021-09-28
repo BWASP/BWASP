@@ -31,7 +31,7 @@ driver.get(URL)
 #type 1=> 확장자 불가 content-type으로 구분
 #netwrok response 안의 패킷 분석
 
-def get_extra_url(body,url):
+def getExtraurl(body,url):
     #url regular expression
     pattern = re.compile('(?:http|ftp|https)(?:://)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
     #pattern = re.compile('(http|https)):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
@@ -52,7 +52,7 @@ def get_extra_url(body,url):
 
 
 #url 구분 저장 
-def save_url(type,body,url):
+def saveUrl(type,body,url):
     # 확장자 일 경우 확장자에 따라 타입 정하기 
     if type == "ext":
         extension = url.split(".")[-1]
@@ -64,26 +64,26 @@ def save_url(type,body,url):
     if type == "json":
             res_jsonlist.add(url)
             print("json:"," ")
-            get_extra_url(body,url)
+            getExtraurl(body,url)
 
     elif type =="javascript":
             res_jsonlist.add(url)
             print("javascript:"," ")
-            get_extra_url(body,url)
+            getExtraurl(body,url)
 
 
 
 #reponse에서 js,json등 정해진 경우만 url 저장
-def get_url(response,response_url):
+def getUrl(response,response_url):
     content = request.response.headers['Content-Type']
     # 확장자 이상하지만 js , json일 경우 
     if content and (res_contlist[0] in content):
         for  contlist in res_contlist:
             if content in contlist:
-                save_url(contlist,response.body,response_url)
+                saveUrl(contlist,response.body,response_url)
                 break
     elif  "." in response_url:
-        save_url("ext",response.body,response_url)
+        saveUrl("ext",response.body,response_url)
 
 
 
@@ -92,8 +92,8 @@ for request in driver.requests:
     if(request.response):
         # 탐색된 모든 url 저장
         res_urllist.add(request.url)
-        get_url(request.response,request.url)
+        getUrl(request.response,request.url)
 
 for list in sorted(list(res_urllist)):
-    print(list)        
+    print(list)    
 driver.quit()
