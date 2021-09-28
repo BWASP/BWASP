@@ -77,7 +77,7 @@ def saveUrl(type,body,url):
 def getUrl(response,response_url):
     content = request.response.headers['Content-Type']
     # 확장자 이상하지만 js , json일 경우 
-    if content and (res_contlist[0] in content):
+    if content and (res_contlist in content):
         for  contlist in res_contlist:
             if content in contlist:
                 saveUrl(contlist,response.body,response_url)
