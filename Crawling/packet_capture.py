@@ -21,7 +21,6 @@ def packetCapture(driver):
             network_packet[i]["response"] = getResponsePacket(data.response)
         else:
             print("[!] Something Wrong.")
-
     return network_packet
 
 def getRequestPacket(data):
@@ -34,8 +33,8 @@ def getRequestPacket(data):
         req_uri += "#" + parsed_url.fragment
 
     req_headers = ""
-    if data.headers["Host"] is None:
-        req_headers = "Host: {}\n{}".format(parsed_url.netloc, str(data.headers))
+    if data.headers["host"] is None:
+        req_headers = "host: {}\n{}".format(parsed_url.netloc, str(data.headers))
     else:
         req_headers = str(data.headers)
 
@@ -91,10 +90,10 @@ if __name__ == "__main__":
     #     SSL Error: https://github.com/wkeeling/selenium-wire#certificates
 
     driver = webdriverSetting()
-    url = "https://youtube.com"
-    driver.scopes = [
-        '.*youtube.*'
-    ]
+    url = "https://naver.com"
+    # driver.scopes = [
+    #     '.*youtube.*'
+    # ]
 
     driver.get(url)
     writeFile(packetCapture(driver))
