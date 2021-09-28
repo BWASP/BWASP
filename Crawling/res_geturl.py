@@ -43,6 +43,7 @@ def get_extra_url(body,url):
             print("extra link ","".join(line))
             # regex group 에 따라 분리해서 출력 가능
             #print("why ",line[0]+"://"+line[1]+line[2])
+    #utf-8이 오류날 경우        
     except:
          for line in pattern.findall(body.decode("ISO-8859-1")):
             print("extra link ","".join(line))
@@ -92,7 +93,6 @@ for request in driver.requests:
         # 탐색된 모든 url 저장
         res_urllist.add(request.url)
         get_url(request.response,request.url)
-        get_extra_url(request.response.body,request.url)
 
 for list in sorted(list(res_urllist)):
     print(list)        
