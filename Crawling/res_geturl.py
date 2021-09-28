@@ -62,10 +62,9 @@ def eachgetUrl(response,response_url):
 #Call this to get extra link
 def getUrl(req_res_packet):
     for i, request in enumerate(req_res_packet):
-        if(request[i]["response"]):
         # 탐색된 모든 url 저장
         #res_urllist.add(request[i]["request"]["url"])
-            eachgetUrl(request[i]["response"],request[i]["request"]["url"])
+        eachgetUrl(request[i]["response"],request[i]["request"]["url"])
     return sorted(list(res_exturllist))
 
 def printUrl():
