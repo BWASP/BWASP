@@ -47,13 +47,16 @@ def get_url(response,response_url):
 #netwrok response 안의 패킷 분석
 def get_extra_url(body,url):
     #url regular expression
-    pattern = re.compile('(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?')
+    pattern = re.compile('(http|ftp|https)(://)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
+    pattern = re.compile('(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
+    #pattern = re.compile('(http|https)):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     print(url)
     #print(body.decode("utf8"))
     print("-"*10,"body's url start")
     for line in pattern.findall(body.decode("utf8")):
-        print(line)
-    print("-"*10,"body's url end")
+        print("why ","".join(line))
+        #print("why ",line[0]+"://"+line[1]+line[2])
+        print("-"*10,"body's url end")
 
 for request in driver.requests:
     if(request.response):
