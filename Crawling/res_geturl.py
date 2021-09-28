@@ -32,7 +32,7 @@ def save_url(url):
     if "." in url:
         if url.split(".")[-1] == "json":
             res_jsonlist.add(url)
-        elif url.split(".")[-1] == "json":
+        elif url.split(".")[-1] == "js":
             res_jslist.add(url)
 
 #reponse에서 확장자 
