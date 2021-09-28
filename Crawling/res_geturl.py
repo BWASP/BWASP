@@ -23,43 +23,74 @@ chrome_options.add_argument('--headless')
 
 driver = webdriver.Chrome(executable_path='chromedriver', options=chrome_options,seleniumwire_options=options)
 
-URL = "http://twitter.com"
+URL = "https://twitter.com/"
 driver.get(URL)
 
 #url 받을시 형태에 따라 저장 
-def save_url(url):
-    res_urllist.add(url)
-    if "." in url:
-        if url.split(".")[-1] == "json":
-            res_jsonlist.add(url)
-        elif url.split(".")[-1] == "js":
-            res_jslist.add(url)
-
-#reponse에서 확장자 
-def get_url(response,response_url):
-    content = request.response.headers['Content-Type']
-    if  "." in response_url:
-        save_url(response_url)
-    elif content and (res_contlist[0] in content):
-        save_url(response_url)
-
-
+#type 0=> 확장자로 구분
+#type 1=> 확장자 불가 content-type으로 구분
 #netwrok response 안의 패킷 분석
+
 def get_extra_url(body,url):
     #url regular expression
-    pattern = re.compile('(http|ftp|https)(://)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
-    pattern = re.compile('(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
+    pattern = re.compile('(?:http|ftp|https)(?:://)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
     #pattern = re.compile('(http|https)):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     print(url)
     #print(body.decode("utf8"))
     print("-"*10,"body's url start")
-    for line in pattern.findall(body.decode("utf8")):
-        print("why ","".join(line))
-        #print("why ",line[0]+"://"+line[1]+line[2])
-        print("-"*10,"body's url end")
+    try:
+        for line in pattern.findall(body.decode("utf8")):
+            print("extra link ","".join(line))
+            # regex group 에 따라 분리해서 출력 가능
+            #print("why ",line[0]+"://"+line[1]+line[2])
+    except:
+         for line in pattern.findall(body.decode("ISO-8859-1")):
+            print("extra link ","".join(line))
+            # regex group 에 따라 분리해서 출력 가능
+            #print("why ",line[0]+"://"+line[1]+line[2])
+
+
+#url 구분 저장 
+def save_url(type,body,url):
+    # 확장자 일 경우 확장자에 따라 타입 정하기 
+    if type == "ext":
+        extension = url.split(".")[-1]
+        if extension == "json":
+            type="json"
+        elif extension == "js":
+            type="javasript"
+    
+    if type == "json":
+            res_jsonlist.add(url)
+            print("json:"," ")
+            get_extra_url(body,url)
+
+    elif type =="javascript":
+            res_jsonlist.add(url)
+            print("javascript:"," ")
+            get_extra_url(body,url)
+
+
+
+#reponse에서 js,json등 정해진 경우만 url 저장
+def get_url(response,response_url):
+    content = request.response.headers['Content-Type']
+    # 확장자 이상하지만 js , json일 경우 
+    if content and (res_contlist[0] in content):
+        for  contlist in res_contlist:
+            if content in contlist:
+                save_url(contlist,response.body,response_url)
+                break
+    elif  "." in response_url:
+        save_url("ext",response.body,response_url)
+
+
+
 
 for request in driver.requests:
     if(request.response):
+        # 탐색된 모든 url 저장
+        res_urllist.add(request.url)
         get_url(request.response,request.url)
         get_extra_url(request.response.body,request.url)
 
