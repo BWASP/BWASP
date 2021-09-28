@@ -8,13 +8,28 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+from urllib.parse import urlparse
 
+def parsingURL(url):
+    parsed_url = urlparse(url)
+    req_uri = parsed_url.netloc + parsed_url.path
+    if parsed_url.query:
+        req_uri += "?" + parsed_url.query
+    if parsed_url.fragment:
+        req_uri += "#" + parsed_url.fragment
+    
+    return req_uri
+
+def seleniumSetting(url):
+    driver = webdriver.Chrome('./chromedriver')
+    driver.get(url)
+    return driver
 
 
 # 1. Selenium을 이용한 태그 클릭
-def seleniumCrawling(url):
-    driver = webdriver.Chrome('./chromedriver')
-    driver.get(url)
+def seleniumCrawling(driver):
+
+    cur_page_links = list()
 
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "html"))
@@ -39,14 +54,19 @@ def seleniumCrawling(url):
             # Selenium 사용 시, element 클릭 가능 여부 판단 방법 ( HTML 내부에서 클릭 이벤트가 구현되어있는 경우, 태그 속성 중 href가 존재 )
             if elem.get_attribute('href') is not None:
                 print(elem.get_attribute('outerHTML'))
+                req_uri = parsingURL(elem.get_attribute('href'))
+                
+                cur_page_links.append(req_uri)
                 # input()
             else:
                 print('false')
         
         input(str(index+1) + ") Finished...")
 
-    # html = driver.page_source
-    driver.close()
+    print(cur_page_links)
+    return cur_page_links
+    
+
 
 
 
@@ -86,4 +106,5 @@ def bs4Crawling(url):
 
 if __name__ == "__main__":
     url = "https://www.naver.com/"
-    seleniumCrawling(url)
+    driver = seleniumSetting(url)
+    seleniumCrawling(driver)
