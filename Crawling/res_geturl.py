@@ -66,7 +66,7 @@ def saveUrl(type,body,url):
             print("json:"," ")
             getExtraurl(body,url)
 
-    elif type =="javascript":
+    if type =="javascript":
             res_jsonlist.add(url)
             print("javascript:"," ")
             getExtraurl(body,url)
