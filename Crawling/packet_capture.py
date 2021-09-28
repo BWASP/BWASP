@@ -3,32 +3,29 @@ from seleniumwire.utils import decode
 from urllib.parse import urlparse
 import json
 
-def packetCapture(url):
+def webdriverSetting():
     # [*] If you want to get decoded response body, you have to add below option.
     options = {
-        'disable_encoding': True
+        'disable_encoding': True,
+        "detach" : True
     }
+
     driver = webdriver.Chrome("./chromedriver.exe", seleniumwire_options = options)
-    driver.get(url)
-    
+    return driver
+
+def packetCapture(driver):
     network_packet = []
     for i, data in enumerate(driver.requests):
         if data.response:
             network_packet.append({"request" : {}, "response" : {}})
             network_packet[i]["request"] = getRequestPacket(data)
-            network_packet[i]["response"] = getResponsePacket(data.response)
+            # network_packet[i]["response"] = getResponsePacket(data.response)
         else:
             print("[!] Something Wrong.")
 
-    writeFile(network_packet)
     return network_packet
 
 def getRequestPacket(data):
-    """
-     TODO
-     -> HTTP protocol
-    """
-
     parsed_url = urlparse(data.url)
 
     req_uri = parsed_url.path
@@ -40,38 +37,31 @@ def getRequestPacket(data):
     req_headers = ""
     if data.headers["Host"] is None:
         req_headers = "Host: {}\n{}".format(parsed_url.netloc, str(data.headers))
-        # req_headers = "{} {}\r\n{}".format(data.method, req_uri, req_headers)
     else:
         req_headers = str(data.headers)
 
-    return_data = {
-        "headers" : {}, 
+    return_data = { 
         "method" : data.method, 
         "url" : req_uri, 
+        "headers" : {},
         "body" : ""
     }
 
     for x in req_headers.splitlines():
-        data = x.split(": ")
-        try: return_data["headers"][data[0]] = data[1]
+        header = x.split(": ")
+        try: return_data["headers"][header[0]] = header[1]
         except: pass
     
-    # try:
-    #     body = decode(data.body, data.headers.get('Content-Encoding', 'identity'))
-    #     return_data["body"] = body.decode('utf-8')
-    #     print("sucdess")
-    # except Exception as e:
-    #     # [*] Do not save image data...etc..
-    #     print("Exception: " + str(e))
+    try:
+        body = decode(data.body, data.headers.get('Content-Encoding', 'identity'))
+        return_data["body"] = body.decode('utf-8')
+    except Exception as e:
+        # [*] Do not save image data...etc..
+        print("Exception: " + str(e))
 
     return return_data
 
 def getResponsePacket(data):
-    """
-     TODO
-     -> HTTP protocol
-    """
-
     return_data = {
         "headers" : {}, 
         "body" : "",
@@ -95,11 +85,17 @@ def getResponsePacket(data):
 def writeFile(data):
     f = open("test.json", "w")
     json.dump(data, f, indent=4)
-    
     f.close()
 
 if __name__ == "__main__":
     # [!] You need to install the seleniumwire's root certificate. Visit below link.
     #     SSL Error: https://github.com/wkeeling/selenium-wire#certificates
-    url = "https://lactea.kr"
-    packetCapture(url)
+
+    driver = webdriverSetting()
+    url = "https://youtube.com"
+    driver.scopes = [
+        '.*youtube.*'
+    ]
+
+    driver.get(url)
+    writeFile(packetCapture(driver))
