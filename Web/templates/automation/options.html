@@ -366,7 +366,7 @@
             <!-- Begin Page Content -->
             <div class="container-fluid">
                 <form class="row bg-white border rounded shadow p-4">
-                    <h3 class="col-md-12 mb-3 text-dark font-weight-bold">웹 프로그램 정보</h3>
+                    <h3 class="col-md-12 mb-3 text-muted"><span class="font-weight-bold text-dark">웹 프로그램 정보</span> (선택사항)</h3>
                     <div class="col-md-4">
                         <div class="card mb-4">
                             <a href="#WebServerSelection" class="d-block card-header py-3" data-toggle="collapse"
@@ -380,7 +380,7 @@
                                             <input type="checkbox" class="custom-control-input"
                                                    id="Info-WebServer-Apache">
                                             <label class="custom-control-label pt-1"
-                                                   for="Info-WebServer-Apache">Apache</label>
+                                                   for="Info-WebServer-Apache">Apache ( v. <input class="border border-white w-50" type="text" min="0" id="Info-WebServer-Apache-Version" placeholder="버전(예: 1.0)"> )</label>
                                         </div>
                                     </div>
                                     <div class="form-group mb-0">
@@ -388,7 +388,7 @@
                                             <input type="checkbox" class="custom-control-input"
                                                    id="Info-WebServer-Nginx">
                                             <label class="custom-control-label pt-1"
-                                                   for="Info-WebServer-Nginx">Nginx</label>
+                                                   for="Info-WebServer-Nginx">Nginx ( v. <input class="border border-white w-50" type="text" min="0" id="Info-WebServer-Nginx-Version" placeholder="버전(예: 1.0)"> )</label>
                                         </div>
                                     </div>
                                 </div>
@@ -408,14 +408,14 @@
                                             <input type="checkbox" class="custom-control-input"
                                                    id="Info-Frameworks-React">
                                             <label class="custom-control-label pt-1"
-                                                   for="Info-Frameworks-React">React</label>
+                                                   for="Info-Frameworks-React">React ( v. <input class="border border-white w-50" type="text" min="0" id="Info-Framework-React-Version" placeholder="버전(예: 1.0)"> )</label>
                                         </div>
                                     </div>
                                     <div class="form-group mb-0">
                                         <div class="custom-control custom-checkbox small">
                                             <input type="checkbox" class="custom-control-input"
                                                    id="Info-Frameworks-Angular">
-                                            <label class="custom-control-label pt-1" for="Info-Frameworks-Angular">Angular.JS</label>
+                                            <label class="custom-control-label pt-1" for="Info-Frameworks-Angular">Angular.JS ( v. <input class="border border-white w-50" type="text" min="0" id="Info-Framework-AngularJS-Version" placeholder="버전(예: 1.0)"> )</label>
                                         </div>
                                     </div>
                                 </div>
@@ -434,7 +434,7 @@
                                         <div class="custom-control custom-checkbox small">
                                             <input type="checkbox" class="custom-control-input" id="Info-Backend-Flask">
                                             <label class="custom-control-label pt-1"
-                                                   for="Info-Backend-Flask">Flask</label>
+                                                   for="Info-Backend-Flask">Flask ( v. <input class="border border-white w-50" type="text" min="0" id="Info-Backend-Flask-Version" placeholder="버전(예: 1.0)"> )</label>
                                         </div>
                                     </div>
                                     <div class="form-group mb-0">
@@ -442,7 +442,7 @@
                                             <input type="checkbox" class="custom-control-input"
                                                    id="Info-Backend-Django">
                                             <label class="custom-control-label pt-1"
-                                                   for="Info-Backend-Django">Django</label>
+                                                   for="Info-Backend-Django">Django ( v. <input class="border border-white w-50" type="text" min="0" id="Info-Backend-Django-Version" placeholder="버전(예: 1.0)"> )</label>
                                         </div>
                                     </div>
                                 </div>
@@ -451,12 +451,12 @@
                     </div>
 
                     <h3 class="col-md-12 mt-5 mb-3 text-dark font-weight-bold">도구 설정</h3>
-                    <div class="col-md-2">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="ToolLevel">탐색 깊이 (레벨)</label>
                             <div class="d-flex align-items-center">
-                                <p class="mb-0 mr-2">1</p>
-                                <input type="range" class="form-control" min="1" max="5" value="1" id="ToolLevel">
+                                <input class="border border-white" type="number" min="1" max="5000" value="1" id="ToolRecursiveLevelInput">
+                                <input type="range" class="form-control" min="1" max="5000" value="1" id="ToolRecursiveLevelSlider">
                             </div>
                         </div>
                     </div>
@@ -564,5 +564,23 @@
 <!-- Page level custom scripts -->
 <script src="{{ url_for('static', filename='js/demo/chart-area-demo.js') }}"></script>
 <script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script>
+<script>
+    const MaximumRecursiveLevel = 5000;
+    document.getElementById("ToolRecursiveLevelSlider").addEventListener("change", function(){
+        if(this.value>MaximumRecursiveLevel){
+            alert(`탐색 깊이는 ${MaximumRecursiveLevel}회를 넘을 수 없습니다.`);
+            this.value = MaximumRecursiveLevel;
+        }
+        document.getElementById("ToolRecursiveLevelInput").value = this.value;
+    })
+
+    document.getElementById("ToolRecursiveLevelInput").addEventListener("change", function(){
+        if(this.value>MaximumRecursiveLevel){
+            alert(`탐색 깊이는 ${MaximumRecursiveLevel}회를 넘을 수 없습니다.`);
+            this.value = MaximumRecursiveLevel;
+        }
+        document.getElementById("ToolRecursiveLevelSlider").value = this.value;
+    })
+</script>
 </body>
 </html>
