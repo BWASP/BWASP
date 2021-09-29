@@ -14,13 +14,15 @@ def webdriverSetting():
 
 def packetCapture(driver):
     network_packet = []
-    for i, data in enumerate(driver.requests):
+    for data in driver.requests:
         if data.response:
-            network_packet.append({"request" : {}, "response" : {}})
-            network_packet[i]["request"] = getRequestPacket(data)
-            network_packet[i]["response"] = getResponsePacket(data.response)
+            network_packet.append({
+                "request" : getRequestPacket(data), 
+                "response" : getResponsePacket(data.response)
+            })
         else:
             print("[!] Something Wrong.")
+
     return network_packet
 
 def getRequestPacket(data):
