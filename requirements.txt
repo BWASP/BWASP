@@ -1,0 +1,5 @@
+beautifulsoup4==4.10.0
+requests==2.26.0
+selenium==3.141.0
+selenium-wire==4.5.2
+regex==2021.8.28
