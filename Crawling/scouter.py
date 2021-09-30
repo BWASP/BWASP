@@ -1,8 +1,8 @@
 from seleniumwire import webdriver
 
-import clickable_tags
-import packet_capture
-import res_geturl
+from feature import clickable_tags
+from feature import packet_capture
+from feature import res_geturl
 
 def start(url, depth):
     driver = initSelenium()
@@ -28,9 +28,9 @@ def initSelenium():
     options = {
         "disable_encoding" : True
     }
-    driver = webdriver.Chrome("./chromedriver.exe", seleniumwire_options = options)
+    driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options = options)
     return driver
 
 if __name__ == "__main__":
-    url = "https://naver.com"
-    start(url)
+    url = "https://youtube.com"
+    start(url, 10)
