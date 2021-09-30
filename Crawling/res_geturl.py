@@ -2,19 +2,19 @@ from seleniumwire import webdriver
 from urllib.parse import urlparse
 import re
 
-res_contlist=["javascript","json"]
-res_extlist=["js"]
+res_contlist=["javascript","json","xml"]
+res_extlist=["js","xml"]
 res_urllist=set()
 res_exturllist=set()
 res_jsonlist=set()
 res_jslist=set()
+res_xmllist=set()
 
 def getExtraurl(body,url):
     #url regular expression
     #참고 정규식 pattern = re.compile('(http|ftp|https)(://)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
     #pattern = re.compile('(http|https)):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     pattern = re.compile('(?:http|ftp|https)(?://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
-    
 
     for line in pattern.findall(body):
         print("extra link ","".join(line))
@@ -29,13 +29,16 @@ def saveUrl(type,body,url):
             type="json"
         elif extension == "js":
             type="javasript"
-
+        elif extension == "xml":
+            type="xml"
     if type == "json":
             res_jsonlist.add(url)
             getExtraurl(body,url)
-
     if type =="javascript":
             res_jslist.add(url)
+            getExtraurl(body,url)
+    if type =="xml":
+            res_xmllist.add(url)
             getExtraurl(body,url)
 
 def eachgetUrl(response,response_url):   
@@ -47,7 +50,6 @@ def eachgetUrl(response,response_url):
                 break
     elif  "." in response_url:
         saveUrl("ext",response["body"],response_url)
-
 
 #Call this to get extra link
 def getUrl(req_res_packet):
@@ -61,7 +63,6 @@ def printUrl():
     print("res url link result : ")
     for result in sorted(list(res_urllist)):
         print(result)
-
     print("extra url link result :")
     # 받아오는 게 아직 불완전함 
     for result in sorted(list(res_exturllist)):
