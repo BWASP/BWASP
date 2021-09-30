@@ -15,20 +15,11 @@ def getExtraurl(body,url):
     #pattern = re.compile('(http|https)):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     pattern = re.compile('(?:http|ftp|https)(?://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
     
-    try:
-        #regex group 에 따라 분리해서 출력 가능
-        #print("why ",line[0]+"://"+line[1]+line[2])
-        for line in pattern.findall(body.decode("utf8")):
-            print("extra link ","".join(line))
-            res_exturllist.add("".join(line))
-
-    #utf-8이 오류날 경우        
-    except:
-        #regex group 에 따라 분리해서 출력 가능
-        #print("why ",line[0]+"://"+line[1]+line[2])
-         for line in pattern.findall(body.decode("ISO-8859-1")):
-            print("extra link ","".join(line))
-            res_exturllist.add("".join(line))
+    #regex group 에 따라 분리해서 출력 가능
+    #print("why ",line[0]+"://"+line[1]+line[2])
+    for line in pattern.findall(body):
+        print("extra link ","".join(line))
+        res_exturllist.add("".join(line))
             
 #url 구분 저장 
 def saveUrl(type,body,url):
