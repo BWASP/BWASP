@@ -3,13 +3,15 @@ from seleniumwire.utils import decode
 from urllib.parse import urlparse
 import json
 
+content_image_type = ["image/bmp", "image/cis-cod", "image/gif", "image/ief", "image/jpeg", "image/pipeg", "image/svg+xml", "image/tiff", "image/tiff", "image/png"]
+
 def webdriverSetting():
     # [*] If you want to get decoded response body, you have to add below option.
     options = {
         'disable_encoding': True,
         "detach" : True
     }
-    driver = webdriver.Chrome("./chromedriver.exe", seleniumwire_options = options)
+    driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options = options)
     return driver
 
 def packetCapture(driver):
@@ -21,7 +23,7 @@ def packetCapture(driver):
                 "response" : getResponsePacket(data.response)
             })
         else:
-            print("[!] Something Wrong.")
+            print("[!] Response is empty.")
 
     return network_packet
 
@@ -69,18 +71,27 @@ def getResponsePacket(data):
         "status_code" : data.status_code
     }
     
+    for x in str(data.headers).splitlines():
+        header = x.split(": ")
+        try: return_data["headers"][header[0].lower()] = header[1]
+        except: pass
+
     try:
         body = decode(data.body, data.headers.get('Content-Encoding', 'identity'))
         return_data["body"] = body.decode('utf-8')
 
+    except UnicodeDecodeError as e:        
+        if "content-type" in return_data["headers"].keys():
+            if return_data["headers"]["content-type"] in content_image_type:
+                print("images")
+                return return_data
+
+        body = decode(data.body, data.headers.get('Content-Encoding', 'identity'))
+        return_data["body"] = body.decode("ISO-8859-1")
+
     except UnicodeDecodeError as e:
         # [*] Do not save image data...etc..
         print("UnicodeDecodeError: " + str(e))
-    
-    for x in str(data.headers).splitlines():
-        data = x.split(": ")
-        try: return_data["headers"][data[0].lower()] = data[1]
-        except: pass
     
     return return_data
 
@@ -94,7 +105,7 @@ if __name__ == "__main__":
     #     SSL Error: https://github.com/wkeeling/selenium-wire#certificates
 
     driver = webdriverSetting()
-    url = "https://youtube.com"
+    url = "https://kitribob.kr"
     # driver.scopes = [
     #     '.*youtube.*'
     # ]
