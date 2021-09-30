@@ -15,8 +15,7 @@ def getExtraurl(body,url):
     #pattern = re.compile('(http|https)):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     pattern = re.compile('(?:http|ftp|https)(?://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
     
-    #regex group 에 따라 분리해서 출력 가능
-    #print("why ",line[0]+"://"+line[1]+line[2])
+
     for line in pattern.findall(body):
         print("extra link ","".join(line))
         res_exturllist.add("".join(line))
@@ -39,16 +38,16 @@ def saveUrl(type,body,url):
             res_jslist.add(url)
             getExtraurl(body,url)
 
-def eachgetUrl(response,response_url):
-    content = response["headers"]['Content-Type']
-    # 확장자 이상하지만 js , json일 경우 
-    if content:
+def eachgetUrl(response,response_url):   
+    if "content-type" in response["headers"]:
+        content = response["headers"]["content-type"]
         for  contlist in res_contlist:
             if contlist in content:
                 saveUrl(contlist,response["body"],response_url)
                 break
     elif  "." in response_url:
         saveUrl("ext",response["body"],response_url)
+
 
 #Call this to get extra link
 def getUrl(req_res_packet):
