@@ -2,6 +2,7 @@
 
 import requests
 from bs4 import BeautifulSoup
+import selenium
 from selenium.common.exceptions import WebDriverException
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -52,14 +53,25 @@ def seleniumCrawling(driver):
     for index in range(len(elems)):
         for elem in elems[index]:
             # Selenium 사용 시, element 클릭 가능 여부 판단 방법 ( HTML 내부에서 클릭 이벤트가 구현되어있는 경우, 태그 속성 중 href가 존재 )
-            if elem.get_attribute('href') is not None:
-                print(elem.get_attribute('outerHTML'))
-                req_uri = parsingURL(elem.get_attribute('href'))
-                
-                cur_page_links.append(req_uri)
-                # input()
-            else:
-                print('false')
+            try:
+                if elem.get_attribute('href') is not None:
+                    print(elem.get_attribute('outerHTML'))
+                    req_uri = parsingURL(elem.get_attribute('href'))
+                    
+                    cur_page_links.append(req_uri)
+                    # input()
+                else:
+                    print('false')
+            except selenium.common.exceptions.StaleElementReferenceException as e:
+                if elem.get_attribute('href') is not None:
+                    print(elem.get_attribute('outerHTML'))
+                    req_uri = parsingURL(elem.get_attribute('href'))
+                    
+                    cur_page_links.append(req_uri)
+                    # input()
+                else:
+                    print('false')
+
         
         input(str(index+1) + ") Finished...")
 
