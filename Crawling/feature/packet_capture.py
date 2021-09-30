@@ -49,15 +49,16 @@ def getRequestPacket(data):
 
     for x in req_headers.splitlines():
         header = x.split(": ")
-        try: return_data["headers"][header[0]] = header[1]
+        try: return_data["headers"][header[0].lower()] = header[1]
         except: pass
     
     try:
         body = decode(data.body, data.headers.get('Content-Encoding', 'identity'))
         return_data["body"] = body.decode('utf-8')
-    except Exception as e:
+
+    except UnicodeDecodeError as e:
         # [*] Do not save image data...etc..
-        print("Exception: " + str(e))
+        print("UnicodeDecodeError: " + str(e))
 
     return return_data
 
@@ -67,18 +68,19 @@ def getResponsePacket(data):
         "body" : "",
         "status_code" : data.status_code
     }
-
+    
     try:
         body = decode(data.body, data.headers.get('Content-Encoding', 'identity'))
         return_data["body"] = body.decode('utf-8')
 
-        for x in str(data.headers).splitlines():
-            data = x.split(": ")
-            try: return_data["headers"][data[0]] = data[1]
-            except: pass
-    except Exception as e:
+    except UnicodeDecodeError as e:
         # [*] Do not save image data...etc..
-        print("Exception: " + str(e))
+        print("UnicodeDecodeError: " + str(e))
+    
+    for x in str(data.headers).splitlines():
+        data = x.split(": ")
+        try: return_data["headers"][data[0].lower()] = data[1]
+        except: pass
     
     return return_data
 
@@ -92,7 +94,7 @@ if __name__ == "__main__":
     #     SSL Error: https://github.com/wkeeling/selenium-wire#certificates
 
     driver = webdriverSetting()
-    url = "https://naver.com"
+    url = "https://youtube.com"
     # driver.scopes = [
     #     '.*youtube.*'
     # ]
