@@ -431,21 +431,18 @@
 <script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script>
 <script>
     const MaximumRecursiveLevel = 5000;
-    document.getElementById("ToolRecursiveLevelSlider").addEventListener("change", function(){
-        if(this.value>MaximumRecursiveLevel){
-            alert(`탐색 깊이는 ${MaximumRecursiveLevel}회를 넘을 수 없습니다.`);
-            this.value = MaximumRecursiveLevel;
-        }
-        document.getElementById("ToolRecursiveLevelInput").value = this.value;
-    })
+    const RecursiveLevelHandler = ["Input", "Slider"];
 
-    document.getElementById("ToolRecursiveLevelInput").addEventListener("change", function(){
-        if(this.value>MaximumRecursiveLevel){
-            alert(`탐색 깊이는 ${MaximumRecursiveLevel}회를 넘을 수 없습니다.`);
-            this.value = MaximumRecursiveLevel;
-        }
-        document.getElementById("ToolRecursiveLevelSlider").value = this.value;
-    })
+    // Add event handler to recursive level handler
+    for(let i=0; i<RecursiveLevelHandler.length; i++){
+        document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[i]}`).addEventListener("change", function(){
+            if(this.value>MaximumRecursiveLevel){
+                alert(`탐색 깊이는 ${MaximumRecursiveLevel}회를 넘을 수 없습니다.`);
+                this.value = MaximumRecursiveLevel;
+            }
+            document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[+ !i]}`).value = this.value;
+        });
+    }
 
     document.getElementById("ClearAllData").addEventListener("click", function(){
         let data = document.getElementsByTagName("input");
