@@ -14,21 +14,28 @@ def getExtraurl(body,url):
     #url regular expression
     #참고 정규식 pattern = re.compile('(http|ftp|https)(://)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?z')
     #pattern = re.compile('(http|https)):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
-    pattern = re.compile('(?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?')
+    pattern = re.compile('((?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)')
 
+    prefix = urlparse(url).scheme+"://"
     for line in pattern.findall(body):
-        res_exturllist.add("".join(line))
+        if not "http" in line[0]:
+            res_exturllist.add(prefix+line[0])
+        else:
+            res_exturllist.add(line[0])
             
 #url 구분 저장 
 def saveUrl(type,body,url):
     # 확장자 일 경우 확장자에 따라 타입 정하기
     if type == "ext":
-        extension = url.split(".")[-1]
-        if extension == "json":
+        extension=list()
+        extension.append(urlparse(url).scheme.split(".")[-1])
+        #index.php?page=a.xml 과 같은 경우 고려
+        extension.append(urlparse(url).query.split("."[-1]))
+        if "json" in extension:
             type="json"
-        elif extension == "js":
+        elif "js" in extension:
             type="javasript"
-        elif extension == "xml":
+        elif "xml" in extension:
             type="xml"
     if type == "json":
             res_jsonlist.add(url)
@@ -55,7 +62,8 @@ def getUrl(req_res_packet):
     for request in req_res_packet:
         # 탐색된 모든 url 저장
         #res_urllist.add(request[i]["request"]["url"])
-        eachgetUrl(request["response"],request["request"]["url"])
+        eachgetUrl(request["response"],request["request"]["full_url"])
+        print(sorted(list(res_exturllist)))
     return sorted(list(res_exturllist))
 
 def printUrl():
