@@ -46,7 +46,8 @@ def getRequestPacket(data):
         "method" : data.method, 
         "url" : req_uri, 
         "headers" : {},
-        "body" : ""
+        "body" : "",
+        "full_url" : data.url 
     }
 
     for x in req_headers.splitlines():
