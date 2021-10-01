@@ -17,7 +17,6 @@ def getExtraurl(body,url):
     pattern = re.compile('(?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?')
 
     for line in pattern.findall(body):
-        print("extra link ","".join(line))
         res_exturllist.add("".join(line))
             
 #url 구분 저장 
