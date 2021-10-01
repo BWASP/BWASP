@@ -22,14 +22,14 @@ app = Flask(__name__)
 # db.app = app
 # db.create_all()
 
-#db test...
+# db test...
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///databases/BWASP.db'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 query = db.select()
-attack_Data=""
+attack_Data = ""
 
 
 @app.route('/start')
