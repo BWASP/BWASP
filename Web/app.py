@@ -22,6 +22,8 @@ app = Flask(__name__)
 # db.app = app
 # db.create_all()
 
+#db test...
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///databases/BWASP.db'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
