@@ -7,7 +7,7 @@ class Config(object):
     SECRET_KEY = os.urandom(16)
     DEBUG = True
     SESSION_COOKIE_NAME = 'BWASP'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///databases/TEST.sqlite'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///databases/BWASP.db'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

@@ -17,7 +17,6 @@ def create_app(config=None):
 
     db.init_app(app)
     db.app = app
-    db.create_all()
 
     # route initialize
     from routes import result_route, automation_route, common_route
