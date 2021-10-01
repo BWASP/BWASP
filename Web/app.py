@@ -10,17 +10,24 @@ from flask import (
 
 app = Flask(__name__)
 
-basdir = os.path.abspath(os.path.dirname(__file__))
-dbfile = os.path.join(basdir, 'db.sqlite')
+# basdir = os.path.abspath(os.path.dirname(__file__))
+# dbfile = os.path.join(basdir, 'db.sqlite')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + dbfile
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + dbfile
+# app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config['SECRET_KEY'] = os.urandom(16)
+
+# db.init_app(app)
+# db.app = app
+# db.create_all()
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///databases/BWASP.db'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.urandom(16)
-
 db.init_app(app)
-db.app = app
-db.create_all()
+query = db.select()
+attack_Data=""
 
 
 @app.route('/start')
@@ -38,9 +45,9 @@ def manual_options():
     return render_template('./automation/options.html')
 
 
-@app.route('/AttackVector')
+@app.route('/common/AttackVector')
 def attack_Vector():
-    return render_template('./AttackVector.html')
+    return render_template('./common/AttackVector.html', data=attack_Data)
 
 
 @app.route('/')
