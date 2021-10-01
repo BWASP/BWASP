@@ -39,7 +39,7 @@ def saveUrl(main_url,type,body,url):
     # 확장자 일 경우 확장자에 따라 타입 정하기
     if type == "ext":
         extension=list()
-        extension.append(urlparse(url).params.split(".")[-1])
+        extension.append(urlparse(url).path.split(".")[-1])
         #index.php?page=a.xml 과 같은 경우 고려
         extension.append(urlparse(url).query.split("."[-1]))
         if "json" in extension:
