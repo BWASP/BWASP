@@ -240,96 +240,13 @@
             <div class="container-fluid">
                 <div class="bg-white border rounded shadow p-4">
                     <h3 class="mb-3 text-dark"><span class="font-weight-bold">웹 프로그램 정보</span> <span class="text-muted small">(선택사항)</span></h3>
-                    <div class="row" id="Section-WebAppInfo">
-                        <div class="col-md-4">
-                            <div class="card mb-4">
-                                <a href="#WebServerSelection" class="d-block card-header py-3" data-toggle="collapse"
-                                   role="button" aria-expanded="false" aria-controls="WebServerSelection">
-                                    <h6 class="m-0 font-weight-bold text-primary">웹 서버</h6>
-                                </a>
-                                <div class="collapse" id="WebServerSelection" style="">
-                                    <div class="card-body">
-                                        <div class="form-group mb-0">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input"
-                                                       id="Info-WebServer-Apache">
-                                                <label class="custom-control-label pt-1"
-                                                       for="Info-WebServer-Apache">Apache ( v. <input class="border border-white w-50" type="text" min="0" id="Info-WebServer-Apache-Version" placeholder="버전(예: 1.0)"> )</label>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-0">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input"
-                                                       id="Info-WebServer-Nginx">
-                                                <label class="custom-control-label pt-1"
-                                                       for="Info-WebServer-Nginx">Nginx ( v. <input class="border border-white w-50" type="text" min="0" id="Info-WebServer-Nginx-Version" placeholder="버전(예: 1.0)"> )</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card mb-4">
-                                <a href="#WebFrameworkSelection" class="d-block card-header py-3" data-toggle="collapse"
-                                   role="button" aria-expanded="false" aria-controls="WebFrameworkSelection">
-                                    <h6 class="m-0 font-weight-bold text-primary">웹 프레임워크 / 라이브러리</h6>
-                                </a>
-                                <div class="collapse" id="WebFrameworkSelection" style="">
-                                    <div class="card-body">
-                                        <div class="form-group mb-0">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input"
-                                                       id="Info-Frameworks-React">
-                                                <label class="custom-control-label pt-1"
-                                                       for="Info-Frameworks-React">React ( v. <input class="border border-white w-50" type="text" min="0" id="Info-Framework-React-Version" placeholder="버전(예: 1.0)"> )</label>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-0">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input"
-                                                       id="Info-Frameworks-Angular">
-                                                <label class="custom-control-label pt-1" for="Info-Frameworks-Angular">Angular.JS ( v. <input class="border border-white w-50" type="text" min="0" id="Info-Framework-AngularJS-Version" placeholder="버전(예: 1.0)"> )</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card mb-4">
-                                <a href="#WebBackendSelection" class="d-block card-header py-3" data-toggle="collapse"
-                                   role="button" aria-expanded="false" aria-controls="WebBackendSelection">
-                                    <h6 class="m-0 font-weight-bold text-primary">백엔드 시스템</h6>
-                                </a>
-                                <div class="collapse" id="WebBackendSelection" style="">
-                                    <div class="card-body">
-                                        <div class="form-group mb-0">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="Info-Backend-Flask">
-                                                <label class="custom-control-label pt-1"
-                                                       for="Info-Backend-Flask">Flask ( v. <input class="border border-white w-50" type="text" min="0" id="Info-Backend-Flask-Version" placeholder="버전(예: 1.0)"> )</label>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-0">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input"
-                                                       id="Info-Backend-Django">
-                                                <label class="custom-control-label pt-1"
-                                                       for="Info-Backend-Django">Django ( v. <input class="border border-white w-50" type="text" min="0" id="Info-Backend-Django-Version" placeholder="버전(예: 1.0)"> )</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="row" id="Section-WebAppInfo"></div>
 
                     <h3 class="mt-4 mb-3 text-dark font-weight-bold">도구 설정</h3>
                     <div class="row" id="Section-ToolSetting">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="ToolLevel">탐색 깊이 (레벨)</label>
+                                <label for="ToolRecursiveLevelInput">탐색 깊이 (레벨)</label>
                                 <div class="d-flex align-items-center">
                                     <input class="border border-white" type="number" min="1" max="5000" value="1" id="ToolRecursiveLevelInput">
                                     <input type="range" class="form-control" min="1" max="5000" value="1" id="ToolRecursiveLevelSlider">
