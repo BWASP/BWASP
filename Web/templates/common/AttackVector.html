@@ -452,8 +452,8 @@
                                                     </a>
                                                     <div class="collapse" id="additionalFuncs">
                                                         <div class="card-body">
-                                                            /class.php <!--DB에 넣을 때 br 태그 필요할 것으로 보임-->
-                                                            /korea.php <!-- a-->
+                                                            /class.php
+                                                            /korea.php
                                                             /bwasp.php
                                                             /abc.bobmart.com
                                                             /admin.bobmart.com
@@ -646,6 +646,18 @@
                                             <td>https://itworld11.com/subdomains.pdf</td>
                                             <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
                                             <td><a href="#" class="btn btn-warning btn-icon-split">
+                                                <span class="text">LOW</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">{{ data1 }}</span></td>
+                                            <td><span class="font-weight-bold">asdfasdf</span><br>on 21.05.2019</td>
+                                            <td>NONE</td>
+                                            <td>https://itworld11.com/subdomains</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td>{% for row in data4 %}
+                                                <p>{{ row[0] }}</p>
+                                              {% endfor %}
                                                 <span class="text">LOW</span>
                                             </a></td>
                                         </tr>
