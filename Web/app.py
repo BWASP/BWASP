@@ -8,6 +8,34 @@ from flask import (
     url_for
 )
 
+#임시 SQLite3로 DB 전달 테스트 중
+import sqlite3
+url = ""
+uri = ""
+attackVector_data = []
+conn = sqlite3.connect("./databases/BWASP.db", isolation_level=None)
+c = conn.cursor()
+c.execute("SELECT URL FROM domains")
+for row in c.fetchall():
+    url = row
+    
+c.execute("SELECT URI FROM domains")
+for row in c.fetchall():
+    uri = row
+
+c.execute("SELECT * FROM Attack_Vector")
+# for row in c.fetchall():
+    # print(row[1])
+    # if(row[2] == 0):
+    #     attackVector_data[0].append('<a href="#" class="btn btn-warning btn-icon-split">')
+    # elif(row[2] == 1):
+    #     attackVector_data[1].append('<a href="#" class="btn btn-success btn-icon-split">')
+    # elif(row[2] == 2):
+    #     attackVector_data[2].append('<a href="#" class="btn btn-danger btn-icon-split">')
+    
+    #attackVector_data[3] = 
+
+
 app = Flask(__name__)
 
 # basdir = os.path.abspath(os.path.dirname(__file__))
@@ -22,7 +50,6 @@ app = Flask(__name__)
 # db.app = app
 # db.create_all()
 
-#db test...
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///databases/BWASP.db'
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
@@ -49,7 +76,7 @@ def manual_options():
 
 @app.route('/common/AttackVector')
 def attack_Vector():
-    return render_template('./common/AttackVector.html', data=attack_Data)
+    return render_template('./common/AttackVector.html', data4=c.fetchall())
 
 
 @app.route('/')
