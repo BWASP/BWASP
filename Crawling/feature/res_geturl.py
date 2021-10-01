@@ -63,7 +63,6 @@ def getUrl(req_res_packet):
         # 탐색된 모든 url 저장
         #res_urllist.add(request[i]["request"]["url"])
         eachgetUrl(request["response"],request["request"]["full_url"])
-        print(sorted(list(res_exturllist)))
     return sorted(list(res_exturllist))
 
 def printUrl():
