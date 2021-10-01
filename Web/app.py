@@ -42,7 +42,7 @@ def CommonExport():
 
 @app.route('/automation/options')
 def manual_options():
-    return render_template('./automation/options.html')
+    return render_template('./automation/options.html', Title="자동 분석 옵션 설정 - BWASP")
 
 
 @app.route('/common/AttackVector')
