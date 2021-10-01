@@ -48,34 +48,29 @@ def seleniumCrawling(driver):
     # links = [elem.get_attribute('href') for elem in elems]
     # print(links)
 
-    input("Continuing...")
+    # input("Continuing...")
 
     for index in range(len(elems)):
         for elem in elems[index]:
             # Selenium 사용 시, element 클릭 가능 여부 판단 방법 ( HTML 내부에서 클릭 이벤트가 구현되어있는 경우, 태그 속성 중 href가 존재 )
             try:
                 if elem.get_attribute('href') is not None:
-                    print(elem.get_attribute('outerHTML'))
+                    # print(elem.get_attribute('outerHTML'))
                     req_uri = parsingURL(elem.get_attribute('href'))
                     
                     cur_page_links.append(req_uri)
-                    # input()
-                else:
-                    print('false')
+
             except selenium.common.exceptions.StaleElementReferenceException as e:
                 if elem.get_attribute('href') is not None:
-                    print(elem.get_attribute('outerHTML'))
+                    # print(elem.get_attribute('outerHTML'))
                     req_uri = parsingURL(elem.get_attribute('href'))
                     
                     cur_page_links.append(req_uri)
-                    # input()
-                else:
-                    print('false')
 
         
-        input(str(index+1) + ") Finished...")
+        # input(str(index+1) + ") Finished...")
 
-    print(cur_page_links)
+    # print(cur_page_links)
     return cur_page_links
     
 
@@ -98,19 +93,16 @@ def bs4Crawling(url):
 
     a_href_list = list()
 
-    input()
-
     for index in range(len(tags)):
         for item in tags[index]:
             try:
                 if item['href']:
                     a_href_list.append(item['href'])
-                else:
-                    print("false")
             except KeyError as e:
-                print("false")
+                print(e)
 
-    print(a_href_list)
+    # print(a_href_list)
+    return a_href_list
 
 
 
