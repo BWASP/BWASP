@@ -2,7 +2,8 @@ from flask import (
     Blueprint, render_template, g
 )
 
-from Web.app import db
+from app import db
+# from Web.app import db
 query = db.select()
 attack_Data = ""
 
