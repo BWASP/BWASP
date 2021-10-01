@@ -58,7 +58,8 @@ def eachgetUrl(response,response_url):
         saveUrl("ext",response["body"],response_url)
 
 #Call this to get extra link
-def getUrl(req_res_packet):
+def getUrl(main_link,req_res_packet):
+    print("현재 링크 :",main_link)
     for request in req_res_packet:
         # 탐색된 모든 url 저장
         #res_urllist.add(request[i]["request"]["url"])
@@ -73,6 +74,7 @@ def printUrl():
     # 받아오는 게 아직 불완전함 
     for result in sorted(list(res_exturllist)):
         print(result)
+        
 
 if __name__ == '__main__':
     chrome_options = webdriver.ChromeOptions()
