@@ -83,7 +83,6 @@ def getResponsePacket(data):
     except UnicodeDecodeError as e:        
         if "content-type" in return_data["headers"].keys():
             if return_data["headers"]["content-type"] in content_image_type:
-                print("images")
                 return return_data
 
         body = decode(data.body, data.headers.get('Content-Encoding', 'identity'))
