@@ -71,7 +71,6 @@ def eachgetUrl(main_url,response,response_url):
 
 #Call this to get extra link
 def getUrl(main_url,req_res_packet):
-    print("현재 링크 :",main_url)
     for request in req_res_packet:
         # 탐색된 모든 url 저장
         #res_urllist.add(request[i]["request"]["url"])
