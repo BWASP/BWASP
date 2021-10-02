@@ -19,6 +19,8 @@ def visit(driver, url, previous_url, depth):
     req_res_packets = packet_capture.packetCapture(driver)
     cur_page_links += res_geturl.getUrl(url, req_res_packets)
     
+    # packet_capture.writeFile(req_res_packets)
+
     for visit_url in cur_page_links:
         if visit_url in previous_url:
             continue
@@ -46,5 +48,5 @@ def initSelenium():
     return driver
 
 if __name__ == "__main__":
-    url = "https://www.kitribob.wiki/"
+    url = "https://naver.com/"
     start(url, 2)
