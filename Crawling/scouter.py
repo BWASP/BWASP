@@ -16,7 +16,7 @@ def visit(driver, url, previous_url, depth):
 
     cur_page_links = clickable_tags.seleniumCrawling(driver)
     req_res_packets = packet_capture.packetCapture(driver)
-    cur_page_links += res_geturl.getUrl(req_res_packets)
+    cur_page_links += res_geturl.getUrl(url, req_res_packets)
 
     """
     TODO
