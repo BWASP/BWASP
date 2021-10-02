@@ -1,26 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 
-<head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>{{ Title }}</title>
-
-    <!-- Custom fonts for this template-->
-    <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet"
-          type="text/css">
-    <link
-            href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-            rel="stylesheet">
-
-    <!-- Custom styles for this template-->
-    <link href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" rel="stylesheet">
-</head>
+{% include 'components/head.html' %}
 
 <body id="page-top">
 
@@ -238,12 +219,23 @@
 
             <!-- Begin Page Content -->
             <div class="container-fluid">
-                <div class="bg-white border rounded shadow p-4">
-                    <h3 class="mb-3 text-dark"><span class="font-weight-bold">웹 프로그램 정보</span> <span class="text-muted small">(선택사항)</span></h3>
-                    <div class="row" id="Section-WebAppInfo"></div>
+                <div class="bg-white border rounded shadow p-4" id="job-order">
+                    <h3 class="mb-3 text-dark font-weight-bold">분석 대상</h3>
+                    <div class="row" id="section-targetURL">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="job-TargetURL">대상 URL</label>
+                                <input type="text" class="form-control p-4 rounded-pill" id="job-TargetURL"
+                                       placeholder="분석 대상 URL">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="mt-4 mb-3 text-dark font-weight-bold"><span class="font-weight-bold">웹 프로그램 정보</span> <span class="text-muted small">(선택사항)</span></h3>
+                    <div class="row" id="section-webAppInfo"></div>
 
                     <h3 class="mt-4 mb-3 text-dark font-weight-bold">도구 설정</h3>
-                    <div class="row" id="Section-ToolSetting">
+                    <div class="row" id="section-ToolSetting">
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="ToolRecursiveLevelInput">탐색 깊이 (레벨)</label>
