@@ -1,4 +1,5 @@
 from seleniumwire import webdriver
+from urllib.parse import urlparse
 
 from feature import clickable_tags
 from feature import packet_capture
@@ -17,17 +18,25 @@ def visit(driver, url, previous_url, depth):
     cur_page_links = clickable_tags.seleniumCrawling(driver)
     req_res_packets = packet_capture.packetCapture(driver)
     cur_page_links += res_geturl.getUrl(url, req_res_packets)
-
-    """
-    TODO
-        -> valid url 인지 확인 필요
-        -> 방문 전, 같은 도메인 인지 확인 필요
-    """
-    for url in cur_page_links:
-        if url in previous_url:
+    
+    for visit_url in cur_page_links:
+        if visit_url in previous_url:
             continue
+        if not isSameDomain(url, visit_url):
+            continue
+        visit(driver, visit_url, previous_url.union(cur_page_links), depth-1)
+
+def isSameDomain(target_url, visit_url):
+    try:
+        target_domain = urlparse(target_url).netloc
+        visit_domain = urlparse(visit_url).netloc
+
+        if target_domain == visit_domain:
+            return True
         else:
-            visit(driver, url, previous_url.union(cur_page_links), depth-1)
+            return False
+    except:
+        return False
 
 def initSelenium():
     options = {
@@ -38,4 +47,4 @@ def initSelenium():
 
 if __name__ == "__main__":
     url = "https://youtube.com"
-    start(url, 10)
+    start(url, 2)
