@@ -11,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 from urllib.parse import urlparse
 
+'''
 def parsingURL(url):
     parsed_url = urlparse(url)
     req_uri = parsed_url.netloc + parsed_url.path
@@ -20,6 +21,7 @@ def parsingURL(url):
         req_uri += "#" + parsed_url.fragment
     
     return req_uri
+'''
 
 def seleniumSetting(url):
     driver = webdriver.Chrome('./chromedriver')
@@ -56,14 +58,15 @@ def seleniumCrawling(driver):
             try:
                 if elem.get_attribute('href') is not None:
                     # print(elem.get_attribute('outerHTML'))
-                    req_uri = parsingURL(elem.get_attribute('href'))
+                    req_uri = elem.get_attribute('href')
                     
                     cur_page_links.append(req_uri)
 
             except selenium.common.exceptions.StaleElementReferenceException as e:
+                time.sleep(2)
                 if elem.get_attribute('href') is not None:
                     # print(elem.get_attribute('outerHTML'))
-                    req_uri = parsingURL(elem.get_attribute('href'))
+                    req_uri = elem.get_attribute('href')
                     
                     cur_page_links.append(req_uri)
 
