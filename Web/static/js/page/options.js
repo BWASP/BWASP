@@ -39,7 +39,7 @@ document.getElementById("ClearAllData").addEventListener("click", function(){
 
 // Frontend constructor
 Object.keys(SupportedList).forEach((Type)=>{
-    let toggleTabName = `Web${Type}Selection`;
+    let toggleTabName = `web${Type}Selection`;
     console.log(SupportedList[Type][0]);
     let Skeleton = {
         parent: document.createElement("div"),
@@ -93,16 +93,16 @@ Object.keys(SupportedList).forEach((Type)=>{
 
         localSkeleton.child.child.checkbox.type = "checkbox";
         localSkeleton.child.child.checkbox.classList.add("custom-control-input");
-        localSkeleton.child.child.checkbox.id = `Info-Web-${Type}-${CodeName}`;
+        localSkeleton.child.child.checkbox.id = `info-web-${Type}-${CodeName}`;
 
         localSkeleton.child.child.codename.classList.add("custom-control-label", "pt-1");
-        localSkeleton.child.child.codename.htmlFor = `Info-Web-${Type}-${CodeName}`;
+        localSkeleton.child.child.codename.htmlFor = `info-web-${Type}-${CodeName}`;
         localSkeleton.child.child.codename.innerHTML = `${CodeName} v.`;
 
         localSkeleton.child.child.versionInput.placeholder = "버전 (선택)";
         localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50")
         localSkeleton.child.child.versionInput.type = "text";
-        localSkeleton.child.child.versionInput.id = `Info-Web-${Type}-Version-${CodeName}`;
+        localSkeleton.child.child.versionInput.id = `info-web-${Type}-Version-${CodeName}`;
 
         localSkeleton.child.child.codename.appendChild(localSkeleton.child.child.versionInput);
         localSkeleton.child.parent.append(localSkeleton.child.child.checkbox, localSkeleton.child.child.codename);
@@ -120,5 +120,5 @@ Object.keys(SupportedList).forEach((Type)=>{
     Skeleton.child.parent.append(Skeleton.child.child.toggleTab, Skeleton.child.child.content.parent);
     Skeleton.parent.appendChild(Skeleton.child.parent);
     console.log(Skeleton.parent);
-    document.getElementById("Section-WebAppInfo").appendChild(Skeleton.parent);
+    document.getElementById("section-webAppInfo").appendChild(Skeleton.parent);
 })
