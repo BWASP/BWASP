@@ -7,7 +7,7 @@ from feature import res_geturl
 
 def start(url, depth):
     driver = initSelenium()
-    visit(driver, url, set(url), depth)
+    visit(driver, url, set([url]), depth)
 
 def visit(driver, url, previous_url, depth):
     if depth == 0:
@@ -30,7 +30,7 @@ def isSameDomain(target_url, visit_url):
     try:
         target_domain = urlparse(target_url).netloc
         visit_domain = urlparse(visit_url).netloc
-
+        
         if target_domain == visit_domain:
             return True
         else:
@@ -46,5 +46,5 @@ def initSelenium():
     return driver
 
 if __name__ == "__main__":
-    url = "https://youtube.com"
+    url = "https://www.kitribob.wiki/"
     start(url, 2)
