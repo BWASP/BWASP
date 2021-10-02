@@ -52,7 +52,7 @@ def seleniumCrawling(driver):
 
                 # print(elem.get_attribute('outerHTML')) # 태그를 text 형식으로 출력 (Ex: <a href="mail.naver.com">메일</a>)
 
-    print(cur_page_links)
+    # print(cur_page_links)
     return cur_page_links
 
 
