@@ -19,10 +19,11 @@ def create_app(config=None):
     db.app = app
 
     # route initialize
-    from routes import result_route, automation_route, common_route
+    from routes import result_route, automation_route, common_route, api_route
     app.register_blueprint(result_route.bp)
     app.register_blueprint(automation_route.bp)
     app.register_blueprint(common_route.bp)
+    app.register_blueprint(api_route.bp)
 
     return app
 
