@@ -2,14 +2,11 @@
 
 import requests
 from bs4 import BeautifulSoup
-import selenium
 from selenium.common.exceptions import WebDriverException
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
-from urllib.parse import urlparse
 
 '''
 def parsingURL(url):
@@ -24,7 +21,7 @@ def parsingURL(url):
 '''
 
 def seleniumSetting(url):
-    driver = webdriver.Chrome('./chromedriver')
+    driver = webdriver.Chrome('/Users/dohunny/MyDoc/Data2021/BoB/Project/BWASP_dev/chromedriver')
     driver.get(url)
     return driver
 
@@ -32,52 +29,31 @@ def seleniumSetting(url):
 # 1. Selenium을 이용한 태그 클릭
 def seleniumCrawling(driver):
 
-    cur_page_links = list()
+    # 가져올 태그 목록
+    clickable_tag_list = ['button','a','div','img','input'] 
+    cur_page_links, elems = list(), list()
 
-    WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "html"))
-    )
-    time.sleep(1)
-
-    elems = list()
-
-    elems.append(driver.find_elements_by_tag_name('button'))
-    elems.append(driver.find_elements_by_tag_name('a'))
-    elems.append(driver.find_elements_by_tag_name('div'))
-    elems.append(driver.find_elements_by_tag_name('img'))
-    elems.append(driver.find_elements_by_tag_name('input'))
-
-    # links = [elem.get_attribute('href') for elem in elems]
-    # print(links)
-
-    # input("Continuing...")
+    for tag in clickable_tag_list:
+        # 찾을 tag가 전부 로드 될 때까지 기다리기
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR,tag))
+        )
+        
+        # 찾을 tag에 해당하는 element를 리스트에 append
+        elems.append(driver.find_elements_by_tag_name(tag))
 
     for index in range(len(elems)):
         for elem in elems[index]:
+            req_url = elem.get_attribute('href')
+            
             # Selenium 사용 시, element 클릭 가능 여부 판단 방법 ( HTML 내부에서 클릭 이벤트가 구현되어있는 경우, 태그 속성 중 href가 존재 )
-            try:
-                if elem.get_attribute('href') is not None:
-                    # print(elem.get_attribute('outerHTML'))
-                    req_uri = elem.get_attribute('href')
-                    
-                    cur_page_links.append(req_uri)
+            if req_url is not None:
+                cur_page_links.append(req_url)
 
-            except selenium.common.exceptions.StaleElementReferenceException as e:
-                time.sleep(2)
-                if elem.get_attribute('href') is not None:
-                    # print(elem.get_attribute('outerHTML'))
-                    req_uri = elem.get_attribute('href')
-                    
-                    cur_page_links.append(req_uri)
+                # print(elem.get_attribute('outerHTML')) # 태그를 text 형식으로 출력 (Ex: <a href="mail.naver.com">메일</a>)
 
-        
-        # input(str(index+1) + ") Finished...")
-
-    # print(cur_page_links)
+    print(cur_page_links)
     return cur_page_links
-    
-
-
 
 
 # 2. BeautifulSoup을 이용한 태그 클릭 리스트
@@ -106,9 +82,6 @@ def bs4Crawling(url):
 
     # print(a_href_list)
     return a_href_list
-
-
-
 
 
 if __name__ == "__main__":
