@@ -9,13 +9,16 @@ def start(url, depth):
     driver = initSelenium()
     visit(driver, url, set([url]), depth)
 
-def visit(driver, url, previous_url, depth):
+def visit(driver, url, previous_urls, depth):
     driver.get(url)
 
     req_res_packets = packet_capture.packetCapture(driver)
     cur_page_links = clickable_tags.bs4Crawling(driver.current_url, driver.page_source)
     cur_page_links += res_geturl.getUrl(url, req_res_packets)
     cur_page_links = list(set(deleteFragment(cur_page_links)))
+
+    # print(cur_page_links)
+    # print(depth)
 
     ################################
     #### Add Attack Vector Code ####
@@ -24,11 +27,17 @@ def visit(driver, url, previous_url, depth):
         return
 
     for visit_url in cur_page_links:
-        if visit_url in previous_url:
+        if visit_url in previous_urls:
+            # print("continue: {}".format(visit_url))
             continue
         if not isSameDomain(url, visit_url):
+            # print("notSameDomain: {}".format(visit_url))
             continue
-        visit(driver, visit_url, previous_url.union(cur_page_links), depth-1)
+        if isSamePath(visit_url, previous_urls):
+            continue
+        # print("visit: {}".format(visit_url))
+        # input("")
+        visit(driver, visit_url, previous_urls.union(cur_page_links), depth-1)
 
 def isSameDomain(target_url, visit_url):
     try:
@@ -40,6 +49,22 @@ def isSameDomain(target_url, visit_url):
         if target.netloc == visit.netloc:
             return True
         else:
+            return False
+    except:
+        return False
+
+def isSamePath(visit_url, previous_urls):
+    try:
+        visit = urlparse(visit_url)
+
+        for link in previous_urls:
+            previous = urlparse(link)
+
+            if (visit.path == previous.path) and (visit.query == previous.query):
+                print("[!] SamePath: {} {}".format(visit_url, link))
+                return True
+        else:
+            print("[!] Not SamePath: {}".format(visit_url))
             return False
     except:
         return False
