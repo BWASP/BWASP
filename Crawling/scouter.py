@@ -1,5 +1,5 @@
 from seleniumwire import webdriver
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 from feature import clickable_tags
 from feature import packet_capture
@@ -15,6 +15,7 @@ def visit(driver, url, previous_url, depth):
     req_res_packets = packet_capture.packetCapture(driver)
     cur_page_links = clickable_tags.bs4Crawling(driver.current_url, driver.page_source)
     cur_page_links += res_geturl.getUrl(url, req_res_packets)
+    cur_page_links = list(set(deleteFragment(cur_page_links)))
 
     ################################
     #### Add Attack Vector Code ####
@@ -36,12 +37,20 @@ def isSameDomain(target_url, visit_url):
 
         if visit.scheme != "http" and visit.scheme != "https":
             return False
-        elif target.netloc == visit.netloc:
+        if target.netloc == visit.netloc:
             return True
         else:
             return False
     except:
         return False
+
+def deleteFragment(links):
+    for i in range(len(links)):
+        parse = urlparse(links[i])
+        parse = parse._replace(fragment="")
+        links[i] = urlunparse(parse)
+
+    return links
 
 def initSelenium():
     options = {
@@ -51,5 +60,5 @@ def initSelenium():
     return driver
 
 if __name__ == "__main__":
-    url = "https://naver.com/"
-    start(url, 2)
+    url = "https://www.naver.com"
+    start(url, 3)
