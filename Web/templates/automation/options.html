@@ -25,7 +25,7 @@
 
                 <!-- Topbar Search -->
                 <div class="d-flex w-100 justify-content-center">
-                    <h3 class="mb-0">자동 분석 옵션 설정</h3>
+
                 </div>
 
                 <!-- Topbar Navbar -->
@@ -219,26 +219,29 @@
 
             <!-- Begin Page Content -->
             <div class="container-fluid">
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Option for Automated analysis</h1>
+                </div>
                 <div class="bg-white border rounded shadow p-4" id="job-order">
-                    <h3 class="mb-3 text-dark font-weight-bold">분석 대상</h3>
+                    <h3 class="mb-3 text-dark font-weight-bold">Analysis target</h3>
                     <div class="row" id="section-targetURL">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="job-TargetURL">대상 URL</label>
+                                <label for="job-TargetURL">Target URL</label>
                                 <input type="text" class="form-control p-4 rounded-pill" id="job-TargetURL"
-                                       placeholder="분석 대상 URL">
+                                       placeholder="Analysis target URL">
                             </div>
                         </div>
                     </div>
 
-                    <h3 class="mt-4 mb-3 text-dark font-weight-bold"><span class="font-weight-bold">웹 프로그램 정보</span> <span class="text-muted small">(선택사항)</span></h3>
+                    <h3 class="mt-4 mb-3 text-dark font-weight-bold"><span class="font-weight-bold">WebApp Information</span> <span class="text-muted small">(Optional)</span></h3>
                     <div class="row" id="section-webAppInfo"></div>
 
-                    <h3 class="mt-4 mb-3 text-dark font-weight-bold">도구 설정</h3>
+                    <h3 class="mt-4 mb-3 text-dark font-weight-bold">Tool Setting</h3>
                     <div class="row" id="section-ToolSetting">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="ToolRecursiveLevelInput">탐색 깊이 (레벨)</label>
+                                <label for="ToolRecursiveLevelInput">Analysis recursive level</label>
                                 <div class="d-flex align-items-center">
                                     <input class="border border-white" type="number" min="1" max="5000" value="1" id="ToolRecursiveLevelInput">
                                     <input type="range" class="form-control" min="1" max="5000" value="1" id="ToolRecursiveLevelSlider">
@@ -247,34 +250,32 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="ToolURLPath">URL 경로 지정</label>
+                                <label for="ToolURLPath">Define URL Path</label>
                                 <input type="text" class="form-control p-4 rounded-pill" id="ToolURLPath"
-                                       placeholder="URL 경로 지정">
+                                       placeholder="Path here">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="AdditionalFunctions">추가 기능</label>
+                                <label for="AdditionalFunctions">Additional Options</label>
                                 <div class="card mb-4" id="AdditionalFunctions">
                                     <a href="#additionalFuncs" class="d-block card-header py-3" data-toggle="collapse"
                                        role="button" aria-expanded="false" aria-controls="additionalFuncs">
-                                        <h6 class="m-0 font-weight-bold text-primary">추가 기능 선택</h6>
+                                        <h6 class="m-0 font-weight-bold text-primary">Additional Options</h6>
                                     </a>
                                     <div class="collapse" id="additionalFuncs" style="">
                                         <div class="card-body">
                                             <div class="form-group mb-0">
                                                 <div class="custom-control custom-checkbox small">
                                                     <input type="checkbox" class="custom-control-input" id="fnc-port-scan">
-                                                    <label class="custom-control-label pt-1" for="fnc-port-scan">포트 스캔 (알려진
-                                                        포트)</label>
+                                                    <label class="custom-control-label pt-1" for="fnc-port-scan">Port scan (Known ports)</label>
                                                 </div>
                                             </div>
                                             <div class="form-group mb-0">
                                                 <div class="custom-control custom-checkbox small">
                                                     <input type="checkbox" class="custom-control-input"
                                                            id="fnc-csp-evaluate">
-                                                    <label class="custom-control-label pt-1" for="fnc-csp-evaluate">CSP
-                                                        평가</label>
+                                                    <label class="custom-control-label pt-1" for="fnc-csp-evaluate">CSP Evaluate</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -285,10 +286,10 @@
                     </div>
                     <div class="row" id="Section-JobButton">
                         <div class="col-md-6 p-2">
-                            <p class="btn btn-danger shadow p-2 pl-3 pr-3 ml-2 w-100" id="ClearAllData">초기화</p>
+                            <p class="btn btn-danger shadow p-2 pl-3 pr-3 ml-2 w-100" id="ClearAllData">Clear all input</p>
                         </div>
                         <div class="col-md-6 p-2">
-                            <a class="btn btn-success shadow p-2 pl-3 pr-3 ml-2 w-100" href="#">분석 수행</a>
+                            <a class="btn btn-success shadow p-2 pl-3 pr-3 ml-2 w-100" href="#">Start analysis</a>
                         </div>
                     </div>
                 </div>
