@@ -69,7 +69,7 @@ def checkURLFormat(origin, url):
         # print(parsed_url.geturl())
 
     if parsed_url.netloc == '':
-        if parsed_url.path.split('/')[0] is not '':
+        if parsed_url.path.split('/')[0] != '':
             parsed_url = parsed_url._replace(
                 scheme=parsed_origin.scheme, 
                 netloc=parsed_url.path.split('/')[0],
@@ -82,16 +82,7 @@ def checkURLFormat(origin, url):
 
 
 # 2. BeautifulSoup을 이용한 태그 클릭 리스트
-def bs4Crawling(url, req_res_packets):
-    html = ''
-    for packet in req_res_packets:
-        # print(packet["request"]["full_url"])
-        if packet["request"]["full_url"] == url:
-            if packet["response"]["status_code"] != 200:
-                continue
-            else: 
-                html = packet["response"]["body"]
-
+def bs4Crawling(url, html):
     soup = BeautifulSoup(html, features="html.parser")
 
     clickable_tag_types = ['button','a','div','img','input'] 
@@ -114,7 +105,7 @@ def bs4Crawling(url, req_res_packets):
 
 if __name__ == "__main__":
     url = "https://www.kitribob.wiki/"
-    req_res_packets = open('./Crawling/feature/message.txt','r').read()
+    req_res_packets = open('./Crawling/attack/packet.txt','r').read()
     req_res_packets = ast.literal_eval(req_res_packets)
     # driver = seleniumSetting(url)
     print(bs4Crawling(url, req_res_packets))
