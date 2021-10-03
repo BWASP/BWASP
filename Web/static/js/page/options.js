@@ -1,16 +1,16 @@
 const MaximumRecursiveLevel = 5000;
 const RecursiveLevelHandler = ["Input", "Slider"];
 const SupportedList = {
-    Server: ["웹 서버", ["Apache", "Nginx"]],
-    Framework: ["웹 프레임워크 / 라이브러리", ["React", "AngularJS"]],
-    Backend: ["백엔드 시스템", ["Flask", "Django"]]
+    Server: ["Web Server", ["Apache", "Nginx"]],
+    Framework: ["Framework / Libs", ["React", "AngularJS"]],
+    Backend: ["Backend", ["Flask", "Django"]]
 }
 
 // Add event handler to recursive level handler
 for(let i=0; i<RecursiveLevelHandler.length; i++){
     document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[i]}`).addEventListener("change", function(){
         if(this.value>MaximumRecursiveLevel){
-            alert(`탐색 깊이는 ${MaximumRecursiveLevel}회를 넘을 수 없습니다.`);
+            alert(`Recursive level cannot exceed ${MaximumRecursiveLevel}.`);
             this.value = MaximumRecursiveLevel;
         }
         document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[+ !i]}`).value = this.value;
@@ -32,7 +32,7 @@ document.getElementById("ClearAllData").addEventListener("click", function(){
                 data[key].checked=false;
                 break;
             default:
-                alert("핸들되지 않은 개체가 있습니다.");
+                alert("Exception: Unhandled object present.");
         }
     });
 })
@@ -99,18 +99,13 @@ Object.keys(SupportedList).forEach((Type)=>{
         localSkeleton.child.child.codename.htmlFor = `info-web-${Type}-${CodeName}`;
         localSkeleton.child.child.codename.innerHTML = `${CodeName} v.`;
 
-        localSkeleton.child.child.versionInput.placeholder = "버전 (선택)";
+        localSkeleton.child.child.versionInput.placeholder = "(Version)";
         localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50")
         localSkeleton.child.child.versionInput.type = "text";
         localSkeleton.child.child.versionInput.id = `info-web-${Type}-Version-${CodeName}`;
 
         localSkeleton.child.child.codename.appendChild(localSkeleton.child.child.versionInput);
         localSkeleton.child.parent.append(localSkeleton.child.child.checkbox, localSkeleton.child.child.codename);
-
-        console.log("=====");
-        console.log(localSkeleton.child.parent);
-        console.log(CodeName);
-        console.log("=====");
         Skeleton.child.child.content.child.appendChild(localSkeleton.child.parent);
     })
 
