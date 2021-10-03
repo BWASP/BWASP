@@ -87,7 +87,10 @@ def bs4Crawling(url, req_res_packets):
     for packet in req_res_packets:
         # print(packet["request"]["full_url"])
         if packet["request"]["full_url"] == url:
-            html = packet["response"]["body"]
+            if packet["response"]["status_code"] != 200:
+                continue
+            else: 
+                html = packet["response"]["body"]
 
     soup = BeautifulSoup(html, features="html.parser")
 
