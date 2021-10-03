@@ -66,7 +66,7 @@ def checkURLFormat(origin, url):
     if parsed_url.scheme == '':
         parsed_url = parsed_url._replace(scheme=parsed_origin.scheme)
         parsed_url = urlparse(parsed_url.geturl())
-        print(parsed_url.geturl())
+        # print(parsed_url.geturl())
 
     if parsed_url.netloc == '':
         if parsed_url.path.split('/')[0] is not '':
@@ -77,7 +77,7 @@ def checkURLFormat(origin, url):
             )
         else:
             parsed_url = parsed_url._replace(netloc=parsed_origin.netloc)
-            
+
     return parsed_url.geturl()
 
 
