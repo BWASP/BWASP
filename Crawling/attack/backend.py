@@ -11,24 +11,18 @@ default_check_cat={12,18,27,22}
 def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22}):
     #12(javascript framework),18(Web frameworks),22(web server),27(Programming Language)
     check_cat = set(check_cat)
-    key_list=set()
     json_list = os.listdir(json_path)
     json_list.remove("categories.json")
-    cat_reprent = retCatrepresnt(allow_cat)
-
+    result={}
     for line in json_list:
         with open(json_path+line,encoding='UTF8') as json_file:
             json_data = json.load(json_file)
             for name in json_data:
-                if (set(check_cat) & set(json_data[name]['cats'])):
-                    #key_list.update(list(json_data[name].keys())) #사용되는 키 반환 
-                    print(name,json_data[name]['cats'])
-                    #if 'js' in json_data[name].keys(): # 특정 요소가 존재하는 지 확인 ex) js
-                    #    print(name,json_data[name]['js']) # 특정 요소가 존재하는 지 확인 ex) js
-                    #print(name,json_data[name])
-    #print("key list {}".format(key_list))
-    #json_string = json_data['A-Frame']['cats']
-    #print(json_string)
+                if set(check_cat) & set(json_data[name]['cats']):
+                    #print(json_data[name])
+                    result[name]=json_data[name]
+    return result
+
 
 
 def extractPriority(cat=[12,18,27,22]):
@@ -61,7 +55,7 @@ def retCatname(singlecat):
     #12(javascript framework),18(Web frameworks),22(web server),27(Programming Language)
     with open(categories_path,encoding='UTF8') as json_file:
         json_data = json.load(json_file)
-        return json_data[str(singlecat)]['name']
+        return json_data[str(singlecat)]#['name']
 
 #retCatsname([12,13])으로 호출 가능 , name 반환   
 def retCatsname(cat):
@@ -75,6 +69,6 @@ def retCatsname(cat):
 
 
 if __name__ == '__main__':
-     extractJson()
-     print(retCatsname([12,18,27,22]))
-     print(18,retCatname(18))
+     print(extractJson())
+     #print(retCatsname([12,18,27,22]))
+     #print(18,retCatname(18))
