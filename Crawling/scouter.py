@@ -10,16 +10,17 @@ def start(url, depth):
     visit(driver, url, set([url]), depth)
 
 def visit(driver, url, previous_url, depth):
-    if depth == 0:
-        return
-    
     driver.get(url)
 
     req_res_packets = packet_capture.packetCapture(driver)
     cur_page_links = clickable_tags.bs4Crawling(driver.current_url, driver.page_source)
     cur_page_links += res_geturl.getUrl(url, req_res_packets)
 
-    # packet_capture.writeFile(req_res_packets)
+    ################################
+    #### Add Attack Vector Code ####
+    ################################
+    if depth == 0:
+        return
 
     for visit_url in cur_page_links:
         if visit_url in previous_url:
@@ -30,10 +31,12 @@ def visit(driver, url, previous_url, depth):
 
 def isSameDomain(target_url, visit_url):
     try:
-        target_domain = urlparse(target_url).netloc
-        visit_domain = urlparse(visit_url).netloc
-        
-        if target_domain == visit_domain:
+        target = urlparse(target_url)
+        visit = urlparse(visit_url)
+
+        if visit.scheme != "http" and visit.scheme != "https":
+            return False
+        elif target.netloc == visit.netloc:
             return True
         else:
             return False
