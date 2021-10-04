@@ -132,10 +132,9 @@ def retCatsname(cat):
     return cat_name
 
 if __name__ == '__main__':
-    #print(extractJson())
-    #print(retCatsname([12,18,27,22]))
     json_path="../wappalyzer/"
     categories_path="../wappalyzer/categories.json"
-    print(18,retCatname(18))
+    print(extractJson())
+    #print(retCatsname([12,18,27,22]))
+    #print(18,retCatname(18))
     #resBackend()
-
