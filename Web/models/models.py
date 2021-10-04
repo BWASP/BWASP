@@ -15,14 +15,16 @@ class User(db.Model):
 class pie(db.Model):
     __tablename__ = 'pie'
 
-    num = db.Column(db.Integer, primary_key=True)
-    userid = db.Column(db.String(32))
-    password = db.Column(db.String(128))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    type = db.Column(db.Integer)
+    name = db.Column(db.TEXT)
+    ratio = db.Column(db.Integer)
 
 
 class area(db.Model):
     __tablename__ = 'area'
 
-    num = db.Column(db.Integer, primary_key=True)
-    userid = db.Column(db.String(32))
-    password = db.Column(db.String(128))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    type = db.Column(db.Integer)
+    name = db.Column(db.TEXT)
+    ratio = db.Column(db.Integer)
