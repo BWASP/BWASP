@@ -1,5 +1,8 @@
 const MaximumRecursiveLevel = 5000;
 const RecursiveLevelHandler = ["Input", "Slider"];
+const URLPatterns = {
+    targetURL: ""
+}
 const SupportedList = {
     Server: ["Web Server", ["Apache", "Nginx"]],
     Framework: ["Framework / Libs", ["React", "AngularJS"]],
@@ -87,25 +90,29 @@ Object.keys(SupportedList).forEach((Type)=>{
                 }
             }
         }
+        let elementNaming = {
+            checkbox: `info-data-${Type}-${CodeName}`,
+            version: `info-version-${Type}-${CodeName}`
+        }
         localSkeleton.parent.classList.add("form-group", "mb-0");
         localSkeleton.child.parent.classList.add("custom-control", "custom-checkbox", "small");
 
         localSkeleton.child.child.checkbox.type = "checkbox";
         localSkeleton.child.child.checkbox.classList.add("custom-control-input");
-        localSkeleton.child.child.checkbox.id = `info-web-${Type}-${CodeName}`;
+        localSkeleton.child.child.checkbox.id = elementNaming.checkbox;
 
         localSkeleton.child.child.codename.classList.add("custom-control-label", "pt-1");
-        localSkeleton.child.child.codename.htmlFor = `info-web-${Type}-${CodeName}`;
-        localSkeleton.child.child.codename.innerHTML = `${CodeName}`;
+        localSkeleton.child.child.codename.htmlFor = elementNaming.checkbox;
+        localSkeleton.child.child.codename.innerHTML = CodeName;
 
         localSkeleton.child.child.versionInput.placeholder = "(Version)";
         localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50", "pl-1", "d-none")
         localSkeleton.child.child.versionInput.type = "text";
-        localSkeleton.child.child.versionInput.id = `info-web-${Type}-Version-${CodeName}`;
+        localSkeleton.child.child.versionInput.id = elementNaming.version;
 
         // Add Event Listener for checkbox - to - version control input.
         localSkeleton.child.child.checkbox.addEventListener("change", function(){
-            let versionInput = document.getElementById(`info-web-${Type}-Version-${CodeName}`);
+            let versionInput = document.getElementById(elementNaming.version);
             versionInput.classList[(!this.checked)?"add":"remove"]("d-none");
             versionInput.focus();
         })
