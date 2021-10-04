@@ -4,10 +4,25 @@ import re
 from urllib.parse import urlparse   
 
 default_allow_cat={12,18,27,22}
+#default_allow_cat={12,18,27,22,28}
 default_check_cat={12,18,27,22}
+#default_check_cat={12,18,27,22,28}
 json_path="./wappalyzer/"
 categories_path="./wappalyzer/categories.json"
 sig_url=list()
+
+def isSameDomain(target_url, visit_url):
+    try:
+        target_domain = urlparse(target_url).netloc
+        visit_domain = urlparse(visit_url).netloc
+        
+        if target_domain == visit_domain:
+            return True
+        else:
+            return False
+    except:
+        return False
+
 
 def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22}):
     #12(javascript framework),18(Web frameworks),22(web server),27(Programming Language)
@@ -20,8 +35,10 @@ def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22}):
             json_data = json.load(json_file)
             for name in json_data:
                 if set(check_cat) & set(json_data[name]['cats']):
+                    if "headers" in json_data[name].keys():
+                        for headers_key  in list(json_data[name]["headers"].keys()):
+                            json_data[name]["headers"][headers_key.lower()] = json_data[name]["headers"].pop(headers_key)
                     result[name]=json_data[name]
-
     return result
 
 def rebuildPattern(pattern):
@@ -38,30 +55,38 @@ def initResult(result,name):
 def appendResult(result,name,detectype,request_index=0,response_index=0):
     if name not in result:
         initResult(result,name)
-    if detectype not in result[name]:
+    if detectype not in result[name]["detect"]:
         result[name]["detect"].append(detectype)
-    if request_index:
+    if request_index not in result[name]["request"]:
         result[name]["request"].append(request_index)
-    if response_index:
+    if response_index not in result[name]["response"]:
         result[name]["response"].append(response_index)
 
 
-def resBackend(req_res_packets):
+def resBackend(target_url,req_res_packets):
     result={}
-    signature=extractJson()
+    signature=extractJson(default_check_cat,default_allow_cat)
     for i,request in enumerate(req_res_packets):
         for  name  in signature:
+            #url로 추출 
             if  'url' in  signature[name].keys():
                 pattern=rebuildPattern(signature[name]["url"])
                 if re.findall(pattern,request["request"]["full_url"]):
                     appendResult(result,name,"url",i,0)
+            #header로 추출
             if  'headers' in  signature[name].keys():
-                pattern=rebuildPattern(signature[name]["url"])
-                if re.findall(pattern,request["request"]["headers"]):
-                    appendResult(result,name,"headers",i,0)
-                if re.findall(pattern,request["response"]["headers"]):
-                    appendResult(result,name,"headers",i,0)
-    return(result)#, 출력값 확인
+                if not isSameDomain(target_url,request["request"]["full_url"]):
+                    continue
+                for comp_header in set(signature[name]["headers"].keys()) & set(request["request"]["headers"].keys()):
+                    pattern=rebuildPattern(signature[name]["headers"][comp_header])
+                    if re.findall(pattern,request["request"]["headers"][comp_header]):
+                        appendResult(result,name,"headers",i,0)
+                for comp_header in set(signature[name]["headers"].keys()) & set(request["response"]["headers"].keys()):
+                    pattern=rebuildPattern(signature[name]["headers"][comp_header])
+                    if re.findall(pattern,request["response"]["headers"][comp_header]):
+                        appendResult(result,name,"headers",0,i)
+                
+    return(result)
                    
 
 def extractPriority(cat=[12,18,27,22]):
@@ -105,19 +130,6 @@ def retCatsname(cat):
         for eachcat in cat:
             cat_name[eachcat] = json_data[str(eachcat)]['name']
     return cat_name
-
-
-def isSameDomain(target_url, visit_url):
-    try:
-        target_domain = urlparse(target_url).netloc
-        visit_domain = urlparse(visit_url).netloc
-        
-        if target_domain == visit_domain:
-            return True
-        else:
-            return False
-    except:
-        return False
 
 if __name__ == '__main__':
     #print(extractJson())
