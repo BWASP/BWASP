@@ -1,16 +1,19 @@
 const MaximumRecursiveLevel = 5000;
 const RecursiveLevelHandler = ["Input", "Slider"];
+const patterns = {
+    targetURL: ""
+}
 const SupportedList = {
-    Server: ["웹 서버", ["Apache", "Nginx"]],
-    Framework: ["웹 프레임워크 / 라이브러리", ["React", "AngularJS"]],
-    Backend: ["백엔드 시스템", ["Flask", "Django"]]
+    Server: ["Web Server", ["Apache", "Nginx"]],
+    Framework: ["Framework / Libs", ["React", "AngularJS"]],
+    Backend: ["Backend", ["Flask", "Django"]]
 }
 
 // Add event handler to recursive level handler
 for(let i=0; i<RecursiveLevelHandler.length; i++){
     document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[i]}`).addEventListener("change", function(){
         if(this.value>MaximumRecursiveLevel){
-            alert(`탐색 깊이는 ${MaximumRecursiveLevel}회를 넘을 수 없습니다.`);
+            alert(`Analysis recursive level cannot exceed ${MaximumRecursiveLevel}.`);
             this.value = MaximumRecursiveLevel;
         }
         document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[+ !i]}`).value = this.value;
@@ -19,20 +22,23 @@ for(let i=0; i<RecursiveLevelHandler.length; i++){
 
 document.getElementById("ClearAllData").addEventListener("click", function(){
     let data = document.getElementsByTagName("input");
-    Object.keys(data).forEach(function(key){
-        switch(data[key].type){
+    Object.keys(data).forEach(function(element){
+        switch(data[element].type){
             case "text":
-                data[key].value="";
+                data[element].value="";
                 break;
             case "number":
             case "range":
-                data[key].value="1";
+                data[element].value="1";
                 break;
             case "checkbox":
-                data[key].checked=false;
+                data[element].checked=false;
                 break;
             default:
-                alert("핸들되지 않은 개체가 있습니다.");
+                alert("Exception: Unhandled object present.");
+        }
+        if(data[element].id.startsWith("info-version")){
+            data[element].classList.add("d-none");
         }
     });
 })
@@ -40,7 +46,6 @@ document.getElementById("ClearAllData").addEventListener("click", function(){
 // Frontend constructor
 Object.keys(SupportedList).forEach((Type)=>{
     let toggleTabName = `web${Type}Selection`;
-    console.log(SupportedList[Type][0]);
     let Skeleton = {
         parent: document.createElement("div"),
         child: {
@@ -88,29 +93,35 @@ Object.keys(SupportedList).forEach((Type)=>{
                 }
             }
         }
+        let elementNaming = {
+            checkbox: `info-data-${Type}-${CodeName}`,
+            version: `info-version-${Type}-${CodeName}`
+        }
         localSkeleton.parent.classList.add("form-group", "mb-0");
         localSkeleton.child.parent.classList.add("custom-control", "custom-checkbox", "small");
 
         localSkeleton.child.child.checkbox.type = "checkbox";
         localSkeleton.child.child.checkbox.classList.add("custom-control-input");
-        localSkeleton.child.child.checkbox.id = `info-web-${Type}-${CodeName}`;
+        localSkeleton.child.child.checkbox.id = elementNaming.checkbox;
 
         localSkeleton.child.child.codename.classList.add("custom-control-label", "pt-1");
-        localSkeleton.child.child.codename.htmlFor = `info-web-${Type}-${CodeName}`;
-        localSkeleton.child.child.codename.innerHTML = `${CodeName} v.`;
+        localSkeleton.child.child.codename.htmlFor = elementNaming.checkbox;
+        localSkeleton.child.child.codename.innerHTML = CodeName;
 
-        localSkeleton.child.child.versionInput.placeholder = "버전 (선택)";
-        localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50")
+        localSkeleton.child.child.versionInput.placeholder = "(Version)";
+        localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50", "pl-1", "d-none")
         localSkeleton.child.child.versionInput.type = "text";
-        localSkeleton.child.child.versionInput.id = `info-web-${Type}-Version-${CodeName}`;
+        localSkeleton.child.child.versionInput.id = elementNaming.version;
+
+        // Add Event Listener for checkbox - to - version control input.
+        localSkeleton.child.child.checkbox.addEventListener("change", function(){
+            let versionInput = document.getElementById(elementNaming.version);
+            versionInput.classList[(!this.checked)?"add":"remove"]("d-none");
+            versionInput.focus();
+        })
 
         localSkeleton.child.child.codename.appendChild(localSkeleton.child.child.versionInput);
         localSkeleton.child.parent.append(localSkeleton.child.child.checkbox, localSkeleton.child.child.codename);
-
-        console.log("=====");
-        console.log(localSkeleton.child.parent);
-        console.log(CodeName);
-        console.log("=====");
         Skeleton.child.child.content.child.appendChild(localSkeleton.child.parent);
     })
 
@@ -119,6 +130,11 @@ Object.keys(SupportedList).forEach((Type)=>{
     Skeleton.child.child.content.parent.appendChild(Skeleton.child.child.content.child);
     Skeleton.child.parent.append(Skeleton.child.child.toggleTab, Skeleton.child.child.content.parent);
     Skeleton.parent.appendChild(Skeleton.child.parent);
-    console.log(Skeleton.parent);
     document.getElementById("section-webAppInfo").appendChild(Skeleton.parent);
+})
+document.getElementById("submitJobRequest").addEventListener("click", function(){
+    $("#jobSubmitVerifyModal").modal({
+        backdrop: 'static',
+        show: true
+    })
 })
