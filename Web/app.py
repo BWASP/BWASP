@@ -1,7 +1,6 @@
 # Flask version 2.0.1
 # Flask-SQLAlchemy version 2.5.1
 
-import os
 from models.models import db
 from flask import (
     Flask, render_template, g
