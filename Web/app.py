@@ -11,12 +11,13 @@ from flask import (
 def create_app(config=None):
     app = Flask(__name__)
 
-    from configs import Config
-    config = Config
+    from configs import DevelopmentsConfig
+    config = DevelopmentsConfig()
     app.config.from_object(config)
 
     db.init_app(app)
     db.app = app
+    db.create_all()
 
     # route initialize
     from routes import result_route, automation_route, common_route, api_route
