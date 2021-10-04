@@ -1,6 +1,6 @@
 const MaximumRecursiveLevel = 5000;
 const RecursiveLevelHandler = ["Input", "Slider"];
-const URLPatterns = {
+const patterns = {
     targetURL: ""
 }
 const SupportedList = {
@@ -13,7 +13,7 @@ const SupportedList = {
 for(let i=0; i<RecursiveLevelHandler.length; i++){
     document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[i]}`).addEventListener("change", function(){
         if(this.value>MaximumRecursiveLevel){
-            alert(`Recursive level cannot exceed ${MaximumRecursiveLevel}.`);
+            alert(`Analysis recursive level cannot exceed ${MaximumRecursiveLevel}.`);
             this.value = MaximumRecursiveLevel;
         }
         document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[+ !i]}`).value = this.value;
@@ -22,20 +22,23 @@ for(let i=0; i<RecursiveLevelHandler.length; i++){
 
 document.getElementById("ClearAllData").addEventListener("click", function(){
     let data = document.getElementsByTagName("input");
-    Object.keys(data).forEach(function(key){
-        switch(data[key].type){
+    Object.keys(data).forEach(function(element){
+        switch(data[element].type){
             case "text":
-                data[key].value="";
+                data[element].value="";
                 break;
             case "number":
             case "range":
-                data[key].value="1";
+                data[element].value="1";
                 break;
             case "checkbox":
-                data[key].checked=false;
+                data[element].checked=false;
                 break;
             default:
                 alert("Exception: Unhandled object present.");
+        }
+        if(data[element].id.startsWith("info-version")){
+            data[element].classList.add("d-none");
         }
     });
 })
