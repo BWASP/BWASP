@@ -77,10 +77,10 @@ def isSamePath(visit_url, previous_urls):
             previous = urlparse(link)
 
             if (visit.path == previous.path) and (visit.query == previous.query):
-                print("[!] SamePath: {} {}".format(visit_url, link))
+                # print("[!] SamePath: {} {}".format(visit_url, link))
                 return True
         else:
-            print("[!] Not SamePath: {}".format(visit_url))
+            # print("[!] Not SamePath: {}".format(visit_url))
             return False
     except:
         return False
@@ -96,12 +96,16 @@ def deleteFragment(links):
 def initSelenium():
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("lang=ko_KR")
+    chrome_options.add_experimental_option("prefs", {
+        "download_restrictions": 3
+    })
     options = {
         "disable_encoding" : True
     }
+
     driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options = options, chrome_options=chrome_options)
     return driver
 
 if __name__ == "__main__":
     url = "https://kitribob.kr/"
-    start(url, 10)
+    start(url, 3)
