@@ -14,4 +14,4 @@ def index():
 
 @bp.route('/start')
 def mode_selection():
-    return render_template('common/mode_selection.html', Title="동작 모드 선택 - BWASP")
+    return render_template('common/mode_selection.html', Title="Select analysis mode - BWASP")
