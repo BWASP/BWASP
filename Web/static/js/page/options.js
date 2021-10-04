@@ -132,3 +132,9 @@ Object.keys(SupportedList).forEach((Type)=>{
     Skeleton.parent.appendChild(Skeleton.child.parent);
     document.getElementById("section-webAppInfo").appendChild(Skeleton.parent);
 })
+document.getElementById("submitJobRequest").addEventListener("click", function(){
+    $("#jobSubmitVerifyModal").modal({
+        backdrop: 'static',
+        show: true
+    })
+})

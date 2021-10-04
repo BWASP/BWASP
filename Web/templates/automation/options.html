@@ -4,6 +4,71 @@
 {% include 'components/head.html' %}
 
 <body id="page-top">
+<div class="modal fade" id="jobSubmitVerifyModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="text-dark font-weight-bolder mb-1">Requested Info</h3>
+                <p>Please review if anything is written incorrectly.</p>
+                <div class="shadow rounded p-2">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Target URL</th>
+                            <td><code>https://google.com/</code></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Web Server</th>
+                            <td>
+                                <ul class="pl-3 mb-0">
+                                    <li><code>Apache v1.0</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Frameworks</th>
+                            <td>
+                                <ul class="pl-3 mb-0">
+                                    <li><code>AngularJS v1.0</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Backend</th>
+                            <td>
+                                <ul class="pl-3 mb-0">
+                                    <li><code>NodeJS v1.0</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Analysis level</th>
+                            <td><code>1</code></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">URL Path</th>
+                            <td>No data.</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Additional Options</th>
+                            <td>
+                                <ul class="pl-3 mb-0">
+                                    <li><code>Port scan</code></li>
+                                    <li><code>CSP Evaluate</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Back</button>
+                    <button type="button" class="btn btn-success ml-2">Start</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Page Wrapper -->
 <div id="wrapper">
@@ -86,7 +151,7 @@
                             <p class="btn btn-danger shadow p-2 pl-3 pr-3 ml-2 w-100" id="ClearAllData">Clear all input</p>
                         </div>
                         <div class="col-md-6 p-2">
-                            <a class="btn btn-success shadow p-2 pl-3 pr-3 ml-2 w-100" href="#">Start analysis</a>
+                            <a class="btn btn-success shadow p-2 pl-3 pr-3 ml-2 w-100" id="submitJobRequest">Start analysis</a>
                         </div>
                     </div>
                 </div>
