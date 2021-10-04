@@ -4,241 +4,106 @@
 {% include 'components/head.html' %}
 
 <body id="page-top">
+<div class="modal fade" id="jobSubmitVerifyModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="text-dark font-weight-bolder mb-1">Requested Info</h3>
+                <p>Please review if anything is written incorrectly.</p>
+                <div class="shadow rounded p-2">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Target URL</th>
+                            <td><code>https://google.com/</code></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Web Server</th>
+                            <td>
+                                <ul class="pl-3 mb-0">
+                                    <li><code>Apache v1.0</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Frameworks</th>
+                            <td>
+                                <ul class="pl-3 mb-0">
+                                    <li><code>AngularJS v1.0</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Backend</th>
+                            <td>
+                                <ul class="pl-3 mb-0">
+                                    <li><code>NodeJS v1.0</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Analysis level</th>
+                            <td><code>1</code></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">URL Path</th>
+                            <td>No data.</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Additional Options</th>
+                            <td>
+                                <ul class="pl-3 mb-0">
+                                    <li><code>Port scan</code></li>
+                                    <li><code>CSP Evaluate</code></li>
+                                </ul>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Back</button>
+                    <button type="button" class="btn btn-success ml-2">Start</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Page Wrapper -->
 <div id="wrapper">
     {% include 'components/sidebar.html' %}
 
-    <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
-
-        <!-- Main Content -->
         <div id="content">
-
-            <!-- Topbar -->
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-                <!-- Sidebar Toggle (Topbar) -->
-                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                    <i class="fa fa-bars"></i>
-                </button>
-
-                <!-- Topbar Search -->
-                <div class="d-flex w-100 justify-content-center">
-                    <h3 class="mb-0">자동 분석 옵션 설정</h3>
-                </div>
-
-                <!-- Topbar Navbar -->
-                <ul class="navbar-nav ml-auto">
-
-                    <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                    <li class="nav-item dropdown no-arrow d-sm-none">
-                        <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-search fa-fw"></i>
-                        </a>
-                        <!-- Dropdown - Messages -->
-                        <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                             aria-labelledby="searchDropdown">
-                            <form class="form-inline mr-auto w-100 navbar-search">
-                                <div class="input-group">
-                                    <input type="text" class="form-control bg-light border-0 small"
-                                           placeholder="Search for..." aria-label="Search"
-                                           aria-describedby="basic-addon2">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary" type="button">
-                                            <i class="fas fa-search fa-sm"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </li>
-
-                    <!-- Nav Item - Alerts -->
-                    <li class="nav-item dropdown no-arrow mx-1">
-                        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-bell fa-fw"></i>
-                            <!-- Counter - Alerts -->
-                            <span class="badge badge-danger badge-counter">3+</span>
-                        </a>
-                        <!-- Dropdown - Alerts -->
-                        <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                             aria-labelledby="alertsDropdown">
-                            <h6 class="dropdown-header">
-                                Alerts Center
-                            </h6>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-primary">
-                                        <i class="fas fa-file-alt text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">December 12, 2019</div>
-                                    <span class="font-weight-bold">A new monthly report is ready to download!</span>
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-success">
-                                        <i class="fas fa-donate text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">December 7, 2019</div>
-                                    $290.29 has been deposited into your account!
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-warning">
-                                        <i class="fas fa-exclamation-triangle text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">December 2, 2019</div>
-                                    Spending Alert: We've noticed unusually high spending for your account.
-                                </div>
-                            </a>
-                            <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
-                        </div>
-                    </li>
-
-                    <!-- Nav Item - Messages -->
-                    <li class="nav-item dropdown no-arrow mx-1">
-                        <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-envelope fa-fw"></i>
-                            <!-- Counter - Messages -->
-                            <span class="badge badge-danger badge-counter">7</span>
-                        </a>
-                        <!-- Dropdown - Messages -->
-                        <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                             aria-labelledby="messagesDropdown">
-                            <h6 class="dropdown-header">
-                                Message Center
-                            </h6>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="dropdown-list-image mr-3">
-                                    <img class="rounded-circle"
-                                         src="{{ url_for('static', filename='img/undraw_profile_1.svg') }}"
-                                         alt="...">
-                                    <div class="status-indicator bg-success"></div>
-                                </div>
-                                <div class="font-weight-bold">
-                                    <div class="text-truncate">Hi there! I am wondering if you can help me with a
-                                        problem I've been having.
-                                    </div>
-                                    <div class="small text-gray-500">Emily Fowler · 58m</div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="dropdown-list-image mr-3">
-                                    <img class="rounded-circle"
-                                         src="{{ url_for('static', filename='img/undraw_profile_2.svg') }}g"
-                                         alt="...">
-                                    <div class="status-indicator"></div>
-                                </div>
-                                <div>
-                                    <div class="text-truncate">I have the photos that you ordered last month, how
-                                        would you like them sent to you?
-                                    </div>
-                                    <div class="small text-gray-500">Jae Chun · 1d</div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="dropdown-list-image mr-3">
-                                    <img class="rounded-circle"
-                                         src="{{ url_for('static', filename='img/undraw_profile_3.svg') }}"
-                                         alt="...">
-                                    <div class="status-indicator bg-warning"></div>
-                                </div>
-                                <div>
-                                    <div class="text-truncate">Last month's report looks great, I am very happy with
-                                        the progress so far, keep up the good work!
-                                    </div>
-                                    <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="dropdown-list-image mr-3">
-                                    <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60"
-                                         alt="...">
-                                    <div class="status-indicator bg-success"></div>
-                                </div>
-                                <div>
-                                    <div class="text-truncate">Am I a good boy? The reason I ask is because someone
-                                        told me that people say this to all dogs, even if they aren't good...
-                                    </div>
-                                    <div class="small text-gray-500">Chicken the Dog · 2w</div>
-                                </div>
-                            </a>
-                            <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
-                        </div>
-                    </li>
-
-                    <div class="topbar-divider d-none d-sm-block"></div>
-
-                    <!-- Nav Item - User Information -->
-                    <li class="nav-item dropdown no-arrow">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
-                            <img class="img-profile rounded-circle"
-                                 src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
-                        </a>
-                        <!-- Dropdown - User Information -->
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                             aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Profile
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Settings
-                            </a>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Activity Log
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Logout
-                            </a>
-                        </div>
-                    </li>
-
-                </ul>
-
-            </nav>
-            <!-- End of Topbar -->
+            {% include 'components/navigation.html' %}
 
             <!-- Begin Page Content -->
             <div class="container-fluid">
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Option for Automated analysis</h1>
+                </div>
                 <div class="bg-white border rounded shadow p-4" id="job-order">
-                    <h3 class="mb-3 text-dark font-weight-bold">분석 대상</h3>
+                    <h3 class="mb-3 text-dark font-weight-bold">Analysis target</h3>
                     <div class="row" id="section-targetURL">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="job-TargetURL">대상 URL</label>
+                                <label for="job-TargetURL">Target URL</label>
                                 <input type="text" class="form-control p-4 rounded-pill" id="job-TargetURL"
-                                       placeholder="분석 대상 URL">
+                                       placeholder="Analysis target URL" aria-describedby="regexViolence-targetURL">
+                                <small id="regexViolence-targetURL" class="form-text text-muted d-none">Regex violence : <span class="text-danger">Target URL must be starts with protocol (http, https, ftp ...</span></small>
                             </div>
                         </div>
                     </div>
 
-                    <h3 class="mt-4 mb-3 text-dark font-weight-bold"><span class="font-weight-bold">웹 프로그램 정보</span> <span class="text-muted small">(선택사항)</span></h3>
+                    <h3 class="mt-4 mb-3 text-dark font-weight-bold"><span class="font-weight-bold">WebApp Information</span> <span class="text-muted small">(Optional)</span></h3>
                     <div class="row" id="section-webAppInfo"></div>
 
-                    <h3 class="mt-4 mb-3 text-dark font-weight-bold">도구 설정</h3>
+                    <h3 class="mt-4 mb-3 text-dark font-weight-bold">Tool Setting</h3>
                     <div class="row" id="section-ToolSetting">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="ToolRecursiveLevelInput">탐색 깊이 (레벨)</label>
+                                <label for="ToolRecursiveLevelInput">Analysis recursive level</label>
                                 <div class="d-flex align-items-center">
                                     <input class="border border-white" type="number" min="1" max="5000" value="1" id="ToolRecursiveLevelInput">
                                     <input type="range" class="form-control" min="1" max="5000" value="1" id="ToolRecursiveLevelSlider">
@@ -247,34 +112,32 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="ToolURLPath">URL 경로 지정</label>
+                                <label for="ToolURLPath">Define URL Path</label>
                                 <input type="text" class="form-control p-4 rounded-pill" id="ToolURLPath"
-                                       placeholder="URL 경로 지정">
+                                       placeholder="Path here">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="AdditionalFunctions">추가 기능</label>
+                                <label for="AdditionalFunctions">Additional Options</label>
                                 <div class="card mb-4" id="AdditionalFunctions">
                                     <a href="#additionalFuncs" class="d-block card-header py-3" data-toggle="collapse"
                                        role="button" aria-expanded="false" aria-controls="additionalFuncs">
-                                        <h6 class="m-0 font-weight-bold text-primary">추가 기능 선택</h6>
+                                        <h6 class="m-0 font-weight-bold text-primary">Additional Options</h6>
                                     </a>
                                     <div class="collapse" id="additionalFuncs" style="">
                                         <div class="card-body">
                                             <div class="form-group mb-0">
                                                 <div class="custom-control custom-checkbox small">
                                                     <input type="checkbox" class="custom-control-input" id="fnc-port-scan">
-                                                    <label class="custom-control-label pt-1" for="fnc-port-scan">포트 스캔 (알려진
-                                                        포트)</label>
+                                                    <label class="custom-control-label pt-1" for="fnc-port-scan">Port scan (Known ports)</label>
                                                 </div>
                                             </div>
                                             <div class="form-group mb-0">
                                                 <div class="custom-control custom-checkbox small">
                                                     <input type="checkbox" class="custom-control-input"
                                                            id="fnc-csp-evaluate">
-                                                    <label class="custom-control-label pt-1" for="fnc-csp-evaluate">CSP
-                                                        평가</label>
+                                                    <label class="custom-control-label pt-1" for="fnc-csp-evaluate">CSP Evaluate</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -285,10 +148,10 @@
                     </div>
                     <div class="row" id="Section-JobButton">
                         <div class="col-md-6 p-2">
-                            <p class="btn btn-danger shadow p-2 pl-3 pr-3 ml-2 w-100" id="ClearAllData">초기화</p>
+                            <p class="btn btn-danger shadow p-2 pl-3 pr-3 ml-2 w-100" id="ClearAllData">Clear all input</p>
                         </div>
                         <div class="col-md-6 p-2">
-                            <a class="btn btn-success shadow p-2 pl-3 pr-3 ml-2 w-100" href="#">분석 수행</a>
+                            <a class="btn btn-success shadow p-2 pl-3 pr-3 ml-2 w-100" id="submitJobRequest">Start analysis</a>
                         </div>
                     </div>
                 </div>

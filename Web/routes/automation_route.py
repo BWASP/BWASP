@@ -8,4 +8,4 @@ bp = Blueprint(NAME, __name__, url_prefix='/automation')
 
 @bp.route('/options')
 def manual_options():
-    return render_template('automation/options.html', Title="자동 분석 옵션 설정 - BWASP")
+    return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")
