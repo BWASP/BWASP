@@ -26,10 +26,11 @@ def getExtraurl(main_url,body,url):
 def getjsExtraurl(main_url,body,url):
     # location 포함 확인 pattern = re.compile('''(location.href)\s*[=\(]\s*["']["'\.\w\/\\\?=&\s\+]+;)''')
     # location url 추출 
-    pattern = re.compile('''location.href\s*[=\(]\s*["'](["'\.\w\/\\\?=&\s\+]+);''')
+    #pattern = re.compile('''location.href\s*[=\(]\s*["'](["'\.\w\/\\\?=&\s\+]+);''')
+    pattern = re.compile('''location.href\s*[=\(]\s*["'](["'_.,:\w\/\\\@?^=%&/~+#-]+);?''')
     #print("추출된 url",pattern.findall(body))
     for line in pattern.findall(body):
-        line = re.sub('[\"\s+]','',line)
+        line = re.sub('[\"\'\s+]','',line)
         # urljoin을 통해 ./  ../  / 와 같은 상대경로 문제 해결
         res_exturllist.add(urljoin(main_url,line))
 
