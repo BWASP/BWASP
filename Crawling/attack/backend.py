@@ -1,6 +1,7 @@
 import json
 import os
-import re 
+import re
+from urllib.parse import urlparse   
 
 default_allow_cat={12,18,27,22}
 default_check_cat={12,18,27,22}
@@ -54,6 +55,12 @@ def resBackend(req_res_packets):
                 pattern=rebuildPattern(signature[name]["url"])
                 if re.findall(pattern,request["request"]["full_url"]):
                     appendResult(result,name,"url",i,0)
+            if  'headers' in  signature[name].keys():
+                pattern=rebuildPattern(signature[name]["url"])
+                if re.findall(pattern,request["request"]["headers"]):
+                    appendResult(result,name,"headers",i,0)
+                if re.findall(pattern,request["response"]["headers"]):
+                    appendResult(result,name,"headers",i,0)
     return(result)#, 출력값 확인
                    
 
@@ -99,6 +106,18 @@ def retCatsname(cat):
             cat_name[eachcat] = json_data[str(eachcat)]['name']
     return cat_name
 
+
+def isSameDomain(target_url, visit_url):
+    try:
+        target_domain = urlparse(target_url).netloc
+        visit_domain = urlparse(visit_url).netloc
+        
+        if target_domain == visit_domain:
+            return True
+        else:
+            return False
+    except:
+        return False
 
 if __name__ == '__main__':
     #print(extractJson())
