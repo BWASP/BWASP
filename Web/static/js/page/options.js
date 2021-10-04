@@ -40,7 +40,6 @@ document.getElementById("ClearAllData").addEventListener("click", function(){
 // Frontend constructor
 Object.keys(SupportedList).forEach((Type)=>{
     let toggleTabName = `web${Type}Selection`;
-    console.log(SupportedList[Type][0]);
     let Skeleton = {
         parent: document.createElement("div"),
         child: {
@@ -97,12 +96,19 @@ Object.keys(SupportedList).forEach((Type)=>{
 
         localSkeleton.child.child.codename.classList.add("custom-control-label", "pt-1");
         localSkeleton.child.child.codename.htmlFor = `info-web-${Type}-${CodeName}`;
-        localSkeleton.child.child.codename.innerHTML = `${CodeName} v.`;
+        localSkeleton.child.child.codename.innerHTML = `${CodeName}`;
 
         localSkeleton.child.child.versionInput.placeholder = "(Version)";
-        localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50")
+        localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50", "pl-1", "d-none")
         localSkeleton.child.child.versionInput.type = "text";
         localSkeleton.child.child.versionInput.id = `info-web-${Type}-Version-${CodeName}`;
+
+        // Add Event Listener for checkbox - to - version control input.
+        localSkeleton.child.child.checkbox.addEventListener("change", function(){
+            let versionInput = document.getElementById(`info-web-${Type}-Version-${CodeName}`);
+            versionInput.classList[(!this.checked)?"add":"remove"]("d-none");
+            versionInput.focus();
+        })
 
         localSkeleton.child.child.codename.appendChild(localSkeleton.child.child.versionInput);
         localSkeleton.child.parent.append(localSkeleton.child.child.checkbox, localSkeleton.child.child.codename);
@@ -114,6 +120,5 @@ Object.keys(SupportedList).forEach((Type)=>{
     Skeleton.child.child.content.parent.appendChild(Skeleton.child.child.content.child);
     Skeleton.child.parent.append(Skeleton.child.child.toggleTab, Skeleton.child.child.content.parent);
     Skeleton.parent.appendChild(Skeleton.child.parent);
-    console.log(Skeleton.parent);
     document.getElementById("section-webAppInfo").appendChild(Skeleton.parent);
 })
