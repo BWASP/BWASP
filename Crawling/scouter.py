@@ -7,19 +7,23 @@ from feature import res_geturl
 
 check = True
 input_url = ""
+visited_links = []
 
 def start(url, depth):
     driver = initSelenium()
-    visit(driver, url, set([url]), depth)
 
-def visit(driver, url, previous_urls, depth):
+    visit(driver, url, depth)
+
+def visit(driver, url, depth):
     global check
     global input_url
+    global visited_links
 
     driver.get(url)
 
     if check:
         input_url = driver.current_url
+        visited_links.append(input_url)
         check = False
 
     req_res_packets = packet_capture.packetCapture(driver)
@@ -38,17 +42,18 @@ def visit(driver, url, previous_urls, depth):
         return
 
     for visit_url in cur_page_links:
-        if visit_url in previous_urls:
-            # print("continue: {}".format(visit_url))
+        if visit_url in visited_links:
             continue
         if not isSameDomain(input_url, visit_url):
             # print("notSameDomain: {}".format(visit_url))
             continue
-        if isSamePath(visit_url, previous_urls):
+        if isSamePath(visit_url, visited_links):
             continue
         # print("visit: {}".format(visit_url))
         # input("")
-        visit(driver, visit_url, previous_urls.union(cur_page_links), depth-1)
+
+        visited_links.append(visit_url)
+        visit(driver, visit_url, depth-1)
 
 def isSameDomain(target_url, visit_url):
     try:
@@ -96,5 +101,5 @@ def initSelenium():
     return driver
 
 if __name__ == "__main__":
-    url = "https://naver.com"
-    start(url, 3)
+    url = "https://kitribob.kr/"
+    start(url, 10)
