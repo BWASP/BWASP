@@ -10,6 +10,7 @@ res_exturllist=set()
 res_jsonlist=set()
 res_jslist=set()
 res_xmllist=set()
+res_htmllist=set()
 
 def getExtraurl(main_url,body,url):
     #url regular expression
@@ -26,16 +27,20 @@ def getExtraurl(main_url,body,url):
 def getjsExtraurl(main_url,body,url):
     # location 포함 확인 pattern = re.compile('''(location.href)\s*[=\(]\s*["']["'\.\w\/\\\?=&\s\+]+;)''')
     # location url 추출 
-    pattern = re.compile('''location.href\s*[=\(]\s*["'](["'\.\w\/\\\?=&\s\+]+);''')
+    #pattern = re.compile('''location.href\s*[=\(]\s*["'](["'\.\w\/\\\?=&\s\+]+);''')
+    pattern = re.compile('''location.href\s*[=\(]\s*["'](["'_.,:\w\/\\\@?^=%&/~+#-]+);?''')
     #print("추출된 url",pattern.findall(body))
     for line in pattern.findall(body):
-        line = re.sub('[\"\s+]','',line)
+        line = re.sub('[\"\'\s+]','',line)
         # urljoin을 통해 ./  ../  / 와 같은 상대경로 문제 해결
         res_exturllist.add(urljoin(main_url,line))
 
             
 #url 구분 저장 
 def saveUrl(main_url,type,body,url):
+    if type == "currentpage":
+        res_htmllist.add(url)
+        getExtraurl(main_url,body,url)
     # 확장자 일 경우 확장자에 따라 타입 정하기
     if type == "ext":
         extension=list()
@@ -70,7 +75,9 @@ def eachgetUrl(main_url,response,response_url):
         saveUrl(main_url,"ext",response["body"],response_url)
 
 #Call this to get extra link
-def getUrl(main_url,req_res_packet):
+#res_geturl.getUrl(driver.current_url, req_res_packets,driver.page_source)
+def getUrl(main_url,req_res_packet,page_source):
+    saveUrl(main_url,"currentpage",page_source,main_url)
     for request in req_res_packet:
         # 탐색된 모든 url 저장
         #res_urllist.add(request[i]["request"]["url"])
