@@ -7,9 +7,9 @@ bp = Blueprint(NAME, __name__, url_prefix='/api')
 
 
 @bp.route('/')
-@bp.route('/api')
 def apiInvalidRequest():
     return jsonify({"success": False, "message": "잘못된 요청입니다."})
+
 
 @bp.route('/job/enroll')
 def apiJobEnroll():
