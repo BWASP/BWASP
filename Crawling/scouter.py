@@ -5,18 +5,29 @@ from feature import clickable_tags
 from feature import packet_capture
 from feature import res_geturl
 
+check = True
+input_url = ""
+
 def start(url, depth):
     driver = initSelenium()
     visit(driver, url, set([url]), depth)
 
 def visit(driver, url, previous_urls, depth):
+    global check
+    global input_url
+
     driver.get(url)
+
+    if check:
+        input_url = driver.current_url
+        check = False
 
     req_res_packets = packet_capture.packetCapture(driver)
     cur_page_links = clickable_tags.bs4Crawling(driver.current_url, driver.page_source)
     cur_page_links += res_geturl.getUrl(url, req_res_packets)
     cur_page_links = list(set(deleteFragment(cur_page_links)))
 
+    # print(input_url)
     # print(cur_page_links)
     # print(depth)
 
@@ -30,7 +41,7 @@ def visit(driver, url, previous_urls, depth):
         if visit_url in previous_urls:
             # print("continue: {}".format(visit_url))
             continue
-        if not isSameDomain(url, visit_url):
+        if not isSameDomain(input_url, visit_url):
             # print("notSameDomain: {}".format(visit_url))
             continue
         if isSamePath(visit_url, previous_urls):
@@ -85,5 +96,5 @@ def initSelenium():
     return driver
 
 if __name__ == "__main__":
-    url = "https://www.naver.com"
+    url = "https://naver.com"
     start(url, 3)
