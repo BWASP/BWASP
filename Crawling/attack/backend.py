@@ -128,7 +128,7 @@ def retCatsname(cat):
     with open(categories_path,encoding='UTF8') as json_file:
         json_data = json.load(json_file)
         for eachcat in cat:
-            cat_name[eachcat] = json_data[str(eachcat)]['name']
+            cat_name[str(eachcat)] = json_data[str(eachcat)]['name']
     return cat_name
 
 if __name__ == '__main__':
