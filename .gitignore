@@ -4,3 +4,5 @@ Web/__pycache__/*
 Web/BWASP/*
 .DS_store
 *.pyc
+Web/databases/CVE.db
+Web/databases/cve_list.csv
