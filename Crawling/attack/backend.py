@@ -1,10 +1,15 @@
 import json
-import os 
+import os
+import re 
 
-json_path="../wappalyzer/"
-categories_path="../wappalyzer/categories.json"
+json_path="./wappalyzer/"
+categories_path="./wappalyzer/categories.json"
 default_allow_cat={12,18,27,22}
 default_check_cat={12,18,27,22}
+
+sig_url=list()
+
+
 
 
 
@@ -19,11 +24,38 @@ def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22}):
             json_data = json.load(json_file)
             for name in json_data:
                 if set(check_cat) & set(json_data[name]['cats']):
-                    #print(json_data[name])
+                    #print(json_data[name])= 
                     result[name]=json_data[name]
+
     return result
 
+def rebuildPattern(pattern):
+    return pattern.split("\\;")[0]
 
+
+
+def resBackend(req_res_packets):
+    print("name",__name__)
+    
+    if __name__ == 'attack.backend':
+        print("yes!! gogo")
+        json_path="./wappalyzer/"
+        categories_path="./wappalyzer/categories.json"
+    
+
+    signature=extractJson()
+    result={}
+    for i,request in enumerate(req_res_packets):
+        for  name  in signature:
+            if  'url' in  signature[name].keys():
+                pattern=rebuildPattern(signature[name]['url'])
+                print(pattern)
+                #print(request['request']['full_url'])
+                if re.findall(pattern,request['request']['full_url']):
+                    print(request['request']['full_url'])
+                
+                    
+                        
 
 def extractPriority(cat=[12,18,27,22]):
     cat = sorted(cat)
@@ -69,6 +101,8 @@ def retCatsname(cat):
 
 
 if __name__ == '__main__':
-     print(extractJson())
-     #print(retCatsname([12,18,27,22]))
-     #print(18,retCatname(18))
+    #print(extractJson())
+    #print(retCatsname([12,18,27,22]))
+    #print(18,retCatname(18))
+    resBackend()
+
