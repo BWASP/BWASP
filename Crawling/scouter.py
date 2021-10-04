@@ -24,7 +24,7 @@ def visit(driver, url, previous_urls, depth):
 
     req_res_packets = packet_capture.packetCapture(driver)
     cur_page_links = clickable_tags.bs4Crawling(driver.current_url, driver.page_source)
-    cur_page_links += res_geturl.getUrl(url, req_res_packets)
+    cur_page_links += res_geturl.getUrl(driver.current_url, req_res_packets)
     cur_page_links = list(set(deleteFragment(cur_page_links)))
 
     # print(input_url)
