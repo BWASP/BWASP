@@ -94,10 +94,12 @@ def deleteFragment(links):
     return links
 
 def initSelenium():
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("lang=ko_KR")
     options = {
         "disable_encoding" : True
     }
-    driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options = options)
+    driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options = options, chrome_options=chrome_options)
     return driver
 
 if __name__ == "__main__":
