@@ -28,9 +28,9 @@ def create_app(config=None):
         db.app = app
         db.create_all()
 
-    @app.before_request
-    def before_request():
-        db.create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+    # @app.before_request
+    # def before_request():
+        # db.create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
 
     @app.errorhandler(404)
     def NotFound(error):
