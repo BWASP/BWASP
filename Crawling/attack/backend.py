@@ -2,16 +2,11 @@ import json
 import os
 import re 
 
-json_path="./wappalyzer/"
-categories_path="./wappalyzer/categories.json"
 default_allow_cat={12,18,27,22}
 default_check_cat={12,18,27,22}
-
+json_path="./wappalyzer/"
+categories_path="./wappalyzer/categories.json"
 sig_url=list()
-
-
-
-
 
 def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22}):
     #12(javascript framework),18(Web frameworks),22(web server),27(Programming Language)
@@ -24,7 +19,6 @@ def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22}):
             json_data = json.load(json_file)
             for name in json_data:
                 if set(check_cat) & set(json_data[name]['cats']):
-                    #print(json_data[name])= 
                     result[name]=json_data[name]
 
     return result
@@ -32,30 +26,36 @@ def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22}):
 def rebuildPattern(pattern):
     return pattern.split("\\;")[0]
 
+def initResult(result,name):
+    result[name]={}
+    result[name]["detect"]=list()
+    result[name]["version"]="false"
+    result[name]["request"]=list()
+    result[name]["response"]=list()
+
+# requset_index , reseponse_index 가 0 이면 관련있는 index가 없다는 걸 의미
+def appendResult(result,name,detectype,request_index=0,response_index=0):
+    if name not in result:
+        initResult(result,name)
+    if detectype not in result[name]:
+        result[name]["detect"].append(detectype)
+    if request_index:
+        result[name]["request"].append(request_index)
+    if response_index:
+        result[name]["response"].append(response_index)
 
 
 def resBackend(req_res_packets):
-    print("name",__name__)
-    
-    if __name__ == 'attack.backend':
-        print("yes!! gogo")
-        json_path="./wappalyzer/"
-        categories_path="./wappalyzer/categories.json"
-    
-
-    signature=extractJson()
     result={}
+    signature=extractJson()
     for i,request in enumerate(req_res_packets):
         for  name  in signature:
             if  'url' in  signature[name].keys():
-                pattern=rebuildPattern(signature[name]['url'])
-                print(pattern)
-                #print(request['request']['full_url'])
-                if re.findall(pattern,request['request']['full_url']):
-                    print(request['request']['full_url'])
-                
-                    
-                        
+                pattern=rebuildPattern(signature[name]["url"])
+                if re.findall(pattern,request["request"]["full_url"]):
+                    appendResult(result,name,"url",i,0)
+    return(result)#, 출력값 확인
+                   
 
 def extractPriority(cat=[12,18,27,22]):
     cat = sorted(cat)
@@ -103,6 +103,8 @@ def retCatsname(cat):
 if __name__ == '__main__':
     #print(extractJson())
     #print(retCatsname([12,18,27,22]))
-    #print(18,retCatname(18))
-    resBackend()
+    json_path="../wappalyzer/"
+    categories_path="../wappalyzer/categories.json"
+    print(18,retCatname(18))
+    #resBackend()
 
