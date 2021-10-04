@@ -25,7 +25,8 @@
                             <div class="form-group">
                                 <label for="job-TargetURL">Target URL</label>
                                 <input type="text" class="form-control p-4 rounded-pill" id="job-TargetURL"
-                                       placeholder="Analysis target URL">
+                                       placeholder="Analysis target URL" aria-describedby="regexViolence-targetURL">
+                                <small id="regexViolence-targetURL" class="form-text text-muted d-none">Regex violence : <span class="text-danger">Target URL must be starts with protocol (http, https, ftp ...</span></small>
                             </div>
                         </div>
                     </div>
