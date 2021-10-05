@@ -75,6 +75,7 @@ def appendResult(result,name,detectype,request_index=0,response_index=0):
 def resBackend(driver,req_res_packets):
     target_url=driver.current_url
     current_page=driver.page_source
+    soup = BeautifulSoup(current_page,"html.parser")
     result={}
     signature=extractJson(default_check_cat,default_allow_cat)
     for i,request in enumerate(req_res_packets):
@@ -128,14 +129,25 @@ def resBackend(driver,req_res_packets):
                     pattern=rebuildPattern(signature[name]["html"])
                     if re.findall(pattern,current_page):
                         #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
-                        appendResult(result,name,"html",0,i)
+                        appendResult(result,name,"html",0,1)
                 #list일 경우
                 elif signature[name]["html"] is list:
                     for html_line in signature[name]["html"]:
                         pattern=rebuildPattern(html_line)
                         if re.findall(pattern,current_page):
                             #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
-                            appendResult(result,name,"html",0,i)
+                            appendResult(result,name,"html",0,1)
+            #meta로 추출 , meta의 값은 dictionary 값 1개만 존재한다 가정
+            if "meta" in signature[name].keys():
+                metas = soup.select('meta[name][content]')
+                for meta_line in metas:             
+                    for comp_metakey in signature[name]["meta"]:
+                        if meta_line['name'] == comp_metakey:
+                            continue
+                        pattern=rebuildPattern(signature[name]["meta"][comp_metakey])
+                        if re.findall(pattern,meta_line["content"]):
+                                #현재 페이지는 response 패킷 1으로 침 
+                                appendResult(result,name,"meta",0,1)
     return(result)
                    
 
