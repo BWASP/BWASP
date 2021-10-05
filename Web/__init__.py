@@ -37,4 +37,3 @@ def create_app(config=None):
 
 # if __name__ == '__main__':ßßßß
 #    create_app().run(host='0.0.0.0', port=5000, debug=True)
-ßß
