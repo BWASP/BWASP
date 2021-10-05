@@ -105,6 +105,21 @@ def resBackend(target_url,req_res_packets):
                     pattern=rebuildPattern(signature[name]["headers"][comp_header])
                     if re.findall(pattern,request["response"]["headers"][comp_header]):
                         appendResult(result,name,"headers",0,i)
+            #cookie로 추출
+            if  'cookie' in  signature[name].keys():
+                if not isSameDomain(target_url,request["request"]["full_url"]):
+                    continue
+                #request packet 비교
+                if "cookie" in signature[name]["headers"].keys():
+                    pattern=rebuildPattern(signature[name]["headers"]["cookie"])
+                    if re.findall(pattern,request["request"]["headers"]["cookie"]):
+                        appendResult(result,name,"cookie",i,0)
+                #response packet 비교
+                for comp_cookie in ({"cookie","set-cookie"}  & set(signature[name]["headers"].keys())):
+                        pattern=rebuildPattern(signature[name]["headers"]["cookie"])
+                        if re.findall(pattern,request["response"]["headers"][comp_header]):
+                            appendResult(result,name,"cookie",0,i)
+            
                 
     return(result)
                    
