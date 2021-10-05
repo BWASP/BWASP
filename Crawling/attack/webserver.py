@@ -68,10 +68,12 @@ def loadCategory(category):
 
 def isSameDomain(target_url, visit_url):
     try:
-        target_domain = urlparse(target_url).netloc
-        visit_domain = urlparse(visit_url).netloc
-        
-        if target_domain == visit_domain:
+        target = urlparse(target_url)
+        visit = urlparse(visit_url)
+
+        if visit.scheme != "http" and visit.scheme != "https":
+            return False
+        if target.netloc == visit.netloc:
             return True
         else:
             return False
