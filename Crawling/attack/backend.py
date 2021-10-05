@@ -43,6 +43,12 @@ def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22}):
                     result[name]=json_data[name]
     return result
 
+def extractJsonattribute(result):
+    attr=set()
+    for name in result:
+        attr.update(result[name].keys())
+    return list(attr) 
+
 def rebuildPattern(pattern):
     return pattern.split("\\;")[0]
 
@@ -136,7 +142,7 @@ def retCatsname(cat):
 if __name__ == '__main__':
     json_path="../wappalyzer/"
     categories_path="../wappalyzer/categories.json"
-    print(extractJson())
+    print(extractJsonattribute(extractJson()))
     #print(retCatsname([12,18,27,22]))
     #print(18,retCatname(18))
     #resBackend()
