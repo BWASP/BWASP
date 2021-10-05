@@ -1,7 +1,8 @@
 import json
 import os
 import re
-from urllib.parse import urlparse   
+from urllib.parse import urlparse
+from bs4 import BeautifulSoup
 
 default_allow_cat={12,18,27,22}
 #default_allow_cat={12,18,27,22,28}
