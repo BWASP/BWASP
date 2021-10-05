@@ -137,7 +137,7 @@ def resBackend(driver,req_res_packets):
                         if re.findall(pattern,current_page):
                             #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
                             appendResult(result,name,"html",0,1)
-            #meta로 추출 , meta의 값은 dictionary 값 1개만 존재한다 가정
+            #meta로 추출 , meta의 값은 dictionary 값 여러개도 가능
             if "meta" in signature[name].keys():
                 metas = soup.select('meta[name][content]')
                 for meta_line in metas:             
