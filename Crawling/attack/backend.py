@@ -81,6 +81,18 @@ def resBackend(target_url,req_res_packets):
                 pattern=rebuildPattern(signature[name]["url"])
                 if re.findall(pattern,request["request"]["full_url"]):
                     appendResult(result,name,"url",i,0)
+            #scripts src 도 url 처럼 추출        
+            if  'scripts' in  signature[name].keys():
+                if signature[name]["scripts"] is str:
+                    pattern=rebuildPattern(scripts_line)
+                    if re.findall(pattern,request["request"]["full_url"]):
+                        appendResult(result,name,"scripts",i,0)
+                elif signature[name]["scripts"] is list:
+                    for scripts_line in signature[name]["scripts"]:
+                        pattern=rebuildPattern(scripts_line)
+                        if re.findall(pattern,request["request"]["full_url"]):
+                            appendResult(result,name,"scripts",i,0)
+
             #header로 추출
             if  'headers' in  signature[name].keys():
                 if not isSameDomain(target_url,request["request"]["full_url"]):
