@@ -71,7 +71,8 @@ def appendResult(result,name,detectype,request_index=0,response_index=0):
         result[name]["response"].append(response_index)
 
 
-def resBackend(target_url,req_res_packets):
+def resBackend(driver,req_res_packets):
+    target_url=driver.current_url
     result={}
     signature=extractJson(default_check_cat,default_allow_cat)
     for i,request in enumerate(req_res_packets):
