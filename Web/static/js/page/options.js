@@ -1,7 +1,11 @@
+
 const MaximumRecursiveLevel = 5000;
 const RecursiveLevelHandler = ["Input", "Slider"];
 const patterns = {
-    targetURL: ""
+    targetURL: /^http[s]?:\/\//
+}
+const identifier = {
+    optionalFunctions: "optFnc"
 }
 const SupportedList = {
     Server: ["Web Server", ["Apache", "Nginx"]],
@@ -132,7 +136,72 @@ Object.keys(SupportedList).forEach((Type)=>{
     Skeleton.parent.appendChild(Skeleton.child.parent);
     document.getElementById("section-webAppInfo").appendChild(Skeleton.parent);
 })
+
+/***
+ * Renderer of <ul> element.
+ * @param target
+ * @param dataPackage
+ */
+let renderULElement = (target, dataPackage) => {
+    let skeleton = document.createElement("ul");
+    skeleton.classList.add("pl-3", "mb-0");
+    dataPackage.forEach((path)=>{
+        let localSkeleton = [document.createElement("li"), document.createElement("code")];
+        localSkeleton[1].innerHTML = path;
+        localSkeleton[0].appendChild(localSkeleton[1]);
+        skeleton.appendChild(localSkeleton[0]);
+    })
+    target.innerHTML = "";
+    target.appendChild(skeleton);
+}
+
+// Handler for submit check modal
 document.getElementById("submitJobRequest").addEventListener("click", function(){
+    let formData = document.getElementsByTagName("input");
+    let requestData = Object();
+    requestData["tool"] = Object();
+    requestData["target"] = Object();
+
+    // Target URL
+    requestData.target["url"] = document.getElementById("target-url").value;
+    if(patterns.targetURL.test(requestData.target.url)===false) {
+        return document.getElementById("regexViolence-targetURL").classList.remove("d-none");
+    }else {
+        document.getElementById("regexViolence-targetURL").classList.add("d-none");
+        document.getElementById("modal-tool-targetURL").innerHTML = requestData.target.url;
+    }
+
+    // Pre-defined URL Path
+    requestData.target["path"] = document.getElementById("target-urlPath").value.replaceAll(" ", "").split(",");
+    if(requestData.target.path.length > 0){
+        renderULElement(document.getElementById("modal-tool-URLPath"), requestData.target.path);
+    }
+
+    // Analysis recursive level
+    requestData.tool["analysisLevel"] = document.getElementById("ToolRecursiveLevelSlider").value;
+    if(isNaN(requestData["tool"]["analysisLevel"])) {
+        return alert("Error!");
+    }else{
+        document.getElementById("modal-tool-analysisLevel").innerHTML = requestData.tool.analysisLevel;
+    }
+
+    // Optional functions
+    let optionalJobs = [];
+    Object.keys(formData).forEach((index)=>{
+        if(formData[index].id.split("-")[0]===identifier.optionalFunctions && formData[index].checked){
+            optionalJobs.push([formData[index].value, document.getElementById(formData[index].id+"-label").innerHTML]);
+        }
+    })
+    requestData.tool["optionalJobs"] = [];
+    if(optionalJobs.length>0) {
+        let tmp = [];
+        optionalJobs.forEach((data) => {
+            requestData.tool.optionalJobs.push(data[0]);
+            tmp.push(data[1]);
+        });
+        renderULElement(document.getElementById("modal-tool-options"), tmp);
+    }
+
     $("#jobSubmitVerifyModal").modal({
         backdrop: 'static',
         show: true
