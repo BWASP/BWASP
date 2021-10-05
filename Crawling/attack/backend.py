@@ -73,6 +73,7 @@ def appendResult(result,name,detectype,request_index=0,response_index=0):
 
 def resBackend(driver,req_res_packets):
     target_url=driver.current_url
+    current_page=driver.page_source
     result={}
     signature=extractJson(default_check_cat,default_allow_cat)
     for i,request in enumerate(req_res_packets):
@@ -119,7 +120,21 @@ def resBackend(driver,req_res_packets):
                         pattern=rebuildPattern(signature[name]["headers"]["cookie"])
                         if re.findall(pattern,request["response"]["headers"][comp_header]):
                             appendResult(result,name,"cookie",0,i)
-            
+            #html 파싱은 현재 페이질 경우만
+            if 'html' in signature[name].keys():
+                #str 일 경우
+                if signature[name]["html"] is str:
+                    pattern=rebuildPattern(signature[name]["html"])
+                    if re.findall(pattern,current_page):
+                        #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
+                        appendResult(result,name,"html",0,i)
+                #list일 경우
+                elif signature[name]["html"] is list:
+                    for html_line in signature[name]["html"]:
+                        pattern=rebuildPattern(html_line)
+                        if re.findall(pattern,current_page):
+                            #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
+                            appendResult(result,name,"html",0,i)
     return(result)
                    
 
