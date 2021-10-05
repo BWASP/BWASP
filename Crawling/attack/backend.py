@@ -86,7 +86,7 @@ def resBackend(driver,req_res_packets):
             #scripts src 도 url 처럼 추출        
             if  'scripts' in  signature[name].keys():
                 if signature[name]["scripts"] is str:
-                    pattern=rebuildPattern(scripts_line)
+                    pattern=rebuildPattern(signature[name]["scripts"])
                     if re.findall(pattern,request["request"]["full_url"]):
                         appendResult(result,name,"scripts",i,0)
                 elif signature[name]["scripts"] is list:
