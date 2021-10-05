@@ -92,7 +92,6 @@ def resBackend(target_url,req_res_packets):
                         pattern=rebuildPattern(scripts_line)
                         if re.findall(pattern,request["request"]["full_url"]):
                             appendResult(result,name,"scripts",i,0)
-
             #header로 추출
             if  'headers' in  signature[name].keys():
                 if not isSameDomain(target_url,request["request"]["full_url"]):
@@ -120,7 +119,6 @@ def resBackend(target_url,req_res_packets):
                         if re.findall(pattern,request["response"]["headers"][comp_header]):
                             appendResult(result,name,"cookie",0,i)
             
-                
     return(result)
                    
 
