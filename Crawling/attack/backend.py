@@ -57,7 +57,8 @@ def rebuildPattern(pattern):
     if len(result) > 1:
         for result_line in result[1:]:
             if "version:" in result_line:
-                version_group=result_line.split(":\\")[1]
+                #version:1 version:\\1
+                version_group=result_line.split(":")[1].replace("\\","")
                 version_group=int(version_group)
             if "confidence:" in result_line:
                 confidence=result_line.split(":")[1]
@@ -114,13 +115,13 @@ def resBackend(driver,req_res_packets):
         #scripts src 현재 페이지에서 추출        
         if "scripts" in signature[name].keys():
             current_scripts = soup.select('script[src]') 
-            if signature[name]["scripts"] is str:
+            if type(signature[name]["scripts"]) is str:
                 pattern,version_group,confidence=rebuildPattern(signature[name]["scripts"])
                 for current_scripts_line in current_scripts:
                     regex_results=re.findall(pattern,current_scripts_line["src"],re.I)
                     if(regex_results):
                         appendResult(result,name,"scripts",retVersiongroup("findall",regex_results,version_group),0,1)
-            elif signature[name]["scripts"] is list:
+            elif type(signature[name]["scripts"]) is list:
                 for scripts_line in signature[name]["scripts"]:
                     pattern,version_group,confidence=rebuildPattern(scripts_line)
                     for current_scripts_line in current_scripts:
@@ -130,14 +131,14 @@ def resBackend(driver,req_res_packets):
                     #html 파싱은 현재 페이질 경우만
         if 'html' in signature[name].keys():
             #str 일 경우
-            if signature[name]["html"] is str:
+            if type(signature[name]["html"]) is type(""):
                 pattern,version_group,confidence=rebuildPattern(signature[name]["html"])
                 regex_results=re.findall(pattern,current_page,re.I)
                 #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
                 if(regex_results):
                     appendResult(result,name,"html",retVersiongroup("findall",regex_results,version_group),0,1)
             #list일 경우
-            elif signature[name]["html"] is list:
+            elif type(signature[name]["html"]) is type(list()):
                 for html_line in signature[name]["html"]:
                     pattern,version_group,confidence=rebuildPattern(html_line)
                     regex_results=re.findall(pattern,current_page,re.I)
