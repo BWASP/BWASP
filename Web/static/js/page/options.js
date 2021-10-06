@@ -232,39 +232,9 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
         if(tempStorage.length > 0) renderULElement(document.getElementById(`modal-info-${type.toLowerCase()}`), tempStorage);
     })
 
-
-    /*
-    Object.keys(formData).forEach((index)=>{
-        let keySet = formData[index].id.split("-");
-        webAppInfo.types.forEach((key)=>{
-            if(keySet[0]===identifier.webAppInfo.name && keySet[1]===key && formData[index].checked) {
-                requestData.info[key.toLowerCase()] = Array();
-                requestData.info[key.toLowerCase()].push({
-                    name: formData[index].value,
-                    version: document.getElementById(`${identifier.webAppInfo.version}-${key}-${formData[index].value}`).value
-                })
-                // tmp.push(document.getElementById(formData[index].id + "-label").innerText);
-            }
-            console.log(tmp)
-        })
-    })
-
-     */
-
-    // asd
-    webAppInfo.types.forEach((index)=>{
-        let tmp = [];
-        webAppInfo[index.toLowerCase()].forEach((localIndex)=>console.log(localIndex));
-
-    })
-    // renderULElement(document.getElementById("modal-info-webServer"), )
-
-    // Web server
-
-
     $("#jobSubmitVerifyModal").modal({
         backdrop: 'static',
         show: true
     })
-    console.log(requestData ,webAppInfo);
+    alert(JSON.stringify(requestData));
 })
