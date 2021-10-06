@@ -41,9 +41,6 @@ def getPortsOffline(target_ip):
             if result == 0:
                 opened_ports[str(p)] = service
                 
-        for i in opened_ports:
-            print('[+] Open Port and Service : {}, {}'.format(i, opened_ports[i]))
-
     except error as e:
         print("[Error] - Port Scan\n" + e)
     
