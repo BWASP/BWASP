@@ -106,6 +106,52 @@ def resBackend(driver,req_res_packets):
     soup = BeautifulSoup(current_page,"html.parser")
     result={}
     signature=extractJson(default_check_cat,default_allow_cat)
+    for  name  in signature:
+        #scripts src 현재 페이지에서 추출        
+        if "scripts" in signature[name].keys():
+            current_scripts = soup.select('script[src]') 
+            if signature[name]["scripts"] is str:
+                pattern,version_group,confidence=rebuildPattern(signature[name]["scripts"])
+                for current_scripts_line in current_scripts:
+                    regex_results=re.findall(pattern,current_scripts_line["src"],re.I)
+                    if(regex_results):
+                        appendResult(result,name,"scripts",retVersiongroup(regex_results,version_group),0,1)
+            elif signature[name]["scripts"] is list:
+                for scripts_line in signature[name]["scripts"]:
+                    pattern,version_group,confidence=rebuildPattern(scripts_line)
+                    for current_scripts_line in current_scripts:
+                        regex_results=re.findall(pattern,current_scripts_line["src"],re.I)
+                        if(regex_results):
+                            appendResult(result,name,"scripts",retVersiongroup(regex_results,version_group),0,1)
+                    #html 파싱은 현재 페이질 경우만
+        if 'html' in signature[name].keys():
+            #str 일 경우
+            if signature[name]["html"] is str:
+                pattern,version_group,confidence=rebuildPattern(signature[name]["html"])
+                regex_results=re.findall(pattern,current_page,re.I)
+                #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
+                if(regex_results):
+                    appendResult(result,name,"html",retVersiongroup(regex_results,version_group),0,1)
+            #list일 경우
+            elif signature[name]["html"] is list:
+                for html_line in signature[name]["html"]:
+                    pattern,version_group,confidence=rebuildPattern(html_line)
+                    regex_results=re.findall(pattern,current_page,re.I)
+                    #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
+                    if(regex_results):
+                        appendResult(result,name,"html",retVersiongroup(regex_results,version_group),0,1)
+        #meta로 추출 , meta의 값은 dictionary 값 여러개도 가능
+        if "meta" in signature[name].keys():
+            metas = soup.select('meta[name][content]')
+            for meta_line in metas:             
+                for comp_metakey in signature[name]["meta"]:
+                    if meta_line['name'] == comp_metakey:
+                        continue
+                    pattern,version_group,confidence=rebuildPattern(signature[name]["meta"][comp_metakey])
+                    regex_results=re.findall(pattern,meta_line["content"],re.I)
+                    #현재 페이지는 response 패킷 1으로 침 
+                    if(regex_results):
+                        appendResult(result,name,"meta",retVersiongroup(regex_results,version_group),0,1)
     for i,request in enumerate(req_res_packets):
         for  name  in signature:
             #url로 추출 
@@ -114,22 +160,6 @@ def resBackend(driver,req_res_packets):
                 regex_results=re.findall(pattern,request["request"]["full_url"],re.I)
                 if(regex_results):
                     appendResult(result,name,"url",retVersiongroup(regex_results,version_group),i,0)
-            #scripts src 현재 페이지에서 추출        
-            if "scripts" in signature[name].keys():
-                current_scripts = soup.select('script[src]') 
-                if signature[name]["scripts"] is str:
-                    pattern,version_group,confidence=rebuildPattern(signature[name]["scripts"])
-                    for current_scripts_line in current_scripts:
-                        regex_results=re.findall(pattern,current_scripts_line["src"],re.I)
-                        if(regex_results):
-                            appendResult(result,name,"scripts",retVersiongroup(regex_results,version_group),i,0)
-                elif signature[name]["scripts"] is list:
-                    for scripts_line in signature[name]["scripts"]:
-                        pattern,version_group,confidence=rebuildPattern(scripts_line)
-                        for current_scripts_line in current_scripts:
-                            regex_results=re.findall(pattern,current_scripts_line["src"],re.I)
-                            if(regex_results):
-                                 appendResult(result,name,"scripts",retVersiongroup(regex_results,version_group),i,0)
             #header로 추출
             if  'headers' in  signature[name].keys():
                 if not isSameDomain(target_url,request["request"]["full_url"]):
@@ -160,35 +190,6 @@ def resBackend(driver,req_res_packets):
                         regex_results=re.findall(pattern,request["response"]["headers"][comp_header],re.I)
                         if(regex_results):
                             appendResult(result,name,"cookie",retVersiongroup(regex_results,version_group),0,i)
-            #html 파싱은 현재 페이질 경우만
-            if 'html' in signature[name].keys():
-                #str 일 경우
-                if signature[name]["html"] is str:
-                    pattern,version_group,confidence=rebuildPattern(signature[name]["html"])
-                    regex_results=re.findall(pattern,current_page,re.I)
-                    #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
-                    if(regex_results):
-                        appendResult(result,name,"html",retVersiongroup(regex_results,version_group),0,1)
-                #list일 경우
-                elif signature[name]["html"] is list:
-                    for html_line in signature[name]["html"]:
-                        pattern,version_group,confidence=rebuildPattern(html_line)
-                        regex_results=re.findall(pattern,current_page,re.I)
-                        #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
-                        if(regex_results):
-                            appendResult(result,name,"html",retVersiongroup(regex_results,version_group),0,1)
-            #meta로 추출 , meta의 값은 dictionary 값 여러개도 가능
-            if "meta" in signature[name].keys():
-                metas = soup.select('meta[name][content]')
-                for meta_line in metas:             
-                    for comp_metakey in signature[name]["meta"]:
-                        if meta_line['name'] == comp_metakey:
-                            continue
-                        pattern,version_group,confidence=rebuildPattern(signature[name]["meta"][comp_metakey])
-                        regex_results=re.findall(pattern,meta_line["content"],re.I)
-                        #현재 페이지는 response 패킷 1으로 침 
-                        if(regex_results):
-                            appendResult(result,name,"meta",retVersiongroup(regex_results,version_group),0,1)
     return(result)
                    
 
