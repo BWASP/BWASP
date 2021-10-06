@@ -61,11 +61,13 @@ def initResult(result,name):
     result[name]["response"]=list()
 
 # requset_index , reseponse_index 가 0 이면 관련있는 index가 없다는 걸 의미
-def appendResult(result,name,detectype,request_index=0,response_index=0):
+def appendResult(result,name,detectype,version,request_index=0,response_index=0):
     if name not in result:
         initResult(result,name)
     if detectype not in result[name]["detect"]:
         result[name]["detect"].append(detectype)
+    if version != "false" and result[name]["version"] == "false":
+        result[name]["version"]=version
     if request_index not in result[name]["request"]:
         result[name]["request"].append(request_index)
     if response_index not in result[name]["response"]:
@@ -84,18 +86,18 @@ def resBackend(driver,req_res_packets):
             if  'url' in  signature[name].keys():
                 pattern=rebuildPattern(signature[name]["url"])
                 if re.findall(pattern,request["request"]["full_url"]):
-                    appendResult(result,name,"url",i,0)
+                    appendResult(result,name,"url",version,i,0)
             #scripts src 도 url 처럼 추출        
             if  'scripts' in  signature[name].keys():
                 if signature[name]["scripts"] is str:
                     pattern=rebuildPattern(signature[name]["scripts"])
                     if re.findall(pattern,request["request"]["full_url"]):
-                        appendResult(result,name,"scripts",i,0)
+                        appendResult(result,name,"scripts",version,i,0)
                 elif signature[name]["scripts"] is list:
                     for scripts_line in signature[name]["scripts"]:
                         pattern=rebuildPattern(scripts_line)
                         if re.findall(pattern,request["request"]["full_url"]):
-                            appendResult(result,name,"scripts",i,0)
+                            appendResult(result,name,"scripts",version,i,0)
             #header로 추출
             if  'headers' in  signature[name].keys():
                 if not isSameDomain(target_url,request["request"]["full_url"]):
@@ -103,11 +105,11 @@ def resBackend(driver,req_res_packets):
                 for comp_header in set(signature[name]["headers"].keys()) & set(request["request"]["headers"].keys()):
                     pattern=rebuildPattern(signature[name]["headers"][comp_header])
                     if re.findall(pattern,request["request"]["headers"][comp_header]):
-                        appendResult(result,name,"headers",i,0)
+                        appendResult(result,name,"headers",version,i,0)
                 for comp_header in set(signature[name]["headers"].keys()) & set(request["response"]["headers"].keys()):
                     pattern=rebuildPattern(signature[name]["headers"][comp_header])
                     if re.findall(pattern,request["response"]["headers"][comp_header]):
-                        appendResult(result,name,"headers",0,i)
+                        appendResult(result,name,"headers",version,0,i)
             #cookie로 추출
             if  'cookie' in  signature[name].keys():
                 if not isSameDomain(target_url,request["request"]["full_url"]):
@@ -116,12 +118,12 @@ def resBackend(driver,req_res_packets):
                 if "cookie" in signature[name]["headers"].keys():
                     pattern=rebuildPattern(signature[name]["headers"]["cookie"])
                     if re.findall(pattern,request["request"]["headers"]["cookie"]):
-                        appendResult(result,name,"cookie",i,0)
+                        appendResult(result,name,"cookie",version,i,0)
                 #response packet 비교
                 for comp_cookie in ({"cookie","set-cookie"}  & set(signature[name]["headers"].keys())):
                         pattern=rebuildPattern(signature[name]["headers"]["cookie"])
                         if re.findall(pattern,request["response"]["headers"][comp_header]):
-                            appendResult(result,name,"cookie",0,i)
+                            appendResult(result,name,"cookie",version,0,i)
             #html 파싱은 현재 페이질 경우만
             if 'html' in signature[name].keys():
                 #str 일 경우
@@ -129,14 +131,14 @@ def resBackend(driver,req_res_packets):
                     pattern=rebuildPattern(signature[name]["html"])
                     if re.findall(pattern,current_page):
                         #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
-                        appendResult(result,name,"html",0,1)
+                        appendResult(result,name,"html",version,0,1)
                 #list일 경우
                 elif signature[name]["html"] is list:
                     for html_line in signature[name]["html"]:
                         pattern=rebuildPattern(html_line)
                         if re.findall(pattern,current_page):
                             #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
-                            appendResult(result,name,"html",0,1)
+                            appendResult(result,name,"html",version,0,1)
             #meta로 추출 , meta의 값은 dictionary 값 여러개도 가능
             if "meta" in signature[name].keys():
                 metas = soup.select('meta[name][content]')
@@ -147,7 +149,7 @@ def resBackend(driver,req_res_packets):
                         pattern=rebuildPattern(signature[name]["meta"][comp_metakey])
                         if re.findall(pattern,meta_line["content"]):
                                 #현재 페이지는 response 패킷 1으로 침 
-                                appendResult(result,name,"meta",0,1)
+                                appendResult(result,name,"meta",version,0,1)
     return(result)
                    
 
