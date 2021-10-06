@@ -29,6 +29,48 @@ from selenium import webdriver
 scripts(O), headers(O), cookies(O), dom(O), meta(O), url(O), html(O), website(O)
 '''
 
+# Main Function
+def detectWebServer(url, cur_page_links, req_res_packets, driver):
+    category = [18, 12, 31, 59]
+    data = loadCategory(category)
+
+    detect_list = dict()
+
+    for i, packet in enumerate(req_res_packets):
+
+        for app in data:
+            # Including external domain as well as including same domain
+            if not isSameDomain(url, packet["request"]["full_url"]):
+                if "url" in list(data[app].keys()):
+                    result = detectUrl(cur_page_links, data, app)
+                    detect_list = resultFunc(detect_list, app, result)
+                if "scripts" in list(data[app].keys()):
+                    result = detectScripts(cur_page_links, data, app)
+                    detect_list = resultFunc(detect_list, app, result)
+                if "website" in list(data[app].keys()):
+                    result = detectWebsite(cur_page_links, data, app)
+                    detect_list = resultFunc(detect_list, app, result)
+            
+            else:
+                if "headers" in list(data[app].keys()):
+                    result = detectHeaders(packet, data, i, app)
+                    detect_list = resultFunc(detect_list, app, result)
+                if "html" in list(data[app].keys()):
+                    result = detectHtml(packet, data, i, app)
+                    detect_list = resultFunc(detect_list, app, result)
+                if "cookies" in list(data[app].keys()):
+                    result = detectCookies(packet, data, i, app)
+                    detect_list = resultFunc(detect_list, app, result)
+                if "meta" in list(data[app].keys()):
+                    result = detectMeta(packet, data, i, app)
+                    detect_list = resultFunc(detect_list, app, result)
+                if "dom" in list(data[app].keys()):
+                    result = detectDom(data, driver, i, app)
+                    detect_list = resultFunc(detect_list, app, result)
+    
+    return detect_list
+
+
 def loadCategory(category):
     return_data = {}
 
@@ -72,49 +114,6 @@ def resultFunc(detect_list, app, result):
         else:
             detect_list[app] = result
 
-    return detect_list
-
-def detectWebServer(cur_page_links, req_res_packets, driver):
-    url = "https://www.cloudflare.com/"
-    req_res_packets = json.loads(open('./test.json','r').read())
-
-    category = [18, 12, 31, 59]
-    data = loadCategory(category)
-
-    detect_list = dict()
-
-    for i, packet in enumerate(req_res_packets):
-
-        for app in data:
-            # Including external domain as well as including same domain
-            if not isSameDomain(url, packet["request"]["full_url"]):
-                if "url" in list(data[app].keys()):
-                    result = detectUrl(cur_page_links, data, app)
-                    detect_list = resultFunc(detect_list, app, result)
-                if "scripts" in list(data[app].keys()):
-                    result = detectScripts(cur_page_links, data, app)
-                    detect_list = resultFunc(detect_list, app, result)
-                if "website" in list(data[app].keys()):
-                    result = detectWebsite(cur_page_links, data, app)
-                    detect_list = resultFunc(detect_list, app, result)
-            
-            else:
-                if "headers" in list(data[app].keys()):
-                    result = detectHeaders(packet, data, i, app)
-                    detect_list = resultFunc(detect_list, app, result)
-                if "html" in list(data[app].keys()):
-                    result = detectHtml(packet, data, i, app)
-                    detect_list = resultFunc(detect_list, app, result)
-                if "cookies" in list(data[app].keys()):
-                    result = detectCookies(packet, data, i, app)
-                    detect_list = resultFunc(detect_list, app, result)
-                if "meta" in list(data[app].keys()):
-                    result = detectMeta(packet, data, i, app)
-                    detect_list = resultFunc(detect_list, app, result)
-                if "dom" in list(data[app].keys()):
-                    result = detectDom(data, driver, i, app)
-                    detect_list = resultFunc(detect_list, app, result)
-    
     return detect_list
 
 # check response Header
@@ -218,9 +217,18 @@ def detectDom(data, driver, index, app):
         return result
 
 if __name__ == "__main__":
-    url = "https://9ucc1.xyz/dimi/index.php"
+    url = "https://www.cloudflare.com/"
+    
     driver = webdriver.Chrome('./Crawling/config/chromedriver')
     driver.get(url)
-    print(detectWebServer(["https://www.naver.com/devbridgeAutocomplete-min.js","https://github.com/jquery/jquery-migrate", "https://edgecastcdn.net/"], 
-    json.loads(open('./test.json','r').read()), 
-    driver) )
+
+    req_res_packets = json.loads(open('./test.json','r').read())
+    
+    print(
+        detectWebServer( # 파라미터 4개 (url, cur_page_links, req_res_packets, driver)
+            url=url, 
+            cur_page_links=["https://www.naver.com/devbridgeAutocomplete-min.js","https://github.com/jquery/jquery-migrate", "https://edgecastcdn.net/"], 
+            req_res_packets=json.loads(open('./test.json','r').read()), 
+            driver=driver
+        )
+    )
