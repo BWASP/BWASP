@@ -64,6 +64,21 @@ def rebuildPattern(pattern):
                 confidence=int(confidence)
     return result[0],version_group,confidence
 
+def retVersiongroup(regex_results,version_group):
+    if version_group == "false":
+        return "false"
+    else:
+        for regex_result in regex_results:
+            if version_group > 1:
+                if(regex_result[version_group-1]):
+                    return regex_result[version_group-1]
+            else:
+                if(regex_result):
+                    return regex_result
+    return "false"
+
+
+
 def initResult(result,name):
     result[name]={}
     result[name]["detect"]=list()
@@ -97,33 +112,21 @@ def resBackend(driver,req_res_packets):
             if  'url' in  signature[name].keys():
                 pattern,version_group,confidence=rebuildPattern(signature[name]["url"])
                 regex_results=re.findall(pattern,request["request"]["full_url"],re.I)
-                for regex_result in regex_results:
-                    if version_group != "false":
-                        version_group=regex_result
-                    appendResult(result,name,"url",version_group,i,0)
+                if(regex_results):
+                    appendResult(result,name,"url",retVersiongroup(regex_results,version_group),i,0)
             #scripts src 도 url 처럼 추출        
             if  'scripts' in  signature[name].keys():
                 if signature[name]["scripts"] is str:
                     pattern,version_group,confidence=rebuildPattern(signature[name]["scripts"])
                     regex_results=re.findall(pattern,request["request"]["full_url"],re.I)
-                    for regex_result in regex_results:
-                        if version_group != "false":
-                            if version_group > 1:
-                                version_group=regex_result[version_group-1]
-                            else:
-                                version_group=regex_result
-                        appendResult(result,name,"scripts",version_group,i,0)
+                    if(regex_results):
+                        appendResult(result,name,"scripts",retVersiongroup(regex_results,version_group),i,0)
                 elif signature[name]["scripts"] is list:
                     for scripts_line in signature[name]["scripts"]:
                         pattern,version_group,confidence=rebuildPattern(scripts_line)
                         regex_results=re.findall(pattern,request["request"]["full_url"],re.I)
-                        for regex_result in regex_results:
-                            if version_group != "false":
-                                if version_group > 1:
-                                    version_group=regex_result[version_group-1]
-                                else:
-                                    version_group=regex_result
-                            appendResult(result,name,"scripts",version_group,i,0)
+                        if(regex_results):
+                            appendResult(result,name,"scripts",retVersiongroup(regex_results,version_group),i,0)
             #header로 추출
             if  'headers' in  signature[name].keys():
                 if not isSameDomain(target_url,request["request"]["full_url"]):
@@ -131,23 +134,13 @@ def resBackend(driver,req_res_packets):
                 for comp_header in set(signature[name]["headers"].keys()) & set(request["request"]["headers"].keys()):
                     pattern,version_group,confidence=rebuildPattern(signature[name]["headers"][comp_header])
                     regex_results=re.findall(pattern,request["request"]["headers"][comp_header],re.I)
-                    for regex_result in regex_results:
-                        if version_group != "false":
-                            if version_group > 1:
-                                version_group=regex_result[version_group-1]
-                            else:
-                                version_group=regex_result
-                        appendResult(result,name,"headers",version_group,i,0)
+                    if(regex_results):
+                        appendResult(result,name,"headers",retVersiongroup(regex_results,version_group),i,0)
                 for comp_header in set(signature[name]["headers"].keys()) & set(request["response"]["headers"].keys()):
                     pattern,version_group,confidence=rebuildPattern(signature[name]["headers"][comp_header])
                     regex_results=re.findall(pattern,request["response"]["headers"][comp_header],re.I)
-                    for regex_result in regex_results:
-                        if version_group != "false":
-                            if version_group > 1:
-                                version_group=regex_result[version_group-1]
-                            else:
-                                version_group=regex_result
-                        appendResult(result,name,"headers",version_group,0,i)
+                    if(regex_results):
+                        appendResult(result,name,"headers",retVersiongroup(regex_results,version_group),0,i)
             #cookie로 추출
             if  'cookie' in  signature[name].keys():
                 if not isSameDomain(target_url,request["request"]["full_url"]):
@@ -156,51 +149,31 @@ def resBackend(driver,req_res_packets):
                 if "cookie" in signature[name]["headers"].keys():
                     pattern,version_group,confidence=rebuildPattern(signature[name]["headers"]["cookie"])
                     regex_results=re.findall(pattern,request["request"]["headers"]["cookie"],re.I)
-                    for regex_result in regex_results:
-                        if version_group != "false":
-                            if version_group > 1:
-                                version_group=regex_result[version_group-1]
-                            else:
-                                version_group=regex_result
-                        appendResult(result,name,"cookie",version_group,i,0)
+                    if(regex_results):
+                        appendResult(result,name,"cookie",retVersiongroup(regex_results,version_group),i,0)
                 #response packet 비교
                 for comp_cookie in ({"cookie","set-cookie"}  & set(signature[name]["headers"].keys())):
                         pattern,version_group,confidence=rebuildPattern(signature[name]["headers"]["cookie"])
                         regex_results=re.findall(pattern,request["response"]["headers"][comp_header],re.I)
-                        for regex_result in regex_results:
-                            if version_group != "false":
-                                if version_group > 1:
-                                    version_group=regex_result[version_group-1]
-                                else:
-                                    version_group=regex_result
-                            appendResult(result,name,"cookie",version_group,0,i)
+                        if(regex_results):
+                            appendResult(result,name,"cookie",retVersiongroup(regex_results,version_group),0,i)
             #html 파싱은 현재 페이질 경우만
             if 'html' in signature[name].keys():
                 #str 일 경우
                 if signature[name]["html"] is str:
                     pattern,version_group,confidence=rebuildPattern(signature[name]["html"])
                     regex_results=re.findall(pattern,current_page,re.I)
-                    for regex_result in regex_results:
-                        #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
-                        if version_group != "false":
-                            if version_group > 1:
-                                version_group=regex_result[version_group-1]
-                            else:
-                                version_group=regex_result
-                        appendResult(result,name,"html",version_group,0,1)
+                    #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
+                    if(regex_results):
+                        appendResult(result,name,"html",retVersiongroup(regex_results,version_group),0,1)
                 #list일 경우
                 elif signature[name]["html"] is list:
                     for html_line in signature[name]["html"]:
                         pattern,version_group,confidence=rebuildPattern(html_line)
                         regex_results=re.findall(pattern,current_page,re.I)
-                        for regex_result in regex_results:
-                            #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
-                            if version_group != "false":
-                                if version_group > 1:
-                                    version_group=regex_result[version_group-1]
-                                else:
-                                    version_group=regex_result
-                            appendResult(result,name,"html",version_group,0,1)
+                        #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
+                        if(regex_results):
+                            appendResult(result,name,"html",retVersiongroup(regex_results,version_group),0,1)
             #meta로 추출 , meta의 값은 dictionary 값 여러개도 가능
             if "meta" in signature[name].keys():
                 metas = soup.select('meta[name][content]')
@@ -210,14 +183,9 @@ def resBackend(driver,req_res_packets):
                             continue
                         pattern,version_group,confidence=rebuildPattern(signature[name]["meta"][comp_metakey])
                         regex_results=re.findall(pattern,meta_line["content"],re.I)
-                        for regex_result in regex_results:
-                                #현재 페이지는 response 패킷 1으로 침 
-                            if version_group != "false":
-                                if version_group > 1:
-                                    version_group=regex_result[version_group-1]
-                                else:
-                                    version_group=regex_result
-                            appendResult(result,name,"meta",version_group,0,1)
+                        #현재 페이지는 response 패킷 1으로 침 
+                        if(regex_results):
+                            appendResult(result,name,"meta",retVersiongroup(regex_results,version_group),0,1)
     return(result)
                    
 
