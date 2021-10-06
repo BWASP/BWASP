@@ -31,7 +31,7 @@ def getWebServerInfo(target_url, req_res_packets):
                     if not key in list(return_data.keys()):
                         return_data[key] = {
                             "detect" : [],
-                            "version" : "",
+                            "version" : "false",
                             "request" : [],
                             "response" : []
                         }
