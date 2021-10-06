@@ -51,7 +51,16 @@ def extractJsonattribute(result):
     return list(attr) 
 
 def rebuildPattern(pattern):
-    return pattern.split("\\;")[0]
+    version_group="false"
+    confidence="false"
+    result = pattern.split('\\;')
+    if len(result) > 1:
+        for result_line in result[1:]:
+            if "version:" in result_line:
+                version_group=result_line.split(":\\")[1]
+            if "confidence:" in result_line:
+                confidence=result_line.split(":")[1]
+    return result[0],version_group,confidence
 
 def initResult(result,name):
     result[name]={}
@@ -84,18 +93,18 @@ def resBackend(driver,req_res_packets):
         for  name  in signature:
             #url로 추출 
             if  'url' in  signature[name].keys():
-                pattern=rebuildPattern(signature[name]["url"])
+                pattern,version_group,confidence=rebuildPattern(signature[name]["url"])
                 if re.findall(pattern,request["request"]["full_url"]):
                     appendResult(result,name,"url",version,i,0)
             #scripts src 도 url 처럼 추출        
             if  'scripts' in  signature[name].keys():
                 if signature[name]["scripts"] is str:
-                    pattern=rebuildPattern(signature[name]["scripts"])
+                    pattern,version_group,confidence=rebuildPattern(signature[name]["scripts"])
                     if re.findall(pattern,request["request"]["full_url"]):
                         appendResult(result,name,"scripts",version,i,0)
                 elif signature[name]["scripts"] is list:
                     for scripts_line in signature[name]["scripts"]:
-                        pattern=rebuildPattern(scripts_line)
+                        pattern,version_group,confidence=rebuildPattern(scripts_line)
                         if re.findall(pattern,request["request"]["full_url"]):
                             appendResult(result,name,"scripts",version,i,0)
             #header로 추출
@@ -103,11 +112,11 @@ def resBackend(driver,req_res_packets):
                 if not isSameDomain(target_url,request["request"]["full_url"]):
                     continue
                 for comp_header in set(signature[name]["headers"].keys()) & set(request["request"]["headers"].keys()):
-                    pattern=rebuildPattern(signature[name]["headers"][comp_header])
+                    pattern,version_group,confidence=rebuildPattern(signature[name]["headers"][comp_header])
                     if re.findall(pattern,request["request"]["headers"][comp_header]):
                         appendResult(result,name,"headers",version,i,0)
                 for comp_header in set(signature[name]["headers"].keys()) & set(request["response"]["headers"].keys()):
-                    pattern=rebuildPattern(signature[name]["headers"][comp_header])
+                    pattern,version_group,confidence=rebuildPattern(signature[name]["headers"][comp_header])
                     if re.findall(pattern,request["response"]["headers"][comp_header]):
                         appendResult(result,name,"headers",version,0,i)
             #cookie로 추출
@@ -116,26 +125,26 @@ def resBackend(driver,req_res_packets):
                     continue
                 #request packet 비교
                 if "cookie" in signature[name]["headers"].keys():
-                    pattern=rebuildPattern(signature[name]["headers"]["cookie"])
+                    pattern,version_group,confidence=rebuildPattern(signature[name]["headers"]["cookie"])
                     if re.findall(pattern,request["request"]["headers"]["cookie"]):
                         appendResult(result,name,"cookie",version,i,0)
                 #response packet 비교
                 for comp_cookie in ({"cookie","set-cookie"}  & set(signature[name]["headers"].keys())):
-                        pattern=rebuildPattern(signature[name]["headers"]["cookie"])
+                        pattern,version_group,confidence=rebuildPattern(signature[name]["headers"]["cookie"])
                         if re.findall(pattern,request["response"]["headers"][comp_header]):
                             appendResult(result,name,"cookie",version,0,i)
             #html 파싱은 현재 페이질 경우만
             if 'html' in signature[name].keys():
                 #str 일 경우
                 if signature[name]["html"] is str:
-                    pattern=rebuildPattern(signature[name]["html"])
+                    pattern,version_group,confidence=rebuildPattern(signature[name]["html"])
                     if re.findall(pattern,current_page):
                         #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
                         appendResult(result,name,"html",version,0,1)
                 #list일 경우
                 elif signature[name]["html"] is list:
                     for html_line in signature[name]["html"]:
-                        pattern=rebuildPattern(html_line)
+                        pattern,version_group,confidence=rebuildPattern(html_line)
                         if re.findall(pattern,current_page):
                             #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
                             appendResult(result,name,"html",version,0,1)
@@ -146,7 +155,7 @@ def resBackend(driver,req_res_packets):
                     for comp_metakey in signature[name]["meta"]:
                         if meta_line['name'] == comp_metakey:
                             continue
-                        pattern=rebuildPattern(signature[name]["meta"][comp_metakey])
+                        pattern,version_group,confidence=rebuildPattern(signature[name]["meta"][comp_metakey])
                         if re.findall(pattern,meta_line["content"]):
                                 #현재 페이지는 response 패킷 1으로 침 
                                 appendResult(result,name,"meta",version,0,1)
