@@ -156,6 +156,52 @@ def resBackend(driver,req_res_packets):
                     #현재 페이지는 response 패킷 1으로 침 
                     if(regex_results):
                         appendResult(result,name,"meta",retVersiongroup("findall",regex_results,version_group),0,1)
+        #dom으로 추출 
+        if "dom" in signature[name].keys():
+            if type(signature[name]["dom"]) is dict: #dict 인지 확인
+                for key_name in list(signature[name]["dom"].keys()):
+                    temp = soup.select(key_name)
+                    if(temp):
+                        for subkey_name in list(signature[name]["dom"][key_name].keys()):
+                            if subkey_name == "attributes" or subkey_name == "properties":
+                                    if subkey_name in temp.attrs:
+                                        pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name][subkey_name])
+                                        regex_results=re.match(pattern,temp[subkey_name])
+                                        if(regex_results):
+                                            appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)                        
+                            if subkey_name == "text":
+                                pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name]["text"])
+                                regex_results=re.match(pattern,temp.text)
+                                if(regex_results):
+                                    appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
+                                #match 값 존재하면 넣기
+
+                            if subkey_name == "exists":
+                                appendResult(result,name,"dom","false",0,1)
+
+                            if subkey_name == "src":
+                                if "src" in temp.attrs:
+                                    pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name]["src"])
+                                    regex_results=re.match(pattern,temp['src'])
+                                    if(regex_results):
+                                        appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
+                            #if key_name == "properties" 아직 구현 x, 2가지만 해당됨
+                            # 일단은 properties는 name과 같은 느낌이라 생각 , attrs로 존재 여무 확인
+                            # 아직은 dict 구조지만 값은 비교안함 
+
+                #dictionary 형태가 아니라 단일 값으로 존재할 때
+
+            elif type(signature[name]["dom"]) is list:
+                for line_list in signature[name]["dom"]:
+                    if soup.select(line_list):
+                        appendResult(result,name,"dom","false",0,1)
+
+            elif type(signature[name]["dom"]) is str:
+                if soup.select(signature[name]["dom"]):
+                    appendResult(result,name,"dom","false",0,1)
+
+
+
     for i,request in enumerate(req_res_packets):
         for  name  in signature:
             #url로 추출 
