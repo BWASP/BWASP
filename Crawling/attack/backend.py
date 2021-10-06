@@ -114,19 +114,22 @@ def resBackend(driver,req_res_packets):
                 regex_results=re.findall(pattern,request["request"]["full_url"],re.I)
                 if(regex_results):
                     appendResult(result,name,"url",retVersiongroup(regex_results,version_group),i,0)
-            #scripts src 도 url 처럼 추출        
-            if  'scripts' in  signature[name].keys():
+            #scripts src 현재 페이지에서 추출        
+            if "scripts" in signature[name].keys():
+                current_scripts = soup.select('script[src]') 
                 if signature[name]["scripts"] is str:
                     pattern,version_group,confidence=rebuildPattern(signature[name]["scripts"])
-                    regex_results=re.findall(pattern,request["request"]["full_url"],re.I)
-                    if(regex_results):
-                        appendResult(result,name,"scripts",retVersiongroup(regex_results,version_group),i,0)
+                    for current_scripts_line in current_scripts:
+                        regex_results=re.findall(pattern,current_scripts_line["src"],re.I)
+                        if(regex_results):
+                            appendResult(result,name,"scripts",retVersiongroup(regex_results,version_group),i,0)
                 elif signature[name]["scripts"] is list:
                     for scripts_line in signature[name]["scripts"]:
                         pattern,version_group,confidence=rebuildPattern(scripts_line)
-                        regex_results=re.findall(pattern,request["request"]["full_url"],re.I)
-                        if(regex_results):
-                            appendResult(result,name,"scripts",retVersiongroup(regex_results,version_group),i,0)
+                        for current_scripts_line in current_scripts:
+                            regex_results=re.findall(pattern,current_scripts_line["src"],re.I)
+                            if(regex_results):
+                                 appendResult(result,name,"scripts",retVersiongroup(regex_results,version_group),i,0)
             #header로 추출
             if  'headers' in  signature[name].keys():
                 if not isSameDomain(target_url,request["request"]["full_url"]):
