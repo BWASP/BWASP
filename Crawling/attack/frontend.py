@@ -1,6 +1,4 @@
-import json, re, ast
-from typing import List
-from urllib import parse
+import json, re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from selenium import webdriver
