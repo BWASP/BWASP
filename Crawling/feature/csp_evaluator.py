@@ -32,11 +32,9 @@ def cspHeader(url):
                 else:
                     third_data[second_data[0]] = second_data[1]
     except:
-        print("No CSP")
+        pass
 
-    print(third_data)
-
-    #return third_data
+    return third_data
 
 if __name__ == "__main__":
     url = "https://github.com/"

@@ -2,7 +2,7 @@ from seleniumwire import webdriver
 from urllib.parse import urlparse, urlunparse
 
 import analyst
-from feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains
+from feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains, csp_evaluator
 
 check = True
 input_url = ""
@@ -35,7 +35,11 @@ def visit(driver, url, depth, options):
     cookie_result = extract_cookies.getCookies(driver.current_url, req_res_packets)
     domain_result = extract_domains.extractDomains(dict(), driver.current_url, cur_page_links)
 
+    csp_result = csp_evaluator.cspHeader(driver.current_url)
     analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver)
+
+    print(csp_result)
+    return
 
     # Here DB code 
 
@@ -110,5 +114,5 @@ def initSelenium():
     return driver
 
 if __name__ == "__main__":
-    url = "https://kitribob.kr/"
-    start(url, 3)
+    url = "https://github.com/"
+    start(url, 3, {})
