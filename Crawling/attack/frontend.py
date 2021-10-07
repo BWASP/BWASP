@@ -59,9 +59,9 @@ def detectWebServer(url, cur_page_links, req_res_packets, driver):
                 if "meta" in list(data[app].keys()):
                     result = detectMeta(packet, data, i, app)
                     detect_list = resultFunc(detect_list, app, result)
-                if "dom" in list(data[app].keys()):
-                    result = detectDom(data, driver, i, app)
-                    detect_list = resultFunc(detect_list, app, result)
+                # if "dom" in list(data[app].keys()):
+                #     result = detectDom(data, driver, i, app)
+                #     detect_list = resultFunc(detect_list, app, result)
     
     return detect_list
 
