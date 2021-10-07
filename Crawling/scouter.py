@@ -8,12 +8,12 @@ check = True
 input_url = ""
 visited_links = []
 
-def start(url, depth):
+def start(url, depth, options):
     driver = initSelenium()
 
-    visit(driver, url, depth)
+    visit(driver, url, depth, options)
 
-def visit(driver, url, depth):
+def visit(driver, url, depth, options):
     global check
     global input_url
     global visited_links
