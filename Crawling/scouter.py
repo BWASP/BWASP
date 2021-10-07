@@ -1,9 +1,11 @@
 from seleniumwire import webdriver
 from urllib.parse import urlparse, urlunparse
 
+import analyst
 from feature import clickable_tags
 from feature import packet_capture
 from feature import res_geturl
+from feature import get_ports
 
 check = True
 input_url = ""
@@ -26,10 +28,14 @@ def visit(driver, url, depth):
         visited_links.append(input_url)
         check = False
 
+        # target_port = get_ports.getPortsOnline(input_url)
+
     req_res_packets = packet_capture.packetCapture(driver)
     cur_page_links = clickable_tags.bs4Crawling(driver.current_url, driver.page_source)
     cur_page_links += res_geturl.getUrl(driver.current_url, req_res_packets, driver.page_source)
     cur_page_links = list(set(deleteFragment(cur_page_links)))
+
+    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver)
 
     if depth == 0:
         return
