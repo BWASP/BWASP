@@ -38,9 +38,6 @@ def visit(driver, url, depth, options):
     csp_result = csp_evaluator.cspHeader(driver.current_url)
     analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver)
 
-    print(csp_result)
-    return
-
     # Here DB code 
 
     if depth == 0:
