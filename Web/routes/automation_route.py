@@ -1,11 +1,45 @@
 from flask import (
-    Blueprint, render_template, g
+    Blueprint, render_template, g,
+    request
 )
 
 NAME = 'automation'
 bp = Blueprint(NAME, __name__, url_prefix='/automation')
 
 
-@bp.route('/options')
+@bp.route('/options', methods=['GET', 'POST'])
 def manual_options():
+    if request.method == 'POST':
+        reqJsonData = request.form['reqJsonData']
+        """
+        {
+          "tool": {
+            "analysisLevel": "1340",
+            "optionalJobs": [
+              "portScan"
+            ]
+          },
+          "info": {
+            "framework": [
+              {
+                "name": "react",
+                "version": "1.12"
+              }
+            ],
+            "backend": [
+              {
+                "name": "django",
+                "version": "hello.world"
+              }
+            ]
+          },
+          "target": {
+            "url": "https://naver.com/",
+            "path": [
+              "/a/b",
+              "/c/d"
+            ]
+          }
+        }
+        """
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")
