@@ -1,9 +1,14 @@
-import requests
+import requests, re
+from urllib.parse import urlparse
 from socket import *
 from bs4 import BeautifulSoup
 
 def getPortsOnline(target_ip):
     open_ports = dict()
+    pattern = re.compile('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+    if pattern.match(target_ip) is None:
+        target_ip = gethostbyname(urlparse(target_ip).netloc)
+    
     html = BeautifulSoup(requests.get("https://censys.io/ipv4/" + target_ip).text, features="html.parser")
 
     for i in html.select('h2'):
@@ -47,4 +52,4 @@ def getPortsOffline(target_ip):
     return opened_ports
 
 if __name__ == '__main__':
-    print(getPortsOnline('158.247.214.182').keys())
+    print(getPortsOnline('https://9ucc1.xyz/').keys())
