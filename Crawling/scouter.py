@@ -31,13 +31,6 @@ def visit(driver, url, depth):
     cur_page_links += res_geturl.getUrl(driver.current_url, req_res_packets, driver.page_source)
     cur_page_links = list(set(deleteFragment(cur_page_links)))
 
-    # print(input_url)
-    # print(cur_page_links)
-    # print(depth)
-
-    ################################
-    #### Add Attack Vector Code ####
-    ################################
     if depth == 0:
         return
 
@@ -45,12 +38,9 @@ def visit(driver, url, depth):
         if visit_url in visited_links:
             continue
         if not isSameDomain(input_url, visit_url):
-            # print("notSameDomain: {}".format(visit_url))
             continue
         if isSamePath(visit_url, visited_links):
             continue
-        # print("visit: {}".format(visit_url))
-        # input("")
 
         visited_links.append(visit_url)
         visit(driver, visit_url, depth-1)
@@ -77,10 +67,15 @@ def isSamePath(visit_url, previous_urls):
             previous = urlparse(link)
 
             if (visit.path == previous.path) and (visit.query == previous.query):
-                # print("[!] SamePath: {} {}".format(visit_url, link))
+                return True
+            
+            # https://naver.com 과 https://naver.com/ 는 같은 url 이므로 검증하는 코드 작성.
+            visit_path_len = len(visit.path.replace("/", ""))
+            previous_path_len = len(previous.path.replace("/", ""))
+            
+            if visit_path_len == 0 and previous_path_len == 0:
                 return True
         else:
-            # print("[!] Not SamePath: {}".format(visit_url))
             return False
     except:
         return False
