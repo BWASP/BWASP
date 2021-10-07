@@ -14,7 +14,8 @@ def cspAnalyst(second_data):
         del (second_data[0])
         third_data[tmp] = second_data
 
-def cspHeader(url, headers):
+def cspHeader(url):
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     r = requests.get(url, headers=headers)
     #third_data = {}
 
@@ -38,6 +39,6 @@ def cspHeader(url, headers):
     #return third_data
 
 if __name__ == "__main__":
-    url = "https://facebook.com"
+    url = "https://github.com/"
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-    cspHeader(url, headers)
+    cspHeader(url)
