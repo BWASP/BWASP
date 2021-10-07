@@ -11,11 +11,7 @@ from selenium import webdriver
 "31": {
     "name": "CDN",
     "priority": 9
-},
-"18": {
-    "name": "Web frameworks",
-    "priority": 7
-},
+}
 "12": {
     "name": "JavaScript frameworks",
     "priority": 8
@@ -31,7 +27,7 @@ scripts(O), headers(O), cookies(O), dom(O), meta(O), url(O), html(O), website(O)
 
 # Main Function
 def detectWebServer(url, cur_page_links, req_res_packets, driver):
-    category = [18, 12, 31, 59]
+    category = [12, 31, 59]
     data = loadCategory(category)
 
     detect_list = dict()
@@ -41,17 +37,16 @@ def detectWebServer(url, cur_page_links, req_res_packets, driver):
         for app in data:
             # Including external domain as well as including same domain
             if not isSameDomain(url, packet["request"]["full_url"]):
-                if "url" in list(data[app].keys()):
-                    result = detectUrl(cur_page_links, data, app)
-                    detect_list = resultFunc(detect_list, app, result)
                 if "scripts" in list(data[app].keys()):
                     result = detectScripts(cur_page_links, data, app)
                     detect_list = resultFunc(detect_list, app, result)
                 if "website" in list(data[app].keys()):
                     result = detectWebsite(cur_page_links, data, app)
                     detect_list = resultFunc(detect_list, app, result)
-            
             else:
+                if "url" in list(data[app].keys()):
+                    result = detectUrl(cur_page_links, data, app)
+                    detect_list = resultFunc(detect_list, app, result)
                 if "headers" in list(data[app].keys()):
                     result = detectHeaders(packet, data, i, app)
                     detect_list = resultFunc(detect_list, app, result)
@@ -124,7 +119,6 @@ def detectHeaders(packet, data, index, app):
 
         regex = data[app]["headers"][header]
         regex = regex.split("\\;version:\\")[0]
-        print(regex)
         pattern = re.compile(regex)
 
         if pattern.search(packet["response"]["headers"][header.lower()]) != None:
@@ -139,8 +133,6 @@ def detectHtml(packet, data, index, app):
                 return result
         else:
             for regex in data[app]["html"]:
-                print(data[app]["html"])
-                print(regex)
                 pattern = re.compile(regex.split("\\;version:\\")[0])
 
                 if pattern.search(packet["response"]["body"]) != None:
@@ -210,8 +202,6 @@ def detectMeta(packet, data, index, app):
 
 # Detecting Dom is not solved yet
 def detectDom(data, driver, index, app):
-    print(app)
-    print(str(data[app]["dom"]))
     if driver.execute_script(str(data[app]["dom"])) is not None:
         result = {"detect":["dom"], "version":"False", "request":[], "response":[index], "url":[]}
         return result
