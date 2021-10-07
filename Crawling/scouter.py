@@ -2,10 +2,7 @@ from seleniumwire import webdriver
 from urllib.parse import urlparse, urlunparse
 
 import analyst
-from feature import clickable_tags
-from feature import packet_capture
-from feature import res_geturl
-from feature import get_ports
+from feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains
 
 check = True
 input_url = ""
@@ -35,7 +32,12 @@ def visit(driver, url, depth):
     cur_page_links += res_geturl.getUrl(driver.current_url, req_res_packets, driver.page_source)
     cur_page_links = list(set(deleteFragment(cur_page_links)))
 
+    cookie_result = extract_cookies.getCookies(driver.current_url, req_res_packets)
+    domain_result = extract_domains.extractDomains(dict(), driver.current_url, cur_page_links)
+
     analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver)
+
+    # Here DB code 
 
     if depth == 0:
         return
