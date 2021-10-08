@@ -4,9 +4,7 @@
 from flask import (
     Flask, render_template, g
 )
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from .models.BWASP import db
 
 
 def create_app(config=None):
@@ -33,6 +31,11 @@ def create_app(config=None):
 
     db.init_app(app)
 
+    @app.before_first_request
+    def before_first_request():
+        db.app = app
+        db.create_all()
+
     @app.errorhandler(404)
     def NotFound(error):
         return render_template('404.html'), 404
@@ -48,5 +51,5 @@ def create_app(config=None):
 
     return app
 
-    # if __name__ == '__main__':
-    #    create_app().run(host='0.0.0.0', port=5000, debug=True)
+# if __name__ == '__main__':
+#    create_app().run(host='0.0.0.0', port=5000, debug=True)
