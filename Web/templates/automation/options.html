@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+{% include 'components/head.html' %}
+
+<body id="page-top">
+<div class="modal fade" id="jobSubmitVerifyModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="text-dark font-weight-bolder mb-1">Requested Info</h3>
+                <p>Please review if anything is written incorrectly.</p>
+                <div class="shadow rounded p-2">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Analysis level</th>
+                            <td><code id="modal-tool-analysisLevel">NaN</code></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 30%;">Target URL</th>
+                            <td><code id="modal-tool-targetURL">No data.</code></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">URL Path</th>
+                            <td id="modal-tool-URLPath"> - </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Web Server</th>
+                            <td id="modal-info-server"> - </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Framework</th>
+                            <td id="modal-info-framework"> - </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Backend</th>
+                            <td id="modal-info-backend"> - </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Options</th>
+                            <td id="modal-tool-options">Not selected.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Back</button>
+                    <button type="button" class="btn btn-success ml-2" id="modal-start-job">Start</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page Wrapper -->
+<div id="wrapper">
+    {% include 'components/sidebar.html' %}
+
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            {% include 'components/navigation.html' %}
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Option for Automated analysis</h1>
+                </div>
+                <div class="bg-white border rounded shadow p-4" id="job-order">
+                    <h3 class="mb-3 text-dark font-weight-bold">Analysis target</h3>
+                    <div class="row" id="section-targetURL">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="target-url">Target URL</label>
+                                <input type="text" class="form-control p-4 rounded-pill" id="target-url"
+                                       placeholder="Analysis target URL" aria-describedby="regexViolence-targetURL" value="https://naver.com/">
+                                <small id="regexViolence-targetURL" class="form-text text-muted d-none">Regex violence : <span class="text-danger">Target URL must be starts with protocol (http, https)</span></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="mt-4 mb-3 text-dark font-weight-bold"><span class="font-weight-bold">WebApp Information</span> <span class="text-muted small">(Optional)</span></h3>
+                    <div class="row" id="section-webAppInfo"></div>
+
+                    <h3 class="mt-4 mb-3 text-dark font-weight-bold">Tool Setting</h3>
+                    <div class="row" id="section-ToolSetting">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="ToolRecursiveLevelInput">Analysis recursive level</label>
+                                <div class="d-flex align-items-center mt-2">
+                                    <input class="border border-white" type="number" min="1" max="5000" value="1" id="ToolRecursiveLevelInput">
+                                    <input type="range" class="form-control-range" min="1" max="5000" value="1" id="ToolRecursiveLevelSlider">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="target-urlPath">Define URL Path</label>
+                                <input type="text" class="form-control p-4 rounded-pill" id="target-urlPath"
+                                       placeholder="Path here" aria-describedby="toolURLPath-Help", value="/a/b, /c/d">
+                                <small id="toolURLPath-Help" class="form-text text-muted">Multiple paths can be input separated with comma(<code>,</code>)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="AdditionalFunctions">Additional Options</label>
+                                <div class="card mb-4" id="AdditionalFunctions">
+                                    <a href="#additionalFuncs" class="d-block card-header py-3" data-toggle="collapse"
+                                       role="button" aria-expanded="false" aria-controls="additionalFuncs">
+                                        <h6 class="m-0 font-weight-bold text-primary">Additional Options</h6>
+                                    </a>
+                                    <div class="collapse" id="additionalFuncs" style="">
+                                        <div class="card-body">
+                                            <div class="form-group mb-0">
+                                                <div class="custom-control custom-checkbox small">
+                                                    <input type="checkbox" class="custom-control-input" id="optFnc-portScan" value="portScan" option_name="Port scan(Known ports)">
+                                                    <label id="optFnc-portScan-label" class="custom-control-label pt-1" for="optFnc-portScan">Port scan (Known ports)</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <div class="custom-control custom-checkbox small">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                           id="optFnc-CSPEvaluate" value="CSPEvaluate">
+                                                    <label class="custom-control-label pt-1" for="optFnc-CSPEvaluate" id="optFnc-CSPEvaluate-label">CSP Evaluate</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="Section-JobButton">
+                        <div class="col-md-6 p-2">
+                            <p class="btn btn-danger shadow p-2 pl-3 pr-3 ml-2 w-100" id="ClearAllData">Clear all input</p>
+                        </div>
+                        <div class="col-md-6 p-2">
+                            <a class="btn btn-success shadow p-2 pl-3 pr-3 ml-2 w-100" id="submitJobRequest">Start analysis</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
+        {% include 'components/footer.html' %}
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Logout Modal-->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-primary" href="login.html">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<!-- Core plugin JavaScript-->
+<script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+<!-- Custom scripts for all pages-->
+<script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/page/options.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'components/head.html' %}
+
+<body id="page-top">
+<div class="modal fade" id="jobSubmitVerifyModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="text-dark font-weight-bolder mb-3">Manual of attack vector page</h3>
+                <p class="mb-0">Click <span class="text-primary">URL</span> to check all payloads.</p>
+                <p>Click <span class="text-primary">Payload Detail</span> to view related packets.</p>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-success w-100" data-dismiss="modal">Dismiss</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        {% include 'components/sidebar.html' %}
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                {% include 'components/navigation.html' %}
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800" id="titleOfPage">Attack Vector</h1>
+                    </div>
+
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">All Attack Vector</h6>
+                            <div class="form-row float-left">
+                                <a href="javascript:void(0);" id="openHelpModal"><i class="fas fa-question"></i> Help</a>
+                                <p class="mb-0 ml-2 mr-2 text-muted"> | </p>
+                                <a href="#" id="switchToPacket"><i class="fas fa-network-wired"></i> Packet</a>
+                            </div>
+                            <div class="form-row float-right">
+                                <a href="#"><i class="fas fa-sort-amount-up"></i>Sort</a>　
+                                <a href="#"><i class="fas fa-filter"></i>Filter</a>　
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead id="parallelTableHead">
+                                        <tr>
+                                            <th>URL List</th>
+                                            <th>Vulnerability Doubt</th>
+                                            <th>Method</th>
+                                            <th>Related Data</th>
+                                            <th>Date</th>
+                                            <th>Impact</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="parallelTableBody">
+                                    <tr>
+                                        <td>
+                                            <a href="#additionalFuncs" class="d-block py-3 m-0 font-weight-bold text-primary" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="additionalFuncs">
+                                                http://bobmart.com/main.php
+                                            </a>
+                                            <div class="collapse" id="additionalFuncs">
+                                                <p class="font-weight-bold mb-1">Payloads</p>
+                                                <ul>
+                                                    <li>/class.php</li>
+                                                    <li>/korea.php</li>
+                                                    <li>/bwasp.php</li>
+                                                    <li>/abc.bobmart.com</li>
+                                                    <li>/admin.bobmart.com</li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td><span class="font-weight-bold">Cross Site Script(XSS)</span><br>CVE 2012-0000-1111</td>
+                                        <td>GET</td>
+                                        <td>http://xsstest123456.com/xssprob1.md</td>
+                                        <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                        <td>
+                                            <p class="btn btn-danger btn-icon-split p-1 pl-3 pr-3 rounded-pill">High</p>
+                                        </td>
+                                    </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/main.php</span></td>
+                                            <td><span class="font-weight-bold">Cross Site Script(XSS)</span><br>CVE 2012-0000-1111</td>
+                                            <td>GET</td>
+                                            <td>http://xsstest123456.com/xssprob1.md</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/board.php?num=</span></td>
+                                            <td><span class="font-weight-bold">SQL Injection and XSS</span><br>CVE 2012-0012-1212<br>CVE 2012-0000-1111</td>
+                                            <td>POST</td>
+                                            <td>http://sqlinjection123456.com/sqli.pdf<br>http://xsstest123456.com/xssprob1.md</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-warning btn-icon-split">
+                                                <span class="text">LOW</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/chat.php</span></td>
+                                            <td><span class="font-weight-bold">SSRF</span><br>CVE 2020-1122-6655</td>
+                                            <td>GET</td>
+                                            <td>http://ssrfgoodgame.com/ssrf.txt</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/icontest.js</span></td>
+                                            <td><span class="font-weight-bold">Prototype Pollution</span><br>CVE 2020-12345</td>
+                                            <td>NONE</td>
+                                            <td>http://prototypejs.gogogo11.org/prototype.jsp</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/asdf.js.LICENSE.txt</span></td>
+                                            <td><span class="font-weight-bold">Development Environment Nuxt.js 2.6.2 version</span><br>CVE 2019-13506</td>
+                                            <td>NONE</td>
+                                            <td>http://nuxtjs.cve.vuln.com/cve201913506</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-success btn-icon-split">
+                                                <span class="text">NORMAL</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <span class="font-weight-bold">http://bobmart.com/</span><br><br>
+                                                <div class="card mb-4">
+                                                    <a href="#additionalFuncs" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="additionalFuncs">
+                                                        <h6 class="m-0 font-weight-bold text-primary">Payload</h6>
+                                                    </a>
+                                                    <div class="collapse" id="additionalFuncs">
+                                                        <div class="card-body">
+                                                            /class.php
+                                                            /korea.php
+                                                            /bwasp.php
+                                                            /abc.bobmart.com
+                                                            /admin.bobmart.com
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="font-weight-bold">Sub Domain List</span><br>on 21.05.2019</td>
+                                            <td>NONE</td>
+                                            <td>https://itworld11.com/subdomains.pdf</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-warning btn-icon-split">
+                                                <span class="text">LOW</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/main.php</span></td>
+                                            <td><span class="font-weight-bold">Cross Site Script(XSS)</span><br>CVE 2012-0000-1111</td>
+                                            <td>GET</td>
+                                            <td>http://xsstest123456.com/xssprob1.md</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/board.php?num=</span></td>
+                                            <td><span class="font-weight-bold">SQL Injection and XSS</span><br>CVE 2012-0012-1212<br>CVE 2012-0000-1111</td>
+                                            <td>POST</td>
+                                            <td>http://sqlinjection123456.com/sqli.pdf<br>http://xsstest123456.com/xssprob1.md</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-warning btn-icon-split">
+                                                <span class="text">LOW</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/chat.php</span></td>
+                                            <td><span class="font-weight-bold">SSRF</span><br>CVE 2020-1122-6655</td>
+                                            <td>GET</td>
+                                            <td>http://ssrfgoodgame.com/ssrf.txt</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/icontest.js</span></td>
+                                            <td><span class="font-weight-bold">Prototype Pollution</span><br>CVE 2020-12345</td>
+                                            <td>NONE</td>
+                                            <td>http://prototypejs.gogogo11.org/prototype.jsp</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/asdf.js.LICENSE.txt</span></td>
+                                            <td><span class="font-weight-bold">Development Environment Nuxt.js 2.6.2 version</span><br>CVE 2019-13506</td>
+                                            <td>NONE</td>
+                                            <td>http://nuxtjs.cve.vuln.com/cve201913506</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-success btn-icon-split">
+                                                <span class="text">NORMAL</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/</span></td>
+                                            <td><span class="font-weight-bold">Sub Domain List</span><br>on 21.05.2019</td>
+                                            <td>NONE</td>
+                                            <td>https://itworld11.com/subdomains.pdf</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-warning btn-icon-split">
+                                                <span class="text">LOW</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/main.php</span></td>
+                                            <td><span class="font-weight-bold">Cross Site Script(XSS)</span><br>CVE 2012-0000-1111</td>
+                                            <td>GET</td>
+                                            <td>http://xsstest123456.com/xssprob1.md</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/board.php?num=</span></td>
+                                            <td><span class="font-weight-bold">SQL Injection and XSS</span><br>CVE 2012-0012-1212<br>CVE 2012-0000-1111</td>
+                                            <td>POST</td>
+                                            <td>http://sqlinjection123456.com/sqli.pdf<br>http://xsstest123456.com/xssprob1.md</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-warning btn-icon-split">
+                                                <span class="text">LOW</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/chat.php</span></td>
+                                            <td><span class="font-weight-bold">SSRF</span><br>CVE 2020-1122-6655</td>
+                                            <td>GET</td>
+                                            <td>http://ssrfgoodgame.com/ssrf.txt</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/icontest.js</span></td>
+                                            <td><span class="font-weight-bold">Prototype Pollution</span><br>CVE 2020-12345</td>
+                                            <td>NONE</td>
+                                            <td>http://prototypejs.gogogo11.org/prototype.jsp</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/asdf.js.LICENSE.txt</span></td>
+                                            <td><span class="font-weight-bold">Development Environment Nuxt.js 2.6.2 version</span><br>CVE 2019-13506</td>
+                                            <td>NONE</td>
+                                            <td>http://nuxtjs.cve.vuln.com/cve201913506</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-success btn-icon-split">
+                                                <span class="text">NORMAL</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/</span></td>
+                                            <td><span class="font-weight-bold">Sub Domain List</span><br>on 21.05.2019</td>
+                                            <td>NONE</td>
+                                            <td>https://itworld11.com/subdomains.pdf</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-warning btn-icon-split">
+                                                <span class="text">LOW</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/main.php</span></td>
+                                            <td><span class="font-weight-bold">Cross Site Script(XSS)</span><br>CVE 2012-0000-1111</td>
+                                            <td>GET</td>
+                                            <td>http://xsstest123456.com/xssprob1.md</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/board.php?num=</span></td>
+                                            <td><span class="font-weight-bold">SQL Injection and XSS</span><br>CVE 2012-0012-1212<br>CVE 2012-0000-1111</td>
+                                            <td>POST</td>
+                                            <td>http://sqlinjection123456.com/sqli.pdf<br>http://xsstest123456.com/xssprob1.md</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-warning btn-icon-split">
+                                                <span class="text">LOW</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/chat.php</span></td>
+                                            <td><span class="font-weight-bold">SSRF</span><br>CVE 2020-1122-6655</td>
+                                            <td>GET</td>
+                                            <td>http://ssrfgoodgame.com/ssrf.txt</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/icontest.js</span></td>
+                                            <td><span class="font-weight-bold">Prototype Pollution</span><br>CVE 2020-12345</td>
+                                            <td>NONE</td>
+                                            <td>http://prototypejs.gogogo11.org/prototype.jsp</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-danger btn-icon-split">
+                                                <span class="text">HIGH</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/asdf.js.LICENSE.txt</span></td>
+                                            <td><span class="font-weight-bold">Development Environment Nuxt.js 2.6.2 version</span><br>CVE 2019-13506</td>
+                                            <td>NONE</td>
+                                            <td>http://nuxtjs.cve.vuln.com/cve201913506</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-success btn-icon-split">
+                                                <span class="text">NORMAL</span>
+                                            </a></td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="font-weight-bold">http://bobmart.com/</span></td>
+                                            <td><span class="font-weight-bold">Sub Domain List</span><br>on 21.05.2019</td>
+                                            <td>NONE</td>
+                                            <td>https://itworld11.com/subdomains.pdf</td>
+                                            <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                            <td><a href="#" class="btn btn-warning btn-icon-split">
+                                                <span class="text">LOW</span>
+                                            </a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            {% include 'components/footer.html' %}
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
+
+    <!-- Page level plugins -->
+    <script src="{{ url_for('static', filename='vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="{{ url_for('static', filename='js/demo/datatables-demo.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/page/attackVector.js') }}"></script>
+    <script>
+        document.getElementById("openHelpModal").addEventListener("click", ()=>$("#jobSubmitVerifyModal").modal("show"));
+    </script>
+
+</body>
+
+</html>
