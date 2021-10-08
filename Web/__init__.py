@@ -23,25 +23,19 @@ def create_app(config=None):
     app.config.from_object(config)
 
     # route initialize
-    from .routes import result_route, automation_route, common_route, api_route, test_route
+    from .routes import result_route, automation_route, common_route, api_route  # , test_route
     app.register_blueprint(result_route.bp)
     app.register_blueprint(automation_route.bp)
     app.register_blueprint(common_route.bp)
     app.register_blueprint(api_route.bp)
-    app.register_blueprint(test_route.bp)
+    # app.register_blueprint(test_route.bp)
 
     db.init_app(app)
 
     @app.before_request
     def before_request():
-        g.db = db.session
-        #g.db.query 기준으로 가져와야 함
-        print(g.db.query(Charts.name).all())
-        print(g.db.query(Charts).all())
-        asdf = g.db.query(Charts).all()
-        print(asdf[0].name)
-        print(asdf[1].name)
         db.app = app
+        g.db = db.session
         db.create_all()
 
     @app.errorhandler(404)

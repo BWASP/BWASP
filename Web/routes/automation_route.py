@@ -18,36 +18,6 @@ def manual_options():
             job(targetURL=str(reqJsonData["target"]["url"]), knownInfo=str(reqJsonData["info"]), recursiveLevel=str(reqJsonData["tool"]["analysisLevel"]), uriPath=str(reqJsonData["target"]["path"]))
         )
         g.db.commit()
-        """
-        {
-          "tool": {
-            "analysisLevel": "1340",
-            "optionalJobs": [
-              "portScan"
-            ]
-          },
-          "info": {
-            "framework": [
-              {
-                "name": "react",
-                "version": "1.12"
-              }
-            ],
-            "backend": [
-              {
-                "name": "django",
-                "version": "hello.world"
-              }
-            ]
-          },
-          "target": {
-            "url": "https://naver.com/",
-            "path": [
-              "/a/b",
-              "/c/d"
-            ]
-          }
-        }
-        """
+
         return jsonify({"success": True})
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")

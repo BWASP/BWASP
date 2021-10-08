@@ -12,6 +12,6 @@ def mode_selection():
     return render_template('common/mode_selection.html', Title="Select analysis mode - BWASP")
 
 
-@bp.route('/index')
+@bp.route('/dashboard')
 def index():
     return render_template('index.html', Title="홈 - BWASP", data1=10, data2=60, data3=20)
