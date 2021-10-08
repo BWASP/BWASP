@@ -1,6 +1,6 @@
 from flask import (
     Blueprint, render_template, g,
-    request
+    request, url_for, redirect
 )
 
 NAME = 'automation'
@@ -42,4 +42,5 @@ def manual_options():
           }
         }
         """
+        redirect(url_for('index'))
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")

@@ -2,8 +2,6 @@ from flask import (
     Blueprint, render_template, g
 )
 
-attack_Data = ""
-
 NAME = 'common'
 bp = Blueprint(NAME, __name__, url_prefix='/common')
 
@@ -15,4 +13,4 @@ def bpExport():
 
 @bp.route('/attack_vector')
 def attack_Vector():
-    return render_template('common/AttackVector.html', Title="Attack vectors - BWASP", data=attack_Data)
+    return render_template('common/AttackVector.html', Title="Attack vectors - BWASP", data="result")
