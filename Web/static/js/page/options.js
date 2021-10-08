@@ -1,4 +1,3 @@
-
 const MaximumRecursiveLevel = 5000;
 const patterns = {
     targetURL: /^http[s]?:\/\//
@@ -236,5 +235,18 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
         backdrop: 'static',
         show: true
     })
-    alert(JSON.stringify(requestData));
+
+    fetch("/automation/options", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+        },
+        body: new URLSearchParams({
+            reqJsonData: JSON.stringify(requestData)
+        })
+    }).then(
+        response => response.json()
+    ).then(
+        json => console.log(json)
+    );
 })
