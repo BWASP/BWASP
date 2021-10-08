@@ -3,6 +3,7 @@ from flask import (
     request, url_for, redirect, jsonify
 )
 from Web.models.BWASP import job
+from Web import AutomatedAnalysis
 import json
 
 NAME = 'automation'
@@ -18,6 +19,8 @@ def manual_options():
             job(targetURL=str(reqJsonData["target"]["url"]), knownInfo=str(reqJsonData["info"]), recursiveLevel=str(reqJsonData["tool"]["analysisLevel"]), uriPath=str(reqJsonData["target"]["path"]))
         )
         g.db.commit()
+
+        # AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData["tool"]["optionJobs"])
 
         return jsonify({"success": True})
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")
