@@ -236,17 +236,23 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
         show: true
     })
 
-    fetch("/automation/options", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-        },
-        body: new URLSearchParams({
-            reqJsonData: JSON.stringify(requestData)
-        })
-    }).then(
-        response => response.json()
-    ).then(
-        json => console.log(json)
-    );
+    document.getElementById("modal-start-job").addEventListener("click", ()=>{
+        fetch("/automation/options", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+            },
+            body: new URLSearchParams({
+                reqJsonData: JSON.stringify(requestData)
+            })
+        }).then(response => response.json())
+            .then(json => {
+                if(json.success){
+                    alert("Create job successfully.");
+                    document.location.replace("/");
+                }else{
+                    alert("Failed to create job.")
+                }
+            });
+    })
 })
