@@ -23,8 +23,8 @@ def create_app(config=None):
     app.config.from_object(config)
 
     # route initialize
-    from .routes import result_route, automation_route, common_route, api_route  # , test_route
-    app.register_blueprint(result_route.bp)
+    from .routes import index_route, automation_route, common_route, api_route  # , test_route
+    app.register_blueprint(index_route.bp)
     app.register_blueprint(automation_route.bp)
     app.register_blueprint(common_route.bp)
     app.register_blueprint(api_route.bp)
