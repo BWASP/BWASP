@@ -3,7 +3,6 @@ from flask import (
     request, url_for, redirect
 )
 from Web.models.BWASP import job
-from Web.routes.result_route import index
 import json
 
 NAME = 'automation'
