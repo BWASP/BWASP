@@ -3,3 +3,9 @@ requests==2.26.0
 selenium==3.141.0
 selenium-wire==4.5.2
 regex==2021.8.28
+click==8.0.1
+Flask==2.0.1
+Flask-SQLAlchemy==2.5.1
+Jinja2==3.0.1
+SQLAlchemy==1.4.25
+Werkzeug==2.0.1
