@@ -1,4 +1,3 @@
-
 .idea/*
 Web/__pycache__/*
 Web/BWASP/*
@@ -6,3 +5,7 @@ Web/BWASP/*
 *.pyc
 Web/databases/CVE.db
 Web/databases/cve_list.csv
+Include/
+Scripts/
+Lib/
+pyvenv.cfg
