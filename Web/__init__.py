@@ -32,18 +32,15 @@ def create_app(config=None):
 
     db.init_app(app)
 
-    @app.before_first_request
-    def before_first_request():
+    @app.before_request
+    def before_request():
+        g.db = db.session
         db.app = app
         db.create_all()
 
     @app.errorhandler(404)
     def NotFound(error):
         return render_template('404.html'), 404
-
-    @app.before_request
-    def before_request():
-        g.db = db.session
 
     @app.teardown_request
     def teardown_request(exception):
