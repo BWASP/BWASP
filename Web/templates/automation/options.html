@@ -14,56 +14,39 @@
                     <table class="table table-borderless mb-0">
                         <tbody>
                         <tr>
-                            <th scope="row" style="width: 25%;">Target URL</th>
-                            <td><code>https://google.com/</code></td>
-                        </tr>
-                        <tr>
-                            <th scope="row" style="width: 25%;">Web Server</th>
-                            <td>
-                                <ul class="pl-3 mb-0">
-                                    <li><code>Apache v1.0</code></li>
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row" style="width: 25%;">Frameworks</th>
-                            <td>
-                                <ul class="pl-3 mb-0">
-                                    <li><code>AngularJS v1.0</code></li>
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row" style="width: 25%;">Backend</th>
-                            <td>
-                                <ul class="pl-3 mb-0">
-                                    <li><code>NodeJS v1.0</code></li>
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr>
                             <th scope="row" style="width: 25%;">Analysis level</th>
-                            <td><code>1</code></td>
+                            <td><code id="modal-tool-analysisLevel">NaN</code></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 30%;">Target URL</th>
+                            <td><code id="modal-tool-targetURL">No data.</code></td>
                         </tr>
                         <tr>
                             <th scope="row" style="width: 25%;">URL Path</th>
-                            <td>No data.</td>
+                            <td id="modal-tool-URLPath"> - </td>
                         </tr>
                         <tr>
-                            <th scope="row" style="width: 25%;">Additional Options</th>
-                            <td>
-                                <ul class="pl-3 mb-0">
-                                    <li><code>Port scan</code></li>
-                                    <li><code>CSP Evaluate</code></li>
-                                </ul>
-                            </td>
+                            <th scope="row">Web Server</th>
+                            <td id="modal-info-server"> - </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Framework</th>
+                            <td id="modal-info-framework"> - </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Backend</th>
+                            <td id="modal-info-backend"> - </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 25%;">Options</th>
+                            <td id="modal-tool-options">Not selected.</td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="d-flex justify-content-end mt-3">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Back</button>
-                    <button type="button" class="btn btn-success ml-2">Start</button>
+                    <button type="button" class="btn btn-success ml-2" id="modal-start-job">Start</button>
                 </div>
             </div>
         </div>
@@ -88,10 +71,10 @@
                     <div class="row" id="section-targetURL">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="job-TargetURL">Target URL</label>
-                                <input type="text" class="form-control p-4 rounded-pill" id="job-TargetURL"
-                                       placeholder="Analysis target URL" aria-describedby="regexViolence-targetURL">
-                                <small id="regexViolence-targetURL" class="form-text text-muted d-none">Regex violence : <span class="text-danger">Target URL must be starts with protocol (http, https, ftp ...</span></small>
+                                <label for="target-url">Target URL</label>
+                                <input type="text" class="form-control p-4 rounded-pill" id="target-url"
+                                       placeholder="Analysis target URL" aria-describedby="regexViolence-targetURL" value="https://naver.com/">
+                                <small id="regexViolence-targetURL" class="form-text text-muted d-none">Regex violence : <span class="text-danger">Target URL must be starts with protocol (http, https)</span></small>
                             </div>
                         </div>
                     </div>
@@ -104,17 +87,18 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="ToolRecursiveLevelInput">Analysis recursive level</label>
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center mt-2">
                                     <input class="border border-white" type="number" min="1" max="5000" value="1" id="ToolRecursiveLevelInput">
-                                    <input type="range" class="form-control" min="1" max="5000" value="1" id="ToolRecursiveLevelSlider">
+                                    <input type="range" class="form-control-range" min="1" max="5000" value="1" id="ToolRecursiveLevelSlider">
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="ToolURLPath">Define URL Path</label>
-                                <input type="text" class="form-control p-4 rounded-pill" id="ToolURLPath"
-                                       placeholder="Path here">
+                                <label for="target-urlPath">Define URL Path</label>
+                                <input type="text" class="form-control p-4 rounded-pill" id="target-urlPath"
+                                       placeholder="Path here" aria-describedby="toolURLPath-Help", value="/a/b, /c/d">
+                                <small id="toolURLPath-Help" class="form-text text-muted">Multiple paths can be input separated with comma(<code>,</code>)</small>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -129,15 +113,15 @@
                                         <div class="card-body">
                                             <div class="form-group mb-0">
                                                 <div class="custom-control custom-checkbox small">
-                                                    <input type="checkbox" class="custom-control-input" id="fnc-port-scan">
-                                                    <label class="custom-control-label pt-1" for="fnc-port-scan">Port scan (Known ports)</label>
+                                                    <input type="checkbox" class="custom-control-input" id="optFnc-portScan" value="portScan" option_name="Port scan(Known ports)">
+                                                    <label id="optFnc-portScan-label" class="custom-control-label pt-1" for="optFnc-portScan">Port scan (Known ports)</label>
                                                 </div>
                                             </div>
                                             <div class="form-group mb-0">
                                                 <div class="custom-control custom-checkbox small">
                                                     <input type="checkbox" class="custom-control-input"
-                                                           id="fnc-csp-evaluate">
-                                                    <label class="custom-control-label pt-1" for="fnc-csp-evaluate">CSP Evaluate</label>
+                                                           id="optFnc-CSPEvaluate" value="CSPEvaluate">
+                                                    <label class="custom-control-label pt-1" for="optFnc-CSPEvaluate" id="optFnc-CSPEvaluate-label">CSP Evaluate</label>
                                                 </div>
                                             </div>
                                         </div>

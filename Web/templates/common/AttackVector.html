@@ -4,6 +4,20 @@
 {% include 'components/head.html' %}
 
 <body id="page-top">
+<div class="modal fade" id="jobSubmitVerifyModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="text-dark font-weight-bolder mb-3">Manual of attack vector page</h3>
+                <p class="mb-0">Click <span class="text-primary">URL</span> to check all payloads.</p>
+                <p>Click <span class="text-primary">Payload Detail</span> to view related packets.</p>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-success w-100" data-dismiss="modal">Dismiss</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -18,15 +32,18 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Attack Vector</h1>
-                    <p class="mb-4">URL Click ▶ Payload All Check<br>Payload Detail Click ▶ Packet Page View</p>
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800" id="titleOfPage">Attack Vector</h1>
+                    </div>
 
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">All Attack Vector</h6>
                             <div class="form-row float-left">
-                                <a href="#"><i class="fas fa-network-wired"></i>Packet</a>
+                                <a href="javascript:void(0);" id="openHelpModal"><i class="fas fa-question"></i> Help</a>
+                                <p class="mb-0 ml-2 mr-2 text-muted"> | </p>
+                                <a href="#" id="switchToPacket"><i class="fas fa-network-wired"></i> Packet</a>
                             </div>
                             <div class="form-row float-right">
                                 <a href="#"><i class="fas fa-sort-amount-up"></i>Sort</a>　
@@ -36,7 +53,7 @@
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
+                                    <thead id="parallelTableHead">
                                         <tr>
                                             <th>URL List</th>
                                             <th>Vulnerability Doubt</th>
@@ -46,7 +63,31 @@
                                             <th>Impact</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="parallelTableBody">
+                                    <tr>
+                                        <td>
+                                            <a href="#additionalFuncs" class="d-block py-3 m-0 font-weight-bold text-primary" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="additionalFuncs">
+                                                http://bobmart.com/main.php
+                                            </a>
+                                            <div class="collapse" id="additionalFuncs">
+                                                <p class="font-weight-bold mb-1">Payloads</p>
+                                                <ul>
+                                                    <li>/class.php</li>
+                                                    <li>/korea.php</li>
+                                                    <li>/bwasp.php</li>
+                                                    <li>/abc.bobmart.com</li>
+                                                    <li>/admin.bobmart.com</li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td><span class="font-weight-bold">Cross Site Script(XSS)</span><br>CVE 2012-0000-1111</td>
+                                        <td>GET</td>
+                                        <td>http://xsstest123456.com/xssprob1.md</td>
+                                        <td><span class="font-weight-bold">2021.09.28</span><br>11:00 AM</td>
+                                        <td>
+                                            <p class="btn btn-danger btn-icon-split p-1 pl-3 pr-3 rounded-pill">High</p>
+                                        </td>
+                                    </tr>
                                         <tr>
                                             <td><span class="font-weight-bold">http://bobmart.com/main.php</span></td>
                                             <td><span class="font-weight-bold">Cross Site Script(XSS)</span><br>CVE 2012-0000-1111</td>
@@ -364,6 +405,10 @@
 
     <!-- Page level custom scripts -->
     <script src="{{ url_for('static', filename='js/demo/datatables-demo.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/page/attackVector.js') }}"></script>
+    <script>
+        document.getElementById("openHelpModal").addEventListener("click", ()=>$("#jobSubmitVerifyModal").modal("show"));
+    </script>
 
 </body>
 
