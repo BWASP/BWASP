@@ -92,3 +92,4 @@ class Charts(db.Model):
     data = db.Column(db.TEXT(1000), nullable=False)
     ratio = db.Column(db.Integer, nullable=False)
     insertPoints = db.Column(db.Integer, nullable=False)
+
