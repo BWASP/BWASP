@@ -17,14 +17,14 @@ def mode_selection():
 def index():
     # result = {}.query.all()
     return render_template('index.html', Title="홈 - BWASP",
-                           header_box={
-                               "Web_Information": 1,
-                               "Vulnerability_Doubt": 1,
-                               "Attack_Vector": 1,
-                               "Related_CVE": 1
-                           },
                            area_Chart={
                                "All_Result": 183,
+                               "Web_Information": 20,
+                               "Vulnerability_Doubt": 40,
+                               "Attack_Vector": 50,
+                               "Related_CVE": 16
+                           },
+                           header_box={
                                "Received": 426,
                                "Average_first_response_time": "1 min",
                                "Average_response_time": "3 min",
