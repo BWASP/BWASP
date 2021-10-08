@@ -43,6 +43,15 @@ class job(db.Model):
     recursiveLevel = db.Column(db.TEXT(1000), nullable=False)
     uriPath = db.Column(db.TEXT(1000), nullable=False)
 
+    def __init__(self, targetURL, knownInfo, recursiveLevel, uriPath, **kargs):
+        self.targetURL = targetURL
+        self.knownInfo = knownInfo
+        self.recursiveLevel = recursiveLevel
+        self.uriPath = uriPath
+
+    def __repr__(self):
+        return f"<job('{self.targetURL}', '{self.knownInfo}', '{self.recursiveLevel}, {self.uriPath}')>"
+
 
 class packets(db.Model):
     __tablename__ = 'packets'
@@ -92,4 +101,3 @@ class Charts(db.Model):
     data = db.Column(db.TEXT(1000), nullable=False)
     ratio = db.Column(db.Integer, nullable=False)
     insertPoints = db.Column(db.Integer, nullable=False)
-

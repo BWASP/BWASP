@@ -2,6 +2,9 @@ from flask import (
     Blueprint, render_template, g,
     request, url_for, redirect
 )
+from Web.models.BWASP import job
+from Web.routes.result_route import index
+import json
 
 NAME = 'automation'
 bp = Blueprint(NAME, __name__, url_prefix='/automation')
@@ -10,7 +13,12 @@ bp = Blueprint(NAME, __name__, url_prefix='/automation')
 @bp.route('/options', methods=['GET', 'POST'])
 def manual_options():
     if request.method == 'POST':
-        reqJsonData = request.form['reqJsonData']
+        reqJsonData = json.loads(request.form['reqJsonData'])
+        g.db.add(
+            # targetURL, knownInfo, recursiveLevel, uriPath
+            job(targetURL=str(reqJsonData["target"]["url"]), knownInfo=str(reqJsonData["info"]), recursiveLevel=str(reqJsonData["tool"]["analysisLevel"]), uriPath=str(reqJsonData["target"]["path"]))
+        )
+        g.db.commit()
         """
         {
           "tool": {
@@ -42,5 +50,5 @@ def manual_options():
           }
         }
         """
-        redirect(url_for('index'))
+        redirect(url_for('result.index'))
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")
