@@ -8,10 +8,7 @@ NAME = 'test'
 bp = Blueprint(NAME, __name__, url_prefix='/test')
 
 
-@bp.route('/')
-def apiInvalidRequest():
-    result = g.db.query(
-        job
-    ).all()
-    # result = job.query.all()
+@bp.route('/select')
+def select():
+    result = job.query.all()
     return str(result)
