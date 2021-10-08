@@ -51,6 +51,3 @@ def create_app(config=None):
             g.db.close()
 
     return app
-
-# if __name__ == '__main__':
-#    create_app().run(host='0.0.0.0', port=5000, debug=True)

@@ -1,6 +1,6 @@
 from flask import (
     Blueprint, render_template, g,
-    request, url_for, redirect
+    request, url_for, redirect, jsonify
 )
 from Web.models.BWASP import job
 import json
@@ -49,5 +49,5 @@ def manual_options():
           }
         }
         """
-        redirect(url_for('index'))
+        return jsonify({"success": True})
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")

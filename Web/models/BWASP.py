@@ -20,7 +20,6 @@ class CSPEmulator(db.Model):
     header = db.Column(db.TEXT(1000), nullable=False)
     analysis = db.Column(db.TEXT(1000), nullable=False)
     status = db.Column(db.TEXT(1000), nullable=False)
-    createTime = db.Column(db.DateTime, nullable=False)
 
 
 class domain(db.Model):
