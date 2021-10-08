@@ -4,7 +4,7 @@
 from flask import (
     Flask, render_template, g
 )
-from .models.BWASP import db
+from .models.BWASP import db, Charts
 
 
 def create_app(config=None):
@@ -35,6 +35,12 @@ def create_app(config=None):
     @app.before_request
     def before_request():
         g.db = db.session
+        #g.db.query 기준으로 가져와야 함
+        print(g.db.query(Charts.name).all())
+        print(g.db.query(Charts).all())
+        asdf = g.db.query(Charts).all()
+        print(asdf[0].name)
+        print(asdf[1].name)
         db.app = app
         db.create_all()
 
