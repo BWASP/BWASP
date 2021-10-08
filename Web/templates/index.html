@@ -34,9 +34,9 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-lg font-weight-bold text-primary text-uppercase mb-1">
-                                            Web Information
+                                            Received
                                         </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ header_box["Web_Information"] }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ header_box["Received"] }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -53,9 +53,9 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-lg font-weight-bold text-success text-uppercase mb-1">
-                                            Vulnerability Doubt
+                                            Average first response time
                                         </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ header_box["Vulnerability_Doubt"] }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ header_box["Average_first_response_time"] }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -72,11 +72,11 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-lg font-weight-bold text-info text-uppercase mb-1">
-                                            Attack Vector
+                                            Average response time
                                         </div>
                                         <div class="row no-gutters align-items-center">
                                             <div class="col-auto">
-                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ header_box["Attack_Vector"] }}</div>
+                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ header_box["Average_response_time"] }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -95,9 +95,9 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-lg font-weight-bold text-warning text-uppercase mb-1">
-                                            Related CVE
+                                            Resolution within SLA
                                         </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ header_box["Related_CVE"] }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ header_box["Resolution_within_SLA"] }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-comments fa-2x text-gray-300"></i>
@@ -135,27 +135,31 @@
                             <!-- Card Body -->
                             <div class="card-body">
                                 <div class="chart-area">
-                                    <table class="table table-hover" id="dataTable">
+                                    <table class="table table-borderless" id="dataTable">
                                         <tbody>
                                         <tr>
-                                            <td>Web All Result</td>
-                                            <td>{{ area_Chart["All_Result"] }}</td>
+                                            <td><strong>Web All Result</strong></td>
+                                            <td><strong>{{ area_Chart["All_Result"] }} count</strong></td>
+                                        </tr>
+                                         <tr>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                         <tr>
-                                            <td>Received</td>
-                                            <td>{{ area_Chart["Received"] }}</td>
+                                            <td>WEB INFORMATION</td>
+                                            <td>{{ area_Chart["Web_Information"] }} count</td>
                                         </tr>
                                         <tr>
-                                            <td>Average first response time</td>
-                                            <td>{{ area_Chart["Average_first_response_time"] }}</td>
+                                            <td>VULNERABILITY DOUBT</td>
+                                            <td>{{ area_Chart["Vulnerability_Doubt"] }} count</td>
                                         </tr>
                                         <tr>
-                                            <td>Average response time</td>
-                                            <td>{{ area_Chart["Average_response_time"] }}</td>
+                                            <td>ATTACK VECTOR</td>
+                                            <td>{{ area_Chart["Attack_Vector"] }} count</td>
                                         </tr>
                                         <tr>
-                                            <td>Resolution within SLA</td>
-                                            <td>{{ area_Chart["Resolution_within_SLA"] }}</td>
+                                            <td>RELATED CVE</td>
+                                            <td>{{ area_Chart["Related_CVE"] }} count</td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -180,7 +184,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-2">
-                                    <table class="table table-hover" id="dataTable">
+                                    <table class="table table-borderless" id="dataTable">
                                         <tbody>
                                         <tr>
                                             <td>SQL injection</td>
@@ -403,9 +407,9 @@
     var myLineChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ["All Result", "Received", "Average first response time", "Average response time", "Resolution within SLA"],
+            labels: ["Web Information", "Vulnerability Doubt", "Attack Vector", "Related CVE"],
             datasets: [{
-                label: "Earnings",
+                label: "Count",
                 lineTension: 0.3,
                 backgroundColor: "rgba(78, 115, 223, 0.05)",
                 borderColor: "rgba(78, 115, 223, 1)",
@@ -417,7 +421,7 @@
                 pointHoverBorderColor: "rgba(78, 115, 223, 1)",
                 pointHitRadius: 10,
                 pointBorderWidth: 2,
-                data: [10, 20, 30, 40, 50],
+                data: [{{ area_Chart["Web_Information"] }}, {{ area_Chart["Vulnerability_Doubt"] }}, {{ area_Chart["Attack_Vector"] }}, {{ area_Chart["Related_CVE"] }}],
             }],
         },
         options: {
@@ -449,7 +453,7 @@
                         padding: 10,
                         // Include a dollar sign in the ticks
                         callback: function (value, index, values) {
-                            return number_format(value) + '%';
+                            return number_format(value) + ' count';
                         }
                     },
                     gridLines: {
@@ -481,7 +485,7 @@
                 callbacks: {
                     label: function (tooltipItem, chart) {
                         var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                        return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+                        return datasetLabel + ': ' + number_format(tooltipItem.yLabel);
                     }
                 }
             }
