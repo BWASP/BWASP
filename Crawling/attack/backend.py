@@ -108,12 +108,12 @@ def retVersiongroup(type,regex_results,version_group):
         if  (version_grouping[3+index] or version_grouping[4+index]):
             if regex_results[int(version_grouping[2+index])+index]:
                 if "\\" in version_grouping[3+index]:
-                    version=regex_results[3+index]
+                    version=regex_results[int(version_grouping[3+index].replace("\\",""))+index]
                 else:   
                     version=version_grouping[3+index]
             else:
                 if "\\" in version_grouping[4+index]:
-                    version=regex_results[4+index]
+                    version=regex_results[int(version_grouping[4+index].replace("\\",""))+index]
                 else:   
                     version=version_grouping[4+index]
         else:
@@ -196,7 +196,7 @@ def resBackend(driver,req_res_packets,options=""):
                             appendResult(result,name,"scripts",retVersiongroup("findall",regex_results,version_group),0,1)
                             appendImplies(result,signature[name],0,1)
 
-        '''#html 파싱은 현재 페이질 경우만
+        #html 파싱은 현재 페이질 경우만
         if 'html' in signature[name].keys():
             #str 일 경우
             if type(signature[name]["html"]) is type(""):
@@ -214,7 +214,7 @@ def resBackend(driver,req_res_packets,options=""):
                     #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
                     if(regex_results):
                         appendResult(result,name,"html",retVersiongroup("findall",regex_results,version_group),0,1)
-                        appendImplies(result,signature[name],0,1)'''
+                        appendImplies(result,signature[name],0,1)
         #meta로 추출 , meta의 값은 dictionary 값 여러개도 가능
 
         if "meta" in signature[name].keys():
