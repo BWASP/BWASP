@@ -5,11 +5,9 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
 default_allow_cat={12,18,27}
-#default_allow_cat={12,18,27,22,28}
 #default_allow_cat = [12,18,27,22, 28, 33, 34, 46]
 default_check_cat={12,18,27}
-    #default_check_cat = [12,18,27,22, 28, 33, 34, 46]
-#default_check_cat={12,18,27,22,28}
+#default_check_cat = [12,18,27,22, 28, 33, 34, 46]
 json_path="./wappalyzer/"
 categories_path="./wappalyzer/categories.json"
 sig_url=list()
@@ -29,7 +27,7 @@ def isSameDomain(target_url, visit_url):
         return False
 
 
-def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22},options=""):
+def extractJson(check_cat={12,18,27},allow_cat={12,18,27},options=""):
     #12(javascript framework),18(Web frameworks),22(web server),27(Programming Language)
     option_names=[]
     if(options):
@@ -53,7 +51,7 @@ def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22},options=""):
                     if options:
                         if "implies" in json_data[name].keys():
                                 implies_list=json_data[name]["implies"]
-                                if type(implies_list) is str:
+                                if type(implies_list) is type(""):
                                     implies_split=implies_list.split('\\;')
                                     implies_list=implies_split[0]
                                     if any(implies_list.lower() == option_name for option_name in option_names):
@@ -68,8 +66,8 @@ def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22},options=""):
                                         if len(json_data[name]["implies"]) == 0:
                                             del json_data[name]["implies"]
                                     
-                result[name]=json_data[name]
-
+                    result[name]=json_data[name]
+    print(result)
     return result
 
 def extractJsonattribute(result):
@@ -97,8 +95,8 @@ def rebuildPattern(pattern):
             if "confidence:" in result_line:
                 confidence=result_line.split(":")[1]
                 confidence=int(confidence)
-    if not result[0]:
-        return result[0],version_group,confidence
+
+    return result[0],version_group,confidence
 
 
 
@@ -380,6 +378,7 @@ if __name__ == '__main__':
     json_path="../wappalyzer/"
     categories_path="../wappalyzer/categories.json"
     print(extractJsonattribute(extractJson()))
+    print(extractJson())
     #print(retCatsname([12,18,27,22]))
     #print(18,retCatname(18))
     #resBackend()
