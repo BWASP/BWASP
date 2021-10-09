@@ -49,6 +49,22 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <div id="loadingProgress">
+                                <div class="pt-5 pb-5 d-flex align-items-center justify-content-center">
+                                    <div class="spinner-border" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <h3 class="ml-3 mb-0 text-dark">Loading in progress...</h3>
+                                </div>
+                            </div>
+                            <div id="resultNoData" class="d-none">
+                                <div class="pt-5 pb-5 d-flex align-items-center justify-content-center text-danger">
+                                    <h3 class="mb-0">
+                                        <i class="fa fa-ban"></i>
+                                    </h3>
+                                    <h3 class="ml-3 mb-0">No data.</h3>
+                                </div>
+                            </div>
                             <div class="table-responsive" id="tablePlace"></div>
                         </div>
                     </div>
