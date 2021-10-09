@@ -14,3 +14,8 @@ def apiInvalidRequest():
 @bp.route('/job/enroll')
 def apiJobEnroll():
     return jsonify({"success": True})
+
+
+@bp.route('/AttackVector')
+def apiJobEnroll():
+    return jsonify({"success": True})

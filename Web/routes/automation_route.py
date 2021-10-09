@@ -3,6 +3,7 @@ from flask import (
     request, url_for, redirect, jsonify
 )
 from Web.models.BWASP import job
+# from Web import AutomatedAnalysis
 import json
 
 NAME = 'automation'
@@ -14,40 +15,13 @@ def manual_options():
     if request.method == 'POST':
         reqJsonData = json.loads(request.form['reqJsonData'])
         g.db.add(
-            # targetURL, knownInfo, recursiveLevel, uriPath
             job(targetURL=str(reqJsonData["target"]["url"]), knownInfo=str(reqJsonData["info"]), recursiveLevel=str(reqJsonData["tool"]["analysisLevel"]), uriPath=str(reqJsonData["target"]["path"]))
         )
         g.db.commit()
-        """
-        {
-          "tool": {
-            "analysisLevel": "1340",
-            "optionalJobs": [
-              "portScan"
-            ]
-          },
-          "info": {
-            "framework": [
-              {
-                "name": "react",
-                "version": "1.12"
-              }
-            ],
-            "backend": [
-              {
-                "name": "django",
-                "version": "hello.world"
-              }
-            ]
-          },
-          "target": {
-            "url": "https://naver.com/",
-            "path": [
-              "/a/b",
-              "/c/d"
-            ]
-          }
-        }
-        """
+
+        # Crawling -> Not found module in Crawling Scouter.py
+        # requirements.txt check
+        # AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData["tool"]["optionJobs"])
+
         return jsonify({"success": True})
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")
