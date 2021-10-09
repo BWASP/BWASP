@@ -36,11 +36,11 @@ def create_app(config=None):
     def before_request():
         g.db = db.session
         #g.db.query 기준으로 가져와야 함
-        print(g.db.query(Charts.name).all())
-        print(g.db.query(Charts).all())
-        asdf = g.db.query(Charts).all()
-        print(asdf[0].name)
-        print(asdf[1].name)
+        #print(g.db.query(Charts.name).all())
+        #print(g.db.query(Charts).all())
+        #asdf = g.db.query(Charts).all()
+        #print(asdf[0].name)
+        #print(asdf[1].name)
         db.app = app
         db.create_all()
 
