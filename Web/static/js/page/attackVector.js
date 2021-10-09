@@ -56,6 +56,11 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
         thead: document.createElement("thead"),
         tbody: document.createElement("tbody")
     };
+    let tableID = createKey(),
+        tablePlace = document.getElementById("tablePlace");
+    tablePlace.innerHTML = "";
+    $("#loadingProgress").removeClass("d-none");
+    $("#resultNoData").addClass("d-none");
     currentState = !currentState;
     ((status = (currentState) ? "Attack Vector" : "Packets")=>{
         document.getElementById("titleOfPage").innerHTML = status;
@@ -79,6 +84,11 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
 
     // Build tbody
     let buildData = (currentState) ? implementationSample_attackVector : implementationSample_packets;
+    if (buildData.length<=0){
+        $("#loadingProgress").addClass("d-none");
+        $("#resultNoData").removeClass("d-none");
+        return;
+    }
     for (let count = 0; count < buildData.length; count++) {
         let frame = document.createElement("tr"),
             localData = buildData[count],
@@ -251,17 +261,15 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
         table.tbody.appendChild(frame);
     }
 
-    let tableID = createKey(),
-        tablePlace = document.getElementById("tablePlace");
     table.table.classList.add("table", "table-bordered");
     table.table.id = tableID;
     table.table.append(
         table.thead,
         table.tbody
     );
-    tablePlace.innerHTML = "";
     tablePlace.appendChild(table.table);
     $(`#${tableID}`).DataTable();
+    $("#loadingProgress").addClass("d-none");
 })
 
 window.onload = () => document.getElementById("switchToPacket").click();
