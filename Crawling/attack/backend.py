@@ -6,8 +6,10 @@ from bs4 import BeautifulSoup
 
 default_allow_cat={12,18,27}
 #default_allow_cat={12,18,27,22,28}
+default_allow_cat = [12,18,27,22, 28, 33, 34, 46]
 default_check_cat={12,18,27}
-#default_check_cat={12,18,27,22,28}
+    #default_check_cat = [12,18,27,22, 28, 33, 34, 46]
+default_check_cat={12,18,27,22,28}
 json_path="./wappalyzer/"
 categories_path="./wappalyzer/categories.json"
 sig_url=list()
@@ -65,6 +67,8 @@ def rebuildPattern(pattern):
                 confidence=int(confidence)
     return result[0],version_group,confidence
 
+
+
 def retVersiongroup(type,regex_results,version_group):
     if version_group == "false":
         return "false"
@@ -104,6 +108,24 @@ def appendResult(result,name,detectype,version,request_index=0,response_index=0)
     if response_index and response_index not in result[name]["response"]:
         result[name]["response"].append(response_index)
 
+#appendImplies(result,signature[name],0,0)
+def appendImplies(result,signature_name,request_index=0,response_index=0):
+    if "implies" in signature_name.keys():
+        implies_list=signature_name["implies"]
+
+        if type(implies_list) is str:
+            print(implies_list)
+            implies_split=implies_list.split('\\;')
+            implies_list=implies_split[0]
+            appendResult(result,implies_list,"implies","false",request_index,response_index)
+        
+        else:
+            for implies_line in	implies_list:
+                implies_split=implies_line.split('\\;')
+                implies_line=implies_split[0]
+                print(implies_line)
+                appendResult(result,implies_line,"implies","false",request_index,response_index)
+
 
 def resBackend(driver,req_res_packets):
     target_url=driver.current_url
@@ -121,6 +143,7 @@ def resBackend(driver,req_res_packets):
                     regex_results=re.findall(pattern,current_scripts_line["src"],re.I)
                     if(regex_results):
                         appendResult(result,name,"scripts",retVersiongroup("findall",regex_results,version_group),0,1)
+                        appendImplies(result,signature[name],0,1)
             elif type(signature[name]["scripts"]) is list:
                 for scripts_line in signature[name]["scripts"]:
                     pattern,version_group,confidence=rebuildPattern(scripts_line)
@@ -128,6 +151,7 @@ def resBackend(driver,req_res_packets):
                         regex_results=re.findall(pattern,current_scripts_line["src"],re.I)
                         if(regex_results):
                             appendResult(result,name,"scripts",retVersiongroup("findall",regex_results,version_group),0,1)
+                            appendImplies(result,signature[name],0,1)
 
         '''#html 파싱은 현재 페이질 경우만
         if 'html' in signature[name].keys():
@@ -138,6 +162,7 @@ def resBackend(driver,req_res_packets):
                 #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
                 if(regex_results):
                     appendResult(result,name,"html",retVersiongroup("findall",regex_results,version_group),0,1)
+                    appendImplies(result,signature[name],0,1)
             #list일 경우
             elif type(signature[name]["html"]) is type(list()):
                 for html_line in signature[name]["html"]:
@@ -145,7 +170,8 @@ def resBackend(driver,req_res_packets):
                     regex_results=re.findall(pattern,current_page,re.I)
                     #현재 페이지는 response에서도 가져오기 때문에 response 패킷에 입력
                     if(regex_results):
-                        appendResult(result,name,"html",retVersiongroup("findall",regex_results,version_group),0,1)'''
+                        appendResult(result,name,"html",retVersiongroup("findall",regex_results,version_group),0,1)
+                        appendImplies(result,signature[name],0,1)'''
         #meta로 추출 , meta의 값은 dictionary 값 여러개도 가능
 
         if "meta" in signature[name].keys():
@@ -159,6 +185,7 @@ def resBackend(driver,req_res_packets):
                     #현재 페이지는 response 패킷 1으로 침 
                     if(regex_results):
                         appendResult(result,name,"meta",retVersiongroup("findall",regex_results,version_group),0,1)
+                        appendImplies(result,signature[name],0,1)
         #dom으로 추출 
         if "dom" in signature[name].keys():
             if type(signature[name]["dom"]) is dict: #dict 인지 확인
@@ -171,16 +198,19 @@ def resBackend(driver,req_res_packets):
                                         pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name][subkey_name])
                                         regex_results=re.match(pattern,temp[subkey_name])
                                         if(regex_results):
-                                            appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)                        
+                                            appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
+                                            appendImplies(result,signature[name],0,1)                        
                             if subkey_name == "text":
                                 pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name]["text"])
                                 regex_results=re.match(pattern,temp.text)
                                 if(regex_results):
                                     appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
+                                    appendImplies(result,signature[name],0,1)
                                 #match 값 존재하면 넣기
 
                             if subkey_name == "exists":
                                 appendResult(result,name,"dom","false",0,1)
+                                appendImplies(result,signature[name],0,1)
 
                             if subkey_name == "src":
                                 if "src" in temp.attrs:
@@ -188,6 +218,7 @@ def resBackend(driver,req_res_packets):
                                     regex_results=re.match(pattern,temp['src'])
                                     if(regex_results):
                                         appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
+                                        appendImplies(result,signature[name],0,1)
                             #if key_name == "properties" 아직 구현 x, 2가지만 해당됨
                             # 일단은 properties는 name과 같은 느낌이라 생각 , attrs로 존재 여무 확인
                             # 아직은 dict 구조지만 값은 비교안함 
@@ -198,10 +229,12 @@ def resBackend(driver,req_res_packets):
                 for line_list in signature[name]["dom"]:
                     if soup.select(line_list):
                         appendResult(result,name,"dom","false",0,1)
+                        appendImplies(result,signature[name],0,1)
 
             elif type(signature[name]["dom"]) is str:
                 if soup.select(signature[name]["dom"]):
                     appendResult(result,name,"dom","false",0,1)
+                    appendImplies(result,signature[name],0,1)
 
 
 
@@ -213,6 +246,7 @@ def resBackend(driver,req_res_packets):
                 regex_results=re.findall(pattern,request["request"]["full_url"],re.I)
                 if(regex_results):
                     appendResult(result,name,"url",retVersiongroup("findall",regex_results,version_group),i,0)
+                    appendImplies(result,signature[name],i,0)
             #header로 추출
             if  'headers' in  signature[name].keys():
                 if not isSameDomain(target_url,request["request"]["full_url"]):
@@ -222,11 +256,13 @@ def resBackend(driver,req_res_packets):
                     regex_results=re.findall(pattern,request["request"]["headers"][comp_header],re.I)
                     if(regex_results):
                         appendResult(result,name,"headers",retVersiongroup("findall",regex_results,version_group),i,0)
+                        appendImplies(result,signature[name],i,0)
                 for comp_header in set(signature[name]["headers"].keys()) & set(request["response"]["headers"].keys()):
                     pattern,version_group,confidence=rebuildPattern(signature[name]["headers"][comp_header])
                     regex_results=re.findall(pattern,request["response"]["headers"][comp_header],re.I)
                     if(regex_results):
                         appendResult(result,name,"headers",retVersiongroup("findall",regex_results,version_group),0,i)
+                        appendImplies(result,signature[name],0,i)
             #cookie로 추출
             if  'cookie' in  signature[name].keys():
                 if not isSameDomain(target_url,request["request"]["full_url"]):
@@ -237,12 +273,14 @@ def resBackend(driver,req_res_packets):
                     regex_results=re.findall(pattern,request["request"]["headers"]["cookie"],re.I)
                     if(regex_results):
                         appendResult(result,name,"cookie",retVersiongroup("findall",regex_results,version_group),i,0)
+                        appendImplies(result,signature[name],i,0)
                 #response packet 비교
                 for comp_cookie in ({"cookie","set-cookie"}  & set(signature[name]["headers"].keys())):
                         pattern,version_group,confidence=rebuildPattern(signature[name]["headers"]["cookie"])
                         regex_results=re.findall(pattern,request["response"]["headers"][comp_header],re.I)
                         if(regex_results):
                             appendResult(result,name,"cookie",retVersiongroup("findall",regex_results,version_group),0,i)
+                            appendImplies(result,signature[name],0,i)
     return(result)
                    
 
