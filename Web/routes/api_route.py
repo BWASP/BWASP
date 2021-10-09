@@ -44,12 +44,14 @@ def cve_Data(search):
 
     # db2.select(db_table) 만 하면 table 전체 columns.year로 하면 year 컬럼만 해당
     query = db2.select(db_table.columns.year).where(and_(
-        db_table.columns.description.like("%" + server_title + "%"), db_table.columns.description.like("%" + server_version + "%"))).order_by(
+        db_table.columns.description.like("%" + server_title + "%"),
+        db_table.columns.description.like("%" + server_version + "%"))).order_by(
         db_table.columns.year.desc())
 
     for i in range(len(list(backend_title_all))):
         backend_query = db2.select(db_table.columns.year).where(and_(
-            db_table.columns.description.like("%" + backend_title[i] + "%"), db_table.columns.description.like("%" + backend_version[i] + "%"))).order_by(
+            db_table.columns.description.like("%" + backend_title[i] + "%"),
+            db_table.columns.description.like("%" + backend_version[i] + "%"))).order_by(
             db_table.columns.year.desc())
 
     result = db_connection.execute(query)
@@ -58,8 +60,9 @@ def cve_Data(search):
     backend_result = db_connection.execute(backend_query)
     backend_result_set = backend_result.fetchall()
 
-    cve_data = str(result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", "")
-    cve_data += str(backend_result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", "")
+    cve_data = list()
+    cve_data.append(str(result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", ""))
+    cve_data.append(str(backend_result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", ""))
     return cve_data
 
 
@@ -86,30 +89,7 @@ def AttackVector():
 
     # sample
     resDataJson = []
-    for i in range(0, len(domain_data)):
-        JsonData = {
-            "url": domain_data[i].URL + domain_data[i].URI,  # "https://naver.com" [URL], /asdf/index.php [URI]
-            "payloads": [
-                domain_data[i].URI
-                # "/index.php",
-                # "/class.php"
-            ],
-            "vulnerability": {
-                "type": "1",#attackVector_data[i].attackVector,
-                # "Cross Site Script(XSS)",  # (stored, reflected, dom) 으로 XSS 분리하면 될 듯...?
-                "CVE": [
-                    {
-                        "numbering": cve_Data(eval(systeminfo_data[0].data))  # "2021-0000-1111"
-                    }
-                ]
-            },
-            "method": packets_data[i].requestType,
-            "date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # "2021-09-28 11:00",
-            "impactRate": 0
-        }
-        resDataJson.append(JsonData)
-
-        """
+    for i in range(0, 10):  # len(domain_data)):
         try:
             JsonData = {
                 "url": domain_data[i].URL + domain_data[i].URI,  # "https://naver.com" [URL], /asdf/index.php [URI]
@@ -119,17 +99,18 @@ def AttackVector():
                     # "/class.php"
                 ],
                 "vulnerability": {
-                    "type": attackVector_data[i].attackVector,  # "Cross Site Script(XSS)",  # (stored, reflected, dom) 으로 XSS 분리하면 될 듯...?
-                    "CVE": [
-                        {
-                            "numbering": cve_Data(systeminfo_data[0].data)  # "2021-0000-1111"
-                        }
-                    ]
+                    "type": "1",  # attackVector_data[i].attackVector,
+                    # "Cross Site Script(XSS)",  # (stored, reflected, dom) 으로 XSS 분리하면 될 듯...?
+                    "CVE": []
                 },
-                "method": "None",
+                "method": packets_data[i].requestType,
                 "date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # "2021-09-28 11:00",
                 "impactRate": 0
             }
+            for cveData in cve_Data(eval(systeminfo_data[0].data)):
+                JsonData["vulnerability"]["CVE"].append({
+                    "numbering": cveData
+                })
             resDataJson.append(JsonData)
         except:
             JsonData = {
@@ -151,8 +132,7 @@ def AttackVector():
             }
             resDataJson.append(JsonData)
             break
-            """
 
-    #print(resDataJson)
+    # print(resDataJson)
 
     return jsonify(resDataJson)
