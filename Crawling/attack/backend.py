@@ -6,10 +6,10 @@ from bs4 import BeautifulSoup
 
 default_allow_cat={12,18,27}
 #default_allow_cat={12,18,27,22,28}
-default_allow_cat = [12,18,27,22, 28, 33, 34, 46]
+#default_allow_cat = [12,18,27,22, 28, 33, 34, 46]
 default_check_cat={12,18,27}
     #default_check_cat = [12,18,27,22, 28, 33, 34, 46]
-default_check_cat={12,18,27,22,28}
+#default_check_cat={12,18,27,22,28}
 json_path="./wappalyzer/"
 categories_path="./wappalyzer/categories.json"
 sig_url=list()
@@ -29,8 +29,13 @@ def isSameDomain(target_url, visit_url):
         return False
 
 
-def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22}):
+def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22},options=""):
     #12(javascript framework),18(Web frameworks),22(web server),27(Programming Language)
+    option_names=[]
+    if(options):
+        for option in options:
+            option_names.append(option["name"].lower())
+
     check_cat = set(check_cat)
     json_list = os.listdir(json_path)
     json_list.remove("categories.json")
@@ -39,11 +44,32 @@ def extractJson(check_cat={12,18,27,22},allow_cat={12,18,27,22}):
         with open(json_path+line,encoding='UTF8') as json_file:
             json_data = json.load(json_file)
             for name in json_data:
+                if any(name.lower() == option_name for option_name in option_names):
+                    continue
                 if set(check_cat) & set(json_data[name]['cats']):
                     if "headers" in json_data[name].keys():
                         for headers_key  in list(json_data[name]["headers"].keys()):
                             json_data[name]["headers"][headers_key.lower()] = json_data[name]["headers"].pop(headers_key)
-                    result[name]=json_data[name]
+                    if options:
+                        if "implies" in json_data[name].keys():
+                                implies_list=json_data[name]["implies"]
+                                if type(implies_list) is str:
+                                    implies_split=implies_list.split('\\;')
+                                    implies_list=implies_split[0]
+                                    if any(implies_list.lower() == option_name for option_name in option_names):
+                                        del json_data[name]["implies"]
+                                else:
+                                    for implies_line in	implies_list:
+                                        implies_split=implies_line.split('\\;')
+                                        implies_line=implies_split[0]
+                                        for option_name in option_names:
+                                            if(implies_line.lower() == option_name.lower()):
+                                                json_data[name]["implies"].remove(option_name)
+                                        if len(json_data[name]["implies"]) == 0:
+                                            del json_data[name]["implies"]
+                                    
+                result[name]=json_data[name]
+
     return result
 
 def extractJsonattribute(result):
@@ -61,10 +87,18 @@ def rebuildPattern(pattern):
             if "version:" in result_line:
                 #version:1 version:\\1
                 version_group=result_line.split(":")[1].replace("\\","")
-                version_group=int(version_group)
+                #예외사항 추가 , 나중에 version 수정 예정
+                try:
+                    version_group=int(version_group)
+                except: 
+                    version_group="false"
+                    break
+                
             if "confidence:" in result_line:
                 confidence=result_line.split(":")[1]
                 confidence=int(confidence)
+    if not result[0]:
+        print("REAL PATTERN","원래 패턴",pattern,"자른 패턴",result[0])
     return result[0],version_group,confidence
 
 
@@ -95,11 +129,16 @@ def initResult(result,name):
     result[name]["request"]=list()
     result[name]["response"]=list()
 
+def setOptions(result,options):
+    for option in options:
+        appendResult(result,option["name"],"",option["version"],request_index=0,response_index=0)
+
+
 # requset_index , reseponse_index 가 0 이면 관련있는 index가 없다는 걸 의미
 def appendResult(result,name,detectype,version,request_index=0,response_index=0):
     if name not in result:
         initResult(result,name)
-    if detectype not in result[name]["detect"]:
+    if detectype and detectype not in result[name]["detect"]:
         result[name]["detect"].append(detectype)
     if version != "false" and result[name]["version"] == "false":
         result[name]["version"]=version
@@ -114,7 +153,6 @@ def appendImplies(result,signature_name,request_index=0,response_index=0):
         implies_list=signature_name["implies"]
 
         if type(implies_list) is str:
-            print(implies_list)
             implies_split=implies_list.split('\\;')
             implies_list=implies_split[0]
             appendResult(result,implies_list,"implies","false",request_index,response_index)
@@ -123,16 +161,17 @@ def appendImplies(result,signature_name,request_index=0,response_index=0):
             for implies_line in	implies_list:
                 implies_split=implies_line.split('\\;')
                 implies_line=implies_split[0]
-                print(implies_line)
                 appendResult(result,implies_line,"implies","false",request_index,response_index)
 
 
-def resBackend(driver,req_res_packets):
+def resBackend(driver,req_res_packets,options=""):
     target_url=driver.current_url
     current_page=driver.page_source
     soup = BeautifulSoup(current_page,"html.parser")
     result={}
-    signature=extractJson(default_check_cat,default_allow_cat)
+    if options:
+        setOptions(result,options)
+    signature=extractJson(default_check_cat,default_allow_cat,options)
     for  name  in signature:
         #scripts src 현재 페이지에서 추출        
         if "scripts" in signature[name].keys():
@@ -178,34 +217,46 @@ def resBackend(driver,req_res_packets):
             metas = soup.select('meta[name][content]')
             for meta_line in metas:             
                 for comp_metakey in signature[name]["meta"]:
-                    if meta_line['name'] == comp_metakey:
+                    if meta_line['name'] != comp_metakey:
                         continue
-                    pattern,version_group,confidence=rebuildPattern(signature[name]["meta"][comp_metakey])
-                    regex_results=re.findall(pattern,meta_line["content"],re.I)
-                    #현재 페이지는 response 패킷 1으로 침 
-                    if(regex_results):
-                        appendResult(result,name,"meta",retVersiongroup("findall",regex_results,version_group),0,1)
-                        appendImplies(result,signature[name],0,1)
+                    if type(signature[name]["meta"][comp_metakey]) is list:
+                        for comp_metakey in signature[name]["meta"][comp_metakey]:
+                            pattern,version_group,confidence=rebuildPattern(comp_metakey)
+                            regex_results=re.findall(pattern,meta_line["content"],re.I)
+                            #현재 페이지는 response 패킷 1으로 침 
+                            if(regex_results):
+                                appendResult(result,name,"meta",retVersiongroup("findall",regex_results,version_group),0,1)
+                                appendImplies(result,signature[name],0,1)
+                    else:
+                        pattern,version_group,confidence=rebuildPattern(signature[name]["meta"][comp_metakey])
+                        regex_results=re.findall(pattern,meta_line["content"],re.I)
+                        #현재 페이지는 response 패킷 1으로 침 
+                        if(regex_results):
+                            print("what pattern",pattern,"regex_result",regex_results)
+                            appendResult(result,name,"meta",retVersiongroup("findall",regex_results,version_group),0,1)
+                            appendImplies(result,signature[name],0,1)
         #dom으로 추출 
         if "dom" in signature[name].keys():
             if type(signature[name]["dom"]) is dict: #dict 인지 확인
                 for key_name in list(signature[name]["dom"].keys()):
-                    temp = soup.select(key_name)
-                    if(temp):
+                    temps = soup.select(key_name)
+                    if(temps):
                         for subkey_name in list(signature[name]["dom"][key_name].keys()):
                             if subkey_name == "attributes" or subkey_name == "properties":
-                                    if subkey_name in temp.attrs:
-                                        pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name][subkey_name])
-                                        regex_results=re.match(pattern,temp[subkey_name])
-                                        if(regex_results):
-                                            appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
-                                            appendImplies(result,signature[name],0,1)                        
+                                    for temp in temps:
+                                        if subkey_name in temp.attrs:
+                                            pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name][subkey_name])
+                                            regex_results=re.match(pattern,temp[subkey_name])
+                                            if(regex_results):
+                                                appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
+                                                appendImplies(result,signature[name],0,1)                        
                             if subkey_name == "text":
                                 pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name]["text"])
-                                regex_results=re.match(pattern,temp.text)
-                                if(regex_results):
-                                    appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
-                                    appendImplies(result,signature[name],0,1)
+                    #            for temp in temps:
+                    #            regex_results=re.match(pattern,"test <><>",temps.get('text'))
+                    #            if(regex_results):
+                    #                appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
+                    #                appendImplies(result,signature[name],0,1)
                                 #match 값 존재하면 넣기
 
                             if subkey_name == "exists":
@@ -213,12 +264,13 @@ def resBackend(driver,req_res_packets):
                                 appendImplies(result,signature[name],0,1)
 
                             if subkey_name == "src":
-                                if "src" in temp.attrs:
-                                    pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name]["src"])
-                                    regex_results=re.match(pattern,temp['src'])
-                                    if(regex_results):
-                                        appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
-                                        appendImplies(result,signature[name],0,1)
+                                for temp in temps:
+                                    if "src" in temps.attrs:
+                                        pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name]["src"])
+                                        regex_results=re.match(pattern,temps['src'])
+                                        if(regex_results):
+                                            appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
+                                            appendImplies(result,signature[name],0,1)
                             #if key_name == "properties" 아직 구현 x, 2가지만 해당됨
                             # 일단은 properties는 name과 같은 느낌이라 생각 , attrs로 존재 여무 확인
                             # 아직은 dict 구조지만 값은 비교안함 
