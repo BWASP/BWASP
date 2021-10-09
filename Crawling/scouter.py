@@ -45,9 +45,8 @@ def visit(driver, url, depth, options):
     domain_result = extract_domains.extractDomains(dict(), driver.current_url, cur_page_links)
 
     csp_result = csp_evaluator.cspHeader(driver.current_url)
-    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver)
+    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver, options)
 
-    # packet_capture.writeFile(req_res_packets)
     previous_packet_count = db.getPacketsCount()
     db.insertPackets(req_res_packets)
     db.insertCSP(csp_result)
@@ -129,5 +128,52 @@ def initSelenium():
 
 
 if __name__ == "__main__":
-    url = "https://github.com/"
-    start(url, 3, {})
+    options = {
+        "tool": {
+            "analysisLevel": "771",
+            "optionalJobs": [
+                "portScan",
+                "CSPEvaluate"
+            ]
+        },
+        "info": {
+            "server": [
+                {
+                    "name": "apache",
+                    "version": "22"
+                },
+                {
+                    "name": "nginx",
+                    "version": "44"
+                }
+            ],
+            "framework": [
+                {
+                    "name": "react",
+                    "version": "22"
+                },
+                {
+                    "name": "angularjs",
+                    "version": "44"
+                }
+            ],
+            "backend": [
+                {
+                    "name": "flask",
+                    "version": "22"
+                },
+                {
+                    "name": "django",
+                    "version": "44"
+                }
+            ]
+        },
+        "target": {
+            "url": "https://github.com/",
+            "path": [
+            "/apply, /login", "/admin"
+            ]
+        }
+    }
+
+    start(options["target"]["url"], int(options["tool"]["analysisLevel"]), options["info"])
