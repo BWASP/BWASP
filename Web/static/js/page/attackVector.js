@@ -49,6 +49,8 @@ let createKey = () => {
 }
 
 document.getElementById("switchToPacket").addEventListener("click", function(){
+    document.getElementById("switchToType").innerText = (currentState) ? "Attack Vectors" : "Packets";
+    document.getElementById("currentType").innerText = `All ${(currentState) ? "Packets" : "Attack Vectors"}`;
     let table = {
         table: document.createElement("table"),
         thead: document.createElement("thead"),
