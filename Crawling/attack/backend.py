@@ -273,9 +273,9 @@ def resBackend(driver,req_res_packets,options=""):
 
                             if subkey_name == "src":
                                 for temp in temps:
-                                    if "src" in temps.attrs:
+                                    if "src" in temp.attrs:
                                         pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name]["src"])
-                                        regex_results=re.match(pattern,temps['src'],re.I)
+                                        regex_results=re.match(pattern,temp['src'],re.I)
                                         if(regex_results):
                                             appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
                                             appendImplies(result,signature[name],0,1)
