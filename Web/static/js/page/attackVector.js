@@ -60,15 +60,11 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
     document.getElementById("titleOfPage").innerHTML = status;
     document.title = `${status} - BWASP`;
 
-    let thead = document.getElementById("parallelTableHead"),
-        tbody = document.getElementById("parallelTableBody"),
-        newThead = document.createElement("tr"),
-        newTbodyElements = [],
+    let newThead = document.createElement("tr"),
         element = [
             ["URL", "Vulnerability Doubt", "Method", "Date", "Impact"],
             ["URL", "Packet", "Vulnerability Doubt", "Method", "Related Data", "Date", "Impact"]
-        ],
-        currentData = [];
+        ];
 
     // Build thead
     element[Number(!currentState)].forEach((columnName)=>{
