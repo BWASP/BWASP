@@ -4,9 +4,9 @@ import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
-default_allow_cat={12,18,27}
+default_allow_cat={12,18,27,59}
 #default_allow_cat = [12,18,27,22, 28, 33, 34, 46]
-default_check_cat={12,18,27}
+default_check_cat={12,18,27,59}
 #default_check_cat = [12,18,27,22, 28, 33, 34, 46]
 json_path="./wappalyzer/"
 categories_path="./wappalyzer/categories.json"
@@ -27,7 +27,7 @@ def isSameDomain(target_url, visit_url):
         return False
 
 
-def extractJson(check_cat={12,18,27},allow_cat={12,18,27},options=""):
+def extractJson(check_cat={12,18,27,59},allow_cat={12,18,27,59},options=""):
     #12(javascript framework),18(Web frameworks),22(web server),27(Programming Language)
     option_names=[]
     if(options):
@@ -67,7 +67,6 @@ def extractJson(check_cat={12,18,27},allow_cat={12,18,27},options=""):
                                             del json_data[name]["implies"]
                                     
                     result[name]=json_data[name]
-    print(result)
     return result
 
 def extractJsonattribute(result):
