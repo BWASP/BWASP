@@ -26,15 +26,17 @@ scripts(O), headers(O), cookies(O), dom(O), meta(O), url(O), html(O), website(O)
 '''
 
 # Main Function
-def detectWebServer(url, cur_page_links, req_res_packets, driver):
+def detectWebServer(url, cur_page_links, req_res_packets, driver, options):
     category = [12, 31, 59]
     data = loadCategory(category)
 
     detect_list = dict()
 
     for i, packet in enumerate(req_res_packets):
-
         for app in data:
+            for option in options:
+                if option['name'] == app:
+                    continue
             # Including external domain as well as including same domain
             if not isSameDomain(url, packet["request"]["full_url"]):
                 if "scripts" in list(data[app].keys()):
@@ -63,6 +65,15 @@ def detectWebServer(url, cur_page_links, req_res_packets, driver):
                 #     result = detectDom(data, driver, i, app)
                 #     detect_list = resultFunc(detect_list, app, result)
     
+    for option in options:
+        detect_list[option['name']] = {
+            "detect" : [],
+            "version" : option['version'],
+            "request" : [],
+            "response" : [],
+            "url" : []
+        }
+
     return detect_list
 
 
