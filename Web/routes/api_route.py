@@ -85,27 +85,4 @@ def AttackVector():
             "impactRate": 0
         })
 
-
-    resDataJson = [
-        {
-            "url": domain_data[0].URL + domain_data[0].URI,  # "https://naver.com" [URL], /asdf/index.php [URI]
-            "payloads": [
-                domain_data[0].URI
-                # "/index.php",
-                # "/class.php"
-            ],
-            "vulnerability": {
-                "type": attackVector_data[0].attackVector,  # "Cross Site Script(XSS)",  # (stored, reflected, dom) 으로 XSS 분리하면 될 듯...?
-                "CVE": [
-                    {
-                        "numbering": cve_Data(systeminfo_data[2].data)  # "2021-0000-1111"
-                    }
-                ]
-            },
-            "method": "None",
-            "date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # "2021-09-28 11:00",
-            "impactRate": 0
-        }
-    ]
-
     return jsonify(resDataJson)
