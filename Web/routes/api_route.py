@@ -64,26 +64,47 @@ def AttackVector():
 
     # sample
     resDataJson = []
-    for i in len(domain_data):
-        JsonData = {
-            "url": domain_data[i].URL + domain_data[i].URI,  # "https://naver.com" [URL], /asdf/index.php [URI]
-            "payloads": [
-                domain_data[i].URI
-                # "/index.php",
-                # "/class.php"
-            ],
-            "vulnerability": {
-                "type": attackVector_data[i].attackVector,  # "Cross Site Script(XSS)",  # (stored, reflected, dom) 으로 XSS 분리하면 될 듯...?
-                "CVE": [
-                    {
-                        "numbering": cve_Data(systeminfo_data[0].data)  # "2021-0000-1111"
-                    }
-                ]
-            },
-            "method": "None",
-            "date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # "2021-09-28 11:00",
-            "impactRate": 0
-        }
-        resDataJson.append(JsonData)
+    for i in range(0, len(domain_data)):
+        try:
+            JsonData = {
+                "url": domain_data[i].URL + domain_data[i].URI,  # "https://naver.com" [URL], /asdf/index.php [URI]
+                "payloads": [
+                    domain_data[i].URI
+                    # "/index.php",
+                    # "/class.php"
+                ],
+                "vulnerability": {
+                    "type": attackVector_data[i].attackVector,  # "Cross Site Script(XSS)",  # (stored, reflected, dom) 으로 XSS 분리하면 될 듯...?
+                    "CVE": [
+                        {
+                            "numbering": cve_Data(systeminfo_data[0].data)  # "2021-0000-1111"
+                        }
+                    ]
+                },
+                "method": "None",
+                "date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # "2021-09-28 11:00",
+                "impactRate": 0
+            }
+            resDataJson.append(JsonData)
+        except:
+            JsonData = {
+                "url": "None",
+                "payloads": [
+                    "None"
+                ],
+                "vulnerability": {
+                    "type": "None",
+                    "CVE": [
+                        {
+                            "numbering": "None"
+                        }
+                    ]
+                },
+                "method": "None",
+                "date": "None",
+                "impactRate": "None"
+            }
+            resDataJson.append(JsonData)
+            break
 
     return jsonify(resDataJson)
