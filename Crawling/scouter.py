@@ -52,7 +52,7 @@ def visit(driver, url, depth, options):
             continue
 
         visited_links.append(visit_url)
-        visit(driver, visit_url, depth-1)
+        visit(driver, visit_url, depth-1, options)
 
 def isSameDomain(target_url, visit_url):
     try:
