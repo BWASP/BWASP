@@ -3,7 +3,7 @@ from flask import (
     request, url_for, redirect, jsonify
 )
 from Web.models.BWASP import job
-from Web import AutomatedAnalysis
+# from Web import AutomatedAnalysis
 import json
 
 NAME = 'automation'
