@@ -83,39 +83,47 @@ def rebuildPattern(pattern):
         for result_line in result[1:]:
             if "version:" in result_line:
                 #version:1 version:\\1
-                version_group=result_line.split(":")[1].replace("\\","")
-                #예외사항 추가 , 나중에 version 수정 예정
-                try:
-                    version_group=int(version_group)
-                except: 
-                    version_group="false"
-                    break
-                
+                version_group=result_line[8:]              
             if "confidence:" in result_line:
-                confidence=result_line.split(":")[1]
+                confidence=result_line[11:]
                 confidence=int(confidence)
-
     return result[0],version_group,confidence
 
 
 
 def retVersiongroup(type,regex_results,version_group):
+    index = -1
+    version=""
     if version_group == "false":
         return "false"
+     #findall 기준으로 0 부터 매칭 , 따라서 version group 과 group index는 -1 로 생각해야 함    
     else:
         if type == "findall":
-            for regex_result in regex_results:
-                if version_group > 1:
-                    if(regex_result[version_group-1]):
-                        return regex_result[version_group-1]
-                else:
-                    if(regex_result):
-                        return regex_result
+            pass
         if type == "match":
-            if regex_result.group(version_group):
-                return regex_result.group(version_group)
-    
-    return "false"
+            # groups로 가져오면 findall 처럼 0 부터 regex 그룹과 매칭 됨
+            regex_results=regex_results.groups()
+        version_regex = '([^\\\\]*)(?:\\\\)?([^\?]*)\??([^:]*):?(.*)$'
+        version_grouping = re.match(version_regex,version_group).groups()
+        if  (version_grouping[3+index] or version_grouping[4+index]):
+            if regex_results[int(version_grouping[2+index])+index]:
+                if "\\" in version_grouping[3+index]:
+                    version=regex_results[3+index]
+                else:   
+                    version=version_grouping[3+index]
+            else:
+                if "\\" in version_grouping[4+index]:
+                    version=regex_results[4+index]
+                else:   
+                    version=version_grouping[4+index]
+        else:
+            version=regex_results[int(version_grouping[2+index])+index]
+        
+    version=str(version)+str(version_grouping[1+index])
+    version=re.sub("[^0-9\.]","",str(version))
+    if not version:
+        version="false" 
+    return version
 
 
 def initResult(result,name):
