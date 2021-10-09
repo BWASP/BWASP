@@ -55,10 +55,10 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
         tbody: document.createElement("tbody")
     };
     currentState = !currentState;
-    let status = (currentState) ? "Attack Vector" : "Packets";
-    key = Math.random().toString(36).substring(2);
-    document.getElementById("titleOfPage").innerHTML = status;
-    document.title = `${status} - BWASP`;
+    ((status = (currentState) ? "Attack Vector" : "Packets")=>{
+        document.getElementById("titleOfPage").innerHTML = status;
+        document.title = `${status} - BWASP`;
+    })()
 
     let newThead = document.createElement("tr"),
         element = [
@@ -78,8 +78,11 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
     // Build tbody
     let buildData = (currentState) ? implementationSample_attackVector : implementationSample_packets;
     for (let count = 0; count < buildData.length; count++) {
-        let frame = document.createElement("tr");
-        let localData = buildData[count], element = Object();
+        let frame = document.createElement("tr"),
+            localData = buildData[count],
+            element = Object(),
+            impactData = [];
+
         // URL
         let idKey = createKey();
         element["url"] = {
@@ -95,9 +98,9 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                 }
             }
         };
-        let linebreak = document.createElement("br");
 
         element.url.parent.classList.add("align-middle");
+        element.url.parent.style.setProperty("width", `${(currentState)?20:10}%`, "important");
 
         element.url.child.url.href = `#${idKey}`;
         element.url.child.url.innerHTML = localData.url;
@@ -130,26 +133,51 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
 
         // Packets
         if(!currentState){
-            let packetDOM = document.createElement("td");
-            packetDOM.innerText = localData.packet;
-            packetDOM.classList.add("align-middle");
-            frame.appendChild(packetDOM);
+            element["packet"] = document.createElement("td");
+            element.packet.innerText = localData.packet;
+            element.packet.classList.add("align-middle");
+            element.packet.style.setProperty("width", `${(currentState)?0:15}%`, "important");
+            frame.appendChild(element.packet);
         }
 
         // Vulnerability doubt
         element["vuln"] = {
             parent: document.createElement("td"),
-            child: {
-                vulnType: document.createElement("span")
+            title: document.createElement("p")
+        };
+
+        element.vuln.title.classList.add("font-weight-bold", "mb-2", "text-danger");
+        element.vuln.title.innerText = localData.vulnerability.type;
+        element.vuln.parent.appendChild(element.vuln.title);
+
+        localData.vulnerability.CVE.forEach((data)=>{
+            let cveElement = {
+                parent: document.createElement("p"),
+                code: document.createElement("code"),
+                description: document.createElement("span")
+            };
+            cveElement.parent.className = "mb-1";
+            cveElement.code.innerText = data.numbering;
+            cveElement.parent.appendChild(cveElement.code);
+            cveElement.parent.appendChild(document.createElement("br"));
+
+            if(!currentState){
+                cveElement.description.innerText = data.description;
+                cveElement.description.className = "small";
+                cveElement.parent.append(cveElement.description);
             }
-        }
+            element.vuln.parent.appendChild(cveElement.parent);
+        })
+
         element.vuln.parent.classList.add("align-middle");
+        element.vuln.parent.style.setProperty("width", `${(currentState)?60:45}%`, "important");
         frame.appendChild(element.vuln.parent);
 
         // Method
         element["method"] = document.createElement("td");
         element.method.innerText = localData.method;
         element.method.classList.add("align-middle");
+        element.method.style.setProperty("width", "3%", "important");
         frame.appendChild(element.method);
 
         // Related
@@ -165,6 +193,7 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                 relatedDOM.innerHTML = data;
                 relatedData.child.appendChild(relatedDOM);
             })
+            relatedData.parent.style.setProperty("width", "10%", "important");
             relatedData.parent.appendChild(relatedData.child);
             frame.appendChild(relatedData.parent);
         }
@@ -185,9 +214,10 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
         element.date.child.time.innerText = `${date[1]} ${date[2]}`;
         element.date.parent.append(
             element.date.child.date,
-            linebreak,
+            document.createElement("br"),
             element.date.child.time
         );
+        element.date.parent.style.setProperty("width", "10%", "important");
         frame.appendChild(element.date.parent);
 
         // Impact
@@ -195,7 +225,7 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
             parent: document.createElement("td"),
             child: document.createElement("p")
         };
-        let impactData = [];
+
         switch(localData.impactRate){
             case 0:
                 impactData = ["success", "Low"]
@@ -213,6 +243,7 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
         element.impact.child.innerText = impactData[1];
 
         element.impact.parent.appendChild(element.impact.child);
+        element.impact.parent.style.setProperty("width", "5%", "important");
         frame.appendChild(element.impact.parent);
 
         table.tbody.appendChild(frame);
