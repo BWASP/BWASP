@@ -13,8 +13,11 @@ def getPortsOnline(target_ip):
 
     for i in html.select('h2'):
         port = i.get_text().replace('\n','').split('/')[0]
-        service = getservbyport(int(port))
-        open_ports[str(port)] = service
+        try:
+            service = getservbyport(int(port))
+            open_ports[str(port)] = service
+        except:
+            open_ports[str(port)] = "Unknown"
 
     return open_ports
 
