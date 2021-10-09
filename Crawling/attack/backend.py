@@ -241,18 +241,23 @@ def resBackend(driver,req_res_packets,options=""):
                                     for temp in temps:
                                         if subkey_name in temp.attrs:
                                             pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name][subkey_name])
-                                            regex_results=re.match(pattern,temp[subkey_name])
+                                            regex_results=re.match(pattern,temp[subkey_name],re.I)
                                             if(regex_results):
                                                 appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
                                                 appendImplies(result,signature[name],0,1)                        
                             if subkey_name == "text":
                                 pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name]["text"])
-                    #            for temp in temps:
-                    #            regex_results=re.match(pattern,"test <><>",temps.get('text'))
-                    #            if(regex_results):
-                    #                appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
-                    #                appendImplies(result,signature[name],0,1)
-                                #match 값 존재하면 넣기
+                                for temp in temps:
+                                    try:
+                                        regex_results=re.match(pattern,temp.getText(),re.I)
+                                    except:
+                                        pattern=pattern.replace("\w-","-\w")
+                                        regex_results=re.match(pattern,temp.getText(),re.I)
+
+                                    if(regex_results):
+                                        appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
+                                        appendImplies(result,signature[name],0,1)
+                                    #match 값 존재하면 넣기
 
                             if subkey_name == "exists":
                                 appendResult(result,name,"dom","false",0,1)
@@ -262,7 +267,7 @@ def resBackend(driver,req_res_packets,options=""):
                                 for temp in temps:
                                     if "src" in temps.attrs:
                                         pattern,version_group,confidence=rebuildPattern(signature[name]["dom"][key_name]["src"])
-                                        regex_results=re.match(pattern,temps['src'])
+                                        regex_results=re.match(pattern,temps['src'],re.I)
                                         if(regex_results):
                                             appendResult(result,name,"dom",retVersiongroup("match",regex_results,version_group),0,1)
                                             appendImplies(result,signature[name],0,1)
@@ -376,7 +381,7 @@ def retCatsname(cat):
 if __name__ == '__main__':
     json_path="../wappalyzer/"
     categories_path="../wappalyzer/categories.json"
-    print(extractJsonattribute(extractJson()))
+    #print(extractJsonattribute(extractJson()))
     print(extractJson())
     #print(retCatsname([12,18,27,22]))
     #print(18,retCatname(18))
