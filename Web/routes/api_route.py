@@ -65,7 +65,7 @@ def AttackVector():
     # sample
     resDataJson = []
     for i in len(domain_data):
-        resDataJson.append({
+        JsonData = {
             "url": domain_data[i].URL + domain_data[i].URI,  # "https://naver.com" [URL], /asdf/index.php [URI]
             "payloads": [
                 domain_data[i].URI
@@ -83,6 +83,7 @@ def AttackVector():
             "method": "None",
             "date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # "2021-09-28 11:00",
             "impactRate": 0
-        })
+        }
+        resDataJson.append(JsonData)
 
     return jsonify(resDataJson)
