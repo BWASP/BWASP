@@ -102,7 +102,7 @@ def AttackVector():
                 },
                 "method": "None",
                 "date": "None",
-                "impactRate": "None"
+                "impactRate": 0
             }
             resDataJson.append(JsonData)
             break
