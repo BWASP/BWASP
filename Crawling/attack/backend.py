@@ -98,7 +98,6 @@ def rebuildPattern(pattern):
                 confidence=result_line.split(":")[1]
                 confidence=int(confidence)
     if not result[0]:
-        print("REAL PATTERN","원래 패턴",pattern,"자른 패턴",result[0])
     return result[0],version_group,confidence
 
 
@@ -232,7 +231,6 @@ def resBackend(driver,req_res_packets,options=""):
                         regex_results=re.findall(pattern,meta_line["content"],re.I)
                         #현재 페이지는 response 패킷 1으로 침 
                         if(regex_results):
-                            print("what pattern",pattern,"regex_result",regex_results)
                             appendResult(result,name,"meta",retVersiongroup("findall",regex_results,version_group),0,1)
                             appendImplies(result,signature[name],0,1)
         #dom으로 추출 
