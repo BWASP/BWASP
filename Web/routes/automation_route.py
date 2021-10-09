@@ -15,11 +15,12 @@ def manual_options():
     if request.method == 'POST':
         reqJsonData = json.loads(request.form['reqJsonData'])
         g.db.add(
-            # targetURL, knownInfo, recursiveLevel, uriPath
             job(targetURL=str(reqJsonData["target"]["url"]), knownInfo=str(reqJsonData["info"]), recursiveLevel=str(reqJsonData["tool"]["analysisLevel"]), uriPath=str(reqJsonData["target"]["path"]))
         )
         g.db.commit()
 
+        # Crawling -> Not found module in Crawling Scouter.py
+        # requirements.txt check
         # AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData["tool"]["optionJobs"])
 
         return jsonify({"success": True})
