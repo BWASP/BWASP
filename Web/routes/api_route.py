@@ -52,7 +52,7 @@ def apiJobEnroll():
     return jsonify({"success": True})
 
 
-@bp.route('/AttackVector')
+@bp.route('/attack_vector')
 def AttackVector():
     g.db = db.session()
     domain_data = g.db.query(domain).all()
