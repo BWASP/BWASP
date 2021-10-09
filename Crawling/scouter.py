@@ -47,6 +47,8 @@ def visit(driver, url, depth, options):
     csp_result = csp_evaluator.cspHeader(driver.current_url)
     analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver, options)
 
+    req_res_packets = deleteCssBody(req_res_packets)
+
     previous_packet_count = db.getPacketsCount()
     db.insertPackets(req_res_packets)
     db.insertCSP(csp_result)
@@ -112,6 +114,18 @@ def deleteFragment(links):
         links[i] = urlunparse(parse)
 
     return links
+
+def deleteCssBody(packets):
+    css_content_types = ["text/css"]
+
+    for index in range(len(packets)):
+        if "content-type" in list(packets[index]["response"]["headers"].keys()):
+            for type in css_content_types:
+                if packets[index]["response"]["headers"]["content-type"].find(type) != -1:
+                    print("find")
+                    packets[index]["response"]["body"] = ""
+    
+    return packets
 
 def initSelenium():
     chrome_options = webdriver.ChromeOptions()
