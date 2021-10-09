@@ -1,11 +1,11 @@
 from flask import (
-    Blueprint, render_template, g, jsonify
+    Blueprint, render_template,
+    g, jsonify
 )
-import json
 from Web.models.BWASP import db, domain, systeminfo, attackVector
 import sqlalchemy as db2
 from sqlalchemy import and_, desc
-import os
+import os, json, datetime
 
 NAME = 'api'
 bp = Blueprint(NAME, __name__, url_prefix='/api')
@@ -60,11 +60,52 @@ def AttackVector():
     attackVector_data = g.db.query(attackVector).all()
     # print("URL: " + domain_data[0].URL + domain_data[0].URI)
     # print("Vulnerability Doubt: " + attackVector_data[0].attackVector)
-    cve_data = cve_Data(systeminfo_data[2].data)
+    # cve_data = cve_Data(systeminfo_data[2].data)
 
-    resDataJson = [domain_data[0].URL + domain_data[0].URI,
-                   attackVector_data[0].attackVector,
-                   systeminfo_data[2].data,
-                   cve_data
-                   ]
+    # sample
+    resDataJson = []
+    for i in len(domain_data):
+        resDataJson.append({
+            "url": domain_data[i].URL + domain_data[i].URI,  # "https://naver.com" [URL], /asdf/index.php [URI]
+            "payloads": [
+                domain_data[i].URI
+                # "/index.php",
+                # "/class.php"
+            ],
+            "vulnerability": {
+                "type": attackVector_data[i].attackVector,  # "Cross Site Script(XSS)",  # (stored, reflected, dom) 으로 XSS 분리하면 될 듯...?
+                "CVE": [
+                    {
+                        "numbering": cve_Data(systeminfo_data[0].data)  # "2021-0000-1111"
+                    }
+                ]
+            },
+            "method": "None",
+            "date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # "2021-09-28 11:00",
+            "impactRate": 0
+        })
+
+
+    resDataJson = [
+        {
+            "url": domain_data[0].URL + domain_data[0].URI,  # "https://naver.com" [URL], /asdf/index.php [URI]
+            "payloads": [
+                domain_data[0].URI
+                # "/index.php",
+                # "/class.php"
+            ],
+            "vulnerability": {
+                "type": attackVector_data[0].attackVector,  # "Cross Site Script(XSS)",  # (stored, reflected, dom) 으로 XSS 분리하면 될 듯...?
+                "CVE": [
+                    {
+                        "numbering": cve_Data(systeminfo_data[2].data)  # "2021-0000-1111"
+                    }
+                ]
+            },
+            "method": "None",
+            "date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),  # "2021-09-28 11:00",
+            "impactRate": 0
+        }
+    ]
+
     return jsonify(resDataJson)
