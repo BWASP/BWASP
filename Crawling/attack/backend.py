@@ -98,7 +98,7 @@ def rebuildPattern(pattern):
                 confidence=result_line.split(":")[1]
                 confidence=int(confidence)
     if not result[0]:
-    return result[0],version_group,confidence
+        return result[0],version_group,confidence
 
 
 
