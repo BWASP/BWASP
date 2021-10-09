@@ -17,5 +17,5 @@ def apiJobEnroll():
 
 
 @bp.route('/AttackVector')
-def apiJobEnroll():
+def AttackVector():
     return jsonify({"success": True})
