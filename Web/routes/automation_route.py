@@ -21,7 +21,7 @@ def manual_options():
 
         # Crawling -> Not found module in Crawling Scouter.py
         # requirements.txt check
-        AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData["tool"]["optionalJobs"])
+        AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
 
         return jsonify({"success": True})
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")

@@ -46,7 +46,7 @@ def visit(driver, url, depth, options):
     domain_result = extract_domains.extractDomains(dict(), driver.current_url, cur_page_links)
 
     csp_result = csp_evaluator.cspHeader(driver.current_url)
-    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver, options)
+    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver, options['info'])
 
     req_res_packets = deleteCssBody(req_res_packets)
 
@@ -143,7 +143,7 @@ def initSelenium():
         "disable_encoding": True
     }
 
-    driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options=options, chrome_options=chrome_options)
+    driver = webdriver.Chrome("./Crawling/config/chromedriver.exe", seleniumwire_options=options, chrome_options=chrome_options)
     return driver
 
 

@@ -99,7 +99,7 @@ def AttackVector():
                     # "/class.php"
                 ],
                 "vulnerability": {
-                    "type": "1",  # attackVector_data[i].attackVector,
+                    "type": "None",  # attackVector_data[i].attackVector,
                     # "Cross Site Script(XSS)",  # (stored, reflected, dom) 으로 XSS 분리하면 될 듯...?
                     "CVE": []
                 },

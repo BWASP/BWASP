@@ -8,8 +8,8 @@ default_allow_cat={12,18,27,59}
 #default_allow_cat = [12,18,27,22, 28, 33, 34, 46]
 default_check_cat={12,18,27,59}
 #default_check_cat = [12,18,27,22, 28, 33, 34, 46]
-json_path="./wappalyzer/"
-categories_path="./wappalyzer/categories.json"
+json_path="./Crawling/wappalyzer/"
+categories_path="./Crawling/wappalyzer/categories.json"
 sig_url=list()
 
 def isSameDomain(target_url, visit_url):
@@ -387,8 +387,8 @@ def retCatsname(cat):
     return cat_name
 
 if __name__ == '__main__':
-    json_path="../wappalyzer/"
-    categories_path="../wappalyzer/categories.json"
+    json_path="../Crawling/wappalyzer/"
+    categories_path="../Crawling/wappalyzer/categories.json"
     #print(extractJsonattribute(extractJson()))
     print(extractJson())
     #print(retCatsname([12,18,27,22]))
