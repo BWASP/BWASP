@@ -134,7 +134,6 @@ def deleteCssBody(packets):
         if "content-type" in list(packets[index]["response"]["headers"].keys()):
             for type in css_content_types:
                 if packets[index]["response"]["headers"]["content-type"].find(type) != -1:
-                    print("find")
                     packets[index]["response"]["body"] = ""
 
     return packets
