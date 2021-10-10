@@ -10,17 +10,16 @@ class attackVector(db.Model):
     attackVector = db.Column(db.TEXT(1000), nullable=False)
     typicalServerity = db.Column(db.Integer, nullable=False)
     description = db.Column(db.TEXT(1000), nullable=False)
-    vlunClass = db.Column(db.TEXT(1000), nullable=False)
+    vulnClass = db.Column(db.TEXT(1000), nullable=False)
 
 
-class CSPEmulator(db.Model):
-    __tablename__ = 'CSPEmulator'
+class CSPEvaluator(db.Model):
+    __tablename__ = 'CSPEvaluator'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     UUID = db.Column(db.Integer, nullable=False)
     header = db.Column(db.TEXT(1000), nullable=False)
     analysis = db.Column(db.TEXT(1000), nullable=False)
     status = db.Column(db.TEXT(1000), nullable=False)
-    createTime = db.Column(db.DateTime, nullable=False)
 
 
 class domain(db.Model):
@@ -75,12 +74,8 @@ class ports(db.Model):
 class systeminfo(db.Model):
     __tablename__ = 'systeminfo'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    relatedPacket = db.Column(db.Integer, nullable=False)
-    reliability = db.Column(db.Integer, nullable=False)
-    type = db.Column(db.Integer, nullable=False)
+    url = db.Column(db.TEXT(1000), nullable=False)
     data = db.Column(db.TEXT(1000), nullable=False)
-    language = db.Column(db.TEXT(1000), nullable=False)
-    method = db.Column(db.TEXT(1000), nullable=False)
 
 
 class URIAnalysis(db.Model):

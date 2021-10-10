@@ -4,7 +4,11 @@
 from flask import (
     Flask, render_template, g
 )
-from .models.BWASP import db
+from .models.BWASP import db, Charts
+
+
+# from Crawling.scouter import start
+# start(url, depth, options):
 
 
 def create_app(config=None):
@@ -23,27 +27,31 @@ def create_app(config=None):
     app.config.from_object(config)
 
     # route initialize
-    from .routes import result_route, automation_route, common_route, api_route, test_route
-    app.register_blueprint(result_route.bp)
+    from .routes import index_route, automation_route, common_route, api_route  # , test_route
+    app.register_blueprint(index_route.bp)
     app.register_blueprint(automation_route.bp)
     app.register_blueprint(common_route.bp)
     app.register_blueprint(api_route.bp)
-    app.register_blueprint(test_route.bp)
+    # app.register_blueprint(test_route.bp)
 
     db.init_app(app)
 
-    @app.before_first_request
-    def before_first_request():
+    @app.before_request
+    def before_request():
+        g.db = db.session
+        # g.db.query 기준으로 가져와야 함
+        # print(g.db.query(Charts.name).all())
+        # print(g.db.query(Charts).all())
+        # asdf = g.db.query(Charts).all()
+        # print(asdf[0].name)
+        # print(asdf[1].name)
         db.app = app
+        g.db = db.session
         db.create_all()
 
     @app.errorhandler(404)
     def NotFound(error):
         return render_template('404.html'), 404
-
-    @app.before_request
-    def before_request():
-        g.db = db.session
 
     @app.teardown_request
     def teardown_request(exception):
@@ -52,5 +60,5 @@ def create_app(config=None):
 
     return app
 
-# if __name__ == '__main__':
-#    create_app().run(host='0.0.0.0', port=5000, debug=True)
+# def AutomatedAnalysis(url, depth, options):
+#     start(url, depth, options)

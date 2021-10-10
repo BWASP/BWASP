@@ -1,0 +1,5 @@
+{
+  "Server": ["Web Server", ["Apache", "Nginx"]],
+  "Framework": ["Framework / Libs", ["React", "AngularJS"]],
+  "Backend": ["Backend", ["Flask", "Django"]]
+}

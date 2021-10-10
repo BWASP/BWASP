@@ -9,11 +9,6 @@ const identifier = {
         version: "webAppVersion"
     }
 }
-const SupportedList = {
-    Server: ["Web Server", [["Apache", "apache"], ["Nginx", "nginx"]]],
-    Framework: ["Framework / Libs", [["React", "react"], ["Angular.JS", "angularjs"]]],
-    Backend: ["Backend", [["Flask", "flask"], ["Django", "django"]]]
-}
 
 // Initialize frontend when load
 window.onload = () => {
@@ -28,6 +23,103 @@ window.onload = () => {
             document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[+ !i]}`).value = this.value;
         });
     }
+
+    // Render
+    fetch("/static/data/supportedList.json")
+        .then(data=>data.json())
+        .then(SupportedList=>{
+            Object.keys(SupportedList).forEach((Type)=>{
+                let toggleTabName = `web${Type}Selection`;
+                let Skeleton = {
+                    parent: document.createElement("div"),
+                    child: {
+                        parent: document.createElement("div"),
+                        child: {
+                            toggleTab: document.createElement("a"),
+                            toggleTabText: document.createElement("h6"),
+                            content: {
+                                parent: document.createElement("div"),
+                                child: document.createElement("div")
+                            }
+                        }
+                    }
+                }
+
+                // Set attributes.
+                Skeleton.parent.classList.add("col-md-4");
+                Skeleton.child.parent.classList.add("card", "mb-4");
+
+                Skeleton.child.child.toggleTab.href = `#${toggleTabName}`;
+                Skeleton.child.child.toggleTab.classList.add("d-block", "card-header", "py-3");
+                Skeleton.child.child.toggleTab.setAttribute("data-toggle", "collapse");
+                Skeleton.child.child.toggleTab.setAttribute("role", "button");
+                Skeleton.child.child.toggleTab.setAttribute("aria-expanded", "false");
+                Skeleton.child.child.toggleTab.setAttribute("aria-controls", toggleTabName);
+
+                Skeleton.child.child.toggleTabText.classList.add("m-0", "font-weight-bold", "text-primary");
+                Skeleton.child.child.toggleTabText.innerHTML = SupportedList[Type][0];
+
+                Skeleton.child.child.content.parent.classList.add("collapse");
+                Skeleton.child.child.content.parent.id=toggleTabName;
+
+                Skeleton.child.child.content.child.classList.add("card-body");
+
+                // Create checkbox input
+                SupportedList[Type][1].forEach((codeName)=>{
+                    let localSkeleton = {
+                        parent: document.createElement("div"),
+                        child: {
+                            parent: document.createElement("div"),
+                            child: {
+                                checkbox: document.createElement("input"),
+                                codename: document.createElement("label"),
+                                versionInput: document.createElement("input")
+                            }
+                        }
+                    }
+                    let codeNameBase64 = btoa(codeName);
+                    let elementNaming = {
+                        checkbox: `${identifier.webAppInfo.name}-${Type}-${codeNameBase64}`,
+                        version: `${identifier.webAppInfo.version}-${Type}-${codeNameBase64}`
+                    }
+                    localSkeleton.parent.classList.add("form-group", "mb-0");
+                    localSkeleton.child.parent.classList.add("custom-control", "custom-checkbox", "small");
+
+                    localSkeleton.child.child.checkbox.type = "checkbox";
+                    localSkeleton.child.child.checkbox.classList.add("custom-control-input");
+                    localSkeleton.child.child.checkbox.value = codeNameBase64;
+                    localSkeleton.child.child.checkbox.id = elementNaming.checkbox;
+
+                    localSkeleton.child.child.codename.classList.add("custom-control-label", "pt-1");
+                    localSkeleton.child.child.codename.htmlFor = elementNaming.checkbox;
+                    localSkeleton.child.child.codename.innerHTML = codeName;
+                    localSkeleton.child.child.codename.id = `${elementNaming.checkbox}-label`
+
+                    localSkeleton.child.child.versionInput.placeholder = "(Version)";
+                    localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50", "pl-1", "d-none")
+                    localSkeleton.child.child.versionInput.type = "text";
+                    localSkeleton.child.child.versionInput.id = elementNaming.version;
+
+                    // Add Event Listener for checkbox - to - version control input.
+                    localSkeleton.child.child.checkbox.addEventListener("change", function(){
+                        let versionInput = document.getElementById(elementNaming.version);
+                        versionInput.classList[(!this.checked)?"add":"remove"]("d-none");
+                        versionInput.focus();
+                    })
+
+                    localSkeleton.child.child.codename.appendChild(localSkeleton.child.child.versionInput);
+                    localSkeleton.child.parent.append(localSkeleton.child.child.checkbox, localSkeleton.child.child.codename);
+                    Skeleton.child.child.content.child.appendChild(localSkeleton.child.parent);
+                })
+
+                // Append all skeletons to each parent
+                Skeleton.child.child.toggleTab.appendChild(Skeleton.child.child.toggleTabText);
+                Skeleton.child.child.content.parent.appendChild(Skeleton.child.child.content.child);
+                Skeleton.child.parent.append(Skeleton.child.child.toggleTab, Skeleton.child.child.content.parent);
+                Skeleton.parent.appendChild(Skeleton.child.parent);
+                document.getElementById("section-webAppInfo").appendChild(Skeleton.parent);
+            })
+        })
 }
 
 document.getElementById("ClearAllData").addEventListener("click", function(){
@@ -51,98 +143,6 @@ document.getElementById("ClearAllData").addEventListener("click", function(){
             data[element].classList.add("d-none");
         }
     });
-})
-
-// Frontend constructor
-Object.keys(SupportedList).forEach((Type)=>{
-    let toggleTabName = `web${Type}Selection`;
-    let Skeleton = {
-        parent: document.createElement("div"),
-        child: {
-            parent: document.createElement("div"),
-            child: {
-                toggleTab: document.createElement("a"),
-                toggleTabText: document.createElement("h6"),
-                content: {
-                    parent: document.createElement("div"),
-                    child: document.createElement("div")
-                }
-            }
-        }
-    }
-
-    // Set attributes.
-    Skeleton.parent.classList.add("col-md-4");
-    Skeleton.child.parent.classList.add("card", "mb-4");
-
-    Skeleton.child.child.toggleTab.href = `#${toggleTabName}`;
-    Skeleton.child.child.toggleTab.classList.add("d-block", "card-header", "py-3");
-    Skeleton.child.child.toggleTab.setAttribute("data-toggle", "collapse");
-    Skeleton.child.child.toggleTab.setAttribute("role", "button");
-    Skeleton.child.child.toggleTab.setAttribute("aria-expanded", "false");
-    Skeleton.child.child.toggleTab.setAttribute("aria-controls", toggleTabName);
-
-    Skeleton.child.child.toggleTabText.classList.add("m-0", "font-weight-bold", "text-primary");
-    Skeleton.child.child.toggleTabText.innerHTML = SupportedList[Type][0];
-
-    Skeleton.child.child.content.parent.classList.add("collapse");
-    Skeleton.child.child.content.parent.id=toggleTabName;
-
-    Skeleton.child.child.content.child.classList.add("card-body");
-
-    // Create checkbox input
-    SupportedList[Type][1].forEach((CodeName)=>{
-        let localSkeleton = {
-            parent: document.createElement("div"),
-            child: {
-                parent: document.createElement("div"),
-                child: {
-                    checkbox: document.createElement("input"),
-                    codename: document.createElement("label"),
-                    versionInput: document.createElement("input")
-                }
-            }
-        }
-        let elementNaming = {
-            checkbox: `${identifier.webAppInfo.name}-${Type}-${CodeName[1]}`,
-            version: `${identifier.webAppInfo.version}-${Type}-${CodeName[1]}`
-        }
-        localSkeleton.parent.classList.add("form-group", "mb-0");
-        localSkeleton.child.parent.classList.add("custom-control", "custom-checkbox", "small");
-
-        localSkeleton.child.child.checkbox.type = "checkbox";
-        localSkeleton.child.child.checkbox.classList.add("custom-control-input");
-        localSkeleton.child.child.checkbox.value = CodeName[1];
-        localSkeleton.child.child.checkbox.id = elementNaming.checkbox;
-
-        localSkeleton.child.child.codename.classList.add("custom-control-label", "pt-1");
-        localSkeleton.child.child.codename.htmlFor = elementNaming.checkbox;
-        localSkeleton.child.child.codename.innerHTML = CodeName[0];
-        localSkeleton.child.child.codename.id = `${elementNaming.checkbox}-label`
-
-        localSkeleton.child.child.versionInput.placeholder = "(Version)";
-        localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50", "pl-1", "d-none")
-        localSkeleton.child.child.versionInput.type = "text";
-        localSkeleton.child.child.versionInput.id = elementNaming.version;
-
-        // Add Event Listener for checkbox - to - version control input.
-        localSkeleton.child.child.checkbox.addEventListener("change", function(){
-            let versionInput = document.getElementById(elementNaming.version);
-            versionInput.classList[(!this.checked)?"add":"remove"]("d-none");
-            versionInput.focus();
-        })
-
-        localSkeleton.child.child.codename.appendChild(localSkeleton.child.child.versionInput);
-        localSkeleton.child.parent.append(localSkeleton.child.child.checkbox, localSkeleton.child.child.codename);
-        Skeleton.child.child.content.child.appendChild(localSkeleton.child.parent);
-    })
-
-    // Append all skeletons to each parent
-    Skeleton.child.child.toggleTab.appendChild(Skeleton.child.child.toggleTabText);
-    Skeleton.child.child.content.parent.appendChild(Skeleton.child.child.content.child);
-    Skeleton.child.parent.append(Skeleton.child.child.toggleTab, Skeleton.child.child.content.parent);
-    Skeleton.parent.appendChild(Skeleton.child.parent);
-    document.getElementById("section-webAppInfo").appendChild(Skeleton.parent);
 })
 
 /***
@@ -210,9 +210,6 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
         renderULElement(document.getElementById("modal-tool-options"), tmp);
     }
 
-    // Get webapp information input
-    renderTmpStorage = {};
-
     webAppInfo.types.forEach((type)=>{
         requestData.info[type.toLowerCase()] = Array();
         let tempStorage = [];
@@ -220,14 +217,13 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
             let keySet = formData[index].id.split("-");
             if(keySet[0]===identifier.webAppInfo.name && keySet[1]===type && formData[index].checked) {
                 let localDataset = {
-                    name: formData[index].value,
+                    name: atob(formData[index].value),
                     version: document.getElementById(`${identifier.webAppInfo.version}-${type}-${formData[index].value}`).value
                 }
                 requestData.info[type.toLowerCase()].push(localDataset)
                 tempStorage.push(document.getElementById(formData[index].id + "-label").innerText.concat((localDataset.version.length>0)?` (Version: ${localDataset.version})`:""));
             }
         })
-        console.log(tempStorage);
         if(tempStorage.length > 0) renderULElement(document.getElementById(`modal-info-${type.toLowerCase()}`), tempStorage);
     })
 
@@ -236,17 +232,23 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
         show: true
     })
 
-    fetch("/automation/options", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-        },
-        body: new URLSearchParams({
-            reqJsonData: JSON.stringify(requestData)
-        })
-    }).then(
-        response => response.json()
-    ).then(
-        json => console.log(json)
-    );
+    document.getElementById("modal-start-job").addEventListener("click", ()=>{
+        fetch("/automation/options", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+            },
+            body: new URLSearchParams({
+                reqJsonData: JSON.stringify(requestData)
+            })
+        }).then(response => response.json())
+            .then(json => {
+                if(json.success){
+                    alert("Create job successfully.");
+                    document.location.replace("/");
+                }else{
+                    alert("Failed to create job.")
+                }
+            });
+    })
 })

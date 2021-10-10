@@ -13,4 +13,4 @@ def bpExport():
 
 @bp.route('/attack_vector')
 def attack_Vector():
-    return render_template('common/AttackVector.html', Title="Attack vectors - BWASP", data="result")
+    return render_template('common/AttackVector.html', Title="Attack Vectors - BWASP")
