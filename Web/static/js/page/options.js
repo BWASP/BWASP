@@ -233,6 +233,7 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
     })
 
     document.getElementById("modal-start-job").addEventListener("click", ()=>{
+        $("#jobSubmitVerifyModal").modal("hide");
         fetch("/automation/options", {
             method: 'POST',
             headers: {
