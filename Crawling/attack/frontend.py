@@ -27,7 +27,7 @@ scripts(O), headers(O), cookies(O), dom(O), meta(O), url(O), html(O), website(O)
 
 # Main Function
 def detectWebServer(url, cur_page_links, req_res_packets, driver, options):
-    category = [12, 31, 59]
+    category = [12, 31, 59, 22, 44, 1]
     data = loadCategory(category)
 
     detect_list = dict()
@@ -76,7 +76,6 @@ def detectWebServer(url, cur_page_links, req_res_packets, driver, options):
 
     return detect_list
 
-
 def loadCategory(category):
     return_data = {}
 
@@ -124,31 +123,43 @@ def resultFunc(detect_list, app, result):
 
 # check response Header
 def detectHeaders(packet, data, index, app):
+    result = None
+
     for header in list(data[app]["headers"].keys()):
         if not header.lower() in list(packet["response"]["headers"].keys()):
             continue
 
         regex = data[app]["headers"][header]
-        regex = regex.split("\\;version:\\")[0]
-        pattern = re.compile(regex)
+        pattern = re.compile(regex.split("\\;")[0])
+        regex_result = pattern.search(packet["response"]["headers"][header.lower()])
 
-        if pattern.search(packet["response"]["headers"][header.lower()]) != None:
-            result = {"detect":["headers"], "version":"False", "request":[], "response":[index], "url":[]}
+        if regex_result != None:
+            version = detectVersion(regex, packet["response"]["headers"][header.lower()])
+            result = {"detect":["headers"], "version":version, "request":[], "response":[index], "url":[]}
             return result
 
 def detectHtml(packet, data, index, app):
-        if type(data[app]["html"]) == str:
-            pattern = re.compile(data[app]["html"].split("\\;version:\\")[0])
-            if pattern.search(packet["response"]["body"]) != None:
-                result = {"detect":["html"], "version":"False", "request":[], "response":[index], "url":[]}
-                return result
-        else:
-            for regex in data[app]["html"]:
-                pattern = re.compile(regex.split("\\;version:\\")[0])
-
-                if pattern.search(packet["response"]["body"]) != None:
-                    result = {"detect":["html"], "version":"False", "request":[], "response":[index], "url":[]}
-                    return result
+    result = None
+    if type(data[app]["html"]) == str:
+        pattern = re.compile(data[app]["html"].split("\\;")[0])
+        regex_result = pattern.search(packet["response"]["body"])
+        if regex_result != None:
+            version = detectVersion(data[app]["html"], regex_result.group())
+            result = {"detect":["html"], "version":version, "request":[], "response":[index], "url":[]}
+    else:
+        for regex in data[app]["html"]:
+            pattern = re.compile(regex.split("\\;")[0])
+            regex_result = pattern.search(packet["response"]["body"])
+            if regex_result != None:
+                version = detectVersion(regex, regex_result.group())
+                if result is not None:
+                    if version != 'False':
+                        result['version'] = version
+                else:
+                    result = {"detect":["html"], "version":version, "request":[], "response":[index], "url":[]}
+                
+    return result
+    
 
 def detectCookies(packet, data, index, app):
     cookies = dict()
@@ -162,32 +173,60 @@ def detectCookies(packet, data, index, app):
             return result
 
 def detectUrl(cur_page_links, data, app):
+    result = None
+    isExit = False
     for url in cur_page_links:
         if type(data[app]["url"]) == str:
-            pattern = re.compile(data[app]["url"])
-            if pattern.search(url) != None:
-                result = {"detect":["url"], "version":"False", "request":[], "response":[], "url":[url]}
-                return result
+            pattern = re.compile(data[app]["url"].split('\\;')[0])
+            regex_result = pattern.search(url)
+            
+            if regex_result != None:
+                version = detectVersion(data[app]["url"], url)
+                result = {"detect":["url"], "version":version, "request":[], "response":[], "url":[url]}
+                isExit = True
         else:
             for url_regex in data[app]["url"]:
-                pattern = re.compile(url_regex)
-                if pattern.search(url) != None:
-                    result = {"detect":["url"], "version":"False", "request":[], "response":[], "url":[url]}
-                    return result
+                pattern = re.compile(url_regex.split('\\;')[0])
+                regex_result = pattern.search(url)
+
+                if regex_result != None:
+                    version = detectVersion(url_regex, url)
+                    if result is not None:
+                        if version != 'False':
+                            result['version'] = version
+                    else:
+                        result = {"detect":["url"], "version":version, "request":[], "response":[], "url":[url]}
+                        isExit = True
+        if isExit:
+            break
+    return result
 
 def detectScripts(cur_page_links, data, app):
+    result = None
+    isExit = False
     for url in cur_page_links:
         if type(data[app]["scripts"]) == str:
-            pattern = re.compile(data[app]["scripts"])
-            if pattern.search(url) != None:
-                result = {"detect":["scripts"], "version":"False", "request":[], "response":[], "url":[url]}
-                return result
+            pattern = re.compile(data[app]["scripts"].split('\\;')[0])
+            regex_result = pattern.search(url)
+            if regex_result is not None:
+                version = detectVersion(data[app]["scripts"], url)
+                result = {"detect":["scripts"], "version":version, "request":[], "response":[], "url":[url]}
+                isExit = True
         else:
             for url_regex in data[app]["scripts"]:
-                pattern = re.compile(url_regex)
-                if pattern.search(url) != None:
-                    result = {"detect":["scripts"], "version":"False", "request":[], "response":[], "url":[url]}
-                    return result
+                pattern = re.compile(url_regex.split('\\;')[0])
+                regex_result = pattern.search(url)
+                if regex_result is not None:
+                    version = detectVersion(url_regex, url)
+                    if result is not None:
+                        if version != 'False':
+                            result['version'] = version
+                    else:
+                        result = {"detect":["scripts"], "version":version, "request":[], "response":[], "url":[url]}
+                        isExit = True
+        if isExit:
+            break
+    return result
 
 def detectWebsite(cur_page_links, data, app):
     for url in cur_page_links:
@@ -204,12 +243,28 @@ def detectWebsite(cur_page_links, data, app):
 def detectMeta(packet, data, index, app):
     html = BeautifulSoup(packet["response"]["body"], features="html.parser")
     for meta_regex in data[app]["meta"].values():
-        pattern = re.compile(meta_regex)
+        pattern = re.compile(meta_regex.split('\\;')[0])
         meta_tag = html.find("meta", {"name":data[app]["meta"].keys()})
         if meta_tag is not None and meta_tag.has_attr("content"):
-            if pattern.search(meta_tag['content']) is not None:
-                result = {"detect":["meta"], "version":"False", "request":[], "response":[index], "url":[]}
+            regex_result = pattern.search(meta_tag['content'])
+            if regex_result is not None:
+                version = detectVersion(meta_regex, str(meta_tag))
+                result = {"detect":["meta"], "version":version, "request":[], "response":[index], "url":[]}
                 return result
+
+def detectVersion(full_regex, detected_info):
+    if "\\;version:\\" not in full_regex:
+        return "False"
+                
+    version_pattern = re.compile('(\\d+(\\.)?)+')
+    version_info = version_pattern.search(detected_info)
+    
+    if version_info != None:
+        return version_info.group()
+    else:
+        print("version info is not found")
+        return "False"
+    
 
 # Detecting Dom is not solved yet
 def detectDom(data, driver, index, app):
@@ -218,18 +273,65 @@ def detectDom(data, driver, index, app):
         return result
 
 if __name__ == "__main__":
-    url = "https://www.cloudflare.com/"
+    url = "https://github.com/"
     
     driver = webdriver.Chrome('./Crawling/config/chromedriver')
     driver.get(url)
 
-    req_res_packets = json.loads(open('./test.json','r').read())
+    options = {
+                "tool": {
+                    "analysisLevel": "771",
+                    "optionalJobs": [
+                        "portScan",
+                        "CSPEvaluate"
+                    ]
+                },
+                "info": {
+                    "server": [
+                        {
+                            "name": "apache",
+                            "version": "22"
+                        },
+                        {
+                            "name": "nginx",
+                            "version": "44"
+                        }
+                    ],
+                    "framework": [
+                        {
+                            "name": "react",
+                            "version": "22"
+                        },
+                        {
+                            "name": "angularjs",
+                            "version": "44"
+                        }
+                    ],
+                    "backend": [
+                        {
+                            "name": "flask",
+                            "version": "22"
+                        },
+                        {
+                            "name": "django",
+                            "version": "44"
+                        }
+                    ]
+                },
+                "target": {
+                    "url": "https://github.com/",
+                    "path": [
+                    "/apply, /login", "/admin"
+                    ]
+                }
+            }
     
     print(
         detectWebServer( # 파라미터 4개 (url, cur_page_links, req_res_packets, driver)
             url=url, 
-            cur_page_links=["https://www.naver.com/devbridgeAutocomplete-min.js","https://github.com/jquery/jquery-migrate", "https://edgecastcdn.net/"], 
+            cur_page_links=["https://www.naver.com/devbridgeAutocomplete-min.js","https://github.com/jquery-14.0.1/jquery-migrate", "https://edgecastcdn.net/"], 
             req_res_packets=json.loads(open('./test.json','r').read()), 
-            driver=driver
+            driver=driver,
+            options=options['info']['framework']
         )
     )
