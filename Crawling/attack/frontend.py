@@ -27,7 +27,7 @@ scripts(O), headers(O), cookies(O), dom(O), meta(O), url(O), html(O), website(O)
 
 # Main Function
 def detectWebServer(url, cur_page_links, req_res_packets, driver, options):
-    category = [12, 31, 59, 22, 44, 1]
+    category = [12, 31, 59]
     data = loadCategory(category)
 
     detect_list = dict()
