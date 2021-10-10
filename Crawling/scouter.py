@@ -13,7 +13,7 @@ def start(url, depth, options):
     driver = initSelenium()
 
     visit(driver, url, depth, options)
-    driver.Quit()
+    driver.quit()
 
 def visit(driver, url, depth, options):
     global check

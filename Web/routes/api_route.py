@@ -63,6 +63,7 @@ def cve_Data(search):
     cve_data = list()
     cve_data.append(str(result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", ""))
     cve_data.append(str(backend_result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", ""))
+
     return cve_data
 
 
