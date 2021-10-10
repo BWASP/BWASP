@@ -32,8 +32,9 @@ def visit(driver, url, depth, options):
         visited_links.append(input_url)
         check = False
 
-        target_port = get_ports.getPortsOnline(input_url)
-        db.insertPorts(target_port, input_url)
+        if "portScan" in options["tool"]["optionalJobs"]:
+            target_port = get_ports.getPortsOnline(input_url)
+            db.insertPorts(target_port, input_url)
 
     # TODO
     # 다른 사이트로 redirect 되었을 때, 추가적으로 same 도메인 인지를 검증하는 코드가 필요함.
@@ -45,14 +46,18 @@ def visit(driver, url, depth, options):
     cookie_result = extract_cookies.getCookies(driver.current_url, req_res_packets)
     domain_result = extract_domains.extractDomains(dict(), driver.current_url, cur_page_links)
 
-    csp_result = csp_evaluator.cspHeader(driver.current_url)
+    if "CSPEvaluate" in options["tool"]["optionalJobs"]:
+        csp_result = csp_evaluator.cspHeader(driver.current_url)
+        db.insertCSP(csp_result)
+
+    # TODO
+    # 찾은 정보의 Icon 제공
     analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver, options['info'])
 
     req_res_packets = deleteCssBody(req_res_packets)
 
     previous_packet_count = db.getPacketsCount()
     db.insertPackets(req_res_packets)
-    db.insertCSP(csp_result)
     db.insertDomains(req_res_packets, cookie_result, previous_packet_count, driver.current_url)
     db.insertWebInfo(analyst_result, input_url, previous_packet_count)
     # Here DB code 
@@ -70,6 +75,8 @@ def visit(driver, url, depth, options):
 
         # TODO
         # 이미지 페이지 등 방문하지 않는 코드 작성
+        # target 외에 다른 사이트로 redirect 될때, 검증하는 코드 작성 필요
+        # 무한 크롤링
         visited_links.append(visit_url)
         visit(driver, visit_url, depth - 1, options)
 

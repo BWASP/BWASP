@@ -124,6 +124,11 @@ def insertPorts(port_list, target_url):
                                             port=port_list[service], result="Open")
         result = db_connect.execute(query)
         result.close()
+    else:
+        query = db.insert(db_table).values(service="None", target=target_url, 
+                                            port="None", result="None")
+        result = db_connect.execute(query)
+        result.close()
 
 def insertWebInfo(analyst_result, target_url, previous_packet_count):
     db_connect, db_table = connect("systeminfo")
