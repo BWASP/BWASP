@@ -13,7 +13,7 @@ def start(url, depth, options):
     driver = initSelenium()
 
     visit(driver, url, depth, options)
-
+    driver.Quit()
 
 def visit(driver, url, depth, options):
     global check
@@ -38,6 +38,7 @@ def visit(driver, url, depth, options):
 
     # TODO
     # 다른 사이트로 redirect 되었을 때, 추가적으로 same 도메인 인지를 검증하는 코드가 필요함.
+    # 첫 패킷에 google 관련 패킷 지우기
     req_res_packets = packet_capture.packetCapture(driver)
     cur_page_links = clickable_tags.bs4Crawling(driver.current_url, driver.page_source)
     cur_page_links += res_geturl.getUrl(driver.current_url, req_res_packets, driver.page_source)
