@@ -2,7 +2,7 @@ from seleniumwire import webdriver
 from urllib.parse import urlparse, urlunparse
 
 import analyst
-from feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains, csp_evaluator
+from feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains, csp_evaluator, db
 
 check = True
 input_url = ""
@@ -10,7 +10,7 @@ visited_links = []
 
 def start(url, depth, options):
     driver = initSelenium()
-
+    
     visit(driver, url, depth, options)
 
 def visit(driver, url, depth, options):
@@ -18,15 +18,24 @@ def visit(driver, url, depth, options):
     global input_url
     global visited_links
 
-    driver.get(url)
+    try:
+        driver.get(url)
+        alert = driver.switch_to_alert()
+        alert.accept()
+    except:
+        pass
+        
 
     if check:
         input_url = driver.current_url
         visited_links.append(input_url)
         check = False
 
-        # target_port = get_ports.getPortsOnline(input_url)
+        target_port = get_ports.getPortsOnline(input_url)
+        db.insertPorts(target_port, input_url)
 
+    # TODO
+    # 다른 사이트로 redirect 되었을 때, 추가적으로 same 도메인 인지를 검증하는 코드가 필요함.
     req_res_packets = packet_capture.packetCapture(driver)
     cur_page_links = clickable_tags.bs4Crawling(driver.current_url, driver.page_source)
     cur_page_links += res_geturl.getUrl(driver.current_url, req_res_packets, driver.page_source)
@@ -36,8 +45,15 @@ def visit(driver, url, depth, options):
     domain_result = extract_domains.extractDomains(dict(), driver.current_url, cur_page_links)
 
     csp_result = csp_evaluator.cspHeader(driver.current_url)
-    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver)
+    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver, options)
 
+    req_res_packets = deleteCssBody(req_res_packets)
+
+    previous_packet_count = db.getPacketsCount()
+    db.insertPackets(req_res_packets)
+    db.insertCSP(csp_result)
+    db.insertDomains(req_res_packets, cookie_result, previous_packet_count, driver.current_url)
+    db.insertWebInfo(analyst_result, input_url, previous_packet_count)
     # Here DB code 
 
     if depth == 0:
@@ -51,6 +67,8 @@ def visit(driver, url, depth, options):
         if isSamePath(visit_url, visited_links):
             continue
 
+        # TODO
+        # 이미지 페이지 등 방문하지 않는 코드 작성
         visited_links.append(visit_url)
         visit(driver, visit_url, depth-1, options)
 
@@ -97,6 +115,18 @@ def deleteFragment(links):
 
     return links
 
+def deleteCssBody(packets):
+    css_content_types = ["text/css"]
+
+    for index in range(len(packets)):
+        if "content-type" in list(packets[index]["response"]["headers"].keys()):
+            for type in css_content_types:
+                if packets[index]["response"]["headers"]["content-type"].find(type) != -1:
+                    print("find")
+                    packets[index]["response"]["body"] = ""
+    
+    return packets
+
 def initSelenium():
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("lang=ko_KR")
@@ -110,6 +140,54 @@ def initSelenium():
     driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options = options, chrome_options=chrome_options)
     return driver
 
+
 if __name__ == "__main__":
-    url = "https://github.com/"
-    start(url, 3, {})
+    options = {
+        "tool": {
+            "analysisLevel": "771",
+            "optionalJobs": [
+                "portScan",
+                "CSPEvaluate"
+            ]
+        },
+        "info": {
+            "server": [
+                {
+                    "name": "apache",
+                    "version": "22"
+                },
+                {
+                    "name": "nginx",
+                    "version": "44"
+                }
+            ],
+            "framework": [
+                {
+                    "name": "react",
+                    "version": "22"
+                },
+                {
+                    "name": "angularjs",
+                    "version": "44"
+                }
+            ],
+            "backend": [
+                {
+                    "name": "flask",
+                    "version": "22"
+                },
+                {
+                    "name": "django",
+                    "version": "44"
+                }
+            ]
+        },
+        "target": {
+            "url": "https://github.com/",
+            "path": [
+            "/apply, /login", "/admin"
+            ]
+        }
+    }
+
+    start(options["target"]["url"], int(options["tool"]["analysisLevel"]), options["info"])
