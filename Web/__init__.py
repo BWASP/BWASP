@@ -5,9 +5,9 @@ from flask import (
     Flask, render_template, g
 )
 from .models.BWASP import db, Charts
+from Crawling.scouter import start
 
 
-# from Crawling.scouter import start
 # start(url, depth, options):
 
 
@@ -60,5 +60,6 @@ def create_app(config=None):
 
     return app
 
-# def AutomatedAnalysis(url, depth, options):
-#     start(url, depth, options)
+
+def AutomatedAnalysis(url, depth, options):
+    start(url, depth, options)

@@ -3,7 +3,7 @@ from flask import (
     request, url_for, redirect, jsonify
 )
 from Web.models.BWASP import job
-# from Web import AutomatedAnalysis
+from Web import AutomatedAnalysis
 import json
 
 NAME = 'automation'
@@ -21,7 +21,7 @@ def manual_options():
 
         # Crawling -> Not found module in Crawling Scouter.py
         # requirements.txt check
-        # AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData["tool"]["optionJobs"])
+        AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData["tool"]["optionalJobs"])
 
         return jsonify({"success": True})
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")

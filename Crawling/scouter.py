@@ -1,17 +1,19 @@
 from seleniumwire import webdriver
 from urllib.parse import urlparse, urlunparse
 
-import analyst
-from feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains, csp_evaluator, db
+from Crawling import analyst
+from Crawling.feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains, csp_evaluator, db
 
 check = True
 input_url = ""
 visited_links = []
 
+
 def start(url, depth, options):
     driver = initSelenium()
-    
+
     visit(driver, url, depth, options)
+
 
 def visit(driver, url, depth, options):
     global check
@@ -24,7 +26,6 @@ def visit(driver, url, depth, options):
         alert.accept()
     except:
         pass
-        
 
     if check:
         input_url = driver.current_url
@@ -70,7 +71,8 @@ def visit(driver, url, depth, options):
         # TODO
         # 이미지 페이지 등 방문하지 않는 코드 작성
         visited_links.append(visit_url)
-        visit(driver, visit_url, depth-1, options)
+        visit(driver, visit_url, depth - 1, options)
+
 
 def isSameDomain(target_url, visit_url):
     try:
@@ -86,6 +88,7 @@ def isSameDomain(target_url, visit_url):
     except:
         return False
 
+
 def isSamePath(visit_url, previous_urls):
     try:
         visit = urlparse(visit_url)
@@ -95,17 +98,18 @@ def isSamePath(visit_url, previous_urls):
 
             if (visit.path == previous.path) and (visit.query == previous.query):
                 return True
-            
+
             # https://naver.com 과 https://naver.com/ 는 같은 url 이므로 검증하는 코드 작성.
             visit_path_len = len(visit.path.replace("/", ""))
             previous_path_len = len(previous.path.replace("/", ""))
-            
+
             if visit_path_len == 0 and previous_path_len == 0:
                 return True
         else:
             return False
     except:
         return False
+
 
 def deleteFragment(links):
     for i in range(len(links)):
@@ -114,6 +118,7 @@ def deleteFragment(links):
         links[i] = urlunparse(parse)
 
     return links
+
 
 def deleteCssBody(packets):
     css_content_types = ["text/css"]
@@ -124,8 +129,9 @@ def deleteCssBody(packets):
                 if packets[index]["response"]["headers"]["content-type"].find(type) != -1:
                     print("find")
                     packets[index]["response"]["body"] = ""
-    
+
     return packets
+
 
 def initSelenium():
     chrome_options = webdriver.ChromeOptions()
@@ -134,10 +140,10 @@ def initSelenium():
         "download_restrictions": 3
     })
     options = {
-        "disable_encoding" : True
+        "disable_encoding": True
     }
 
-    driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options = options, chrome_options=chrome_options)
+    driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options=options, chrome_options=chrome_options)
     return driver
 
 
@@ -185,7 +191,7 @@ if __name__ == "__main__":
         "target": {
             "url": "https://github.com/",
             "path": [
-            "/apply, /login", "/admin"
+                "/apply, /login", "/admin"
             ]
         }
     }
