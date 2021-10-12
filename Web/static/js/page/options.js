@@ -1,14 +1,20 @@
-const MaximumRecursiveLevel = 5000;
-const patterns = {
-    targetURL: /^http[s]?:\/\//
-}
-const identifier = {
-    optionalFunctions: "optFnc",
-    webAppInfo: {
-        name: "webAppName",
-        version: "webAppVersion"
-    }
-}
+const MaximumRecursiveLevel = 5000,
+    patterns = {
+        targetURL: /^http[s]?:\/\//
+    },
+    identifier = {
+        optionalFunctions: "optFnc",
+        webAppInfo: {
+            name: "webAppName",
+            version: "webAppVersion"
+        }
+    },
+    /*
+    DO NOT SET THIS VALUE TO FALSE WHEN PRODUCTION!!
+     - Result may not be worked or printed as designated.
+     - Please remove this keywords when code goes on production.
+     */
+    verifyOutput = false;
 
 // Initialize frontend when load
 window.onload = () => {
@@ -25,6 +31,7 @@ window.onload = () => {
     }
 
     // Render
+    let requestToCrawler = fetch("/static/data/supportedList.json");
     fetch("/static/data/supportedList.json")
         .then(data=>data.json())
         .then(SupportedList=>{
@@ -242,14 +249,27 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
             body: new URLSearchParams({
                 reqJsonData: JSON.stringify(requestData)
             })
-        }).then(response => response.json())
-            .then(json => {
-                if(json.success){
-                    alert("Create job successfully.");
-                    document.location.replace("/");
-                }else{
-                    alert("Failed to create job.")
+        })
+            .then(response => {
+                let setResult = (result) => {
+                    if(Boolean(result)){
+                        alert("Job has just requested.\nRedirecting you to Dashboard...");
+                        document.location.replace("/dashboard");
+                    }else{
+                        alert("Failed to create job.")
+                    }
                 }
-            });
+
+                if(!verifyOutput) setResult(true);
+                else{
+                    response.json().then(json => {
+                        if(json.success){
+                            setResult(true);
+                        }else{
+                            setResult(false);
+                        }
+                    });
+                }
+            })
     })
 })
