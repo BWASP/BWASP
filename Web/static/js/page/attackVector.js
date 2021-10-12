@@ -84,11 +84,12 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
 
     // Build tbody
     fetch((currentState)?"/api/attack_vector":"/api/packets").then((res)=>{
-        if(res.status!==200) {
+        let noData = () => {
             $("#loadingProgress").addClass("d-none");
             $("#resultNoData").removeClass("d-none");
             console.error("Error! HTTP status: " + res.status);
         }
+        if(res.status!==200) noData();
         else res.json().then((buildData)=>{
             if (buildData.length<=0){
                 $("#loadingProgress").addClass("d-none");
@@ -100,6 +101,8 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                     localData = buildData[count],
                     element = Object(),
                     impactData = [];
+
+                if(localData.date === "None") return noData();
 
                 // URL
                 let idKey = createKey();
