@@ -3,7 +3,7 @@ import os
 import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-from Crawling.feature import func.isSameDomain
+from Crawling.feature import func
 
 default_allow_cat={12,18,27,59}
 #default_allow_cat = [12,18,27,22, 28, 33, 34, 46]
@@ -296,7 +296,7 @@ def resBackend(driver,req_res_packets,options=""):
                     appendImplies(result,signature[name],i,0)
             #header로 추출
             if  'headers' in  signature[name].keys():
-                if not isSameDomain(target_url,request["request"]["full_url"]):
+                if not func.isSameDomain(target_url,request["request"]["full_url"]):
                     continue
                 for comp_header in set(signature[name]["headers"].keys()) & set(request["request"]["headers"].keys()):
                     pattern,version_group,confidence=rebuildPattern(signature[name]["headers"][comp_header])
@@ -312,7 +312,7 @@ def resBackend(driver,req_res_packets,options=""):
                         appendImplies(result,signature[name],0,i)
             #cookie로 추출
             if  'cookie' in  signature[name].keys():
-                if not isSameDomain(target_url,request["request"]["full_url"]):
+                if not func.isSameDomain(target_url,request["request"]["full_url"]):
                     continue
                 #request packet 비교
                 if "cookie" in signature[name]["headers"].keys():
