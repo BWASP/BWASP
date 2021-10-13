@@ -75,8 +75,8 @@ def eachgetUrl(main_url,response,response_url):
         saveUrl(main_url,"ext",response["body"],response_url)
 
 #Call this to get extra link
-#res_geturl.getUrl(driver.current_url, req_res_packets,driver.page_source)
-def getUrl(main_url,req_res_packet,page_source):
+#res_geturl.start(driver.current_url, req_res_packets,driver.page_source)
+def start(main_url,req_res_packet,page_source):
     saveUrl(main_url,"currentpage",page_source,main_url)
     for request in req_res_packet:
         # 탐색된 모든 url 저장
