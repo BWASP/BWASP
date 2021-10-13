@@ -4,19 +4,30 @@ from urllib.parse import urlparse
 
 category = [22, 28, 33, 34, 46]
 
-def getWebServerInfo(target_url, req_res_packets):
+def getWebServerInfo(target_url, req_res_packets, options):
     return_data = {}
     data = loadCategory(category)
     
+    option_data = []
+    for option in options:
+        option_data.append(option["name"])
+
     for index, packet in enumerate(req_res_packets):
         if not isSameDomain(target_url, packet["request"]["full_url"]):
             continue
         
+        ### 사용자가 지정한 서버 정보는 탐색하지 않음.
+        webserver_keyword = list(data.keys())
+        for d in webserver_keyword:
+            if d.lower() in option_data:
+                webserver_keyword.remove(d)
+        ### End
+
         # check response Header
-        for key in list(data.keys()):
+        for key in webserver_keyword:
             if not "headers" in list(data[key].keys()):
                 continue
-
+            
             for header in list(data[key]["headers"].keys()):
                 if not header.lower() in list(packet["response"]["headers"].keys()):
                     continue
@@ -47,13 +58,22 @@ def getWebServerInfo(target_url, req_res_packets):
                     if version_info != None:
                         return_data[key]["version"] = version_info.group()
     
+    ### 사용자가 입력한 옵션 데이터를 수동으로 넣어줌
+    for option in options:
+        return_data[option["name"]] = {
+            "detect" : [],
+            "version" : option["version"],
+            "request" : [],
+            "response" : []
+        }
+
     return return_data
 
 def loadCategory(category):
     return_data = {}
 
     for name in "abcdefghijklmnopqrstuvwxyz_":
-        file = "./wappalyzer/{}.json".format(name)
+        file = "./Crawling/wappalyzer/{}.json".format(name)
 
         f = open(file, "r", encoding="utf-8")
         data = json.load(f)

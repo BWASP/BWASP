@@ -3,7 +3,7 @@ from seleniumwire.utils import decode
 from urllib.parse import urlparse
 import json
 
-content_image_type = ["image/bmp", "image/cis-cod", "image/gif", "image/ief", "image/jpeg", "image/pipeg", "image/svg+xml", "image/tiff", "image/tiff", "image/png"]
+content_image_type = ["image/bmp", "image/cis-cod", "image/gif", "image/ief", "image/jpeg", "image/pipeg", "image/svg+xml", "image/tiff", "image/tiff", "image/png", "font/woff2"]
 
 def webdriverSetting():
     # [*] If you want to get decoded response body, you have to add below option.

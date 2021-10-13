@@ -63,6 +63,7 @@ def cve_Data(search):
     cve_data = list()
     cve_data.append(str(result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", ""))
     cve_data.append(str(backend_result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", ""))
+
     return cve_data
 
 
@@ -99,7 +100,7 @@ def AttackVector():
                     # "/class.php"
                 ],
                 "vulnerability": {
-                    "type": "1",  # attackVector_data[i].attackVector,
+                    "type": "None",  # attackVector_data[i].attackVector,
                     # "Cross Site Script(XSS)",  # (stored, reflected, dom) 으로 XSS 분리하면 될 듯...?
                     "CVE": []
                 },
