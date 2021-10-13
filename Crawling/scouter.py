@@ -2,7 +2,7 @@ from seleniumwire import webdriver
 from urllib.parse import urlparse, urlunparse
 
 from Crawling import analyst
-from Crawling.feature import extract_page_links, packet_capture, extract_res_links, get_ports, extract_cookies, extract_domains, csp_evaluator, db, func
+from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
 
 check = True
 input_url = ""
@@ -39,12 +39,12 @@ def visit(driver, url, depth, options):
     # 다른 사이트로 redirect 되었을 때, 추가적으로 same 도메인 인지를 검증하는 코드가 필요함.
     # 첫 패킷에 google 관련 패킷 지우기
     req_res_packets = packet_capture.start(driver)
-    cur_page_links = extract_page_links.start(driver.current_url, driver.page_source)
-    cur_page_links += extract_res_links.start(driver.current_url, req_res_packets, driver.page_source)
+    cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
+    cur_page_links += get_res_links.start(driver.current_url, req_res_packets, driver.page_source)
     cur_page_links = list(set(deleteFragment(cur_page_links)))
 
-    cookie_result = extract_cookies.start(driver.current_url, req_res_packets)
-    domain_result = extract_domains.start(dict(), driver.current_url, cur_page_links)
+    cookie_result = get_cookies.start(driver.current_url, req_res_packets)
+    domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
 
     if "CSPEvaluate" in options["tool"]["optionalJobs"]:
         csp_result = csp_evaluator.start(driver.current_url)
