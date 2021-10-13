@@ -1,6 +1,7 @@
 import json
 import re
-from urllib.parse import urlparse
+
+from Crawling.feature import func
 
 category = [22, 28, 33, 34, 46]
 
@@ -13,7 +14,7 @@ def getWebServerInfo(target_url, req_res_packets, options):
         option_data.append(option["name"])
 
     for index, packet in enumerate(req_res_packets):
-        if not isSameDomain(target_url, packet["request"]["full_url"]):
+        if not func.isSameDomain(target_url, packet["request"]["full_url"]):
             continue
         
         ### 사용자가 지정한 서버 정보는 탐색하지 않음.
@@ -85,20 +86,6 @@ def loadCategory(category):
                     return_data[key] = data[key]
                     
     return return_data
-
-def isSameDomain(target_url, visit_url):
-    try:
-        target = urlparse(target_url)
-        visit = urlparse(visit_url)
-
-        if visit.scheme != "http" and visit.scheme != "https":
-            return False
-        if target.netloc == visit.netloc:
-            return True
-        else:
-            return False
-    except:
-        return False
 
 if __name__ == "__main__":
     f = open("../test.json", "r", encoding="utf-8")

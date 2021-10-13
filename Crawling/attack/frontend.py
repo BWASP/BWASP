@@ -3,6 +3,8 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
+from Crawling.feature import func
+
 '''
 "59": {
     "name": "JavaScript libraries",
@@ -38,7 +40,7 @@ def detectWebServer(url, cur_page_links, req_res_packets, driver, options):
                 if option['name'] == app:
                     continue
             # Including external domain as well as including same domain
-            if not isSameDomain(url, packet["request"]["full_url"]):
+            if not func.isSameDomain(url, packet["request"]["full_url"]):
                 if "scripts" in list(data[app].keys()):
                     result = detectScripts(cur_page_links, data, app)
                     detect_list = resultFunc(detect_list, app, result)
@@ -92,20 +94,6 @@ def loadCategory(category):
                     return_data[key] = data[key]
                     
     return return_data
-
-def isSameDomain(target_url, visit_url):
-    try:
-        target = urlparse(target_url)
-        visit = urlparse(visit_url)
-
-        if visit.scheme != "http" and visit.scheme != "https":
-            return False
-        if target.netloc == visit.netloc:
-            return True
-        else:
-            return False
-    except:
-        return False
 
 def resultFunc(detect_list, app, result):
     if result is not None:

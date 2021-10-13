@@ -2,7 +2,7 @@ from seleniumwire import webdriver
 from urllib.parse import urlparse, urlunparse
 
 from Crawling import analyst
-from Crawling.feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains, csp_evaluator, db
+from Crawling.feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains, csp_evaluator, db, func
 
 check = True
 input_url = ""
@@ -69,9 +69,9 @@ def visit(driver, url, depth, options):
     for visit_url in cur_page_links:
         if visit_url in visited_links:
             continue
-        if not isSameDomain(input_url, visit_url):
+        if not func.isSameDomain(input_url, visit_url):
             continue
-        if isSamePath(visit_url, visited_links):
+        if func.isSamePath(visit_url, visited_links):
             continue
 
         # TODO
@@ -81,44 +81,6 @@ def visit(driver, url, depth, options):
         visited_links.append(visit_url)
         visit(driver, visit_url, depth - 1, options)
 
-
-def isSameDomain(target_url, visit_url):
-    try:
-        target = urlparse(target_url)
-        visit = urlparse(visit_url)
-
-        if visit.scheme != "http" and visit.scheme != "https":
-            return False
-        if target.netloc == visit.netloc:
-            return True
-        else:
-            return False
-    except:
-        return False
-
-
-def isSamePath(visit_url, previous_urls):
-    try:
-        visit = urlparse(visit_url)
-
-        for link in previous_urls:
-            previous = urlparse(link)
-
-            if (visit.path == previous.path) and (visit.query == previous.query):
-                return True
-
-            # https://naver.com 과 https://naver.com/ 는 같은 url 이므로 검증하는 코드 작성.
-            visit_path_len = len(visit.path.replace("/", ""))
-            previous_path_len = len(previous.path.replace("/", ""))
-
-            if visit_path_len == 0 and previous_path_len == 0:
-                return True
-        else:
-            return False
-    except:
-        return False
-
-
 def deleteFragment(links):
     for i in range(len(links)):
         parse = urlparse(links[i])
@@ -126,7 +88,6 @@ def deleteFragment(links):
         links[i] = urlunparse(parse)
 
     return links
-
 
 def deleteCssBody(packets):
     css_content_types = ["text/css"]
