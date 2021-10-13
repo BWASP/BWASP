@@ -2,7 +2,7 @@ import json
 from urllib.parse import urlparse
 from Crawling.feature import func
 
-def getCookies(url, req_res_packets):
+def start(url, req_res_packets):
     cookies_per_packet = dict()
     
     for packet in req_res_packets:
@@ -19,4 +19,4 @@ def getCookies(url, req_res_packets):
 
 if __name__ == "__main__":
     req_res_packets = json.loads(open('./test.json','r').read())
-    print(getCookies('https://kitribob.kr/', req_res_packets))
+    print(start('https://kitribob.kr/', req_res_packets))
