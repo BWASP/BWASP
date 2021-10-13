@@ -2,12 +2,11 @@ from seleniumwire import webdriver
 from urllib.parse import urlparse, urlunparse
 
 from Crawling import analyst
-from Crawling.feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains, csp_evaluator, db, func
+from Crawling.feature import extract_page_links, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains, csp_evaluator, db, func
 
 check = True
 input_url = ""
 visited_links = []
-
 
 def start(url, depth, options):
     driver = initSelenium()
@@ -40,7 +39,7 @@ def visit(driver, url, depth, options):
     # 다른 사이트로 redirect 되었을 때, 추가적으로 same 도메인 인지를 검증하는 코드가 필요함.
     # 첫 패킷에 google 관련 패킷 지우기
     req_res_packets = packet_capture.start(driver)
-    cur_page_links = clickable_tags.start(driver.current_url, driver.page_source)
+    cur_page_links = extract_page_links.start(driver.current_url, driver.page_source)
     cur_page_links += res_geturl.start(driver.current_url, req_res_packets, driver.page_source)
     cur_page_links = list(set(deleteFragment(cur_page_links)))
 
