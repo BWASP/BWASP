@@ -3,6 +3,7 @@ import os
 import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+from Crawling.feature import func.isSameDomain
 
 default_allow_cat={12,18,27,59}
 #default_allow_cat = [12,18,27,22, 28, 33, 34, 46]
@@ -11,20 +12,6 @@ default_check_cat={12,18,27,59}
 json_path="./Crawling/wappalyzer/"
 categories_path="./Crawling/wappalyzer/categories.json"
 sig_url=list()
-
-def isSameDomain(target_url, visit_url):
-    try:
-        target = urlparse(target_url)
-        visit = urlparse(visit_url)
-
-        if visit.scheme != "http" and visit.scheme != "https":
-            return False
-        if target.netloc == visit.netloc:
-            return True
-        else:
-            return False
-    except:
-        return False
 
 
 def extractJson(check_cat={12,18,27,59},allow_cat={12,18,27,59},options=""):
