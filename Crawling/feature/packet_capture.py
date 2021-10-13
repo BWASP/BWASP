@@ -14,7 +14,7 @@ def webdriverSetting():
     driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options = options)
     return driver
 
-def packetCapture(driver):
+def start(driver):
     network_packet = []
     for data in driver.requests:
         if data.response:
@@ -111,4 +111,4 @@ if __name__ == "__main__":
     # ]
 
     driver.get(url)
-    writeFile(packetCapture(driver))
+    writeFile(start(driver))
