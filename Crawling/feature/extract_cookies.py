@@ -1,26 +1,13 @@
 import json
 from urllib.parse import urlparse
-
-def isSameDomain(target_url, visit_url):
-    try:
-        target = urlparse(target_url)
-        visit = urlparse(visit_url)
-
-        if visit.scheme != "http" and visit.scheme != "https":
-            return False
-        if target.netloc == visit.netloc:
-            return True
-        else:
-            return False
-    except:
-        return False
+from Crawling.feature import func
 
 def getCookies(url, req_res_packets):
     cookies_per_packet = dict()
     
     for packet in req_res_packets:
         cookies = dict()
-        if not isSameDomain(url, packet["request"]["full_url"]) or "cookie" not in list(packet["request"]["headers"].keys()):
+        if not func.isSameDomain(url, packet["request"]["full_url"]) or "cookie" not in list(packet["request"]["headers"].keys()):
             continue
 
         for i in packet["request"]["headers"]["cookie"].split('; '):
