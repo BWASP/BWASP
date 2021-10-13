@@ -2,18 +2,10 @@ import sqlalchemy as db
 import os
 import json
 from urllib.parse import urlparse,urlunparse
-from sqlalchemy.orm import relation
-
 from Crawling.feature import func
 
-def get_dbpath(repo_name="BWASP",prefix="sqlite:///",sub_path="Web\databases\BWASP.db"):
-    repopath = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-    index = repopath.find(repo_name)
-    repopath = repopath[:index+len(repo_name)]
-    return (prefix+repopath+"\\"+sub_path).replace("\\","\\\\")
-
 def connect(table_name):
-    db_path =get_dbpath()
+    db_path =func.get_dbpath()
     db_engine = db.create_engine(db_path)
     db_connect = db_engine.connect()
     db_metadata = db.MetaData()
