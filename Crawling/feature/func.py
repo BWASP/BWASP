@@ -1,4 +1,5 @@
 from urllib.parse import urlparse, urlunparse
+import os
 
 def isSameDomain(target_url, visit_url):
     try:
@@ -34,3 +35,9 @@ def isSamePath(visit_url, previous_urls):
             return False
     except:
         return False
+
+def get_dbpath(repo_name="BWASP",prefix="sqlite:///",sub_path="Web\databases\BWASP.db"):
+    repopath = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+    index = repopath.find(repo_name)
+    repopath = repopath[:index+len(repo_name)]
+    return (prefix+repopath+"\\"+sub_path).replace("\\","\\\\")
