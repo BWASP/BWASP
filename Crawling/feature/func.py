@@ -41,3 +41,25 @@ def get_dbpath(repo_name="BWASP",prefix="sqlite:///",sub_path="Web\databases\BWA
     index = repopath.find(repo_name)
     repopath = repopath[:index+len(repo_name)]
     return (prefix+repopath+"\\"+sub_path).replace("\\","\\\\")
+
+"""
+    This function check the extension of url.
+        - url: String
+        - key: String
+        - return: boolean
+"""
+def checkExtension(url, key):
+    extensions_dict = {
+        "image" : ["png", "gif", "jpg", "jpeg", "webp", "tiff", "bmp", "svg", "jpe", "jif", "jfif", "jfi"]
+    }
+
+    if not key in list(extensions_dict.keys()):
+        return False
+    
+    extension_list = extensions_dict[key]
+    url_extension = url.split(".")[::-1][0]
+
+    if url_extension in extension_list:
+        return True
+    else:
+        return False

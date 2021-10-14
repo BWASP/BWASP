@@ -72,9 +72,10 @@ def visit(driver, url, depth, options):
             continue
         if func.isSamePath(visit_url, visited_links):
             continue
+        if func.checkExtension(visit_url, "image"):
+            continue
 
         # TODO
-        # 이미지 페이지 등 방문하지 않는 코드 작성
         # target 외에 다른 사이트로 redirect 될때, 검증하는 코드 작성 필요
         # 무한 크롤링
         visited_links.append(visit_url)
