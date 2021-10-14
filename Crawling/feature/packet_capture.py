@@ -18,6 +18,9 @@ def start(driver):
     network_packet = []
     for data in driver.requests:
         if data.response:
+            if data.url == "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard":
+                continue
+
             network_packet.append({
                 "request" : getRequestPacket(data), 
                 "response" : getResponsePacket(data.response)
