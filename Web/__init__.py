@@ -8,9 +8,6 @@ from .models.BWASP import db, Charts
 from Crawling.scouter import start
 
 
-# start(url, depth, options):
-
-
 def create_app(config=None):
     app = Flask(__name__)
 
@@ -26,28 +23,21 @@ def create_app(config=None):
     # config type
     app.config.from_object(config)
 
-    # route initialize
-    from .routes import index_route, automation_route, common_route, api_route  # , test_route
+    # route initialization
+    from .routes import index_route, automation_route, common_route, api_route
     app.register_blueprint(index_route.bp)
     app.register_blueprint(automation_route.bp)
     app.register_blueprint(common_route.bp)
     app.register_blueprint(api_route.bp)
-    # app.register_blueprint(test_route.bp)
 
+    # DB initialization
     db.init_app(app)
 
     @app.before_request
     def before_request():
-        g.db = db.session
-        # g.db.query 기준으로 가져와야 함
-        # print(g.db.query(Charts.name).all())
-        # print(g.db.query(Charts).all())
-        # asdf = g.db.query(Charts).all()
-        # print(asdf[0].name)
-        # print(asdf[1].name)
         db.app = app
-        g.db = db.session
         db.create_all()
+        g.db = db.session
 
     @app.errorhandler(404)
     def NotFound(error):
