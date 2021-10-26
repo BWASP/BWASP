@@ -3,6 +3,7 @@ import os
 import json
 import datetime
 from urllib.parse import urlparse,urlunparse
+from bs4 import BeautifulSoup
 
 from sqlalchemy.orm import relation
 
@@ -44,6 +45,26 @@ def insertPackets(req_res_packets):
         request_json = json.dumps(packet["request"])
         resonse_header = json.dumps(packet["response"]["headers"])
         response_body = packet["response"]["body"]
+
+
+        #form tag action and input tag and input name parse
+        soup = BeautifulSoup(response_body, 'html.parser')
+        text = soup.find_all('input')
+        try:
+            form = soup.find_all('form')
+        except:
+            form = "none"
+        print("TEST TOP9")
+
+        for tag in text:
+            if tag.attrs['type'] != "submit" and len(text) != 0:
+                print(tag) #input tag 값 ex) <input ~
+                print(tag.attrs['name']) #parameter name 값 ex) uname
+
+        if form != "none":
+            for tag in form:
+                print(tag.attrs['action'])
+
 
         query = db.insert(db_table).values(statusCode=status_code, requestType=request_type, requestJson=request_json,
                                             responseHeader=resonse_header, responseBody=response_body)
