@@ -42,7 +42,7 @@ def visit(driver, url, depth, options):
     cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
     cur_page_links += get_res_links.start(driver.current_url, req_res_packets, driver.page_source)
     cur_page_links = list(set(deleteFragment(cur_page_links)))
-
+    
     cookie_result = get_cookies.start(driver.current_url, req_res_packets)
     domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
 
@@ -72,7 +72,7 @@ def visit(driver, url, depth, options):
             continue
         if func.isSamePath(visit_url, visited_links):
             continue
-        if func.checkExtension(visit_url, "image"):
+        if func.isExistExtension(visit_url, "image"):
             continue
 
         # TODO
@@ -157,7 +157,7 @@ if __name__ == "__main__":
             ]
         },
         "target": {
-            "url": "https://github.com/",
+            "url": "http://testphp.vulnweb.com/",
             "path": [
                 "/apply, /login", "/admin"
             ]
