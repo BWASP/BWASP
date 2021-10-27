@@ -1,42 +1,49 @@
 // true (vector) / false (packet)
+const API = {
+    vectors: "/api/attack_vector",
+    packets: "/api/packets"
+},
+    debug = true;
 let currentState = false;
-let implementationSample_attackVector = [
-    {
-        url: "http://bobmart.com/main.php",
-        payloads: ["/class.php", "/korea.php", "/bwasp.php", "/abc.bobmart.com", "/admin.bobmart.com"],
-        vulnerability: {
-            type: "Cross Site Script(XSS)",
-            CVE: [
-                {
-                    numbering: "2021-0000-111"
-                }
-            ]
-        },
-        method: "None",
-        date: "2021-09-28 11:00",
-        impactRate: 0
-    }
-];
-let implementationSample_packets = [
-    {
-        url: "http://bobmart.com/main.php",
-        payloads: ["/class.php", "/korea.php", "/bwasp.php", "/abc.bobmart.com", "/admin.bobmart.com"],
-        packet: "?num= parameter check",
-        vulnerability: {
-            type: "Cross Site Script(XSS)",
-            CVE: [
-                {
-                    numbering: "2021-0000-111",
-                    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-                }
-            ]
-        },
-        method: "None",
-        relatedData: ["http://xsstest123456.com/xssprob1.md"],
-        date: "2021-09-28 11:00",
-        impactRate: 0
-    }
-];
+let implementationSample = {
+    vectors: [
+        {
+            url: "http://bobmart.com/main.php",
+            payloads: ["/class.php", "/korea.php", "/bwasp.php", "/abc.bobmart.com", "/admin.bobmart.com"],
+            vulnerability: {
+                type: "Cross Site Script(XSS)",
+                CVE: [
+                    {
+                        numbering: "2021-0000-111"
+                    }
+                ]
+            },
+            method: "None",
+            date: "2021-09-28 11:00",
+            impactRate: 0
+        }
+    ],
+    packets: [
+        {
+            url: "http://bobmart.com/main.php",
+            payloads: ["/class.php", "/korea.php", "/bwasp.php", "/abc.bobmart.com", "/admin.bobmart.com"],
+            packet: "?num= parameter check",
+            vulnerability: {
+                type: "Cross Site Script(XSS)",
+                CVE: [
+                    {
+                        numbering: "2021-0000-111",
+                        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                    }
+                ]
+            },
+            method: "None",
+            relatedData: ["http://xsstest123456.com/xssprob1.md"],
+            date: "2021-09-28 11:00",
+            impactRate: 0
+        }
+    ]
+}
 let idKeyList = [], key = "";
 
 let createKey = () => {
@@ -50,7 +57,7 @@ let createKey = () => {
 
 document.getElementById("switchToPacket").addEventListener("click", function(){
     document.getElementById("switchToType").innerText = (currentState) ? "Attack Vectors" : "Packets";
-    document.getElementById("currentType").innerText = `All ${(currentState) ? "Packets" : "Attack Vectors"}`;
+    // document.getElementById("currentType").innerText = `All ${(currentState) ? "Packets" : "Attack Vectors"}`;
     let table = {
         table: document.createElement("table"),
         thead: document.createElement("thead"),
@@ -59,11 +66,11 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
     let tableID = createKey(),
         tablePlace = document.getElementById("tablePlace");
     tablePlace.innerHTML = "";
-    $("#loadingProgress").removeClass("d-none");
-    $("#resultNoData").addClass("d-none");
+    document.getElementById("loadingProgress").classList.remove("d-none");
+    document.getElementById("resultNoData").classList.add("d-none");
     currentState = !currentState;
     ((status = (currentState) ? "Attack Vector" : "Packets")=>{
-        document.getElementById("titleOfPage").innerHTML = status;
+        document.getElementById("pageTitle").innerHTML = status;
         document.title = `${status} - BWASP`;
     })()
 
@@ -83,17 +90,19 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
     table.thead.appendChild(newThead);
 
     // Build tbody
-    fetch((currentState)?"/api/attack_vector":"/api/packets").then((res)=>{
+    let currentKey = (currentState)?"vectors":"packets";
+    fetch(API[currentKey]).then((res)=>{
         let noData = () => {
-            $("#loadingProgress").addClass("d-none");
-            $("#resultNoData").removeClass("d-none");
+            document.getElementById("loadingProgress").classList.add("d-none");
+            document.getElementById("resultNoData").classList.remove("d-none");
             console.error("Error! HTTP status: " + res.status);
         }
-        if(res.status!==200) noData();
+        if(res.status!==200 && !debug) noData();
         else res.json().then((buildData)=>{
+            if(debug) buildData = implementationSample[currentKey];
             if (buildData.length<=0){
-                $("#loadingProgress").addClass("d-none");
-                $("#resultNoData").removeClass("d-none");
+                document.getElementById("loadingProgress").classList.add("d-none");
+                document.getElementById("resultNoData").classList.remove("d-none");
                 return;
             }
             for (let count = 0; count < buildData.length; count++) {
@@ -102,7 +111,7 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                     element = Object(),
                     impactData = [];
 
-                if(localData.date === "None") return noData();
+                if(localData.date === "None" && !debug) return noData();
 
                 // URL
                 let idKey = createKey();
@@ -125,8 +134,8 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
 
                 element.url.child.url.href = `#${idKey}`;
                 element.url.child.url.innerHTML = localData.url;
-                element.url.child.url.classList.add("d-block", "py-3", "m-0", "font-weight-bold", "text-primary");
-                element.url.child.url.setAttribute("data-toggle", "collapse");
+                element.url.child.url.classList.add("d-block", "py-3", "m-0", "fw-bold", "text-decoration-none", "text-primary");
+                element.url.child.url.setAttribute("data-bs-toggle", "collapse");
                 element.url.child.url.setAttribute("role", "button");
                 element.url.child.url.setAttribute("aria-expanded", "false")
                 element.url.child.url.setAttribute("aria-controls", idKey);
@@ -238,7 +247,7 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                     }
                 }
                 element.date.parent.classList.add("align-middle");
-                element.date.child.date.classList.add("font-weight-bold");
+                element.date.child.date.classList.add("fw-bold");
                 element.date.child.date.innerText = date[0];
                 element.date.child.time.innerText = `${date[1]} ${date[2]}`;
                 element.date.parent.append(
@@ -278,15 +287,15 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                 table.tbody.appendChild(frame);
             }
 
-            table.table.classList.add("table", "table-bordered");
+            table.table.classList.add("table", "table-stripped");
             table.table.id = tableID;
             table.table.append(
                 table.thead,
                 table.tbody
             );
             tablePlace.appendChild(table.table);
-            $(`#${tableID}`).DataTable();
-            $("#loadingProgress").addClass("d-none");
+            // $(`#${tableID}`).DataTable();
+            document.getElementById("loadingProgress").classList.add("d-none");
         })
     })
 })
