@@ -1,103 +1,27 @@
-<!-- Sidebar -->
-<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-    <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="start">
-        <div class="sidebar-brand-icon rotate-n-15">
-            <i class="fas fa-laugh-wink"></i>
-        </div>
-        <div class="sidebar-brand-text mx-3">BWASP <sup>0.1</sup></div>
+<div class="BWASP-navigation commonPadding">
+    <a class="bg-primary text-decoration-none text-white shadow sizer element-top center-horizontal center-vertical border-rounded"
+        href="/">
+        <h4 class="text-decoration-none text-white mb-0 font-logo">BWASP</h4>
     </a>
-
-    <!-- Divider -->
-    <hr class="sidebar-divider my-0">
-
-    <!-- Nav Item - Dashboard -->
-    <li class="nav-item active">
-        <a class="nav-link" href="/dashboard">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Dashboard</span></a>
-    </li>
-
-    <!-- Divider -->
-    <hr class="sidebar-divider">
-
-    <!-- Heading -->
-    <div class="sidebar-heading">
-        Interface
-    </div>
-
-    <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-           aria-expanded="true" aria-controls="collapseTwo">
-            <i class="fas fa-fw fa-cog"></i>
-            <span>Status</span>
-        </a>
-        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <p class="collapse-item">Status: <span class="text-success">Analyzing</span></p>
-            </div>
+    <!-- btn-toggle-nav list-unstyled fw-normal pb-1 small -->
+    <div class="bg-white shadow text-dark sizer element-sidebar border-rounded separatedTab">
+        <div class="sidebar-elements">
+            <p class="sidebar-title">Interface</p>
+            <ul class="list-unstyled mb-auto">
+                <li class="sidebar-elements">
+                    <p class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
+                        Home
+                    </p>
+                    <div class="collapse show" id="home-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="#" class="link-dark rounded">Overview</a></li>
+                            <li><a href="#" class="link-dark rounded">Updates</a></li>
+                            <li><a href="#" class="link-dark rounded">Reports</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
         </div>
-    </li>
-
-    <!-- Nav Item - Utilities Collapse Menu -->
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-           aria-expanded="true" aria-controls="collapseUtilities">
-            <i class="fas fa-fw fa-plus-square"></i>
-            <span>Start</span>
-        </a>
-        <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-             data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="/start">Start</a>
-                <h6 class="collapse-header">Quick Start</h6>
-                <a class="collapse-item" href="/automation/options">Automated Analysis</a>
-                <a class="collapse-item" href="/manual">Manual Analysis</a>
-            </div>
-        </div>
-    </li>
-
-    <!-- Divider -->
-    <hr class="sidebar-divider">
-
-    <!-- Heading -->
-    <div class="sidebar-heading">
-        Report
     </div>
-
-    <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
-           aria-expanded="true" aria-controls="collapsePages">
-            <i class="fas fa-fw fa-folder"></i>
-            <span>View</span>
-        </a>
-        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <h6 class="collapse-header">Quick View</h6>
-                <a class="collapse-item" href="/common/attack_vector">Attack Vector</a>
-                <!--
-                <div class="collapse-divider"></div>
-                <h6 class="collapse-header">Other Pages:</h6>
-                -->
-            </div>
-        </div>
-    </li>
-
-    <li class="nav-item">
-        <a class="nav-link" href="/common/export">
-            <i class="fas fa-fw fa-file-export"></i>
-            <span>Export</span></a>
-    </li>
-
-    <!-- Divider -->
-    <hr class="sidebar-divider d-none d-md-block">
-
-    <!-- Sidebar Toggler (Sidebar) -->
-    <div class="text-center d-none d-md-inline">
-        <button class="rounded-circle border-0" id="sidebarToggle"></button>
-    </div>
-</ul>
-<!-- End of Sidebar -->
+    {% include 'components/footer.html' %}
+</div>
