@@ -1,9 +1,7 @@
 from seleniumwire import webdriver
 from seleniumwire.utils import decode
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 import json
-
-from Crawling.feature import func
 
 content_image_type = ["image/bmp", "image/cis-cod", "image/gif", "image/ief", "image/jpeg", "image/pipeg", "image/svg+xml", "image/tiff", "image/tiff", "image/png", "font/woff2"]
 
@@ -116,6 +114,25 @@ def filterDomain(packets, target_url):
             result_packet.append(packet)
     
     return result_packet
+
+def deleteFragment(links):
+    for i in range(len(links)):
+        parse = urlparse(links[i])
+        parse = parse._replace(fragment="")
+        links[i] = urlunparse(parse)
+
+    return links
+
+def deleteUselessBody(packets):
+    content_types = ["text/css", "application/font-woff2"]
+
+    for index in range(len(packets)):
+        if "content-type" in list(packets[index]["response"]["headers"].keys()):
+            for type in content_types:
+                if packets[index]["response"]["headers"]["content-type"].find(type) != -1:
+                    packets[index]["response"]["body"] = ""
+
+    return packets
 
 def writeFile(data):
     f = open("test.json", "w")

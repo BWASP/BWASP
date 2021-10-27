@@ -17,7 +17,6 @@ def start(url, depth, options):
 
 def visit(driver, url, depth, options):
     global start_options
-    global check
 
     try:
         driver.get(url)
@@ -48,12 +47,12 @@ def visit(driver, url, depth, options):
     else:
         cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
         cur_page_links += get_res_links.start(driver.current_url, req_res_packets, driver.page_source)
-        cur_page_links = list(set(deleteFragment(cur_page_links)))
+        cur_page_links = list(set(packet_capture.deleteFragment(cur_page_links)))
         # domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
     cookie_result = get_cookies.start(driver.current_url, req_res_packets)
     
     analyst_result = analyst.start(start_options["input_url"], req_res_packets, cur_page_links, driver, options['info'])
-    req_res_packets = deleteCssBody(req_res_packets)
+    req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
 
     previous_packet_count = db.getPacketsCount()
     db.insertPackets(req_res_packets)
@@ -78,26 +77,6 @@ def visit(driver, url, depth, options):
         # 무한 크롤링 해결 해야 함.
         start_options["visited_links"].append(visit_url)
         visit(driver, visit_url, depth - 1, options)
-
-def deleteFragment(links):
-    for i in range(len(links)):
-        parse = urlparse(links[i])
-        parse = parse._replace(fragment="")
-        links[i] = urlunparse(parse)
-
-    return links
-
-def deleteCssBody(packets):
-    css_content_types = ["text/css"]
-
-    for index in range(len(packets)):
-        if "content-type" in list(packets[index]["response"]["headers"].keys()):
-            for type in css_content_types:
-                if packets[index]["response"]["headers"]["content-type"].find(type) != -1:
-                    packets[index]["response"]["body"] = ""
-
-    return packets
-
 
 def initSelenium():
     chrome_options = webdriver.ChromeOptions()
