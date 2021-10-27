@@ -3,6 +3,8 @@ from seleniumwire.utils import decode
 from urllib.parse import urlparse
 import json
 
+from Crawling.feature import func
+
 content_image_type = ["image/bmp", "image/cis-cod", "image/gif", "image/ief", "image/jpeg", "image/pipeg", "image/svg+xml", "image/tiff", "image/tiff", "image/png", "font/woff2"]
 
 def webdriverSetting():
@@ -97,6 +99,23 @@ def getResponsePacket(data):
         print("UnicodeDecodeError: " + str(e))
     
     return return_data
+
+"""
+    This function filter only same domain when browser was redirected other site.
+        - packets:      list (req, res packet)
+        - target_url:   String
+
+        - return:       list (req, res packet)
+"""
+def filterDomain(packets, target_url):
+    target_domain = urlparse(target_url).netloc
+    result_packet = []
+
+    for packet in packets:
+        if packet["request"]["headers"]["host"] == target_domain:
+            result_packet.append(packet)
+    
+    return result_packet
 
 def writeFile(data):
     f = open("test.json", "w")

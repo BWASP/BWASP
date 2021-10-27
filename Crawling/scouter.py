@@ -4,18 +4,21 @@ from urllib.parse import urlparse, urlunparse
 from Crawling import analyst
 from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
 
+start_options = {
+    "check" : True,
+    "input_url" : "",
+    "visited_links" : []
+}
+
 def start(url, depth, options):
     driver = initSelenium()
-    start_options = {
-        "check" : True,
-        "input_url" : "",
-        "visited_links" : []
-    }
-    visit(driver, url, depth, options, start_options)
+    visit(driver, url, depth, options)
     driver.quit()
 
-def visit(driver, url, depth, options, start_options):
-    print("check: {}, input_url: {}, visited_links: {}".format(start_options["check"], start_options["input_url"], len(start_options["visited_links"])))
+def visit(driver, url, depth, options):
+    global start_options
+    global check
+
     try:
         driver.get(url)
         alert = driver.switch_to_alert()
@@ -32,32 +35,31 @@ def visit(driver, url, depth, options, start_options):
             target_port = get_ports.getPortsOnline(start_options["input_url"])
             db.insertPorts(target_port, start_options["input_url"])
 
-    # TODO
-    # 다른 사이트로 redirect 되었을 때, 추가적으로 same 도메인 인지를 검증하는 코드가 필요함.
-    # 첫 패킷에 google 관련 패킷 지우기
-    req_res_packets = packet_capture.start(driver)
-    cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
-    cur_page_links += get_res_links.start(driver.current_url, req_res_packets, driver.page_source)
-    cur_page_links = list(set(deleteFragment(cur_page_links)))
-    
-    cookie_result = get_cookies.start(driver.current_url, req_res_packets)
-    domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
-
     if "CSPEvaluate" in options["tool"]["optionalJobs"]:
         csp_result = csp_evaluator.start(driver.current_url)
         db.insertCSP(csp_result)
 
-    # TODO
-    # 찾은 정보의 Icon 제공
-    analyst_result = analyst.start(start_options["input_url"], req_res_packets, cur_page_links, driver, options['info'])
+    req_res_packets = packet_capture.start(driver)
 
+    # 다른 사이트로 Redirect 되었는지 검증.
+    if not func.isSameDomain(driver.current_url, start_options["input_url"]):
+        req_res_packets = packet_capture.filterDomain(req_res_packets, start_options["input_url"])
+        cur_page_links = list()
+    else:
+        cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
+        cur_page_links += get_res_links.start(driver.current_url, req_res_packets, driver.page_source)
+        cur_page_links = list(set(deleteFragment(cur_page_links)))
+        # domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
+    cookie_result = get_cookies.start(driver.current_url, req_res_packets)
+    
+    analyst_result = analyst.start(start_options["input_url"], req_res_packets, cur_page_links, driver, options['info'])
     req_res_packets = deleteCssBody(req_res_packets)
 
     previous_packet_count = db.getPacketsCount()
     db.insertPackets(req_res_packets)
     db.insertDomains(req_res_packets, cookie_result, previous_packet_count, driver.current_url)
     db.insertWebInfo(analyst_result, start_options["input_url"], previous_packet_count)
-    # Here DB code 
+    # Here DB code
 
     if depth == 0:
         return
@@ -73,10 +75,9 @@ def visit(driver, url, depth, options, start_options):
             continue
 
         # TODO
-        # target 외에 다른 사이트로 redirect 될때, 검증하는 코드 작성 필요
-        # 무한 크롤링
+        # 무한 크롤링 해결 해야 함.
         start_options["visited_links"].append(visit_url)
-        visit(driver, visit_url, depth - 1, options, start_options)
+        visit(driver, visit_url, depth - 1, options)
 
 def deleteFragment(links):
     for i in range(len(links)):
