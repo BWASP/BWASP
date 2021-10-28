@@ -80,9 +80,7 @@ def retnumTostr(detect_list):
         return dict() 
     sorted_list = sorted(detect_list.items())
     unzipped_list = [dict_key for dict_key, dict_value in sorted_list],[dict_value for dict_key, dict_value in sorted_list]
-    print("!!!!why",detect_list)
     for i, cat in enumerate(unzipped_list[0]):
-        #print(cat, unzipped_list[0])
         unzipped_list[0][i]=cat_meta[str(cat)]["name"] 
     return dict(zip(unzipped_list[0],unzipped_list[1]))
 
