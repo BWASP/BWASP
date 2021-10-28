@@ -3,11 +3,9 @@ import os
 import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-from selenium import webdriver
 from Crawling.feature import func
 
 # Main Function
-#dom 에서 driver 사용 예정
 
 
 def loadCategory_meta():
@@ -36,7 +34,7 @@ def loadCategory(category):
     return return_data
 
 
-def start(url, cur_page_links, req_res_packets, driver, options):
+def start(url, cur_page_links, req_res_packets,options):
     category =  list(range(1,96))
     global data
     data = loadCategory(category)
@@ -44,13 +42,14 @@ def start(url, cur_page_links, req_res_packets, driver, options):
     cat_meta=loadCategory_meta()
     detect_list = {}
 
+
+    #TO DO 이미 찾은 패킷은 더 이상 진행 x  , detect 들 append 호출 했을 때 리턴값으로 구분 하면 가능  
     for i, packet in enumerate(req_res_packets):
         for app in data:
             cats = data[app]['cats']
             for option in options:
                 if option['name'] == app:
                     appendResult(detect_list,cats,app,"option",option['version'],0,0)
-                    continue
             # Including external domain as well as including same domain
             if not func.isSameDomain(url, packet["request"]["full_url"]):
                 if "scripts" in list(data[app].keys()):
@@ -58,21 +57,34 @@ def start(url, cur_page_links, req_res_packets, driver, options):
                 if "website" in list(data[app].keys()):
                     detectWebsite(detect_list, cur_page_links, data, cats, app)
             else:
+                if i == 1: # 좋은 한정 범위 있다면 수정 ,현재 페이지 소스
+                    if "html" in list(data[app].keys()):
+                        detectHtml(detect_list, packet, data, 1, cats, app)
+                    if "meta" in list(data[app].keys()):
+                        detectMeta(detect_list, packet, data, 1, cats, app)
+                    if "dom" in list(data[app].keys()):
+                        detectDom(detect_list, packet, data, cats, app)
+
                 if "url" in list(data[app].keys()):
                     detectUrl(detect_list, cur_page_links, data, cats, app)
                 if "headers" in list(data[app].keys()):
                     detectHeaders(detect_list, packet, data, i, cats, app)
-                if "html" in list(data[app].keys()):
-                    detectHtml(detect_list, packet, data, i, cats, app)
+
                 if "cookies" in list(data[app].keys()):
                     detectCookies(detect_list, packet, data, i, cats, app)
-                if "meta" in list(data[app].keys()):
-                    detectMeta(detect_list, packet, data, i, cats, app)
-                # if "dom" in list(data[app].keys()):
-                #     result = detectDom(data, driver, i, app)
-                #     detect_list = resultFunc(detect_list, app, result)
-#반환전 숫자 정렬 , 글자로 바꾸기 
-    return detect_list
+
+    return retnumTostr(detect_list)
+
+def retnumTostr(detect_list):
+    if not detect_list:
+        return dict() 
+    sorted_list = sorted(detect_list.items())
+    unzipped_list = [dict_key for dict_key, dict_value in sorted_list],[dict_value for dict_key, dict_value in sorted_list]
+    print("!!!!why",detect_list)
+    for i, cat in enumerate(unzipped_list[0]):
+        #print(cat, unzipped_list[0])
+        unzipped_list[0][i]=cat_meta[str(cat)]["name"] 
+    return dict(zip(unzipped_list[0],unzipped_list[1]))
 
 def retCatrepresnt(cats):
     if len(cats) == 1:
@@ -80,9 +92,9 @@ def retCatrepresnt(cats):
     cats = sorted(cats)
     max_priority=-1
     for eachcat in cats:
-        #if cat_meta[str(eachcat)]['priority'] > max_priority:
-        max_priority = cat_meta[str(eachcat)]['priority']
-        cat_represent = eachcat
+        if cat_meta[str(eachcat)]['priority'] > max_priority:
+            max_priority = cat_meta[str(eachcat)]['priority']
+            cat_represent = eachcat
     
     return cat_represent
 
@@ -171,13 +183,10 @@ def detectHtml(detect_list, packet, data, index, cats, app):
                 appendResult(detect_list,cats,app,"html",version,0,index)
                 appendImplies(detect_list,app,0,index)
                 
-    
-    
 
 def detectCookies(detect_list, packet, data, index, cats, app):
     cookies = dict()
-    #fale? 쿠키에는 version 없는지 확인
-    # cookie에서 버전있는 경우는 한가지
+    # cookie에서 버전있는 경우는 한가지 CodeIgniter , ci_csrf_token
     version = "false"
     if "cookie" not in list(packet["request"]["headers"].keys()):
         return
@@ -190,7 +199,7 @@ def detectCookies(detect_list, packet, data, index, cats, app):
             #result = {"detect":["cookies"], "version":"False", "request":[index], "response":[], "url":[]}
 
 def detectUrl(detect_list, cur_page_links, data, cats, app):
-    #version false 이유
+    #version false 이유 : url은 \\;version 없음
     version ="false"
     for url in cur_page_links:
         if type(data[app]["url"]) == str:
@@ -262,7 +271,7 @@ def detectMeta(detect_list, packet, data, index, cats, app):
         try:
             pattern = re.compile(meta_regex.split('\\;')[0])
         except: 
-            pattern = "vmkwdlwkw"
+            pattern = "DonotD!ete!ct"
         meta_tag = html.find("meta", {"name":data[app]["meta"].keys()})
         if meta_tag and meta_tag.has_attr("content"):
             regex_result = pattern.search(meta_tag['content'])
@@ -271,49 +280,70 @@ def detectMeta(detect_list, packet, data, index, cats, app):
                 appendResult(detect_list,cats,app,"meta",version,0,index)
                 appendImplies(detect_list,app,0,index)
 
-'''
-def detectMeta(detect_list, packet, data, index, cats, app):
-    if "meta" in data[app].keys():
-        html = BeautifulSoup(packet["response"]["body"], features="html.parser")
-        metas = html.select('meta[name][content]')
-        for meta_line in metas:             
-            for comp_metakey in data[app]["meta"]:
-                if meta_line['name'] != comp_metakey:
-                    continue
-                if type(data[app]["meta"][comp_metakey]) is list:
-                    print("list type!!",data[app]["meta"][comp_metakey])
-                    for comp_metakey in data[app]["meta"][comp_metakey]:
-                        regex=comp_metakey
-                        pattern = comp_metakey.split('\\;')[0]
-                        regex_results=re.findall(pattern,meta_line["content"],re.I)
-                        #현재 페이지는 response 패킷 1으로 침 
-                        if(regex_results):
-                            version = detectVersion(regex, regex_results)
-                            appendResult(detect_list,cats,app,"meta",version,0,index)
-                            appendImplies(detect_list,app,0,index)
-                    else:
-                        regex=data[app]["meta"][comp_metakey]
-                        pattern = data[app]["meta"][comp_metakey].split('\\;')[0]
-                        regex_results=re.findall(pattern,meta_line["content"],re.I)
-                    #현재 페이지는 response 패킷 1으로 침 
-                    if regex_results :
-                        version = detectVersion(regex, regex_results)
-                        appendResult(detect_list,cats,app,"meta",version,0,index)
-                        appendImplies(detect_list,app,0,index)
-'''
-'''
-def detectVersion(full_regex, detected_info):
-    if "\\;version:\\" not in full_regex:
-        return "False"
-                
-    version_pattern = re.compile('(\\d+(\\.)?)+')
-    version_info = version_pattern.search(detected_info)
-    
-    if version_info:
-        return version_info.group()
-    else:
-        return "False"
-'''
+def detectDom(detect_list, packet, data, cats, app):
+     if "dom" in data[app].keys():
+            if type(data[app]["dom"]) is dict: #dict 인지 확인
+                for key_name in list(data[app]["dom"].keys()):
+                    html = BeautifulSoup(packet["response"]["body"], features="html.parser")
+                    temps = html.select(key_name)
+                    if(temps):
+                        for subkey_name in list(data[app]["dom"][key_name].keys()):
+                            if subkey_name == "attributes" or subkey_name == "properties":
+                                    for temp in temps:
+                                        if subkey_name in temp.attrs:
+                                            regex = data[app]["dom"][key_name][subkey_name]
+                                            regex_results=re.match(regex.split('\\;')[0],temp[subkey_name],re.I)
+                                            if regex_results:
+                                                version=detectVersion(regex, regex_results)
+                                                appendResult(detect_list,cats,app,"dom",version,0,1)
+                                                appendImplies(detect_list,app,0,1)                      
+                            if subkey_name == "text":
+                                regex = data[app]["dom"][key_name]["text"]
+                                pattern = data[app]["dom"][key_name]["text"].split('\\;')[0]
+                                for temp in temps:
+                                    try:
+                                        regex_results=re.match(pattern,temp.getText(),re.I)
+                                    except:
+                                        pattern=pattern.replace("\w-","-\w")
+                                        regex_results=re.match(pattern,temp.getText(),re.I)
+
+                                    if regex_results:
+                                        version=detectVersion(regex,regex_results)
+                                        appendResult(detect_list,app,"dom",version,0,1)
+                                        appendImplies(detect_list,app,0,1)  
+                                    #match 값 존재하면 넣기
+
+                            if subkey_name == "exists":
+                                appendResult(detect_list,app,"dom","false",0,1)
+                                appendImplies(detect_list,app,0,1)
+
+                            if subkey_name == "src":
+                                for temp in temps:
+                                    if "src" in temp.attrs:
+                                        regex=data[app]["dom"][key_name]["src"]
+                                        regex_results=re.match(regex.split('\\;')[0],temp['src'],re.I)
+                                        if regex_results:
+                                            version=detectVersion(regex,regex_results)
+                                            appendResult(detect_list,cats,app,"dom",version,0,1)
+                                            appendImplies(detect_list,app,0,1)
+                            #if key_name == "properties" 아직 구현 x, 2가지만 해당됨
+                            # 일단은 properties는 name과 같은 느낌이라 생각 , attrs로 존재 여무 확인
+                            # 아직은 dict 구조지만 값은 비교안함 
+
+                #dictionary 형태가 아니라 단일 값으로 존재할 때
+
+            elif type(data[app]["dom"]) is list:
+                html = BeautifulSoup(packet["response"]["body"], features="html.parser")
+                for line_list in data[app]["dom"]:
+                    if html.select(line_list):
+                        appendResult(detect_list,cats,app,"dom","false",0,1)
+                        appendImplies(detect_list,app,0,1)
+
+            elif type(data[app]["dom"]) is str:
+                html = BeautifulSoup(packet["response"]["body"], features="html.parser")
+                if html.select(data[app]["dom"]):
+                    appendResult(detect_list,cats,app,"dom","false",0,1)
+                    appendImplies(detect_list,app,0,1)
 
 def detectVersion(regex,regex_results,type="search"):
     version=""
@@ -355,13 +385,3 @@ def detectVersion(regex,regex_results,type="search"):
     if not version:
         version="false"
     return version  
-    
-
-
-
-
-# Detecting Dom is not solved yet
-def detectDom(data, driver, index, app):
-    if driver.execute_script(str(data[app]["dom"])):
-        result = {"detect":["dom"], "version":"False", "request":[], "response":[index], "url":[]}
-        return result
