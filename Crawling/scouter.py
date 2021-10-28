@@ -61,6 +61,7 @@ def visit(driver, url, depth, options):
     db.insertPackets(req_res_packets)
     db.insertDomains(req_res_packets, cookie_result, previous_packet_count, driver.current_url)
     db.insertWebInfo(analyst_result, input_url, previous_packet_count)
+    db.insertAttackVector(input_url)
     # Here DB code 
 
     if depth == 0:

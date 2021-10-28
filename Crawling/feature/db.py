@@ -4,6 +4,7 @@ import json
 import datetime
 from urllib.parse import urlparse,urlunparse
 from bs4 import BeautifulSoup
+import requests
 
 from sqlalchemy.orm import relation
 
@@ -175,6 +176,46 @@ def insertWebInfo(analyst_result, target_url, previous_packet_count):
         query = db.update(db_table).where(db_table.columns.url == target_url).values(data = json.dumps(analyst_result))
         result = db_connect.execute(query)
         result.close()
+
+def insertAttackVector(target_url):
+    r = requests.get(target_url)
+    dict_data = r.headers
+    infor_data = ""
+    infor_vector = ""
+    http_method = requests.options(target_url)
+    try:
+        http_method = http_method.headers['Allow']
+    except:
+        http_method = "http method private data :("
+
+    try:
+        tmp_data = dict_data['Set-Cookie']
+        i = len(tmp_data.split())
+        if "HttpOnly" in tmp_data:
+            for j in range(0, i):
+                infor_data += tmp_data.split()[j] + "\n"
+        elif "Secure" in tmp_data:
+            for j in range(0, i):
+                infor_data += tmp_data.split()[j] + "\n"
+        else:
+            infor_data = tmp_data
+            infor_vector += "Not_HttpOnly\n"
+
+    except:
+        infor_vector += "Not_HttpOnly\n"
+
+    try:
+        tmp_data = dict_data['X-Frame-Options']
+        i = len(tmp_data.split())
+        for j in range(0, i):
+            infor_data += tmp_data.split()[j] + "\n"
+
+    except:
+        infor_vector += "Not_X-Frame-Options\n"
+
+    print("Check Server Information Attack Vector")
+    print(http_method)
+    print(infor_vector)
 
 # 한번 방문할 때마다 실행되기 때문에 느릴거 같음.
 def getPacketsCount():
