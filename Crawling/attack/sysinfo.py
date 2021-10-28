@@ -42,7 +42,6 @@ def start(url, cur_page_links, req_res_packets,options):
     cat_meta=loadCategory_meta()
     detect_list = {}
 
-
     #TO DO 이미 찾은 패킷은 더 이상 진행 x  , detect 들 append 호출 했을 때 리턴값으로 구분 하면 가능  
     for i, packet in enumerate(req_res_packets):
         for app in data:
@@ -50,6 +49,12 @@ def start(url, cur_page_links, req_res_packets,options):
             for option in options:
                 if option['name'] == app:
                     appendResult(detect_list,cats,app,"option",option['version'],0,0)
+                    continue
+            # 이미 탐지한 app일 때
+            if str(cats) in detect_list and app in detect_list[cats]:
+                # version 까지 획득했다면 더 이상 조회 x 
+                    if "version" in detect_list[cats][app]["version"] != "false":
+                        continue
             # Including external domain as well as including same domain
             if not func.isSameDomain(url, packet["request"]["full_url"]):
                 if "scripts" in list(data[app].keys()):
@@ -179,8 +184,7 @@ def detectHtml(detect_list, packet, data, index, cats, app):
             if regex_result:
                 version = detectVersion(regex, regex_result)
                 appendResult(detect_list,cats,app,"html",version,0,index)
-                appendImplies(detect_list,app,0,index)
-                
+                appendImplies(detect_list,app,0,index)             
 
 def detectCookies(detect_list, packet, data, index, cats, app):
     cookies = dict()
@@ -220,7 +224,6 @@ def detectUrl(detect_list, cur_page_links, data, cats, app):
                     appendResult(detect_list,cats,app,"url",version,0,1,url)
                     appendImplies(detect_list,app,0,1)
                     return
-    
 
 def detectScripts(detect_list, cur_page_links, data, cats, app):
     for url in cur_page_links:
@@ -242,7 +245,6 @@ def detectScripts(detect_list, cur_page_links, data, cats, app):
                     appendResult(detect_list,cats,app,"scripts",version,0,1,url)
                     appendImplies(detect_list,app,0,1)
                     return
-    
 
 def detectWebsite(detect_list, cur_page_links, data, cats, app):
     version="false"
@@ -279,69 +281,69 @@ def detectMeta(detect_list, packet, data, index, cats, app):
                 appendImplies(detect_list,app,0,index)
 
 def detectDom(detect_list, packet, data, cats, app):
-     if "dom" in data[app].keys():
-            if type(data[app]["dom"]) is dict: #dict 인지 확인
-                for key_name in list(data[app]["dom"].keys()):
-                    html = BeautifulSoup(packet["response"]["body"], features="html.parser")
-                    temps = html.select(key_name)
-                    if(temps):
-                        for subkey_name in list(data[app]["dom"][key_name].keys()):
-                            if subkey_name == "attributes" or subkey_name == "properties":
-                                    for temp in temps:
-                                        if subkey_name in temp.attrs:
-                                            regex = data[app]["dom"][key_name][subkey_name]
-                                            regex_results=re.match(regex.split('\\;')[0],temp[subkey_name],re.I)
-                                            if regex_results:
-                                                version=detectVersion(regex, regex_results)
-                                                appendResult(detect_list,cats,app,"dom",version,0,1)
-                                                appendImplies(detect_list,app,0,1)                      
-                            if subkey_name == "text":
-                                regex = data[app]["dom"][key_name]["text"]
-                                pattern = data[app]["dom"][key_name]["text"].split('\\;')[0]
+    if "dom" in data[app].keys():
+        if type(data[app]["dom"]) is dict: #dict 인지 확인
+            for key_name in list(data[app]["dom"].keys()):
+                html = BeautifulSoup(packet["response"]["body"], features="html.parser")
+                temps = html.select(key_name)
+                if(temps):
+                    for subkey_name in list(data[app]["dom"][key_name].keys()):
+                        if subkey_name == "attributes" or subkey_name == "properties":
                                 for temp in temps:
-                                    try:
-                                        regex_results=re.match(pattern,temp.getText(),re.I)
-                                    except:
-                                        pattern=pattern.replace("\w-","-\w")
-                                        regex_results=re.match(pattern,temp.getText(),re.I)
+                                    if subkey_name in temp.attrs:
+                                        regex = data[app]["dom"][key_name][subkey_name]
+                                        regex_results=re.match(regex.split('\\;')[0],temp[subkey_name],re.I)
+                                        if regex_results:
+                                            version=detectVersion(regex, regex_results)
+                                            appendResult(detect_list,cats,app,"dom",version,0,1)
+                                            appendImplies(detect_list,app,0,1)                      
+                        if subkey_name == "text":
+                            regex = data[app]["dom"][key_name]["text"]
+                            pattern = data[app]["dom"][key_name]["text"].split('\\;')[0]
+                            for temp in temps:
+                                try:
+                                    regex_results=re.match(pattern,temp.getText(),re.I)
+                                except:
+                                    pattern=pattern.replace("\w-","-\w")
+                                    regex_results=re.match(pattern,temp.getText(),re.I)
 
+                                if regex_results:
+                                    version=detectVersion(regex,regex_results)
+                                    appendResult(detect_list,app,"dom",version,0,1)
+                                    appendImplies(detect_list,app,0,1)  
+                                #match 값 존재하면 넣기
+
+                        if subkey_name == "exists":
+                            appendResult(detect_list,app,"dom","false",0,1)
+                            appendImplies(detect_list,app,0,1)
+
+                        if subkey_name == "src":
+                            for temp in temps:
+                                if "src" in temp.attrs:
+                                    regex=data[app]["dom"][key_name]["src"]
+                                    regex_results=re.match(regex.split('\\;')[0],temp['src'],re.I)
                                     if regex_results:
                                         version=detectVersion(regex,regex_results)
-                                        appendResult(detect_list,app,"dom",version,0,1)
-                                        appendImplies(detect_list,app,0,1)  
-                                    #match 값 존재하면 넣기
+                                        appendResult(detect_list,cats,app,"dom",version,0,1)
+                                        appendImplies(detect_list,app,0,1)
+                        #if key_name == "properties" 아직 구현 x, 2가지만 해당됨
+                        # 일단은 properties는 name과 같은 느낌이라 생각 , attrs로 존재 여무 확인
+                        # 아직은 dict 구조지만 값은 비교안함 
 
-                            if subkey_name == "exists":
-                                appendResult(detect_list,app,"dom","false",0,1)
-                                appendImplies(detect_list,app,0,1)
+            #dictionary 형태가 아니라 단일 값으로 존재할 때
 
-                            if subkey_name == "src":
-                                for temp in temps:
-                                    if "src" in temp.attrs:
-                                        regex=data[app]["dom"][key_name]["src"]
-                                        regex_results=re.match(regex.split('\\;')[0],temp['src'],re.I)
-                                        if regex_results:
-                                            version=detectVersion(regex,regex_results)
-                                            appendResult(detect_list,cats,app,"dom",version,0,1)
-                                            appendImplies(detect_list,app,0,1)
-                            #if key_name == "properties" 아직 구현 x, 2가지만 해당됨
-                            # 일단은 properties는 name과 같은 느낌이라 생각 , attrs로 존재 여무 확인
-                            # 아직은 dict 구조지만 값은 비교안함 
-
-                #dictionary 형태가 아니라 단일 값으로 존재할 때
-
-            elif type(data[app]["dom"]) is list:
-                html = BeautifulSoup(packet["response"]["body"], features="html.parser")
-                for line_list in data[app]["dom"]:
-                    if html.select(line_list):
-                        appendResult(detect_list,cats,app,"dom","false",0,1)
-                        appendImplies(detect_list,app,0,1)
-
-            elif type(data[app]["dom"]) is str:
-                html = BeautifulSoup(packet["response"]["body"], features="html.parser")
-                if html.select(data[app]["dom"]):
+        elif type(data[app]["dom"]) is list:
+            html = BeautifulSoup(packet["response"]["body"], features="html.parser")
+            for line_list in data[app]["dom"]:
+                if html.select(line_list):
                     appendResult(detect_list,cats,app,"dom","false",0,1)
                     appendImplies(detect_list,app,0,1)
+
+        elif type(data[app]["dom"]) is str:
+            html = BeautifulSoup(packet["response"]["body"], features="html.parser")
+            if html.select(data[app]["dom"]):
+                appendResult(detect_list,cats,app,"dom","false",0,1)
+                appendImplies(detect_list,app,0,1)
 
 def detectVersion(regex,regex_results,type="search"):
     version=""
