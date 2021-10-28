@@ -8,53 +8,7 @@ from Crawling.feature import func
 
 # Main Function
 #dom 에서 driver 사용 예정
-cat_meta = {}
-def start(url, cur_page_links, req_res_packets, driver, options):
-    category =  list(range(1,96))
-    data = loadCategory(category)
-    cat_meta=loadCategory_meta()
-    detect_list = {}
 
-    for i, packet in enumerate(req_res_packets):
-        for app in data:
-            for option in options:
-                if option['name'] == app:
-
-                    appendResult(detect_list,cats,app,"option",option['version'],request_index=0,response_index=0)
-                    continue
-            # cats 추가
-            cats = data[app]['cats']    
-            # Including external domain as well as including same domain
-            if not func.isSameDomain(url, packet["request"]["full_url"]):
-                if "scripts" in list(data[app].keys()):
-                    detectScripts(detect_list, cur_page_links, data, cats, app)
-                if "website" in list(data[app].keys()):
-                    detectWebsite(detect_list, cur_page_links, data, cats, app)
-            else:
-                if "url" in list(data[app].keys()):
-                    detectUrl(detect_list, cur_page_links, data, cats, app)
-                if "headers" in list(data[app].keys()):
-                    detectHeaders(detect_list, packet, data, i, cats, app)
-                if "html" in list(data[app].keys()):
-                    detectHtml(detect_list, packet, data, i, cats, app)
-                if "cookies" in list(data[app].keys()):
-                    detectCookies(detect_list, packet, data, i, cats, app)
-                #if "meta" in list(data[app].keys()):
-                #    detectMeta(detect_list, packet, data, i, cats, app)
-                # if "dom" in list(data[app].keys()):
-                #     result = detectDom(data, driver, i, app)
-                #     detect_list = resultFunc(detect_list, app, result)
-    
-    for option in options:
-        detect_list[option['name']] = {
-            "detect" : [],
-            "version" : option['version'],
-            "request" : [],
-            "response" : [],
-            "url" : []
-        }
-
-    return detect_list
 
 def loadCategory_meta():
     file = "./Crawling/wappalyzer/categories.json"    
@@ -82,15 +36,62 @@ def loadCategory(category):
     return return_data
 
 
+def start(url, cur_page_links, req_res_packets, driver, options):
+    category =  list(range(1,96))
+    data = loadCategory(category)
+    global cat_meta
+    cat_meta=loadCategory_meta()
+    detect_list = {}
+
+    for i, packet in enumerate(req_res_packets):
+        for app in data:
+            cats = data[app]['cats']
+            for option in options:
+                if option['name'] == app:
+                    appendResult(detect_list,cats,app,"option",option['version'],request_index=0,response_index=0)
+                    continue
+            # Including external domain as well as including same domain
+            if not func.isSameDomain(url, packet["request"]["full_url"]):
+                if "scripts" in list(data[app].keys()):
+                    detectScripts(detect_list, cur_page_links, data, cats, app)
+                if "website" in list(data[app].keys()):
+                    detectWebsite(detect_list, cur_page_links, data, cats, app)
+            else:
+                if "url" in list(data[app].keys()):
+                    detectUrl(detect_list, cur_page_links, data, cats, app)
+                if "headers" in list(data[app].keys()):
+                    detectHeaders(detect_list, packet, data, i, cats, app)
+                if "html" in list(data[app].keys()):
+                    detectHtml(detect_list, packet, data, i, cats, app)
+                if "cookies" in list(data[app].keys()):
+                    detectCookies(detect_list, packet, data, i, cats, app)
+                if "meta" in list(data[app].keys()):
+                    detectMeta(detect_list, packet, data, i, cats, app)
+                # if "dom" in list(data[app].keys()):
+                #     result = detectDom(data, driver, i, app)
+                #     detect_list = resultFunc(detect_list, app, result)
+    
+    for option in options:
+        detect_list[option['name']] = {
+            "detect" : [],
+            "version" : option['version'],
+            "request" : [],
+            "response" : [],
+            "url" : []
+        }
+
+    return detect_list
+
 def retCatrepresnt(cats):
     if len(cats) == 1:
         return cats[0]
     cats = sorted(cats)
     max_priority=-1
     for eachcat in cats:
-        if cat_meta[str(eachcat)]['priority'] >  max_priority:
-            max_priority = cat_meta[str(eachcat)]['priority']
-            cat_represent = eachcat
+        #if cat_meta[str(eachcat)]['priority'] > max_priority:
+        max_priority = cat_meta[str(eachcat)]['priority']
+        cat_represent = eachcat
+    
     return cat_represent
 
 
@@ -230,20 +231,23 @@ def detectWebsite(detect_list, cur_page_links, data, cats, app):
                     appendResult(detect_list,cats,app,"website",version,0,1,url)
                     return
 
-'''def detectMeta(detect_list, packet, data, index, cats, app):
+def detectMeta(detect_list, packet, data, index, cats, app):
     version="false"
     html = BeautifulSoup(packet["response"]["body"], features="html.parser")
     for meta_regex in data[app]["meta"].values():
-        pattern = re.compile(meta_regex.split('\\;')[0])
+        print(meta_regex)
+        try:
+            pattern = re.compile(meta_regex.split('\\;')[0])
+        except: 
+            pattern = "vmkwdlwkw"
         meta_tag = html.find("meta", {"name":data[app]["meta"].keys()})
         if meta_tag and meta_tag.has_attr("content"):
             regex_result = pattern.search(meta_tag['content'])
             if regex_result:
                 version = detectVersion(meta_regex, str(meta_tag))
                 appendResult(detect_list,cats,app,"meta",version,0,index)
+
 '''
-
-
 def detectMeta(detect_list, packet, data, index, cats, app):
     if "meta" in data[app].keys():
         html = BeautifulSoup(packet["response"]["body"], features="html.parser")
@@ -253,7 +257,7 @@ def detectMeta(detect_list, packet, data, index, cats, app):
                 if meta_line['name'] != comp_metakey:
                     continue
                 if type(data[app]["meta"][comp_metakey]) is list:
-                    print(data[app]["meta"][comp_metakey])
+                    print("list type!!",data[app]["meta"][comp_metakey])
                     for comp_metakey in data[app]["meta"][comp_metakey]:
                         pattern = comp_metakey.split('\\;')[0]
                         regex_results=re.findall(pattern,meta_line["content"],re.I)
@@ -261,14 +265,14 @@ def detectMeta(detect_list, packet, data, index, cats, app):
                         if(regex_results):
                             version = detectVersion(comp_metakey, meta_line["content"])
                             appendResult(detect_list,cats,app,"meta",version,0,index)
-                else:
-                    pattern = data[app]["meta"][comp_metakey].split('\\;')[0]
-                    regex_results=re.findall(pattern,meta_line["content"],re.I)
+                    else:
+                        pattern = data[app]["meta"][comp_metakey].split('\\;')[0]
+                        regex_results=re.findall(pattern,meta_line["content"],re.I)
                     #현재 페이지는 response 패킷 1으로 침 
                     if(regex_results):
                         version = detectVersion(data[app]["meta"][comp_metakey], meta_line["content"])
                         appendResult(detect_list,cats,app,"meta",version,0,index)
-
+'''
 def detectVersion(full_regex, detected_info):
     if "\\;version:\\" not in full_regex:
         return "False"
@@ -279,7 +283,6 @@ def detectVersion(full_regex, detected_info):
     if version_info:
         return version_info.group()
     else:
-        print("version info is not found")
         return "False"
     
 
