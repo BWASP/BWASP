@@ -38,6 +38,7 @@ def loadCategory(category):
 
 def start(url, cur_page_links, req_res_packets, driver, options):
     category =  list(range(1,96))
+    global data
     data = loadCategory(category)
     global cat_meta
     cat_meta=loadCategory_meta()
@@ -110,20 +111,43 @@ def initResult(detect_list,cats,name):
 
 
 # requset_index , reseponse_index 가 0 이면 관련있는 index가 없다는 걸 의미
-def appendResult(detect_list,cats,name,detectype,version,request_index=0,response_index=0,url=""):
+
+def appendResult(detect_list,cats,app,detectype,version,request_index=0,response_index=0,url=""):
 
     cats = retCatrepresnt(cats) 
-    initResult(detect_list,cats,name)
-    if detectype and detectype not in detect_list[cats][name]["detect"]:
-        detect_list[cats][name]["detect"].append(detectype)
-    if version != "false" and detect_list[cats][name]["version"] == "false":
-        detect_list[cats][name]["version"]=version
-    if request_index and request_index not in detect_list[cats][name]["request"]:
-        detect_list[cats][name]["request"].append(request_index)
-    if response_index and response_index not in detect_list[cats][name]["response"]:
-        detect_list[cats][name]["response"].append(response_index)
-    if url and url not in detect_list[cats][name]["url"]:
-        detect_list[cats][name]["url"].append(url)
+    initResult(detect_list,cats,app)
+    if detectype and detectype not in detect_list[cats][app]["detect"]:
+        detect_list[cats][app]["detect"].append(detectype)
+    if version != "false" and detect_list[cats][app]["version"] == "false":
+        detect_list[cats][app]["version"]=version
+    if request_index and request_index not in detect_list[cats][app]["request"]:
+        detect_list[cats][app]["request"].append(request_index)
+    if response_index and response_index not in detect_list[cats][app]["response"]:
+        detect_list[cats][app]["response"].append(response_index)
+    if url and url not in detect_list[cats][app]["url"]:
+        detect_list[cats][app]["url"].append(url)
+
+
+# detect_list , app(이름) , request 패킷번호 ,response 패킷 번호 
+def  appendImplies(detect_list,app,request_index=0,response_index=0,url=""):
+    if "implies" in data.keys():
+        implies_list=data[app]["implies"]
+
+        if type(implies_list) is str:
+            implies_split=implies_list.split('\\;')
+            implies_list=implies_split[0]
+            cats = data[implies_list]["cats"]
+            appendResult(detect_list,data[implies_list]["cats"],app,"implies","false",request_index,response_index)
+        else:
+            for implies_line in	implies_list:
+                implies_split=implies_line.split('\\;')
+                implies_line=implies_split[0]
+                appendResult(detect_list,data[implies_list]["cats"],app,"implies","false",request_index,response_index)
+
+
+def appendResults(detect_list,cats,app,detectype,version,request_index=0,response_index=0,url=""):
+    appendResult(detect_list,cats,app,detectype,version,request_index=0,response_index=0,url="")
+    appendImplies(detect_list,app,request_index,response_index)
 
 
 
@@ -139,7 +163,7 @@ def detectHeaders(detect_list,packet, data, index, cats, app):
 
         if regex_result:
             version = detectVersion(regex, packet["response"]["headers"][header.lower()])
-            appendResult(detect_list,cats,app,"headers",version,0,index)
+            appendResults(detect_list,cats,app,"headers",version,0,index)
 
 def detectHtml(detect_list, packet, data, index, cats, app):
     if type(data[app]["html"]) == str:
@@ -147,14 +171,14 @@ def detectHtml(detect_list, packet, data, index, cats, app):
         regex_result = pattern.search(packet["response"]["body"])
         if regex_result:
             version = detectVersion(data[app]["html"], regex_result.group())
-            appendResult(detect_list,cats,app,"html",version,0,index)
+            appendResults(detect_list,cats,app,"html",version,0,index)
     else:
         for regex in data[app]["html"]:
             pattern = re.compile(regex.split("\\;")[0])
             regex_result = pattern.search(packet["response"]["body"])
             if regex_result:
                 version = detectVersion(regex, regex_result.group())
-                appendResult(detect_list,cats,app,"html",version,0,index)
+                appendResults(detect_list,cats,app,"html",version,0,index)
                 
     
     
@@ -170,7 +194,7 @@ def detectCookies(detect_list, packet, data, index, cats, app):
         cookies[i.split('=')[0]] = i.split('=')[1]
     for cookie in data[app]["cookies"]:
         if cookie in cookies.keys():
-            appendResult(detect_list,cats,app,"cookies",version,index,0)
+            appendResults(detect_list,cats,app,"cookies",version,index,0)
             #result = {"detect":["cookies"], "version":"False", "request":[index], "response":[], "url":[]}
 
 def detectUrl(detect_list, cur_page_links, data, cats, app):
@@ -183,7 +207,7 @@ def detectUrl(detect_list, cur_page_links, data, cats, app):
             
             if regex_result:
                 version = detectVersion(data[app]["url"], url)
-                appendResult(detect_list,cats,app,"url",version,0,1,url)
+                appendResults(detect_list,cats,app,"url",version,0,1,url)
                 return
         else:
             for url_regex in data[app]["url"]:
@@ -192,7 +216,7 @@ def detectUrl(detect_list, cur_page_links, data, cats, app):
 
                 if regex_result:
                     version = detectVersion(url_regex, url)
-                    appendResult(detect_list,cats,app,"url",version,0,1,url)
+                    appendResults(detect_list,cats,app,"url",version,0,1,url)
                     return
     
 
@@ -203,7 +227,7 @@ def detectScripts(detect_list, cur_page_links, data, cats, app):
             regex_result = pattern.search(url)
             if regex_result:
                 version = detectVersion(data[app]["scripts"], url)
-                appendResult(detect_list,cats,app,"scripts",version,0,1,url)
+                appendResults(detect_list,cats,app,"scripts",version,0,1,url)
                 return
         else:
             for url_regex in data[app]["scripts"]:
@@ -211,7 +235,7 @@ def detectScripts(detect_list, cur_page_links, data, cats, app):
                 regex_result = pattern.search(url)
                 if regex_result:
                     version = detectVersion(url_regex, url)
-                    appendResult(detect_list,cats,app,"scripts",version,0,1,url)
+                    appendResults(detect_list,cats,app,"scripts",version,0,1,url)
                     return
     
 
@@ -222,13 +246,13 @@ def detectWebsite(detect_list, cur_page_links, data, cats, app):
         if type(data[app]["website"]) == str:
             if data[app]["website"] in url:
                 #1 => 현재 페이지
-                appendResult(detect_list,cats,app,"website",version,0,1,url)
+                appendResults(detect_list,cats,app,"website",version,0,1,url)
                 return
         else:
             for url_cond in data[app]["website"]:
                 if url_cond in url:
                      #1 => 현재 페이지
-                    appendResult(detect_list,cats,app,"website",version,0,1,url)
+                    appendResults(detect_list,cats,app,"website",version,0,1,url)
                     return
 
 def detectMeta(detect_list, packet, data, index, cats, app):
@@ -245,7 +269,7 @@ def detectMeta(detect_list, packet, data, index, cats, app):
             regex_result = pattern.search(meta_tag['content'])
             if regex_result:
                 version = detectVersion(meta_regex, str(meta_tag))
-                appendResult(detect_list,cats,app,"meta",version,0,index)
+                appendResults(detect_list,cats,app,"meta",version,0,index)
 
 '''
 def detectMeta(detect_list, packet, data, index, cats, app):
@@ -264,14 +288,14 @@ def detectMeta(detect_list, packet, data, index, cats, app):
                         #현재 페이지는 response 패킷 1으로 침 
                         if(regex_results):
                             version = detectVersion(comp_metakey, meta_line["content"])
-                            appendResult(detect_list,cats,app,"meta",version,0,index)
+                            appendResults(detect_list,cats,app,"meta",version,0,index)
                     else:
                         pattern = data[app]["meta"][comp_metakey].split('\\;')[0]
                         regex_results=re.findall(pattern,meta_line["content"],re.I)
                     #현재 페이지는 response 패킷 1으로 침 
                     if(regex_results):
                         version = detectVersion(data[app]["meta"][comp_metakey], meta_line["content"])
-                        appendResult(detect_list,cats,app,"meta",version,0,index)
+                        appendResults(detect_list,cats,app,"meta",version,0,index)
 '''
 def detectVersion(full_regex, detected_info):
     if "\\;version:\\" not in full_regex:
