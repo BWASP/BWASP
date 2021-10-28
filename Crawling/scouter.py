@@ -32,10 +32,11 @@ def visit(driver, url, depth, options):
         start_options["visited_links"].append(start_options["input_url"])
         start_options["check"] = False
 
-        # TODO
-        # 옵션 검증
         if "portScan" in options["tool"]["optionalJobs"]:
             target_port = get_ports.getPortsOnline(start_options["input_url"])
+            db.insertPorts(target_port, start_options["input_url"])
+        else:
+            target_port = get_ports.getPortsOffline(start_options["input_url"])
             db.insertPorts(target_port, start_options["input_url"])
 
     if "CSPEvaluate" in options["tool"]["optionalJobs"]:
