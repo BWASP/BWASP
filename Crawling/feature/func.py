@@ -50,16 +50,30 @@ def get_dbpath(repo_name="BWASP",prefix="sqlite:///",sub_path="Web\databases\BWA
 """
 def isExistExtension(url, key):
     extensions_dict = {
-        "image" : ["png", "gif", "jpg", "jpeg", "webp", "tiff", "bmp", "svg", "jpe", "jif", "jfif", "jfi"]
+        "image" : ["png", "gif", "jpg", "jpeg", "webp", "tiff", "bmp", "svg", "jpe", "jif", "jfif", "jfi", "ico"]
     }
 
     if not key in list(extensions_dict.keys()):
         return False
     
     extension_list = extensions_dict[key]
-    url_extension = url.split(".")[::-1][0]
+    parse_url = urlparse(url)
 
-    if url_extension in extension_list:
+    # Check only path
+    url_path_extension = parse_url.path.split(".")[::-1][0]
+    if url_path_extension in extension_list:
         return True
-    else:
-        return False
+    
+    # Check only query
+    url_query = parse_url.query.split("&")
+    for query in url_query:
+        value = query.split("=")
+
+        if len(value) == 2:
+            query_extension = value[1].split(".")[::-1][0]
+        else:
+            query_extension = value[0].split(".")[::-1][0]
+        if query_extension in extension_list:
+            return True
+
+    return False

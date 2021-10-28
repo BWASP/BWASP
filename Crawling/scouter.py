@@ -4,6 +4,8 @@ from urllib.parse import urlparse, urlunparse
 from Crawling import analyst
 from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
 
+# TODO
+# 사용자가 여러개의 사이트를 동시에 테스트 할 때, 전역 변수의 관리 문제
 start_options = {
     "check" : True,
     "input_url" : "",
@@ -30,6 +32,8 @@ def visit(driver, url, depth, options):
         start_options["visited_links"].append(start_options["input_url"])
         start_options["check"] = False
 
+        # TODO
+        # 옵션 검증
         if "portScan" in options["tool"]["optionalJobs"]:
             target_port = get_ports.getPortsOnline(start_options["input_url"])
             db.insertPorts(target_port, start_options["input_url"])
@@ -50,7 +54,7 @@ def visit(driver, url, depth, options):
         cur_page_links = list(set(packet_capture.deleteFragment(cur_page_links)))
         # domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
     cookie_result = get_cookies.start(driver.current_url, req_res_packets)
-    
+
     analyst_result = analyst.start(start_options["input_url"], req_res_packets, cur_page_links, driver, options['info'])
     req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
 
@@ -59,7 +63,7 @@ def visit(driver, url, depth, options):
     db.insertDomains(req_res_packets, cookie_result, previous_packet_count, driver.current_url)
     db.insertWebInfo(analyst_result, start_options["input_url"], previous_packet_count)
     # Here DB code
-
+    
     if depth == 0:
         return
 
