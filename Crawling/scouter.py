@@ -9,7 +9,8 @@ from Crawling.feature import get_page_links, packet_capture, get_res_links, get_
 start_options = {
     "check" : True,
     "input_url" : "",
-    "visited_links" : []
+    "visited_links" : [],
+    "count_links" : {}
 }
 
 def start(url, depth, options):
@@ -20,6 +21,7 @@ def start(url, depth, options):
     start_options["check"] = True
     start_options["input_url"] = ""
     start_options["visited_links"] = []
+    start_options["count_links"] = {}
 
 def visit(driver, url, depth, options):
     global start_options
@@ -81,11 +83,24 @@ def visit(driver, url, depth, options):
             continue
         if func.isExistExtension(visit_url, "image"):
             continue
-
-        # TODO
-        # 무한 크롤링 해결 해야 함.
+        if checkCountLink(visit_url, start_options["count_links"]):
+            continue
+        
         start_options["visited_links"].append(visit_url)
         visit(driver, visit_url, depth - 1, options)
+
+def checkCountLink(visit_url, count_links):
+    visit_path = urlparse(visit_url).path
+
+    try:
+        if count_links[visit_path]["count"] > 10:
+            return True
+
+        count_links[visit_path]["count"] += 1
+    except:
+        start_options["count_links"][visit_path] = {"count" : 1}
+
+    return False
 
 def initSelenium():
     chrome_options = webdriver.ChromeOptions()
