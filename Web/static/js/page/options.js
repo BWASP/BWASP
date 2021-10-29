@@ -242,7 +242,8 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
     jobSubmitVerifyModal.toggle();
 
     document.getElementById("modal-start-job").addEventListener("click", ()=>{
-        $("#jobSubmitVerifyModal").modal("hide");
+        jobSubmitVerifyModal.hide();
+        document.getElementById("modal-start-job").setAttribute("disabled", "true");
         fetch("/automation/options", {
             method: 'POST',
             headers: {
