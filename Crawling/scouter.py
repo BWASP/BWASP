@@ -17,6 +17,10 @@ def start(url, depth, options):
     visit(driver, url, depth, options)
     driver.quit()
 
+    start_options["check"] = True
+    start_options["input_url"] = ""
+    start_options["visited_links"] = []
+
 def visit(driver, url, depth, options):
     global start_options
 
