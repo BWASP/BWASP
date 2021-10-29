@@ -57,13 +57,13 @@ window.onload = () => {
                 Skeleton.child.parent.classList.add("card", "mb-4");
 
                 Skeleton.child.child.toggleTab.href = `#${toggleTabName}`;
-                Skeleton.child.child.toggleTab.classList.add("d-block", "card-header", "py-3");
-                Skeleton.child.child.toggleTab.setAttribute("data-toggle", "collapse");
+                Skeleton.child.child.toggleTab.classList.add("d-block", "card-header", "text-decoration-none", "py-3");
+                Skeleton.child.child.toggleTab.setAttribute("data-bs-toggle", "collapse");
                 Skeleton.child.child.toggleTab.setAttribute("role", "button");
                 Skeleton.child.child.toggleTab.setAttribute("aria-expanded", "false");
                 Skeleton.child.child.toggleTab.setAttribute("aria-controls", toggleTabName);
 
-                Skeleton.child.child.toggleTabText.classList.add("m-0", "font-weight-bold", "text-primary");
+                Skeleton.child.child.toggleTabText.classList.add("m-0", "fw-bold", "text-primary");
                 Skeleton.child.child.toggleTabText.innerHTML = SupportedList[Type][0];
 
                 Skeleton.child.child.content.parent.classList.add("collapse");
@@ -90,20 +90,20 @@ window.onload = () => {
                         version: `${identifier.webAppInfo.version}-${Type}-${codeNameBase64}`
                     }
                     localSkeleton.parent.classList.add("form-group", "mb-0");
-                    localSkeleton.child.parent.classList.add("custom-control", "custom-checkbox", "small");
+                    localSkeleton.child.parent.classList.add("form-check", "small");
 
                     localSkeleton.child.child.checkbox.type = "checkbox";
-                    localSkeleton.child.child.checkbox.classList.add("custom-control-input");
+                    localSkeleton.child.child.checkbox.classList.add("form-check-input");
                     localSkeleton.child.child.checkbox.value = codeNameBase64;
                     localSkeleton.child.child.checkbox.id = elementNaming.checkbox;
 
-                    localSkeleton.child.child.codename.classList.add("custom-control-label", "pt-1");
+                    localSkeleton.child.child.codename.classList.add("form-check-label", "d-inline-flex", "ms-2");
                     localSkeleton.child.child.codename.htmlFor = elementNaming.checkbox;
                     localSkeleton.child.child.codename.innerHTML = codeName;
                     localSkeleton.child.child.codename.id = `${elementNaming.checkbox}-label`
 
                     localSkeleton.child.child.versionInput.placeholder = "(Version)";
-                    localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50", "pl-1", "d-none")
+                    localSkeleton.child.child.versionInput.classList.add("border", "border-white", "w-50", "ps-1", "d-none")
                     localSkeleton.child.child.versionInput.type = "text";
                     localSkeleton.child.child.versionInput.id = elementNaming.version;
 
@@ -159,7 +159,7 @@ document.getElementById("ClearAllData").addEventListener("click", function(){
  */
 let renderULElement = (target, dataPackage) => {
     let skeleton = document.createElement("ul");
-    skeleton.classList.add("pl-3", "mb-0");
+    skeleton.classList.add("ps-3", "mb-0");
     dataPackage.forEach((path)=>{
         let localSkeleton = [document.createElement("li"), document.createElement("code")];
         localSkeleton[1].innerHTML = path;
@@ -234,13 +234,16 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
         if(tempStorage.length > 0) renderULElement(document.getElementById(`modal-info-${type.toLowerCase()}`), tempStorage);
     })
 
-    $("#jobSubmitVerifyModal").modal({
+    let jobSubmitVerifyModal = new bootstrap.Modal(document.getElementById('jobSubmitVerifyModal'), {
+        keyboard: false,
         backdrop: 'static',
         show: true
-    })
+    });
+    jobSubmitVerifyModal.toggle();
 
     document.getElementById("modal-start-job").addEventListener("click", ()=>{
-        $("#jobSubmitVerifyModal").modal("hide");
+        jobSubmitVerifyModal.hide();
+        document.getElementById("modal-start-job").setAttribute("disabled", "true");
         fetch("/automation/options", {
             method: 'POST',
             headers: {

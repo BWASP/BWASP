@@ -1,134 +1,93 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 {% include 'components/head.html' %}
 
-<body id="page-top">
-
-<!-- Page Wrapper -->
-<div id="wrapper">
-    {% include 'components/sidebar.html' %}
-
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content">
-            {% include 'components/navigation.html' %}
-
-            <!-- Begin Page Content -->
-            <div class="container-fluid">
-                <div class="bg-white border rounded shadow p-4">
-                    <div class="container pt-5 pb-5">
-                        <div class="form-group">
-                            <label for="ReportFileName">Report filename</label>
-                            <div class="d-flex align-items-center">
-                                <input type="text" class="form-control p-4 rounded-pill" id="ReportFileName"
-                                       placeholder="Please enter filename of report.">
-                                <h3 class="text-primary ml-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="30" fill="currentColor" class="bi bi-folder-fill" viewBox="0 0 16 16">
-                                        <path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3zm-8.322.12C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139z"/>
-                                    </svg>
-                                </h3>
+<body>
+{% include 'components/sidebar.html' %}
+<div class="commonPadding w-100">
+    <div class="d-inline-flex sizer element-top">
+        <div class="bg-white h-100 text-dark p-4 pt-3 pb-3 w-100 sizer center-horizontal border-rounded shadow">
+            <h4 class="text-decoration-none mb-0">Export Report</h4>
+        </div>
+        <button type="button" id="ClearAllData"
+                class="bg-white p-4 pt-3 pb-3 ms-2 btn btn-link border-rounded shadow"
+                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Clear all input">
+            <h4 class="mb-0"><i class="fas fa-redo-alt text-danger"></i></h4>
+        </button>
+    </div>
+    <div class="bg-white shadow text-dark sizer element-objects border-rounded separatedTab">
+        <div class="p-4 w-100" id="job-order">
+            <div class="container pt-5 pb-5">
+                <div class="form-group">
+                    <label for="ReportFileName">Report filename</label>
+                    <div class="d-flex align-items-center">
+                        <input type="text" class="form-control p-4 rounded-pill" id="ReportFileName"
+                               placeholder="Please enter filename of report.">
+                        <h3 class="text-primary ml-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="30" fill="currentColor" class="bi bi-folder-fill" viewBox="0 0 16 16">
+                                <path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3zm-8.322.12C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139z"/>
+                            </svg>
+                        </h3>
+                    </div>
+                </div>
+                <div class="form-group mt-5">
+                    <label for="ReportFileDirectory">Report save directory</label>
+                    <div class="d-flex align-items-center">
+                        <input type="text" class="form-control p-4 rounded-pill" id="ReportFileDirectory"
+                               placeholder="Please select the directory where the report will be saved.">
+                        <h3 class="text-primary ml-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="30" fill="currentColor" class="bi bi-folder-fill" viewBox="0 0 16 16">
+                                <path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3zm-8.322.12C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139z"/>
+                            </svg>
+                        </h3>
+                    </div>
+                </div>
+                <div class="form-group mt-3">
+                    <div class="row">
+                        <div class="col">
+                            <div class="custom-control custom-checkbox small">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="ReportType-PDF">
+                                <label class="custom-control-label pt-1" for="ReportType-PDF">PDF</label>
                             </div>
                         </div>
-                        <div class="form-group mt-5">
-                            <label for="ReportFileDirectory">Report save directory</label>
-                            <div class="d-flex align-items-center">
-                                <input type="text" class="form-control p-4 rounded-pill" id="ReportFileDirectory"
-                                       placeholder="Please select the directory where the report will be saved.">
-                                <h3 class="text-primary ml-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="30" fill="currentColor" class="bi bi-folder-fill" viewBox="0 0 16 16">
-                                        <path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3zm-8.322.12C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139z"/>
-                                    </svg>
-                                </h3>
+                        <div class="col">
+                            <div class="custom-control custom-checkbox small">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="ReportType-MD">
+                                <label class="custom-control-label pt-1" for="ReportType-MD">Markdown(md)</label>
                             </div>
                         </div>
-                        <div class="form-group mt-3">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="custom-control custom-checkbox small">
-                                        <input type="checkbox" class="custom-control-input"
-                                               id="ReportType-PDF">
-                                        <label class="custom-control-label pt-1" for="ReportType-PDF">PDF</label>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="custom-control custom-checkbox small">
-                                        <input type="checkbox" class="custom-control-input"
-                                               id="ReportType-MD">
-                                        <label class="custom-control-label pt-1" for="ReportType-MD">Markdown(md)</label>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="custom-control custom-checkbox small">
-                                        <input type="checkbox" class="custom-control-input"
-                                               id="ReportType-CSV">
-                                        <label class="custom-control-label pt-1" for="ReportType-CSV">CSV</label>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="custom-control custom-checkbox small">
-                                        <input type="checkbox" class="custom-control-input"
-                                               id="ReportType-DB">
-                                        <label class="custom-control-label pt-1" for="ReportType-DB">DB(SQLite)</label>
-                                    </div>
-                                </div>
+                        <div class="col">
+                            <div class="custom-control custom-checkbox small">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="ReportType-CSV">
+                                <label class="custom-control-label pt-1" for="ReportType-CSV">CSV</label>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-end mt-5">
-                            <p class="btn btn-primary">Export</p>
+                        <div class="col">
+                            <div class="custom-control custom-checkbox small">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="ReportType-DB">
+                                <label class="custom-control-label pt-1" for="ReportType-DB">DB(SQLite)</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- /.container-fluid -->
-
-        </div>
-        <!-- End of Main Content -->
-
-        {% include 'components/footer.html' %}
-
-    </div>
-    <!-- End of Content Wrapper -->
-
-</div>
-<!-- End of Page Wrapper -->
-
-<!-- Scroll to Top Button-->
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
-
-<!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="login.html">Logout</a>
+                <div class="d-flex justify-content-end mt-5">
+                    <p class="btn btn-primary">Export</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap core JavaScript-->
-<script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<!-- Core plugin JavaScript-->
-<script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-<!-- Custom scripts for all pages-->
-<script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
-<!-- Page level plugins -->
-<script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
-<!-- Page level custom scripts -->
-<script src="{{ url_for('static', filename='js/demo/chart-area-demo.js') }}"></script>
-<script src="{{ url_for('static', filename='js/demo/chart-pie-demo.js') }}"></script>
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
 </body>
 </html>
