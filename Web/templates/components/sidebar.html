@@ -5,20 +5,28 @@
     </a>
     <!-- btn-toggle-nav list-unstyled fw-normal pb-1 small -->
     <div class="bg-white shadow text-dark sizer element-sidebar border-rounded separatedTab">
-        <div class="sidebar-elements">
+        <div class="sidebar-category">
+            <p class="sidebar-element-title collapsed">
+                <a href="/dashboard"><i class="bi bi-activity"></i> Dashboard</a>
+            </p>
+            <hr>
             <p class="sidebar-title">Interface</p>
-            <ul class="list-unstyled mb-auto">
-                <li class="sidebar-elements">
-                    <p class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
-                        Home
+            <ul class="sidebar-element list-unstyled mb-auto">
+                <li class="sidebar-element">
+                    <p class="sidebar-element-title collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
+                        <i class="bi bi-play-fill"></i> Start
                     </p>
-                    <div class="collapse show" id="home-collapse">
+                    <div class="sidebar-element-content collapse shadow border-rounded" id="home-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded">Overview</a></li>
-                            <li><a href="#" class="link-dark rounded">Updates</a></li>
-                            <li><a href="#" class="link-dark rounded">Reports</a></li>
+                            <li><a href="/automation/options" class="link-dark rounded"><i class="bi bi-gear-fill"></i> Automated</a></li>
+                            <li><a href="#" class="link-dark rounded"><i class="bi bi-people-fill"></i> Manual</a></li>
                         </ul>
                     </div>
+                </li>
+                <li class="sidebar-element mt-2">
+                    <p class="sidebar-element-title collapsed">
+                        <a href="/common/attack_vector"><i class="bi bi-activity"></i> Attack Vectors</a>
+                    </p>
                 </li>
             </ul>
         </div>
