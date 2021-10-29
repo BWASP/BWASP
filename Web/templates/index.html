@@ -3,495 +3,151 @@
 
 {% include 'components/head.html' %}
 
-<body id="page-top">
-
-<!-- Page Wrapper -->
-<div id="wrapper">
-    {% include 'components/sidebar.html' %}
-
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content">
-            {% include 'components/navigation.html' %}
-
-            <!-- Begin Page Content -->
-            <div class="container-fluid">
-
-                <!-- Page Heading -->
-                <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">BWASP Main Result Dashboard</h1>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                        <i class="fas fa-download fa-sm text-white-50"></i> Generate Report (PDF)
-                    </a>
-                </div>
-
-                <!-- Content Row -->
-                <div class="row">
-                    <!-- Earnings (Monthly) Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-primary shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-lg font-weight-bold text-primary text-uppercase mb-1">
-                                            Received
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ header_box["Received"] }}</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Earnings (Monthly) Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-success shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-lg font-weight-bold text-success text-uppercase mb-1">
-                                            Average first response time
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ header_box["Average_first_response_time"] }}</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Earnings (Monthly) Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-info shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-lg font-weight-bold text-info text-uppercase mb-1">
-                                            Average response time
-                                        </div>
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col-auto">
-                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ header_box["Average_response_time"] }}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pending Requests Card Example -->
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-warning shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-lg font-weight-bold text-warning text-uppercase mb-1">
-                                            Resolution within SLA
-                                        </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ header_box["Resolution_within_SLA"] }}</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-comments fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Content Row -->
-
-                <div class="row">
-
-                    <!-- Area Chart -->
-                    <div class="col-xl-8 col-lg-7">
-                        <div class="card shadow mb-4">
-                            <!-- Card Header - Dropdown -->
-                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Main Result Chart</h6>
-                            </div>
-                            <!-- Card Body -->
-                            <div class="card-body">
-                                <div class="chart-area">
-                                    <canvas id="myAreaChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-4 col-lg-5">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Main Result Chart</h6>
-                            </div>
-                            <!-- Card Body -->
-                            <div class="card-body">
-                                <div class="chart-area">
-                                    <table class="table table-borderless" id="dataTable">
-                                        <tbody>
-                                        <tr>
-                                            <td><strong>Web All Result</strong></td>
-                                            <td><strong>{{ area_Chart["All_Result"] }} count</strong></td>
-                                        </tr>
-                                         <tr>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>WEB INFORMATION</td>
-                                            <td>{{ area_Chart["Web_Information"] }} count</td>
-                                        </tr>
-                                        <tr>
-                                            <td>VULNERABILITY DOUBT</td>
-                                            <td>{{ area_Chart["Vulnerability_Doubt"] }} count</td>
-                                        </tr>
-                                        <tr>
-                                            <td>ATTACK VECTOR</td>
-                                            <td>{{ area_Chart["Attack_Vector"] }} count</td>
-                                        </tr>
-                                        <tr>
-                                            <td>RELATED CVE</td>
-                                            <td>{{ area_Chart["Related_CVE"] }} count</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Content Row -->
-                <div class="row">
-                    <div class="col-lg-6 mb-4">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Vulnerability Doubt</h6>
-                                <div class="no-arrow">
-                                    <div class="text-right">
-                                        <a href="#">View Detail</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-2">
-                                    <table class="table table-borderless" id="dataTable">
-                                        <tbody>
-                                        <tr>
-                                            <td>SQL injection</td>
-                                            <td>1</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Cross Site Scripting (Stored)</td>
-                                            <td>2</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Server Side Request Forgery</td>
-                                            <td>1</td>
-                                        </tr>
-                                        <tr>
-                                            <td>File Download (LFI/RFI)</td>
-                                            <td>4</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 mb-2">
-                        <div class="mb-4">
-                            <!-- Card Body -->
-                            <div class="card-body">
-                                <div class="chart-pie pt-2 pb-2">
-                                    <canvas id="client"></canvas>
-                                </div>
-                                <div class="mt-2 text-center small">
-                                    <span class="mr-2">
-                                        <i class="fas fa-circle text-primary"></i> Node.js
-                                    </span>
-                                    <span class="mr-2">
-                                        <i class="fas fa-circle text-success"></i> Angular JS
-                                    </span>
-                                    <span class="mr-2">
-                                        <i class="fas fa-circle text-info"></i> CSS
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 mb-2">
-                        <div class="mb-4">
-                            <!-- Card Body -->
-                            <div class="card-body">
-                                <div class="chart-pie pt-2 pb-2">
-                                    <canvas id="server"></canvas>
-                                </div>
-                                <div class="mt-2 text-center small">
-                                    <span class="mr-2">
-                                        <i class="fas fa-circle text-primary"></i> MySQL
-                                    </span>
-                                    <span class="mr-2">
-                                        <i class="fas fa-circle text-success"></i> Django
-                                    </span>
-                                    <span class="mr-2">
-                                        <i class="fas fa-circle text-info"></i> CVE
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <!-- /.container-fluid -->
-
+<body>
+{% include 'components/sidebar.html' %}
+<div class="commonPadding w-100">
+    <div class="d-inline-flex sizer element-top">
+        <div class="bg-white h-100 text-dark p-4 pt-3 pb-3 w-100 sizer center-horizontal border-rounded shadow">
+            <h4 class="text-decoration-none mb-0 font-logo">Dashboard</h4>
         </div>
-        <!-- End of Main Content -->
-
-        {% include 'components/footer.html' %}
-
     </div>
-    <!-- End of Content Wrapper -->
-
-
-</div>
-<!-- End of Page Wrapper -->
-
-<!-- Scroll to Top Button-->
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
-
-<!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="login.html">Logout</a>
-            </div>
+    <div class="bg-white shadow text-dark sizer element-objects border-rounded separatedTab">
+        <div class="p-4 w-100">
+            <section class="row">
+                <h3 class="col-md-12 fw-bold text-capitalize mb-3">Quick view</h3>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Received<br>Packets</p>
+                        <p class="fs-2 mb-0">426</p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Average<br>first response time</p>
+                        <p class="fs-2 mb-0">1 min</p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Average<br>Response time</p>
+                        <p class="fs-2 mb-0">3 min</p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Resolution<br>within SLA</p>
+                        <p class="fs-2 mb-0">94 %</p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Web Information</p>
+                        <p class="fs-2 mb-0">20</p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Vulnerability Doubt</p>
+                        <p class="fs-2 mb-0">40</p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Attack Vector</p>
+                        <p class="fs-2 mb-0">50</p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Related CVE</p>
+                        <p class="fs-2 mb-0">16</p>
+                    </div>
+                </div>
+                <p class="col-md-12 mt-2 text-muted small">Calculated numbers may has numerical errors.</p>
+            </section>
+            <section class="row mt-3 pb-3">
+                <h3 class="col-md-12 fw-bold text-capitalize mb-3">Scan result</h3>
+                <div class="col-md-6 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <div class="sizer">
+                            <p class="mb-1 text-uppercase">Vulnerability Doubt</p>
+                            <a class="text-decoration-none ms-auto small mb-1 text-uppercase" href="/common/attack_vector"><i class="bi bi-zoom-in"></i> Detail</a>
+                        </div>
+                        <table class="table table-borderless mt-3">
+                            <tbody>
+                            <tr>
+                                <td>SQL Injection</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>Cross Site Scripting (Stored)</td>
+                                <td>2</td>
+                            </tr>
+                            <tr>
+                                <td>Server Side Request Forgery</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>File Download (LFI/RFI)</td>
+                                <td>4</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-6 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <div class="sizer">
+                            <p class="mb-1 text-uppercase">Web Environment Information</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mt-3">
+                                <p class="text-muted small text-capitalize">Web server</p>
+                                <div>
+                                    <a href="#" class="mt-2 sizer align-items-center text-decoration-none">
+                                        <img width="30" height="30" class="rounded-circle shadow-sm" src="https://t1.daumcdn.net/cfile/tistory/116113424FCC681312">
+                                        <p class="mb-0 ms-2">Nginx</p>
+                                        <p class="mb-0 badge ms-1 text-dark border border-secondary">1.19.0</p>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <p class="text-muted small text-capitalize">Frontend</p>
+                                <div>
+                                    <a href="#" class="mt-2 sizer align-items-center text-decoration-none">
+                                        <img width="30" height="30" class="rounded-circle shadow-sm" src="https://t1.daumcdn.net/cfile/tistory/116113424FCC681312">
+                                        <p class="mb-0 ms-2">React</p>
+                                    </a>
+                                    <a href="#" class="mt-2 sizer align-items-center text-decoration-none">
+                                        <img width="30" height="30" class="rounded-circle shadow-sm" src="https://t1.daumcdn.net/cfile/tistory/116113424FCC681312">
+                                        <p class="mb-0 ms-2">Moment.js</p>
+                                        <p class="mb-0 badge ms-1 text-dark border border-secondary">2.24.0</p>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <p class="text-muted small text-capitalize">Backend</p>
+                                <div>
+                                    <a href="#" class="mt-2 sizer align-items-center text-decoration-none">
+                                        <img width="30" height="30" class="rounded-circle shadow-sm" src="https://t1.daumcdn.net/cfile/tistory/116113424FCC681312">
+                                        <p class="mb-0 ms-2">PHP</p>
+                                        <p class="mb-0 badge ms-1 text-dark border border-secondary">5.6.40</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap core JavaScript-->
-<script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<!-- Core plugin JavaScript-->
-<script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-<!-- Custom scripts for all pages-->
-<script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
-<!-- Page level plugins -->
-<script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
-<script type="text/javascript">
-    // Set new default font family and font color to mimic Bootstrap's default styling
-    Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-    Chart.defaults.global.defaultFontColor = '#858796';
-
-    // Pie Chart Example
-    var client_ctx = document.getElementById("client");
-    var client_PieChart = new Chart(client_ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ["Direct", "Referral", "Social"],
-            datasets: [{
-                data: [{{ pie_chart["data1"] }}, {{ pie_chart["data2"] }}, {{ pie_chart["data3"] }}],
-                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
-                hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            tooltips: {
-                backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#858796",
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                caretPadding: 10,
-            },
-            legend: {
-                display: false
-            },
-            cutoutPercentage: 80,
-        },
-    });
-
-    // Pie Chart Example
-    var server_ctx = document.getElementById("server");
-    var serverPieChart = new Chart(server_ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ["Direct", "Referral", "Social"],
-            datasets: [{
-                data: [{{ pie_chart["data1"] }}, {{ pie_chart["data2"] }}, {{ pie_chart["data3"] }}],
-                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
-                hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            tooltips: {
-                backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#858796",
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                caretPadding: 10,
-            },
-            legend: {
-                display: false
-            },
-            cutoutPercentage: 80,
-        },
-    });
-
-</script>
-<script type="text/javascript">
-    // Set new default font family and font color to mimic Bootstrap's default styling
-    Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-    Chart.defaults.global.defaultFontColor = '#858796';
-
-    function number_format(number, decimals, dec_point, thousands_sep) {
-        // *     example: number_format(1234.56, 2, ',', ' ');
-        // *     return: '1 234,56'
-        number = (number + '').replace(',', '').replace(' ', '');
-        var n = !isFinite(+number) ? 0 : +number,
-            prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
-            sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
-            dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
-            s = '',
-            toFixedFix = function (n, prec) {
-                var k = Math.pow(10, prec);
-                return '' + Math.round(n * k) / k;
-            };
-        // Fix for IE parseFloat(0.55).toFixed(0) = 0;
-        s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
-        if (s[0].length > 3) {
-            s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
-        }
-        if ((s[1] || '').length < prec) {
-            s[1] = s[1] || '';
-            s[1] += new Array(prec - s[1].length + 1).join('0');
-        }
-        return s.join(dec);
-    }
-
-    // Area Chart Example
-    var ctx = document.getElementById("myAreaChart");
-    var myLineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ["Web Information", "Vulnerability Doubt", "Attack Vector", "Related CVE"],
-            datasets: [{
-                label: "Count",
-                lineTension: 0.3,
-                backgroundColor: "rgba(78, 115, 223, 0.05)",
-                borderColor: "rgba(78, 115, 223, 1)",
-                pointRadius: 3,
-                pointBackgroundColor: "rgba(78, 115, 223, 1)",
-                pointBorderColor: "rgba(78, 115, 223, 1)",
-                pointHoverRadius: 3,
-                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-                pointHitRadius: 10,
-                pointBorderWidth: 2,
-                data: [{{ area_Chart["Web_Information"] }}, {{ area_Chart["Vulnerability_Doubt"] }}, {{ area_Chart["Attack_Vector"] }}, {{ area_Chart["Related_CVE"] }}],
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    left: 10,
-                    right: 25,
-                    top: 25,
-                    bottom: 0
-                }
-            },
-            scales: {
-                xAxes: [{
-                    time: {
-                        unit: 'date'
-                    },
-                    gridLines: {
-                        display: false,
-                        drawBorder: false
-                    },
-                    ticks: {
-                        maxTicksLimit: 7
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        maxTicksLimit: 5,
-                        padding: 10,
-                        // Include a dollar sign in the ticks
-                        callback: function (value, index, values) {
-                            return number_format(value) + ' count';
-                        }
-                    },
-                    gridLines: {
-                        color: "rgb(234, 236, 244)",
-                        zeroLineColor: "rgb(234, 236, 244)",
-                        drawBorder: false,
-                        borderDash: [2],
-                        zeroLineBorderDash: [2]
-                    }
-                }],
-            },
-            legend: {
-                display: false
-            },
-            tooltips: {
-                backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#858796",
-                titleMarginBottom: 10,
-                titleFontColor: '#6e707e',
-                titleFontSize: 14,
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                intersect: false,
-                mode: 'index',
-                caretPadding: 10,
-                callbacks: {
-                    label: function (tooltipItem, chart) {
-                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                        return datasetLabel + ': ' + number_format(tooltipItem.yLabel);
-                    }
-                }
-            }
-        }
-    });
-
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
 </script>
 </body>
 </html>
