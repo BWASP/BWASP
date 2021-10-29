@@ -1,5 +1,6 @@
 from seleniumwire import webdriver
 from urllib.parse import urlparse, urlunparse
+from webdriver_manager.chrome import ChromeDriverManager
 
 from Crawling import analyst
 from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
@@ -112,9 +113,8 @@ def initSelenium():
         "disable_encoding": True
     }
 
-    driver = webdriver.Chrome("./Crawling/config/chromedriver.exe", seleniumwire_options=options, chrome_options=chrome_options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), seleniumwire_options=options, chrome_options=chrome_options)
     return driver
-
 
 if __name__ == "__main__":
     options = {
