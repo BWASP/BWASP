@@ -277,7 +277,7 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                 }
 
                 element.impact.parent.classList.add("align-middle");
-                element.impact.child.classList.add("btn", "btn-icon-split", "p-1", "mb-0", "pl-3", "pr-3", "rounded-pill", `btn-${impactData[0]}`);
+                element.impact.child.classList.add("small", "text-center", "p-1", "mb-0", "pl-3", "pr-3", "rounded-pill", `btn-${impactData[0]}`);
                 element.impact.child.innerText = impactData[1];
 
                 element.impact.parent.appendChild(element.impact.child);
