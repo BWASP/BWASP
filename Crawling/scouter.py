@@ -15,6 +15,8 @@ start_options = {
     "count_links" : {}
 }
 
+sysinfo_detectlist = {}
+
 def start(url, depth, options):
     global start_options
     driver = initSelenium()
@@ -27,7 +29,8 @@ def start(url, depth, options):
     start_options["count_links"] = {}
 
 def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url):
-    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, options['info'])
+    global sysinfo_detectlist
+    analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, options['info'])
     previous_packet_count = db.getPacketsCount()
     db.insertDomains(req_res_packets, cookie_result, previous_packet_count, current_url)
     db.insertWebInfo(analyst_result, input_url, previous_packet_count)
