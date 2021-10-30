@@ -1,7 +1,6 @@
 from flask import (
     Blueprint, render_template, g
 )
-from Web.models.BWASP import attackVector, CSPEvaluator, domain, packets
 
 NAME = 'result'
 bp = Blueprint(NAME, __name__, url_prefix='/')
@@ -15,7 +14,6 @@ def mode_selection():
 
 @bp.route('/dashboard')
 def index():
-    # result = {}.query.all()
     return render_template('index.html', Title="홈 - BWASP",
                            area_Chart={
                                "All_Result": 183,
