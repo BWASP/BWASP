@@ -28,7 +28,19 @@
     <div class="bg-white shadow text-dark sizer element-objects border-rounded separatedTab">
         <div class="p-4 w-100 actualContent">
             <div class="p-2 mb-3 border-rounded shadow d-inline-flex w-100">
-                <a href="#" class="btn border-rounded btn-outline-success" id="openHelpModal"><i class="fas fa-question"></i> Help</a>
+                <div class="dropdown">
+                    <button class="btn btn-outline-success border-rounded dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        10 Rows
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="#">10 Rows</a></li>
+                        <li><a class="dropdown-item" href="#">20 Rows</a></li>
+                        <li><a class="dropdown-item" href="#">30 Rows</a></li>
+                        <li><a class="dropdown-item" href="#">40 Rows</a></li>
+                        <li><a class="dropdown-item" href="#">50 Rows</a></li>
+                    </ul>
+                </div>
+                <a href="#" class="ms-2 btn border-rounded btn-outline-success" id="openHelpModal"><i class="fas fa-question"></i> Help</a>
                 <a href="#" class="ms-2 btn border-rounded btn-outline-primary" id="switchToPacket"><i class="fas fa-random"></i> <span id="switchToType">Packet</span></a>
             </div>
             <div class="p-4 border-rounded shadow">

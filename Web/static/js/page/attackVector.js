@@ -1,61 +1,42 @@
-// true (vector) / false (packet)
-const API = {
-    vectors: "/api/attack_vector",
-    packets: "/api/packets"
-},
-    debug = true;
-let currentState = false;
-let implementationSample = {
-    vectors: [
-        {
-            url: "http://bobmart.com/main.php",
-            payloads: ["/class.php", "/korea.php", "/bwasp.php", "/abc.bobmart.com", "/admin.bobmart.com"],
-            vulnerability: {
-                type: "Cross Site Script(XSS)",
-                CVE: [
-                    {
-                        numbering: "2021-0000-111"
-                    }
-                ]
-            },
-            method: "None",
-            date: "2021-09-28 11:00",
-            impactRate: 0
+let pagination = {
+        currentPage: 1,
+        overallPageCount: 1
+    },
+    currentState = false,
+    idKeyList = [],
+    key = "";
+
+const options = {
+    verifyResStatusCode: false,
+    debug: true,
+    API: {
+        vectors: "http://192.168.50.158:20102/api/attackVector",
+        packets: "/api/attack_vector"
+    },
+    requestOption: {
+        mode: "no-cors",
+        headers : {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
         }
-    ],
-    packets: [
-        {
-            url: "http://bobmart.com/main.php",
-            payloads: ["/class.php", "/korea.php", "/bwasp.php", "/abc.bobmart.com", "/admin.bobmart.com"],
-            packet: "?num= parameter check",
-            vulnerability: {
-                type: "Cross Site Script(XSS)",
-                CVE: [
-                    {
-                        numbering: "2021-0000-111",
-                        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-                    }
-                ]
-            },
-            method: "None",
-            relatedData: ["http://xsstest123456.com/xssprob1.md"],
-            date: "2021-09-28 11:00",
-            impactRate: 0
-        }
-    ]
-}
-let idKeyList = [], key = "";
+    }
+};
+
 
 let createKey = () => {
     let gen = () => {
         let key = Math.random().toString(36).substring(2);
-        if(!idKeyList.includes(key)) return key;
+        if (!idKeyList.includes(key)) return key;
         else gen()
     }
     return `anonID-${gen()}-${gen()}`;
 }
 
-document.getElementById("switchToPacket").addEventListener("click", function(){
+document.getElementById("switchToPacket").addEventListener("click", function() {
+    let noData = () => {
+        document.getElementById("loadingProgress").classList.add("d-none");
+        document.getElementById("resultNoData").classList.remove("d-none");
+    }
     document.getElementById("switchToType").innerText = (currentState) ? "Attack Vectors" : "Packets";
     // document.getElementById("currentType").innerText = `All ${(currentState) ? "Packets" : "Attack Vectors"}`;
     let table = {
@@ -69,7 +50,7 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
     document.getElementById("loadingProgress").classList.remove("d-none");
     document.getElementById("resultNoData").classList.add("d-none");
     currentState = !currentState;
-    ((status = (currentState) ? "Attack Vector" : "Packets")=>{
+    ((status = (currentState) ? "Attack Vector" : "Packets") => {
         document.getElementById("pageTitle").innerHTML = status;
         document.title = `${status} - BWASP`;
     })()
@@ -81,7 +62,7 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
         ];
 
     // Build thead
-    element[Number(!currentState)].forEach((columnName)=>{
+    element[Number(!currentState)].forEach((columnName) => {
         let tempThElement = document.createElement("th");
         tempThElement.innerHTML = columnName;
         newThead.appendChild(tempThElement);
@@ -90,28 +71,33 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
     table.thead.appendChild(newThead);
 
     // Build tbody
-    let currentKey = (currentState)?"vectors":"packets";
-    fetch(API[currentKey]).then((res)=>{
-        let noData = () => {
-            document.getElementById("loadingProgress").classList.add("d-none");
-            document.getElementById("resultNoData").classList.remove("d-none");
-            console.error("Error! HTTP status: " + res.status);
-        }
-        if(res.status!==200 && !debug) noData();
-        else res.json().then((buildData)=>{
-            if(debug) buildData = implementationSample[currentKey];
-            if (buildData.length<=0){
-                document.getElementById("loadingProgress").classList.add("d-none");
-                document.getElementById("resultNoData").classList.remove("d-none");
-                return;
-            }
+    let currentKey = (currentState) ? "vectors" : "packets";
+    let currentAPI = options.API[currentKey];
+
+    console.log(currentAPI);
+    fetch(currentAPI, options.requestOption)
+        .then((res)=>res.json())
+        .then((buildData)=>console.log(buildData))
+
+    // Connect to API to receive dataset
+    /*
+    fetch(currentAPI, options.requestOption)
+        .then((res) => res.json())
+        .then((buildData) => {
+            // console.log(buildData);
+            if (buildData.length <= 0) noData();
             for (let count = 0; count < buildData.length; count++) {
+                console.log(buildData);
+                // fetch(currentAPI+"")
+
+
+
                 let frame = document.createElement("tr"),
                     localData = buildData[count],
                     element = Object(),
                     impactData = [];
 
-                if(localData.date === "None" && !debug) return noData();
+                if (localData.date === "None" && !options.debug) return noData();
 
                 // URL
                 let idKey = createKey();
@@ -162,7 +148,7 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                 frame.appendChild(element.url.parent);
 
                 // Packets
-                if(!currentState){
+                if (!currentState) {
                     element["packet"] = document.createElement("td");
                     element.packet.innerText = localData.packet;
                     element.packet.classList.add("align-middle");
@@ -177,28 +163,28 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                     cve: document.createElement("div")
                 };
 
-                if(currentState) element.vuln.cve.classList.add("d-inline-flex");
+                if (currentState) element.vuln.cve.classList.add("d-inline-flex");
                 element.vuln.title.classList.add("font-weight-bold", "mb-2", "text-danger");
                 element.vuln.title.innerText = localData.vulnerability.type;
                 element.vuln.parent.appendChild(element.vuln.title);
 
-                localData.vulnerability.CVE.forEach((data)=>{
+                localData.vulnerability.CVE.forEach((data) => {
                     let cveElement = {
-                        parent: document.createElement("p"),
-                        code: document.createElement("code"),
-                        description: document.createElement("span")
-                    },
-                    separateBy = [
-                        document.createElement("span"),
-                        document.createElement("br")
-                    ];
+                            parent: document.createElement("p"),
+                            code: document.createElement("code"),
+                            description: document.createElement("span")
+                        },
+                        separateBy = [
+                            document.createElement("span"),
+                            document.createElement("br")
+                        ];
                     separateBy[0].innerText = ",";
-                    cveElement.parent.classList.add("mb-1", (!currentState)?"mb-1":"mr-1");
+                    cveElement.parent.classList.add("mb-1", (!currentState) ? "mb-1" : "mr-1");
                     cveElement.code.innerText = data.numbering;
                     cveElement.parent.appendChild(cveElement.code);
                     cveElement.parent.appendChild(separateBy[Number(!currentState)]);
 
-                    if(!currentState){
+                    if (!currentState) {
                         cveElement.description.innerText = data.description;
                         cveElement.description.className = "small";
                         cveElement.parent.append(cveElement.description);
@@ -219,13 +205,13 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                 frame.appendChild(element.method);
 
                 // Related
-                if(!currentState){
+                if (!currentState) {
                     let relatedData = {
                         parent: document.createElement("td"),
                         child: document.createElement("div")
                     };
                     relatedData.parent.classList.add("align-middle");
-                    localData.relatedData.forEach((data)=>{
+                    localData.relatedData.forEach((data) => {
                         let relatedDOM = document.createElement("a")
                         relatedDOM.href = data;
                         relatedDOM.innerHTML = data;
@@ -264,7 +250,7 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                     child: document.createElement("p")
                 };
 
-                switch(localData.impactRate){
+                switch (localData.impactRate) {
                     case 0:
                         impactData = ["success", "Low"]
                         break
@@ -297,7 +283,10 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
             // $(`#${tableID}`).DataTable();
             document.getElementById("loadingProgress").classList.add("d-none");
         })
-    })
+     */
 })
 
-window.onload = () => document.getElementById("switchToPacket").click();
+window.onload = () => {
+    // Initialize DOM Elements.
+    document.getElementById("switchToPacket").click();
+}
