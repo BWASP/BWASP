@@ -84,11 +84,12 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
 
     // Build tbody
     fetch((currentState)?"/api/attack_vector":"/api/packets").then((res)=>{
-        if(res.status!==200) {
+        let noData = () => {
             $("#loadingProgress").addClass("d-none");
             $("#resultNoData").removeClass("d-none");
             console.error("Error! HTTP status: " + res.status);
         }
+        if(res.status!==200) noData();
         else res.json().then((buildData)=>{
             if (buildData.length<=0){
                 $("#loadingProgress").addClass("d-none");
@@ -100,6 +101,8 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                     localData = buildData[count],
                     element = Object(),
                     impactData = [];
+
+                if(localData.date === "None") return noData();
 
                 // URL
                 let idKey = createKey();
@@ -161,9 +164,11 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                 // Vulnerability doubt
                 element["vuln"] = {
                     parent: document.createElement("td"),
-                    title: document.createElement("p")
+                    title: document.createElement("p"),
+                    cve: document.createElement("div")
                 };
 
+                if(currentState) element.vuln.cve.classList.add("d-inline-flex");
                 element.vuln.title.classList.add("font-weight-bold", "mb-2", "text-danger");
                 element.vuln.title.innerText = localData.vulnerability.type;
                 element.vuln.parent.appendChild(element.vuln.title);
@@ -173,19 +178,25 @@ document.getElementById("switchToPacket").addEventListener("click", function(){
                         parent: document.createElement("p"),
                         code: document.createElement("code"),
                         description: document.createElement("span")
-                    };
-                    cveElement.parent.className = "mb-1";
+                    },
+                    separateBy = [
+                        document.createElement("span"),
+                        document.createElement("br")
+                    ];
+                    separateBy[0].innerText = ",";
+                    cveElement.parent.classList.add("mb-1", (!currentState)?"mb-1":"mr-1");
                     cveElement.code.innerText = data.numbering;
                     cveElement.parent.appendChild(cveElement.code);
-                    cveElement.parent.appendChild(document.createElement("br"));
+                    cveElement.parent.appendChild(separateBy[Number(!currentState)]);
 
                     if(!currentState){
                         cveElement.description.innerText = data.description;
                         cveElement.description.className = "small";
                         cveElement.parent.append(cveElement.description);
                     }
-                    element.vuln.parent.appendChild(cveElement.parent);
+                    element.vuln.cve.appendChild(cveElement.parent);
                 })
+                element.vuln.parent.appendChild(element.vuln.cve);
 
                 element.vuln.parent.classList.add("align-middle");
                 element.vuln.parent.style.setProperty("width", `${(currentState)?60:45}%`, "important");

@@ -1,4 +1,5 @@
 from seleniumwire import webdriver
+from multiprocessing import Process
 from urllib.parse import urlparse, urlunparse
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -15,14 +16,23 @@ start_options = {
 }
 
 def start(url, depth, options):
+    global start_options
     driver = initSelenium()
     visit(driver, url, depth, options)
     driver.quit()
-
+    
     start_options["check"] = True
     start_options["input_url"] = ""
     start_options["visited_links"] = []
     start_options["count_links"] = {}
+
+def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url):
+    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, page_source, current_url ,options['info'])
+    previous_packet_count = db.getPacketsCount()
+    db.insertDomains(req_res_packets, cookie_result, previous_packet_count, current_url)
+    db.insertWebInfo(analyst_result, input_url, previous_packet_count)
+    
+    return 1
 
 def visit(driver, url, depth, options):
     global start_options
@@ -63,14 +73,10 @@ def visit(driver, url, depth, options):
         # domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
     cookie_result = get_cookies.start(driver.current_url, req_res_packets)
 
-    analyst_result = analyst.start(start_options["input_url"], req_res_packets, cur_page_links, driver, options['info'])
     req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
-
-    previous_packet_count = db.getPacketsCount()
     db.insertPackets(req_res_packets)
-    db.insertDomains(req_res_packets, cookie_result, previous_packet_count, driver.current_url)
-    db.insertWebInfo(analyst_result, start_options["input_url"], previous_packet_count)
-    # Here DB code
+    p = Process(target=analysis, args=(input_url, req_res_packets, cur_page_links, options, cookie_result, driver.page_source, driver.current_url)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p.start()
     
     if depth == 0:
         return
@@ -114,6 +120,7 @@ def initSelenium():
     }
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), seleniumwire_options=options, chrome_options=chrome_options)
+
     return driver
 
 if __name__ == "__main__":

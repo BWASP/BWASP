@@ -62,5 +62,4 @@ def create_app(config=None):
 
 
 def AutomatedAnalysis(url, depth, options):
-    print(options)
     start(url, int(depth), options)

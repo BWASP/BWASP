@@ -28,7 +28,7 @@ scripts(O), headers(O), cookies(O), dom(O), meta(O), url(O), html(O), website(O)
 '''
 
 # Main Function
-def detectWebServer(url, cur_page_links, req_res_packets, driver, options):
+def detectWebServer(url, cur_page_links, req_res_packets, options):
     category = [12, 31, 59]
     data = loadCategory(category)
 
@@ -255,10 +255,10 @@ def detectVersion(full_regex, detected_info):
     
 
 # Detecting Dom is not solved yet
-def detectDom(data, driver, index, app):
-    if driver.execute_script(str(data[app]["dom"])) is not None:
-        result = {"detect":["dom"], "version":"False", "request":[], "response":[index], "url":[]}
-        return result
+# def detectDom(data, driver, index, app):
+#     if driver.execute_script(str(data[app]["dom"])) is not None:
+#         result = {"detect":["dom"], "version":"False", "request":[], "response":[index], "url":[]}
+#         return result
 
 if __name__ == "__main__":
     url = "https://github.com/"

@@ -155,9 +155,7 @@ def appendImplies(result,signature_name,request_index=0,response_index=0):
                 appendResult(result,implies_line,"implies","false",request_index,response_index)
 
 
-def resBackend(driver,req_res_packets,options=""):
-    target_url=driver.current_url
-    current_page=driver.page_source
+def resBackend(target_url, current_page, req_res_packets,options=""):
     soup = BeautifulSoup(current_page,"html.parser")
     result={}
     if options:
