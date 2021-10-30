@@ -82,7 +82,7 @@ def checkURLFormat(origin, url):
 
 
 # 2. BeautifulSoup을 이용한 태그 클릭 리스트
-def bs4Crawling(url, html):
+def start(url, html):
     soup = BeautifulSoup(html, features="html.parser")
 
     clickable_tag_types = ['button','a','div','img','input'] 
@@ -108,4 +108,4 @@ if __name__ == "__main__":
     req_res_packets = open('./Crawling/attack/packet.txt','r').read()
     req_res_packets = ast.literal_eval(req_res_packets)
     # driver = seleniumSetting(url)
-    print(bs4Crawling(url, req_res_packets))
+    print(start(url, req_res_packets))

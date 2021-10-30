@@ -1,37 +1,41 @@
 from seleniumwire import webdriver
 from multiprocessing import Process
 from urllib.parse import urlparse, urlunparse
+from webdriver_manager.chrome import ChromeDriverManager
 
 from Crawling import analyst
-from Crawling.feature import clickable_tags, packet_capture, res_geturl, get_ports, extract_cookies, extract_domains, csp_evaluator, db
+from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
 
-check = True
-input_url = ""
-visited_links = []
-
+# TODO
+# 사용자가 여러개의 사이트를 동시에 테스트 할 때, 전역 변수의 관리 문제
+start_options = {
+    "check" : True,
+    "input_url" : "",
+    "visited_links" : [],
+    "count_links" : {}
+}
 
 def start(url, depth, options):
+    global start_options
     driver = initSelenium()
-
     visit(driver, url, depth, options)
     driver.quit()
+    
+    start_options["check"] = True
+    start_options["input_url"] = ""
+    start_options["visited_links"] = []
+    start_options["count_links"] = {}
 
 def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url):
-    
     analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, page_source, current_url ,options['info'])
-    print(analyst_result)
-    req_res_packets = deleteCssBody(req_res_packets)
-
-    # previous_packet_count = db.getPacketsCount()
-    # db.insertDomains(req_res_packets, cookie_result, previous_packet_count, current_url)
-    # db.insertWebInfo(analyst_result, input_url, previous_packet_count)
-    # Here DB code 
+    previous_packet_count = db.getPacketsCount()
+    db.insertDomains(req_res_packets, cookie_result, previous_packet_count, current_url)
+    db.insertWebInfo(analyst_result, input_url, previous_packet_count)
+    
     return 1
 
 def visit(driver, url, depth, options):
-    global check
-    global input_url
-    global visited_links
+    global start_options
 
     try:
         driver.get(url)
@@ -40,117 +44,70 @@ def visit(driver, url, depth, options):
     except:
         pass
 
-    if check:
-        input_url = driver.current_url
-        visited_links.append(input_url)
-        check = False
+    if start_options["check"]:
+        start_options["input_url"] = driver.current_url
+        start_options["visited_links"].append(start_options["input_url"])
+        start_options["check"] = False
 
         if "portScan" in options["tool"]["optionalJobs"]:
-            target_port = get_ports.getPortsOnline(input_url)
-            db.insertPorts(target_port, input_url)
+            target_port = get_ports.getPortsOnline(start_options["input_url"])
+            db.insertPorts(target_port, start_options["input_url"])
+        else:
+            target_port = get_ports.getPortsOffline(start_options["input_url"])
+            db.insertPorts(target_port, start_options["input_url"])
 
-    # TODO
-    # 다른 사이트로 redirect 되었을 때, 추가적으로 same 도메인 인지를 검증하는 코드가 필요함.
-    # 첫 패킷에 google 관련 패킷 지우기
-    req_res_packets = packet_capture.packetCapture(driver)
-    cur_page_links = clickable_tags.bs4Crawling(driver.current_url, driver.page_source)
-    cur_page_links += res_geturl.getUrl(driver.current_url, req_res_packets, driver.page_source)
-    cur_page_links = list(set(deleteFragment(cur_page_links)))
+    if "CSPEvaluate" in options["tool"]["optionalJobs"]:
+        csp_result = csp_evaluator.start(driver.current_url)
+        db.insertCSP(csp_result)
 
-    cookie_result = extract_cookies.getCookies(driver.current_url, req_res_packets)
-    domain_result = extract_domains.extractDomains(dict(), driver.current_url, cur_page_links)
+    req_res_packets = packet_capture.start(driver)
 
-    # if "CSPEvaluate" in options["tool"]["optionalJobs"]:
-    #     csp_result = csp_evaluator.cspHeader(driver.current_url)
-    #     db.insertCSP(csp_result)
+    # 다른 사이트로 Redirect 되었는지 검증.
+    if not func.isSameDomain(driver.current_url, start_options["input_url"]):
+        req_res_packets = packet_capture.filterDomain(req_res_packets, start_options["input_url"])
+        cur_page_links = list()
+    else:
+        cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
+        cur_page_links += get_res_links.start(driver.current_url, req_res_packets, driver.page_source)
+        cur_page_links = list(set(packet_capture.deleteFragment(cur_page_links)))
+        # domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
+    cookie_result = get_cookies.start(driver.current_url, req_res_packets)
 
-    # TODO
-    # 찾은 정보의 Icon 제공
-
-    # db.insertPackets(req_res_packets)
-
-    packet_capture.writeFile(req_res_packets)
-
+    req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
+    db.insertPackets(req_res_packets)
     p = Process(target=analysis, args=(input_url, req_res_packets, cur_page_links, options, cookie_result, driver.page_source, driver.current_url)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
     p.start()
-
-
+    
     if depth == 0:
         return
 
     for visit_url in cur_page_links:
-        if visit_url in visited_links:
+        if visit_url in start_options["visited_links"]:
             continue
-        if not isSameDomain(input_url, visit_url):
+        if not func.isSameDomain(start_options["input_url"], visit_url):
             continue
-        if isSamePath(visit_url, visited_links):
+        if func.isSamePath(visit_url, start_options["visited_links"]):
             continue
-
-        # TODO
-        # 이미지 페이지 등 방문하지 않는 코드 작성
-        # target 외에 다른 사이트로 redirect 될때, 검증하는 코드 작성 필요
-        # 무한 크롤링
-        visited_links.append(visit_url)
+        if func.isExistExtension(visit_url, "image"):
+            continue
+        if checkCountLink(visit_url, start_options["count_links"]):
+            continue
+        
+        start_options["visited_links"].append(visit_url)
         visit(driver, visit_url, depth - 1, options)
 
+def checkCountLink(visit_url, count_links):
+    visit_path = urlparse(visit_url).path
 
-def isSameDomain(target_url, visit_url):
     try:
-        target = urlparse(target_url)
-        visit = urlparse(visit_url)
-
-        if visit.scheme != "http" and visit.scheme != "https":
-            return False
-        if target.netloc == visit.netloc:
+        if count_links[visit_path]["count"] > 10:
             return True
-        else:
-            return False
+
+        count_links[visit_path]["count"] += 1
     except:
-        return False
+        start_options["count_links"][visit_path] = {"count" : 1}
 
-
-def isSamePath(visit_url, previous_urls):
-    try:
-        visit = urlparse(visit_url)
-
-        for link in previous_urls:
-            previous = urlparse(link)
-
-            if (visit.path == previous.path) and (visit.query == previous.query):
-                return True
-
-            # https://naver.com 과 https://naver.com/ 는 같은 url 이므로 검증하는 코드 작성.
-            visit_path_len = len(visit.path.replace("/", ""))
-            previous_path_len = len(previous.path.replace("/", ""))
-
-            if visit_path_len == 0 and previous_path_len == 0:
-                return True
-        else:
-            return False
-    except:
-        return False
-
-
-def deleteFragment(links):
-    for i in range(len(links)):
-        parse = urlparse(links[i])
-        parse = parse._replace(fragment="")
-        links[i] = urlunparse(parse)
-
-    return links
-
-
-def deleteCssBody(packets):
-    css_content_types = ["text/css"]
-
-    for index in range(len(packets)):
-        if "content-type" in list(packets[index]["response"]["headers"].keys()):
-            for type in css_content_types:
-                if packets[index]["response"]["headers"]["content-type"].find(type) != -1:
-                    packets[index]["response"]["body"] = ""
-
-    return packets
-
+    return False
 
 def initSelenium():
     chrome_options = webdriver.ChromeOptions()
@@ -162,9 +119,9 @@ def initSelenium():
         "disable_encoding": True
     }
 
-    driver = webdriver.Chrome("./Crawling/config/chromedriver", seleniumwire_options=options, chrome_options=chrome_options)
-    return driver
+    driver = webdriver.Chrome(ChromeDriverManager().install(), seleniumwire_options=options, chrome_options=chrome_options)
 
+    return driver
 
 if __name__ == "__main__":
     options = {
@@ -208,7 +165,7 @@ if __name__ == "__main__":
             ]
         },
         "target": {
-            "url": "https://github.com/",
+            "url": "http://testphp.vulnweb.com/",
             "path": [
                 "/apply, /login", "/admin"
             ]

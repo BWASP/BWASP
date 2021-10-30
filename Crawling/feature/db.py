@@ -1,33 +1,11 @@
 import sqlalchemy as db
 import os
 import json
-import datetime
 from urllib.parse import urlparse,urlunparse
-
-from sqlalchemy.orm import relation
-
-def get_dbpath(repo_name="BWASP",prefix="sqlite:///",sub_path="Web\databases\BWASP.db"):
-    repopath = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-    index = repopath.find(repo_name)
-    repopath = repopath[:index+len(repo_name)]
-    return (prefix+repopath+"\\"+sub_path).replace("\\","\\\\")
-
-def isSameDomain(target_url, visit_url):
-    try:
-        target = urlparse(target_url)
-        visit = urlparse(visit_url)
-
-        if visit.scheme != "http" and visit.scheme != "https":
-            return False
-        if target.netloc == visit.netloc:
-            return True
-        else:
-            return False
-    except:
-        return False
+from Crawling.feature import func
 
 def connect(table_name):
-    db_path =get_dbpath()
+    db_path =func.get_dbpath()
     db_engine = db.create_engine(db_path)
     db_connect = db_engine.connect()
     db_metadata = db.MetaData()
@@ -94,7 +72,7 @@ def insertDomains(req_res_packets, cookie_result, previous_packet_count, target_
     '''
 
     for i,packet in enumerate(req_res_packets):
-        if not isSameDomain(target_url, packet["request"]["full_url"]):
+        if not func.isSameDomain(target_url, packet["request"]["full_url"]):
             continue
 
         url_part=urlparse(packet["request"]["full_url"])

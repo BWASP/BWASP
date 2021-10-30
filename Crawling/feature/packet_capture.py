@@ -1,6 +1,6 @@
 from seleniumwire import webdriver
 from seleniumwire.utils import decode
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 import json
 
 content_image_type = ["image/bmp", "image/cis-cod", "image/gif", "image/ief", "image/jpeg", "image/pipeg", "image/svg+xml", "image/tiff", "image/tiff", "image/png", "font/woff2"]
@@ -14,10 +14,13 @@ def webdriverSetting():
     driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options = options)
     return driver
 
-def packetCapture(driver):
+def start(driver):
     network_packet = []
     for data in driver.requests:
         if data.response:
+            if data.url == "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard":
+                continue
+
             network_packet.append({
                 "request" : getRequestPacket(data), 
                 "response" : getResponsePacket(data.response)
@@ -95,6 +98,42 @@ def getResponsePacket(data):
     
     return return_data
 
+"""
+    This function filter only same domain when browser was redirected other site.
+        - packets:      list (req, res packet)
+        - target_url:   String
+
+        - return:       list (req, res packet)
+"""
+def filterDomain(packets, target_url):
+    target_domain = urlparse(target_url).netloc
+    result_packet = []
+
+    for packet in packets:
+        if packet["request"]["headers"]["host"] == target_domain:
+            result_packet.append(packet)
+    
+    return result_packet
+
+def deleteFragment(links):
+    for i in range(len(links)):
+        parse = urlparse(links[i])
+        parse = parse._replace(fragment="")
+        links[i] = urlunparse(parse)
+
+    return links
+
+def deleteUselessBody(packets):
+    content_types = ["text/css", "application/font-woff2"]
+
+    for index in range(len(packets)):
+        if "content-type" in list(packets[index]["response"]["headers"].keys()):
+            for type in content_types:
+                if packets[index]["response"]["headers"]["content-type"].find(type) != -1:
+                    packets[index]["response"]["body"] = ""
+
+    return packets
+
 def writeFile(data):
     f = open("test.json", "w")
     json.dump(data, f, indent=4)
@@ -111,4 +150,4 @@ if __name__ == "__main__":
     # ]
 
     driver.get(url)
-    writeFile(packetCapture(driver))
+    writeFile(start(driver))
