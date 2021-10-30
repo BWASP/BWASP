@@ -20,20 +20,35 @@ def get_dbpath(repo_name="BWASP", prefix="sqlite:///", sub_path="Web\databases\C
 
 
 def cve_Data(search):
+    print("first check")
     server_title_all = search['webserver']
+    print(server_title_all)
     server_title = list(server_title_all)[0]
+    print(server_title)
     server_version = server_title_all[server_title]['version']
+    print(server_version)
     backend_title_all = search['backend']
+    print(backend_title_all)
     backend_title = ""
     backend_version = ""
     if len(list(backend_title_all)) > 1:
+        print("second check")
+        backend_version = []
         for i in range(len(list(backend_title_all))):
             backend_title = list(backend_title_all)
-            backend_version += backend_title_all[backend_title[i]]['version']
+            print(backend_title)
+            if backend_title_all[backend_title[i]]['version'] == "false":
+                print("third check")
+                backend_version.append("")
+            else:
+                print("fourth_check")
+                backend_version.append(backend_title_all[backend_title[i]]['version'])
     else:
+        print("fifth cehck")
         backend_title = list(backend_title_all)[0]
         backend_version = backend_title_all[backend_title[0]]['version']
 
+    print("sixth check")
     db_engine = db2.create_engine(get_dbpath())
     db_connection = db_engine.connect()
     db_metadata = db2.MetaData()
@@ -48,21 +63,43 @@ def cve_Data(search):
         db_table.columns.description.like("%" + server_version + "%"))).order_by(
         db_table.columns.year.desc())
 
+    print(query)
+
+    result = db_connection.execute(query)
+    result_set = result.fetchall()
+    if len(result_set) == 0:
+        result_set.append("Server CVE None")
+
+    print("gggggggg")
+
+    cve_data = list()
+    cve_data.append(str(result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", ""))
+
+    asdf_title = []
+    asdf_version = []
+
+    print(backend_title_all)
+    print(len(list(backend_title_all)))
+
     for i in range(len(list(backend_title_all))):
         backend_query = db2.select(db_table.columns.year).where(and_(
             db_table.columns.description.like("%" + backend_title[i] + "%"),
             db_table.columns.description.like("%" + backend_version[i] + "%"))).order_by(
             db_table.columns.year.desc())
 
-    result = db_connection.execute(query)
-    result_set = result.fetchall()
+        backend_result = db_connection.execute(backend_query)
+        backend_result_set = backend_result.fetchall()
 
-    backend_result = db_connection.execute(backend_query)
-    backend_result_set = backend_result.fetchall()
+        asdf_title.append(backend_title[i])
+        asdf_version.append(backend_version[i])
 
-    cve_data = list()
-    cve_data.append(str(result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", ""))
-    cve_data.append(str(backend_result_set[0]).replace("(", "").replace(")", "").replace(",", "").replace("'", ""))
+        for j in range(5):
+            cve_data.append(str(backend_result_set[j]).replace("(", "").replace(")", "").replace(",", "").replace("'", ""))
+
+    print(asdf_title)
+    print(asdf_version)
+
+    print(cve_data)
 
     return cve_data
 
