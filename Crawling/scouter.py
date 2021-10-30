@@ -27,7 +27,7 @@ def start(url, depth, options):
     start_options["count_links"] = {}
 
 def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url):
-    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, page_source, current_url ,options['info'])
+    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, options['info'])
     previous_packet_count = db.getPacketsCount()
     db.insertDomains(req_res_packets, cookie_result, previous_packet_count, current_url)
     db.insertWebInfo(analyst_result, input_url, previous_packet_count)
@@ -50,10 +50,10 @@ def visit(driver, url, depth, options):
         start_options["check"] = False
 
         if "portScan" in options["tool"]["optionalJobs"]:
-            target_port = get_ports.getPortsOnline(start_options["input_url"])
+            target_port = get_ports.getPortsOffline(start_options["input_url"])
             db.insertPorts(target_port, start_options["input_url"])
         else:
-            target_port = get_ports.getPortsOffline(start_options["input_url"])
+            target_port = get_ports.getPortsOnline(start_options["input_url"])
             db.insertPorts(target_port, start_options["input_url"])
 
     if "CSPEvaluate" in options["tool"]["optionalJobs"]:
@@ -75,7 +75,7 @@ def visit(driver, url, depth, options):
 
     req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
     db.insertPackets(req_res_packets)
-    p = Process(target=analysis, args=(input_url, req_res_packets, cur_page_links, options, cookie_result, driver.page_source, driver.current_url)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result, driver.page_source, driver.current_url)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
     p.start()
     
     if depth == 0:

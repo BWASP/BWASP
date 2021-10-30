@@ -23,6 +23,7 @@ def getPortsOnline(target_ip):
 
 def getPortsOffline(target_ip):
     try:
+        target_ip = gethostbyname(urlparse(target_ip).netloc)
         s = socket(AF_INET, SOCK_DGRAM)
         s.connect((target_ip,80))
         ipscan = s.getsockname()[0]
@@ -50,7 +51,7 @@ def getPortsOffline(target_ip):
                 opened_ports[str(p)] = service
                 
     except error as e:
-        print("[Error] - Port Scan\n" + e)
+        print("[Error] - Port Scan\n" + str(e))
     
     return opened_ports
 

@@ -3,6 +3,7 @@ import os
 import json
 from urllib.parse import urlparse,urlunparse
 from Crawling.feature import func
+from bs4 import BeautifulSoup
 
 
 def connect(table_name):
