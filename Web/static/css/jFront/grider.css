@@ -1,0 +1,62 @@
+:root{
+    --unified-margin: 15px;
+    --sizing-top: 65px;
+    --sizing-sidebar: calc(100% - var(--sizing-top) - var(--sizing-footer) - var(--unified-margin));
+    --sizing-body: calc(100% - var(--sizing-top) - var(--unified-margin));
+    --sizing-footer: 60px;
+}
+
+html, body {
+    min-height: 100% !important;
+    height: 100% !important;
+    min-height: -webkit-fill-available;
+}
+
+body{
+    display: flex;
+    align-items: stretch;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.rounded-custom{
+    border-radius: .5rem !important;
+}
+
+.sizer{
+    display: flex !important;
+}
+
+.sizer.full-width{
+    width: 100%;
+}
+
+.sizer.element-top{
+    height: var(--sizing-top) !important;
+    margin-bottom: 15px !important;
+}
+
+.sizer.element-sidebar{
+    height: var(--sizing-sidebar) !important;
+}
+
+.sizer.element-objects{
+    height: var(--sizing-body) !important;
+}
+
+footer{
+    height: calc(var(--sizing-footer) - var(--unified-margin)) !important;
+    margin-top: var(--unified-margin);
+}
+
+footer>div{
+    height: 100% !important;
+}
+
+footer>div>p{
+    color: var(--material-grey);
+    margin-bottom: 0 !important;
+}
+
+.separatedTab{
+    overflow: scroll !important;
+}

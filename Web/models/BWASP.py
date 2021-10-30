@@ -42,7 +42,7 @@ class job(db.Model):
     recursiveLevel = db.Column(db.TEXT(1000), nullable=False)
     uriPath = db.Column(db.TEXT(1000), nullable=False)
 
-    def __init__(self, targetURL, knownInfo, recursiveLevel, uriPath, **kargs):
+    def __init__(self, targetURL, knownInfo, recursiveLevel, uriPath, **kwargs):
         self.targetURL = targetURL
         self.knownInfo = knownInfo
         self.recursiveLevel = recursiveLevel
@@ -60,6 +60,16 @@ class packets(db.Model):
     requestJson = db.Column(db.TEXT(1000), nullable=False)
     responseHeader = db.Column(db.TEXT(1000), nullable=False)
     responseBody = db.Column(db.TEXT(1000), nullable=False)
+
+    def __init__(self, statusCode, requestType, requestJson, responseHeader, responseBody, **kwargs):
+        self.statusCode = statusCode
+        self.requestType = requestType
+        self.requestJson = requestJson
+        self.responseHeader = responseHeader
+        self.responseBody = responseBody
+
+    def __repr__(self):
+        return f"<job('{self.statusCode}', '{self.requestType}', '{self.requestJson}, {self.responseHeader}, {self.responseBody}')>"
 
 
 class ports(db.Model):
