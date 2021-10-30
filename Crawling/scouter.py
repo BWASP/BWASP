@@ -1,4 +1,5 @@
 from seleniumwire import webdriver
+from multiprocessing import Process
 from urllib.parse import urlparse, urlunparse
 
 from Crawling import analyst
@@ -14,6 +15,18 @@ def start(url, depth, options):
 
     visit(driver, url, depth, options)
     driver.quit()
+
+def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url):
+    
+    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, page_source, current_url ,options['info'])
+    print(analyst_result)
+    req_res_packets = deleteCssBody(req_res_packets)
+
+    # previous_packet_count = db.getPacketsCount()
+    # db.insertDomains(req_res_packets, cookie_result, previous_packet_count, current_url)
+    # db.insertWebInfo(analyst_result, input_url, previous_packet_count)
+    # Here DB code 
+    return 1
 
 def visit(driver, url, depth, options):
     global check
@@ -47,21 +60,20 @@ def visit(driver, url, depth, options):
     cookie_result = extract_cookies.getCookies(driver.current_url, req_res_packets)
     domain_result = extract_domains.extractDomains(dict(), driver.current_url, cur_page_links)
 
-    if "CSPEvaluate" in options["tool"]["optionalJobs"]:
-        csp_result = csp_evaluator.cspHeader(driver.current_url)
-        db.insertCSP(csp_result)
+    # if "CSPEvaluate" in options["tool"]["optionalJobs"]:
+    #     csp_result = csp_evaluator.cspHeader(driver.current_url)
+    #     db.insertCSP(csp_result)
 
     # TODO
     # 찾은 정보의 Icon 제공
-    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, driver, options['info'])
 
-    req_res_packets = deleteCssBody(req_res_packets)
+    # db.insertPackets(req_res_packets)
 
-    previous_packet_count = db.getPacketsCount()
-    db.insertPackets(req_res_packets)
-    db.insertDomains(req_res_packets, cookie_result, previous_packet_count, driver.current_url)
-    db.insertWebInfo(analyst_result, input_url, previous_packet_count)
-    # Here DB code 
+    packet_capture.writeFile(req_res_packets)
+
+    p = Process(target=analysis, args=(input_url, req_res_packets, cur_page_links, options, cookie_result, driver.page_source, driver.current_url)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p.start()
+
 
     if depth == 0:
         return
@@ -150,7 +162,7 @@ def initSelenium():
         "disable_encoding": True
     }
 
-    driver = webdriver.Chrome("./Crawling/config/chromedriver.exe", seleniumwire_options=options, chrome_options=chrome_options)
+    driver = webdriver.Chrome("./Crawling/config/chromedriver", seleniumwire_options=options, chrome_options=chrome_options)
     return driver
 
 
