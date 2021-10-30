@@ -30,7 +30,9 @@ def cve_Data(search):
     backend_title_all = search['backend']
     print(backend_title_all)
     backend_title = ""
-    backend_version = ""
+
+    check = True
+
     if len(list(backend_title_all)) > 1:
         print("second check")
         backend_version = []
@@ -44,9 +46,13 @@ def cve_Data(search):
                 print("fourth_check")
                 backend_version.append(backend_title_all[backend_title[i]]['version'])
     else:
-        print("fifth cehck")
+        print("fifth check")
         backend_title = list(backend_title_all)[0]
-        backend_version = backend_title_all[backend_title[0]]['version']
+        backend_version = backend_title_all[backend_title]['version']
+        check = False
+
+    print(backend_title)
+    print(backend_version)
 
     print("sixth check")
     db_engine = db2.create_engine(get_dbpath())
@@ -82,10 +88,16 @@ def cve_Data(search):
     print(len(list(backend_title_all)))
 
     for i in range(len(list(backend_title_all))):
-        backend_query = db2.select(db_table.columns.year).where(and_(
-            db_table.columns.description.like("%" + backend_title[i] + "%"),
-            db_table.columns.description.like("%" + backend_version[i] + "%"))).order_by(
-            db_table.columns.year.desc())
+        if check == True:
+            backend_query = db2.select(db_table.columns.year).where(and_(
+                db_table.columns.description.like("%" + backend_title[i] + "%"),
+                db_table.columns.description.like("%" + backend_version[i] + "%"))).order_by(
+                db_table.columns.year.desc())
+        else:
+            backend_query = db2.select(db_table.columns.year).where(and_(
+                db_table.columns.description.like("%" + backend_title + "%"),
+                db_table.columns.description.like("%" + backend_version + "%"))).order_by(
+                db_table.columns.year.desc())
 
         backend_result = db_connection.execute(backend_query)
         backend_result_set = backend_result.fetchall()
