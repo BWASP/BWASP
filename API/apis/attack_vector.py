@@ -27,17 +27,16 @@ class AttackVectorDAO(object):
     def get(self, id=-1, Type=False):
         if Type is False and id == -1:
             AttackVector = g.BWASP_DBObj.query(attackVectorModel).all()
-            print(len(AttackVector))
             return AttackVector
-        elif Type is not False and id > 0:
+
+        if Type is not False and id > 0:
             AttackVector = g.BWASP_DBObj.query(attackVectorModel).filter(attackVectorModel.id == id).all()
             return AttackVector
-        else:
-            ns.abort(404, f"Port {id} doesn't exist")
+        
+        ns.abort(404, f"Port {id} doesn't exist")
 
     def count(self):
         self.counter = int(g.BWASP_DBObj.query(attackVectorModel).count())
-        print(self.counter)
         return self.counter
 
     def retCountbyData(self, start, counting):
@@ -46,18 +45,21 @@ class AttackVectorDAO(object):
 
     def create(self, data):
         AttackVector = data
-        g.BWASP_DBObj.add(
-            attackVectorModel(UUID=AttackVector["UUID"],
+        try:
+            g.BWASP_DBObj.add(
+                attackVectorModel(UUID=AttackVector["UUID"],
                               attackVector=AttackVector["attackVector"],
                               typicalServerity=AttackVector["typicalServerity"],
                               description=AttackVector["description"]
                               )
-        )
-        g.BWASP_DBObj.commit()
-        return AttackVector
+            )
+
+            g.BWASP_DBObj.commit()
+            return AttackVector
+        except: 
+            g.BWASP_DBObj.rollback()
 
 AttackVector_DAO = AttackVectorDAO()
-
 
 # AttackVector
 @ns.route('')
