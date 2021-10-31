@@ -1,10 +1,6 @@
-from flask import (
-    Flask, g, jsonify
-)
-from flask_restx import Api, Resource, fields, Namespace
-from werkzeug.middleware.proxy_fix import ProxyFix
+from flask import g
+from flask_restx import Resource, fields, Namespace
 from models.BWASP import systeminfo as systeminfoModel
-from sqlalchemy import func
 
 ns = Namespace('api/systeminfo', description='system-info operations')
 

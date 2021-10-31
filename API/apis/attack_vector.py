@@ -1,10 +1,6 @@
-from flask import (
-    Flask, g, jsonify
-)
-from flask_restx import Api, Resource, fields, Namespace
-from werkzeug.middleware.proxy_fix import ProxyFix
-from models.BWASP import domain as domainModel
-from sqlalchemy import func
+from flask import g
+from flask_restx import Resource, fields, Namespace
+from models.BWASP import attackVector as attackVectorModel
 
 ns = Namespace('api/attackVector', description='attackVector operations')
 

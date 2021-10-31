@@ -1,12 +1,9 @@
-from flask import (
-    Flask, g, jsonify
-)
-from flask_restx import Api, Resource, fields, Namespace
+from flask import g
+from flask_restx import Resource, fields, Namespace
 from werkzeug.middleware.proxy_fix import ProxyFix
 from models.CVE import (
     cve as cveModel
 )
-from sqlalchemy import func
 
 ns = Namespace('api/cve/search', description='cve info operations')
 

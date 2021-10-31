@@ -1,11 +1,6 @@
-from flask import (
-    Flask, g, jsonify
-)
-from flask_restx import Api, Resource, fields, Namespace
-from werkzeug.middleware.proxy_fix import ProxyFix
-from sqlalchemy import func
-
-from models.BWASP import packets as packetModel
+from flask import g
+from flask_restx import Resource, fields, Namespace
+from models.BWASP import packets as packetsModel
 
 ns = Namespace('api/packets', description='packet operations')
 

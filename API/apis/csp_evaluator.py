@@ -1,11 +1,7 @@
-from flask import (
-    Flask, g, jsonify
-)
+from flask import g
 
-from flask_restx import Api, Resource, fields, Namespace
-from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_restx import Resource, fields, Namespace
 from models.BWASP import CSPEvaluator as CSPEvaluatorModel
-from sqlalchemy import func
 
 ns = Namespace('api/csp_evaluator', description='csp_evaluator operations')
 

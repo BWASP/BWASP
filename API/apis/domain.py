@@ -1,8 +1,5 @@
-from flask import (
-    Flask, g, jsonify
-)
-from flask_restx import Api, Resource, fields, Namespace
-from werkzeug.middleware.proxy_fix import ProxyFix
+from flask import g
+from flask_restx import Resource, fields, Namespace
 from models.BWASP import domain as domainModel
 
 ns = Namespace('api/domain', description='domain operations')
