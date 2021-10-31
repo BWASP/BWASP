@@ -34,12 +34,15 @@ def loadCategory(category):
     return return_data
 
 
-def start(detect_list, url, cur_page_links, req_res_packets,options):
+def start(detect_list, url, cur_page_links, req_res_packets,packet_indexes_,options):
     category =  list(range(1,96))
     global data
     data = loadCategory(category)
     global cat_meta
     cat_meta=loadCategory_meta()
+    global packet_indexes
+    packet_indexes = packet_indexes_
+
     #detect_list
 
     #TO DO 이미 찾은 패킷은 더 이상 진행 x  , detect 들 append 호출 했을 때 리턴값으로 구분 하면 가능  
@@ -62,11 +65,11 @@ def start(detect_list, url, cur_page_links, req_res_packets,options):
                 if "website" in list(data[app].keys()):
                     detectWebsite(detect_list, cur_page_links, data, cats, app)
             else:
-                if i == 1: # 좋은 한정 범위 있다면 수정 ,현재 페이지 소스
+                if i == 0: # 좋은 한정 범위 있다면 수정 ,현재 페이지 소스, google anayltics가 빠져 0 페이지가 현재 소스
                     if "html" in list(data[app].keys()):
-                        detectHtml(detect_list, packet, data, 1, cats, app)
+                        detectHtml(detect_list, packet, data, 0, cats, app)
                     if "meta" in list(data[app].keys()):
-                        detectMeta(detect_list, packet, data, 1, cats, app)
+                        detectMeta(detect_list, packet, data, 0, cats, app)
                     if "dom" in list(data[app].keys()):
                         detectDom(detect_list, packet, data, cats, app)
 
@@ -95,7 +98,6 @@ def retCatrepresnt(cats):
 
 
 def initResult(detect_list,cats,app):
-    print("why,",cats, detect_list)  
     if cats not in detect_list.keys():
         detect_list[cats]=dict()
     
@@ -109,9 +111,20 @@ def initResult(detect_list,cats,app):
         detect_list[cats][app]["icon"]="false"
 
 
-# requset_index , reseponse_index 가 0 이면 관련있는 index가 없다는 걸 의미
 
-def appendResult(detect_list,cats,app,detectype,version,request_index=0,response_index=0,url=""):
+def retRelatedpacketidx(index):
+    global packet_indexes
+    if index == -1:
+        return 0
+    else:
+        return packet_indexes[index]
+
+# requset_index , reseponse_index 가 -1 이면 관련있는 index가 없다는 걸 의미, 0이면 현재 페이지 소스
+
+def appendResult(detect_list,cats,app,detectype,version,request_index=-1,response_index=-1,url=""):
+    
+    request_index =retRelatedpacketidx(request_index)
+    response_index = retRelatedpacketidx(response_index)
 
     initResult(detect_list,cats,app)
     if detectype and detectype not in detect_list[cats][app]["detect"]:
@@ -130,7 +143,7 @@ def appendResult(detect_list,cats,app,detectype,version,request_index=0,response
 
 
 # detect_list , app(이름) , request 패킷번호 ,response 패킷 번호 
-def  appendImplies(detect_list,app,request_index=0,response_index=0,url=""):
+def  appendImplies(detect_list,app,request_index=-1,response_index=-1,url=""):
     if "implies" in data[app].keys():
         implies_list=data[app]["implies"]
 
@@ -156,8 +169,8 @@ def detectHeaders(detect_list,packet, data, index, cats, app):
 
         if regex_result:
             version = detectVersion(regex, regex_result)
-            appendResult(detect_list,cats,app,"headers",version,0,index)
-            appendImplies(detect_list,app,0,index)
+            appendResult(detect_list,cats,app,"headers",version,-1,index)
+            appendImplies(detect_list,app,-1,index)
 
 def detectHtml(detect_list, packet, data, index, cats, app):
     if type(data[app]["html"]) == str:
@@ -166,16 +179,16 @@ def detectHtml(detect_list, packet, data, index, cats, app):
         regex_result = pattern.search(packet["response"]["body"])
         if regex_result:
             version = detectVersion(regex, regex_result)
-            appendResult(detect_list,cats,app,"html",version,0,index)
-            appendImplies(detect_list,app,0,index)
+            appendResult(detect_list,cats,app,"html",version,-1,index)
+            appendImplies(detect_list,app,-1,index)
     else:
         for regex in data[app]["html"]:
             pattern = re.compile(regex.split("\\;")[0])
             regex_result = pattern.search(packet["response"]["body"])
             if regex_result:
                 version = detectVersion(regex, regex_result)
-                appendResult(detect_list,cats,app,"html",version,0,index)
-                appendImplies(detect_list,app,0,index)             
+                appendResult(detect_list,cats,app,"html",version,-1,index)
+                appendImplies(detect_list,app,-1,index)             
 
 def detectCookies(detect_list, packet, data, index, cats, app):
     cookies = dict()
@@ -187,8 +200,8 @@ def detectCookies(detect_list, packet, data, index, cats, app):
         cookies[i.split('=')[0]] = i.split('=')[1]
     for cookie in data[app]["cookies"]:
         if cookie in cookies.keys():
-            appendResult(detect_list,cats,app,"cookies",version,index,0)
-            appendImplies(detect_list,app,index,0)
+            appendResult(detect_list,cats,app,"cookies",version,index,-1)
+            appendImplies(detect_list,app,index,-1)
             #result = {"detect":["cookies"], "version":"False", "request":[index], "response":[], "url":[]}
 
 def detectUrl(detect_list, cur_page_links, data, cats, app):
@@ -202,8 +215,8 @@ def detectUrl(detect_list, cur_page_links, data, cats, app):
             
             if regex_result:
                 version = detectVersion(regex, regex_result)
-                appendResult(detect_list,cats,app,"url",version,0,1,url)
-                appendImplies(detect_list,app,0,1)
+                appendResult(detect_list,cats,app,"url",version,-1,0,url)
+                appendImplies(detect_list,app,-1,0)
                 return
         else:
             for url_regex in data[app]["url"]:
@@ -212,8 +225,8 @@ def detectUrl(detect_list, cur_page_links, data, cats, app):
 
                 if regex_result:
                     version = detectVersion(url_regex, regex_result)
-                    appendResult(detect_list,cats,app,"url",version,0,1,url)
-                    appendImplies(detect_list,app,0,1)
+                    appendResult(detect_list,cats,app,"url",version,-1,0,url)
+                    appendImplies(detect_list,app,-1,0)
                     return
 
 def detectScripts(detect_list, cur_page_links, data, cats, app):
@@ -224,8 +237,8 @@ def detectScripts(detect_list, cur_page_links, data, cats, app):
             regex_result = pattern.search(url)
             if regex_result:
                 version = detectVersion(regex, regex_result)
-                appendResult(detect_list,cats,app,"scripts",version,0,1,url)
-                appendImplies(detect_list,app,0,1)
+                appendResult(detect_list,cats,app,"scripts",version,-1,0,url)
+                appendImplies(detect_list,app,-1,0)
                 return
         else:
             for url_regex in data[app]["scripts"]:
@@ -233,8 +246,8 @@ def detectScripts(detect_list, cur_page_links, data, cats, app):
                 regex_result = pattern.search(url)
                 if regex_result:
                     version = detectVersion(url_regex,regex_result)
-                    appendResult(detect_list,cats,app,"scripts",version,0,1,url)
-                    appendImplies(detect_list,app,0,1)
+                    appendResult(detect_list,cats,app,"scripts",version,-1,0,url)
+                    appendImplies(detect_list,app,-1,0)
                     return
 
 def detectWebsite(detect_list, cur_page_links, data, cats, app):
@@ -244,15 +257,15 @@ def detectWebsite(detect_list, cur_page_links, data, cats, app):
         if type(data[app]["website"]) == str:
             if data[app]["website"] in url:
                 #1 => 현재 페이지
-                appendResult(detect_list,cats,app,"website",version,0,1,url)
-                appendImplies(detect_list,app,0,1)
+                appendResult(detect_list,cats,app,"website",version,-1,0,url)
+                appendImplies(detect_list,app,-1,0)
                 return
         else:
             for url_cond in data[app]["website"]:
                 if url_cond in url:
                      #1 => 현재 페이지
-                    appendResult(detect_list,cats,app,"website",version,0,1,url)
-                    appendImplies(detect_list,app,0,1)
+                    appendResult(detect_list,cats,app,"website",version,-1,0,url)
+                    appendImplies(detect_list,app,-1,0)
                     return
 
 def detectMeta(detect_list, packet, data, index, cats, app):
@@ -268,8 +281,8 @@ def detectMeta(detect_list, packet, data, index, cats, app):
             regex_result = pattern.search(meta_tag['content'])
             if regex_result:
                 version = detectVersion(meta_regex, regex_result)
-                appendResult(detect_list,cats,app,"meta",version,0,index)
-                appendImplies(detect_list,app,0,index)
+                appendResult(detect_list,cats,app,"meta",version,-1,index)
+                appendImplies(detect_list,app,-1,index)
 
 def detectDom(detect_list, packet, data, cats, app):
     if "dom" in data[app].keys():
@@ -286,8 +299,8 @@ def detectDom(detect_list, packet, data, cats, app):
                                         regex_results=re.match(regex.split('\\;')[0],temp[subkey_name],re.I)
                                         if regex_results:
                                             version=detectVersion(regex, regex_results)
-                                            appendResult(detect_list,cats,app,"dom",version,0,1)
-                                            appendImplies(detect_list,app,0,1)                      
+                                            appendResult(detect_list,cats,app,"dom",version,-1,0)
+                                            appendImplies(detect_list,app,-1,0)                      
                         if subkey_name == "text":
                             regex = data[app]["dom"][key_name]["text"]
                             pattern = data[app]["dom"][key_name]["text"].split('\\;')[0]
@@ -300,13 +313,13 @@ def detectDom(detect_list, packet, data, cats, app):
 
                                 if regex_results:
                                     version=detectVersion(regex,regex_results)
-                                    appendResult(detect_list,cats,app,"dom",version,0,1)
-                                    appendImplies(detect_list,app,0,1)  
+                                    appendResult(detect_list,cats,app,"dom",version,-1,0)
+                                    appendImplies(detect_list,app,-1,0)  
                                 #match 값 존재하면 넣기
 
                         if subkey_name == "exists":
-                            appendResult(detect_list,cats,app,"dom","false",0,1)
-                            appendImplies(detect_list,app,0,1)
+                            appendResult(detect_list,cats,app,"dom","false",-1,0)
+                            appendImplies(detect_list,app,-1,0)
 
                         if subkey_name == "src":
                             for temp in temps:
@@ -315,8 +328,8 @@ def detectDom(detect_list, packet, data, cats, app):
                                     regex_results=re.match(regex.split('\\;')[0],temp['src'],re.I)
                                     if regex_results:
                                         version=detectVersion(regex,regex_results)
-                                        appendResult(detect_list,cats,app,"dom",version,0,1)
-                                        appendImplies(detect_list,app,0,1)
+                                        appendResult(detect_list,cats,app,"dom",version,-1,0)
+                                        appendImplies(detect_list,app,-1,0)
                         #if key_name == "properties" 아직 구현 x, 2가지만 해당됨
                         # 일단은 properties는 name과 같은 느낌이라 생각 , attrs로 존재 여무 확인
                         # 아직은 dict 구조지만 값은 비교안함 
@@ -327,14 +340,14 @@ def detectDom(detect_list, packet, data, cats, app):
             html = BeautifulSoup(packet["response"]["body"], features="html.parser")
             for line_list in data[app]["dom"]:
                 if html.select(line_list):
-                    appendResult(detect_list,cats,app,"dom","false",0,1)
-                    appendImplies(detect_list,app,0,1)
+                    appendResult(detect_list,cats,app,"dom","false",-1,0)
+                    appendImplies(detect_list,app,-1,0)
 
         elif type(data[app]["dom"]) is str:
             html = BeautifulSoup(packet["response"]["body"], features="html.parser")
             if html.select(data[app]["dom"]):
-                appendResult(detect_list,cats,app,"dom","false",0,1)
-                appendImplies(detect_list,app,0,1)
+                appendResult(detect_list,cats,app,"dom","false",-1,0)
+                appendImplies(detect_list,app,-1,0)
 
 def detectVersion(regex,regex_results,type="search"):
     version=""
