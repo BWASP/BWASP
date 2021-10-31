@@ -49,6 +49,7 @@ def input_tag(response_body):
     tag_name_list=[]
     board = ""
     login = ""
+    attack_vector = "SQL Injection, XSS"
     try:
         text = soup.find_all('input')
         text_length = len(text)
@@ -74,10 +75,10 @@ def input_tag(response_body):
 
                 # th tag check (board) and type="password" check (login)
                 if "<th" in response_body:
-                    board = "board check (sql injection and xss)"
+                    attack_vector += " (board)"
 
                 if tag.attrs['type'] == "password":
-                    login = "login check (sql injection)"
+                    attack_vector += " (login)"
 
         except:
             pass
@@ -86,6 +87,6 @@ def input_tag(response_body):
         for tag in form:
             print(tag.attrs['action'])
 
-    return tag_list, tag_name_list, board, login
+    return tag_list, tag_name_list, attackVector
 
 
