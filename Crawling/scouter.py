@@ -5,6 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from Crawling import analyst
 from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
+from Crawling.attack_vector import attack_header
 import json
 # TODO
 # 사용자가 여러개의 사이트를 동시에 테스트 할 때, 전역 변수의 관리 문제
@@ -60,6 +61,7 @@ def visit(driver, url, depth, options):
         pass
 
     if start_options["check"]:
+        attack_header(driver.current_url)
         start_options["input_url"] = driver.current_url
         start_options["visited_links"].append(start_options["input_url"])
         start_options["check"] = False

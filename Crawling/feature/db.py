@@ -15,7 +15,7 @@ def connect(table_name):
 
     return db_connect, db_table
 
-
+#REST API: 종민 Packets
 def insertPackets(req_res_packets):
     db_connect, db_table = connect("packets")
 
@@ -121,6 +121,7 @@ def insertPorts(port_list, target_url):
         result.close()
 
 
+#REST API: 주명 WebInfo
 def insertWebInfo(analyst_result, target_url, previous_packet_count):
     db_connect, db_table = connect("systeminfo")
 
