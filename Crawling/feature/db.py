@@ -32,6 +32,7 @@ def insertPackets(req_res_packets):
         result.close()
 
 
+#REST API: 주원 CSP, Ports
 def insertCSP(csp_result):
     db_connect, db_table = connect("CSPEvaluator")
     UUID = 0
@@ -49,19 +50,26 @@ def insertCSP(csp_result):
         result.close()
 
 
+#REST API: 도훈 Domains
 # TODO
 # 중복된 url 이 있을 경우, 데이터를 넣어야 하는가?
 def insertDomains(req_res_packets, cookie_result, previous_packet_count, target_url):
     db_connect, db_table = connect("domain")
     '''
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    relatePacket = db.Column(db.Integer, nullable=False)
-    URL = db.Column(db.TEXT(1000), nullable=False)
-    URI = db.Column(db.TEXT(1000), nullable=False)
-    params = db.Column(db.TEXT(1000), nullable=False)
-    cookie = db.Column(db.TEXT(1000), nullable=False)
-    authType = db.Column(db.Integer, nullable=False)
-    comment = db.Column(db.TEXT(1000), nullable=False)
+    [
+    {
+    "id": 0,
+    "relatePacket": 0
+    "URL": "string",
+    "URI": "string",
+    "params": "string",
+    "comment": "string",
+    "attackVector": "string",
+    "typicalServerity": "string",
+    "description": "string",
+    "Details": "string"
+    }
+    ]
     '''
 
     '''
@@ -70,9 +78,11 @@ def insertDomains(req_res_packets, cookie_result, previous_packet_count, target_
     url: http://kitribob.kr/
     uri: /asdf/1.php
     param: 인자 값 (json)
-    cookie: cookie value (json)
-    authType: 인증이 없는 페이지 0, 로그인 같은 일반 인증 1, 토큰 2
     comment: 해당 페이지의 주석
+    attackVector: SQL Injection, XSS
+    typeicalServerity: 0 (취약점 영향도 low, normal, high)
+    description: 취약점 설명 또는 관련 url
+    Details: input tag, cookie, query string(get params) json 형태로
     '''
 
     for i,packet in enumerate(req_res_packets):
@@ -105,7 +115,7 @@ def insertDomains(req_res_packets, cookie_result, previous_packet_count, target_
         result = db_connect.execute(query)
         result.close()
 
-
+#REST API: 주원 CSP, Ports
 def insertPorts(port_list, target_url):
     db_connect, db_table = connect("ports")
 
@@ -151,13 +161,13 @@ def insertWebInfo(analyst_result, target_url, previous_packet_count):
 
 
 # 한번 방문할 때마다 실행되기 때문에 느릴거 같음.
-def getPacketsCount():
-    db_connect, db_table = connect("packets")
+#def getPacketsCount():
+#    db_connect, db_table = connect("packets")
 
-    query = db.select([db_table])
-    row = db_connect.execute(query).fetchall()
+#    query = db.select([db_table])
+#    row = db_connect.execute(query).fetchall()
 
-    return len(row)
+#    return len(row)
 
 
 def getPacketIndex(packet_index, previous_packet_count):
