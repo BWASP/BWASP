@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+import json
 
 
 def attack_header(target_url):
@@ -85,8 +86,17 @@ def input_tag(response_body):
 
     if form != "none":
         for tag in form:
-            print(tag.attrs['action'])
+            action_page= tag.attrs['action']
 
-    return tag_list, tag_name_list, attackVector
+    return tag_list, tag_name_list, attack_vector, action_page
 
+def corsCheck(req_res_packets):
+    cors_check = "None"
 
+    for packet in req_res_packets:
+        resonse_header = json.dumps(packet["response"]["headers"])
+
+    if resonse_header['access-control-allow-origin'] == "*":
+        cors_check = "CORS Misconfiguration: *"
+
+    return cors_check
