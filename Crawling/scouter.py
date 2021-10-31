@@ -12,8 +12,11 @@ start_options = {
     "check" : True,
     "input_url" : "",
     "visited_links" : [],
-    "count_links" : {}
+    "count_links" : {},
+    "previous_packet_count" : 0 #누적 패킷 개수
 }
+
+sysinfo_detectlist = {}
 
 def start(url, depth, options):
     global start_options
@@ -26,9 +29,10 @@ def start(url, depth, options):
     start_options["visited_links"] = []
     start_options["count_links"] = {}
 
-def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url):
-    analyst_result = analyst.start(input_url, req_res_packets, cur_page_links, options['info'])
-    previous_packet_count = db.getPacketsCount()
+def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url,previous_packet_count):
+    global start_options
+    global sysinfo_detectlist
+    analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, options['info'])
     db.insertDomains(req_res_packets, cookie_result, previous_packet_count, current_url)
     db.insertWebInfo(analyst_result, input_url, previous_packet_count)
     
@@ -75,7 +79,8 @@ def visit(driver, url, depth, options):
 
     req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
     db.insertPackets(req_res_packets)
-    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result, driver.page_source, driver.current_url)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result, driver.page_source, driver.current_url,start_options["previous_packet_count"])) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    start_options["previous_packet_count"] += len(req_res_packets)
     p.start()
     
     if depth == 0:

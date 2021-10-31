@@ -3,7 +3,7 @@ import os
 import json
 from urllib.parse import urlparse,urlunparse
 from Crawling.feature import func
-from bs4 import BeautifulSoup
+from Crawling.attack_vector import *
 
 
 def connect(table_name):
@@ -25,47 +25,6 @@ def insertPackets(req_res_packets):
         request_json = json.dumps(packet["request"])
         resonse_header = json.dumps(packet["response"]["headers"])
         response_body = packet["response"]["body"]
-
-        # form tag action and input tag and input name parse
-        soup = BeautifulSoup(response_body, 'html.parser')
-        try:
-            text = soup.find_all('input')
-            text_length = len(text)
-        except:
-            text_length = 0
-
-        try:
-            form = soup.find_all('form')
-        except:
-            form = "none"
-        print("TEST TOP9")
-
-        for tag in text:
-
-            try:
-                tag.attrs['type']
-                print("type check ok")
-
-                if tag.attrs['type'] != "submit" and text_length != 0:
-                    print(tag)  # input tag 값 ex) <input ~
-                    try:
-                        print(tag.attrs['name'])  # parameter name 값 ex) uname
-                    except:
-                        print("name option No: " + str(tag))
-
-                    # th tag check (board) and type="password" check (login)
-                    if "<th" in response_body:
-                        print("board check (sql injection and xss)")
-
-                    if tag.attrs['type'] == "password":
-                        print("login check (sql injection)")
-
-            except:
-                pass
-
-        if form != "none":
-            for tag in form:
-                print(tag.attrs['action'])
 
         query = db.insert(db_table).values(statusCode=status_code, requestType=request_type, requestJson=request_json,
                                            responseHeader=resonse_header, responseBody=response_body)
@@ -119,11 +78,15 @@ def insertDomains(req_res_packets, cookie_result, previous_packet_count, target_
     for i,packet in enumerate(req_res_packets):
         if not func.isSameDomain(target_url, packet["request"]["full_url"]):
             continue
+            
+        response_body = packet["response"]["body"]
+        tag_list, tag_name_list, board, login = input_tag(response_body)
 
         url_part = urlparse(packet["request"]["full_url"])
         domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
         domain_uri = urlunparse(url_part._replace(scheme="", netloc=""))
         domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
+
 
         if not packet["request"]["full_url"] in cookie_result.keys():
             domain_cookie = 'None'
@@ -182,47 +145,6 @@ def insertWebInfo(analyst_result, target_url, previous_packet_count):
         query = db.update(db_table).where(db_table.columns.url == target_url).values(data=json.dumps(analyst_result))
         result = db_connect.execute(query)
         result.close()
-
-
-def insertAttackVector(target_url):
-    r = requests.get(target_url)
-    dict_data = r.headers
-    infor_data = ""
-    infor_vector = ""
-    http_method = requests.options(target_url)
-    try:
-        http_method = http_method.headers['Allow']
-    except:
-        http_method = "http method private data :("
-
-    try:
-        tmp_data = dict_data['Set-Cookie']
-        i = len(tmp_data.split())
-        if "HttpOnly" in tmp_data:
-            for j in range(0, i):
-                infor_data += tmp_data.split()[j] + "\n"
-        elif "Secure" in tmp_data:
-            for j in range(0, i):
-                infor_data += tmp_data.split()[j] + "\n"
-        else:
-            infor_data = tmp_data
-            infor_vector += "Not_HttpOnly\n"
-
-    except:
-        infor_vector += "Not_HttpOnly\n"
-
-    try:
-        tmp_data = dict_data['X-Frame-Options']
-        i = len(tmp_data.split())
-        for j in range(0, i):
-            infor_data += tmp_data.split()[j] + "\n"
-
-    except:
-        infor_vector += "Not_X-Frame-Options\n"
-
-    print("Check Server Information Attack Vector")
-    print(http_method)
-    print(infor_vector)
 
 
 # 한번 방문할 때마다 실행되기 때문에 느릴거 같음.
