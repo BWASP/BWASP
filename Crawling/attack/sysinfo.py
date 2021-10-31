@@ -34,24 +34,24 @@ def loadCategory(category):
     return return_data
 
 
-def start(url, cur_page_links, req_res_packets,options):
+def start(detect_list, url, cur_page_links, req_res_packets,options):
     category =  list(range(1,96))
     global data
     data = loadCategory(category)
     global cat_meta
     cat_meta=loadCategory_meta()
-    detect_list = {}
+    #detect_list
 
     #TO DO 이미 찾은 패킷은 더 이상 진행 x  , detect 들 append 호출 했을 때 리턴값으로 구분 하면 가능  
     for i, packet in enumerate(req_res_packets):
         for app in data:
-            cats = data[app]['cats']
+            cats = cat_meta[str(retCatrepresnt(data[app]['cats']))]["name"]
             for option in options:
                 if option['name'] == app:
                     appendResult(detect_list,cats,app,"option",option['version'],0,0)
                     continue
             # 이미 탐지한 app일 때
-            if str(cats) in detect_list and app in detect_list[cats]:
+            if cats in detect_list and app in detect_list[cats]:
                 # version 까지 획득했다면 더 이상 조회 x 
                     if "version" in detect_list[cats][app]["version"] != "false":
                         continue
@@ -78,16 +78,7 @@ def start(url, cur_page_links, req_res_packets,options):
                 if "cookies" in list(data[app].keys()):
                     detectCookies(detect_list, packet, data, i, cats, app)
 
-    return retnumTostr(detect_list)
-
-def retnumTostr(detect_list):
-    if not detect_list:
-        return dict() 
-    sorted_list = sorted(detect_list.items())
-    unzipped_list = [dict_key for dict_key, dict_value in sorted_list],[dict_value for dict_key, dict_value in sorted_list]
-    for i, cat in enumerate(unzipped_list[0]):
-        unzipped_list[0][i]=cat_meta[str(cat)]["name"] 
-    return dict(zip(unzipped_list[0],unzipped_list[1]))
+    return detect_list
 
 def retCatrepresnt(cats):
     if len(cats) == 1:
@@ -103,7 +94,8 @@ def retCatrepresnt(cats):
 
 
 
-def initResult(detect_list,cats,app):  
+def initResult(detect_list,cats,app):
+    print("why,",cats, detect_list)  
     if cats not in detect_list.keys():
         detect_list[cats]=dict()
     
@@ -121,7 +113,6 @@ def initResult(detect_list,cats,app):
 
 def appendResult(detect_list,cats,app,detectype,version,request_index=0,response_index=0,url=""):
 
-    cats = retCatrepresnt(cats) 
     initResult(detect_list,cats,app)
     if detectype and detectype not in detect_list[cats][app]["detect"]:
         detect_list[cats][app]["detect"].append(detectype)
@@ -146,12 +137,12 @@ def  appendImplies(detect_list,app,request_index=0,response_index=0,url=""):
         if type(implies_list) is str:
             implies_split=implies_list.split('\\;')
             implies_list=implies_split[0]
-            appendResult(detect_list,data[implies_list]["cats"],implies_list,"implies","false",request_index,response_index)
+            appendResult(detect_list,cat_meta[str(retCatrepresnt(data[implies_list]["cats"]))]["name"],implies_list,"implies","false",request_index,response_index)
         else:
             for implies_line in	implies_list:
                 implies_split=implies_line.split('\\;')
                 implies_line=implies_split[0]
-                appendResult(detect_list,data[implies_line]["cats"],implies_line,"implies","false",request_index,response_index)
+                appendResult(detect_list,cat_meta[str(retCatrepresnt(data[implies_line]["cats"]))]["name"],implies_line,"implies","false",request_index,response_index)
 
 # check response Header
 def detectHeaders(detect_list,packet, data, index, cats, app):
@@ -309,12 +300,12 @@ def detectDom(detect_list, packet, data, cats, app):
 
                                 if regex_results:
                                     version=detectVersion(regex,regex_results)
-                                    appendResult(detect_list,app,"dom",version,0,1)
+                                    appendResult(detect_list,cats,app,"dom",version,0,1)
                                     appendImplies(detect_list,app,0,1)  
                                 #match 값 존재하면 넣기
 
                         if subkey_name == "exists":
-                            appendResult(detect_list,app,"dom","false",0,1)
+                            appendResult(detect_list,cats,app,"dom","false",0,1)
                             appendImplies(detect_list,app,0,1)
 
                         if subkey_name == "src":

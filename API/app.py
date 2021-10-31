@@ -1,9 +1,12 @@
 from flask import (
     Flask, g, jsonify
 )
-from flask_restx import Api, Resource, fields
+from flask_restx import (
+    Api, Resource, fields
+)
 from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import func
+from flask_cors import CORS
 import os
 
 # db model import
@@ -14,14 +17,10 @@ from models.BWASP import (
     job as jobModel,
     packets as packetsModel,
     ports as portsModel,
-    systeminfo as systeminfoModel,
-    attackVector as attackVectorModel
+    systeminfo as systeminfoModel
 )
 from models.CVE import cve_db as CVE_DB_Obj
-from models.CVE import (
-    cve as cveModel
-)
-from flask_cors import CORS
+from models.CVE import cve as cveModel
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
@@ -35,9 +34,8 @@ api = Api(
 )
 
 # config initialization
-# from configs import DevelopmentsConfig, ProductionConfig
-# config = DevelopmentsConfig()
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+
 app.config["SECRET_KEY"] = os.urandom(16)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///databases/BWASP.db"
 app.config["SQLALCHEMY_BINDS"] = {
@@ -46,14 +44,6 @@ app.config["SQLALCHEMY_BINDS"] = {
 }
 app.config["SQLALCHEMY_COMMIT_ON_TEARDOWN"] = True
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-"""
-if app.config['DEBUG']:
-    config = DevelopmentsConfig()
-else:
-    config = ProductionConfig()
-"""
-# app.config.from_object(config)
 
 # DB initialization
 BWASP_DB_Obj.init_app(app)
@@ -83,7 +73,6 @@ job_ns = api.namespace('api/job', description='job operations')
 ports_ns = api.namespace('api/ports', description='ports operations')
 systeminfo_ns = api.namespace('api/systeminfo', description='system-info operations')
 cveInfo_ns = api.namespace('api/cve/search', description='cve info operations')
-attackVector_ns = api.namespace('api/attackVector', description='attackVector operations')
 
 packet = api.model('Packet', {
     'id': fields.Integer(readonly=True, description='The task unique identifier'),
@@ -100,61 +89,48 @@ packetID = api.model('PacketID', {
 })
 
 domain = api.model('Domain', {
-    'id': fields.Integer(readonly=True, description='The task unique identifier'),
-    'relatePacket': fields.Integer(required=True, description='The task unique identifier'),
-    'URL': fields.String(required=True, description='The task details'),
-    'URI': fields.String(required=True, description='The task details'),
-    'params': fields.String(required=True, description='The task details'),
-    'cookie': fields.String(required=True, description='The task details'),
-    'comment': fields.String(required=True, description='The task details')
-})
-
-csp_evaluator = api.model('Csp_evaluator', {
-    'id': fields.Integer(readonly=True, description='The task unique identifier'),
-    'UUID': fields.Integer(required=True, description='The task unique identifier'),
-    'header': fields.String(required=True, description='The task details'),
-    'analysis': fields.String(required=True, description='The task details'),
-    'status': fields.String(required=True, description='The task details')
+    'id': fields.Integer(readonly=True, description='domain data unique identifier'),
+    'URL': fields.String(required=True, description='URL'),
+    'URI': fields.String(required=True, description='URI'),
+    'params': fields.String(required=True, description='URL params'),
+    'comment': fields.String(required=True, description='HTML comment'),
+    'attackVector': fields.String(required=True, description='attack vector of domain'),
+    'typicalServerity': fields.String(required=True, description='typical Serverity of attack vector'),
+    'description': fields.String(required=True, description='attack vector description'),
+    'Details': fields.String(required=True, description='attack vector detail')
 })
 
 job = api.model('Job', {
-    'id': fields.Integer(readonly=True, description='The task unique identifier'),
-    'targetURL': fields.String(required=True, description='The task details'),
-    'knownInfo': fields.String(required=True, description='The task details'),
-    'recursiveLevel': fields.String(required=True, description='The task details'),
-    'uriPath': fields.String(required=True, description='The task details')
+    'id': fields.Integer(readonly=True, description='job setting data unique identifier'),
+    'targetURL': fields.String(required=True, description='target URL'),
+    'knownInfo': fields.String(required=True, description='target known info'),
+    'recursiveLevel': fields.String(required=True, description='recursive level'),
+    'uriPath': fields.String(required=True, description='set target url path')
+})
+
+csp_evaluator = api.model('Csp_evaluator', {
+    'id': fields.Integer(readonly=True, description='csp evaluator data unique identifier'),
+    'header': fields.String(required=True, description='Content-Security-Policy header'),
 })
 
 ports = api.model('Ports', {
-    'id': fields.Integer(readonly=True, description='The task unique identifier'),
-    'service': fields.String(required=True, description='The task details'),
-    'target': fields.String(required=True, description='The task details'),
-    'port': fields.String(required=True, description='The task details'),
-    'result': fields.String(required=True, description='The task details')
+    'id': fields.Integer(readonly=True, description='target server port data unique identifier'),
+    'service': fields.String(required=True, description='service info'),
+    'target': fields.String(required=True, description='target'),
+    'port': fields.String(required=True, description='port open list'),
+    'result': fields.String(required=True, description='port scan result')
 })
 
 systeminfo = api.model('Systeminfo', {
-    'id': fields.Integer(readonly=True, description='The task unique identifier'),
-    'url': fields.String(required=True, description='The task details'),
-    'data': fields.String(required=True, description='The task details')
-})
-
-AttackVector = api.model('AttackVector', {
-    'id': fields.Integer(readonly=True, description='The task unique identifier'),
-    'UUID': fields.Integer(required=True, description='The task unique identifier'),
-    'attackVector': fields.String(required=True, description='The task details'),
-    'typicalServerity': fields.String(required=True, description='The task details'),
-    'description': fields.String(required=True, description='The task details')
-})
-
-AttackVector_Count = api.model('AttackVector_Count', {
-    'counting': fields.Integer(readonly=True, description='The task count')
+    'id': fields.Integer(readonly=True, description='system info data unique identifier'),
+    'url': fields.String(required=True, description='target url'),
+    'data': fields.String(required=True, description='target service system info')
 })
 
 cveinfo = api.model('Cveinfo', {
-    'id': fields.Integer(readonly=True, description='The task unique identifier'),
-    'year': fields.String(required=True, description='The task details'),
-    'description': fields.String(required=True, description='The task details'),
+    'id': fields.Integer(readonly=True, description='CVE data unique identifier'),
+    'year': fields.String(required=True, description='cve number'),
+    'description': fields.String(required=True, description='cve description'),
 })
 
 
@@ -200,28 +176,40 @@ class PacketDAO(object):
     def automation_index_get(self):
         self.selectData = str(list(g.BWASP_DBObj.query(packetsModel.id).filter(packetsModel.category == self.DefineAutomation).all())).replace("(", "").replace("),", "").replace(
             ",)", "")
-        print(self.selectData)
         return self.selectData  # automaton id of packet list
 
     def manual_index_get(self):
         self.selectData = str(list(g.BWASP_DBObj.query(packetsModel.id).filter(packetsModel.category == self.DefineManual).all())).replace("(", "").replace("),", "").replace(
             ",)", "")
-        print(self.selectData)
         return self.selectData  # manual id of packet list
 
     def automation_create(self, data):
-        for dataLength in range(len(data)):
-            self.insertData = data[dataLength]
-            g.BWASP_DBObj.add(
-                packetsModel(category=0,
-                             statusCode=self.insertData['statusCode'],
-                             requestType=self.insertData['requestType'],
-                             requestJson=self.insertData['requestJson'],
-                             responseHeader=self.insertData['responseHeader'],
-                             responseBody=self.insertData['responseBody']
-                             )
-            )
-            g.BWASP_DBObj.commit()
+        print(f"Type: {type(self.insertData)}, Data: {self.insertData}")
+        if type(data) == "<class 'list'>":
+            for dataLength in range(len(data)):
+                self.insertData = data[dataLength]
+                g.BWASP_DBObj.add(
+                    packetsModel(category=0,
+                                 statusCode=self.insertData['statusCode'],
+                                 requestType=self.insertData['requestType'],
+                                 requestJson=self.insertData['requestJson'],
+                                 responseHeader=self.insertData['responseHeader'],
+                                 responseBody=self.insertData['responseBody']
+                                 )
+                )
+                g.BWASP_DBObj.commit()
+
+        self.insertData = data
+        g.BWASP_DBObj.add(
+            packetsModel(category=0,
+                         statusCode=self.insertData['statusCode'],
+                         requestType=self.insertData['requestType'],
+                         requestJson=self.insertData['requestJson'],
+                         responseHeader=self.insertData['responseHeader'],
+                         responseBody=self.insertData['responseBody']
+                         )
+        )
+        g.BWASP_DBObj.commit()
         return self.insertData
 
     def manual_create(self, data):
@@ -259,7 +247,6 @@ class DomainDAO(object):
 
     def create(self, data):
         domain = data
-        print(domain)
         g.BWASP_DBObj.add(
             domainModel(relatePacket=domain["relatePacket"],
                         URL=domain["URL"],
@@ -284,7 +271,6 @@ class JobDAO(object):
     def get(self, id=-1, Type=False):
         if Type is False and id == -1:
             job = g.BWASP_DBObj.query(jobModel).all()
-            print(len(job))
             return job
         elif Type is not False and id > 0:
             job = g.BWASP_DBObj.query(jobModel).filter(jobModel.id == id).all()
@@ -316,7 +302,6 @@ class CSPEvaluatorDAO(object):
     def get(self, id=-1, Type=False):
         if Type is False and id == -1:
             csp_evaluator = g.BWASP_DBObj.query(CSPEvaluatorModel).all()
-            print(len(csp_evaluator))
             return csp_evaluator
         elif Type is not False and id > 0:
             csp_evaluator = g.BWASP_DBObj.query(CSPEvaluatorModel).filter(CSPEvaluatorModel.id == id).all()
@@ -348,7 +333,6 @@ class PortsDAO(object):
     def get(self, id=-1, Type=False):
         if Type is False and id == -1:
             ports = g.BWASP_DBObj.query(portsModel).all()
-            print(len(ports))
             return ports
         elif Type is not False and id > 0:
             ports = g.BWASP_DBObj.query(portsModel).filter(portsModel.id == id).all()
@@ -369,47 +353,6 @@ class PortsDAO(object):
         return ports
 
 
-class AttackVectorDAO(object):
-    def __init__(self):
-        self.counter = 0
-        self.selectData = ""
-        self.insertData = ""
-
-        self.AttackVectors = 0
-
-    def get(self, id=-1, Type=False):
-        if Type is False and id == -1:
-            AttackVector = g.BWASP_DBObj.query(attackVectorModel).all()
-            print(len(AttackVector))
-            return AttackVector
-        elif Type is not False and id > 0:
-            AttackVector = g.BWASP_DBObj.query(attackVectorModel).filter(attackVectorModel.id == id).all()
-            return AttackVector
-        else:
-            api.abort(404, f"Port {id} doesn't exist")
-
-    def count(self):
-        self.counter = int(g.BWASP_DBObj.query(attackVectorModel).count())
-        print(self.counter)
-        return self.counter
-
-    def retCountbyData(self, start, counting):
-        self.AttackVectors = g.BWASP_DBObj.query(attackVectorModel).filter(attackVectorModel.id >= start).limit(counting).all()
-        return self.AttackVectors
-
-    def create(self, data):
-        AttackVector = data
-        g.BWASP_DBObj.add(
-            attackVectorModel(UUID=AttackVector["UUID"],
-                              attackVector=AttackVector["attackVector"],
-                              typicalServerity=AttackVector["typicalServerity"],
-                              description=AttackVector["description"]
-                              )
-        )
-        g.BWASP_DBObj.commit()
-        return AttackVector
-
-
 class SysteminfoDAO(object):
     def __init__(self):
         self.counter = 0
@@ -421,7 +364,6 @@ class SysteminfoDAO(object):
     def get(self, id=-1, Type=False):
         if Type is False and id == -1:
             systeminfo = g.BWASP_DBObj.query(systeminfoModel).all()
-            print(len(systeminfo))
             return systeminfo
         elif Type is not False and id > 0:
             systeminfo = g.BWASP_DBObj.query(systeminfoModel).filter(systeminfoModel.id == id).all()
@@ -465,7 +407,6 @@ Job_DAO = JobDAO()
 Systeminfo_DAO = SysteminfoDAO()
 CSPEvaluator_DAO = CSPEvaluatorDAO()
 Ports_DAO = PortsDAO()
-AttackVector_DAO = AttackVectorDAO()
 CVEInfo_DAO = CVEInfoDAO()
 
 
@@ -497,8 +438,6 @@ class automation_packetList(Resource):
     def get(self):
         """List manual packets id"""
         return {"id": Packet_DAO.automation_index_get()}
-        # print(str(list(g.BWASP_DBObj.query(packetsModel.id).filter(packetsModel.category == self.DefineAutomation).all())).replace("(", "").replace("),", "").replace(",)", ""))
-        # return {"id": str(list(g.BWASP_DBObj.query(packetsModel.id).filter(packetsModel.category == self.DefineAutomation).all())).replace("(", "").replace("),", "").replace(",)", "")}
 
 
 @packet_ns.route('/automation/<int:id>')
@@ -716,66 +655,9 @@ class CSPEvaluator(Resource):
         return CSPEvaluator_DAO.get(id, Type=True)
 
 
-# AttackVector
-@attackVector_ns.route('')
-class attackVectorList(Resource):
-    """Shows a list of all packets, and lets you POST to add new tasks"""
-
-    @attackVector_ns.doc('list_attackVector')
-    @attackVector_ns.marshal_list_with(AttackVector)
-    def get(self):
-        """List all tasks"""
-        return AttackVector_DAO.get()
-
-    @attackVector_ns.doc('create_attackVector')
-    @attackVector_ns.expect(AttackVector)
-    @attackVector_ns.marshal_with(AttackVector, code=201)
-    def post(self):
-        """Create a new task"""
-        return AttackVector_DAO.create(api.payload), 201
-
-
-@attackVector_ns.route('/<int:id>')
-@attackVector_ns.response(404, 'attackVector not found')
-@attackVector_ns.param('id', 'The task identifier')
-class attackVector(Resource):
-    """Show a single packet item and lets you delete them"""
-
-    @attackVector_ns.doc('get_attackVector')
-    @attackVector_ns.marshal_with(AttackVector)
-    def get(self, id):
-        """Fetch a given resource"""
-        return AttackVector_DAO.get(id, Type=True)
-
-
-@attackVector_ns.route('/<string:start>-<string:counting>')
-@attackVector_ns.response(404, 'attackVector not found')
-@attackVector_ns.param('start', 'The task start')
-@attackVector_ns.param('counting', 'The task counting')
-class attackVectorData(Resource):
-    """Show a attackVector Count data"""
-
-    @attackVector_ns.doc('get attackVector counting data')
-    @attackVector_ns.marshal_with(AttackVector)
-    def get(self, start, counting):
-        """Fetch a given resource"""
-        return AttackVector_DAO.retCountbyData(start, counting)
-
-
-@attackVector_ns.route('/count')
-class automation_packetList(Resource):
-    """Shows a count of all attackVector data list"""
-
-    @attackVector_ns.doc('count of attackVector list')
-    @attackVector_ns.marshal_list_with(AttackVector_Count)
-    def get(self):
-        """Count of list attackVector data"""
-        return {"counting": AttackVector_DAO.count()}
-
-
 # CVE
 @cveInfo_ns.route('/<string:framework>/<string:version>')
-class attackVectorList(Resource):
+class CVEList(Resource):
     """Shows a list of all cve"""
 
     @cveInfo_ns.doc('list_cveInfo')
