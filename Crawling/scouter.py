@@ -42,7 +42,7 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
         loadpacket_indexes = list(range(1,len(loadpacket_indexes)*2)) # rest api 전 호환을 위한 위의 임시 코드 
     
     packet_indexes = loadpacket_indexes[previous_packet_count:recent_packet_count]
-    analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, options['info'])
+    analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
     db.insertDomains(req_res_packets, cookie_result,packet_indexes , current_url)
     db.insertWebInfo(analyst_result, input_url,packet_indexes)
