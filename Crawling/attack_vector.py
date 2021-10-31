@@ -48,8 +48,6 @@ def input_tag(response_body):
     soup = BeautifulSoup(response_body, 'html.parser')
     tag_list=[]
     tag_name_list=[]
-    board = ""
-    login = ""
     attack_vector = "SQL Injection, XSS"
     try:
         text = soup.find_all('input')
