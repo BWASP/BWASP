@@ -5,7 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from Crawling import analyst
 from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
-
+import json
 # TODO
 # 사용자가 여러개의 사이트를 동시에 테스트 할 때, 전역 변수의 관리 문제
 start_options = {
@@ -17,6 +17,7 @@ start_options = {
 }
 
 sysinfo_detectlist = {}
+loadpacket_indexes = list() # automation packet indexes 
 
 def start(url, depth, options):
     global start_options
@@ -32,9 +33,19 @@ def start(url, depth, options):
 def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url,previous_packet_count):
     global start_options
     global sysinfo_detectlist
+    global loadpacket_indexes
+
+    recent_packet_count =  len(req_res_packets) + len(previous_packet_count)
+    # {"id": "[1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]"}     
+    if len(loadpacket_indexes) < recent_packet_count:
+        # rest api 개발되면 사용 loadpacket_indexes= json.loads(db.Packets.GetAutomationIndex()["id"])
+        loadpacket_indexes = list(range(1,len(loadpacket_indexes)*2)) # rest api 전 호환을 위한 위의 임시 코드 
+    
+    packet_indexes = loadpacket_indexes[previous_packet_count:recent_packet_count]
     analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, options['info'])
-    db.insertDomains(req_res_packets, cookie_result, previous_packet_count, current_url)
-    db.insertWebInfo(analyst_result, input_url, previous_packet_count)
+    # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
+    db.insertDomains(req_res_packets, cookie_result,packet_indexes , current_url)
+    db.insertWebInfo(analyst_result, input_url,packet_indexes)
     
     return 1
 
