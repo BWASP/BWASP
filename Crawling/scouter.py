@@ -1,12 +1,13 @@
 from seleniumwire import webdriver
 from multiprocessing import Process
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlparse
 from webdriver_manager.chrome import ChromeDriverManager
+import re
 
 from Crawling import analyst
 from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
 from Crawling.attack_vector import attack_header
-import json
+
 # TODO
 # 사용자가 여러개의 사이트를 동시에 테스트 할 때, 전역 변수의 관리 문제
 start_options = {
@@ -80,7 +81,7 @@ def visit(driver, url, depth, options):
     req_res_packets = packet_capture.start(driver)
 
     # 다른 사이트로 Redirect 되었는지 검증.
-    if not func.isSameDomain(driver.current_url, start_options["input_url"]):
+    if isRedirection(driver.current_url, start_options["input_url"]):
         req_res_packets = packet_capture.filterDomain(req_res_packets, start_options["input_url"])
         cur_page_links = list()
     else:
@@ -124,6 +125,23 @@ def checkCountLink(visit_url, count_links):
         count_links[visit_path]["count"] += 1
     except:
         start_options["count_links"][visit_path] = {"count" : 1}
+
+    return False
+
+# TODO
+# 주명님께 질문 (정규표현식 관련)
+def isRedirection(visit_url, target_url):
+    # 다른 도메인으로 이동한 경우
+    if not func.isSameDomain(visit_url, target_url):
+        pattern = re.compile('((?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)')
+        query = urlparse(visit_url).query
+
+        # 방문한 URL의 query에 url 값이 있는지 확인
+        if pattern.findall(query):
+            return True
+        
+        # 서버 설정으로 이동된 경우 ex) naver.com/test => test.naver.com/test
+        return False
 
     return False
 
