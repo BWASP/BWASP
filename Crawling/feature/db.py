@@ -2,6 +2,8 @@ import sqlalchemy as db
 import os
 import json
 from urllib.parse import urlparse,urlunparse
+import requests
+
 from Crawling.feature import func
 from Crawling.attack_vector import *
 
@@ -17,20 +19,22 @@ def connect(table_name):
 
 #REST API: 종민 Packets
 def insertPackets(req_res_packets):
-    db_connect, db_table = connect("packets")
+    api_url = "http://localhost:20102/api/packets/automation"
+    headers = {"Content-Type" : "application/json; charset=utf-8"}
+    data = []
 
     for packet in req_res_packets:
-        status_code = packet["response"]["status_code"]
-        request_type = packet["request"]["method"]
-        request_json = json.dumps(packet["request"])
-        resonse_header = json.dumps(packet["response"]["headers"])
-        response_body = packet["response"]["body"]
-
-        query = db.insert(db_table).values(statusCode=status_code, requestType=request_type, requestJson=request_json,
-                                           responseHeader=resonse_header, responseBody=response_body)
-        result = db_connect.execute(query)
-        result.close()
-
+        params = {
+            "statusCode" : packet["response"]["status_code"],
+            "requestType" : packet["request"]["method"],
+            "requestJson" : packet["request"],
+            "responseHeader" : packet["response"]["headers"],
+            "responseBody" : packet["response"]["body"]
+        }
+        data.append(params)
+    
+    res = requests.post(api_url, headers=headers, data=json.dumps(data))
+    print(res)
 
 #REST API: 주원 CSP, Ports
 def insertCSP(csp_result):
