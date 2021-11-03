@@ -11,6 +11,8 @@ def getPortsOnline(target_ip):
     
     html = BeautifulSoup(requests.get("https://censys.io/ipv4/" + target_ip).text, features="html.parser")
 
+    #censys.io/ipv4/ vs search.censys.io/hosts/   // suninatas.com, webhacking.kr 기준 search.censys.io가 더 정확
+
     for i in html.select('h2'):
         port = i.get_text().replace('\n','').split('/')[0]
         try:
