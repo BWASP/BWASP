@@ -173,17 +173,18 @@ def insertPorts(port_list, target_url):
 
 #REST API: 주명 WebInfo
 # 맨처음에 url , data를 포함한 post 한번 먼저 실행
-def postWebInfo(analyst_result, input_url, packet_indexes):
+def postWebInfo(input_url):
     data = {
         "url": input_url,
-        "data": analyst_result
+        "data": {}
         }  
     SystemInfo.PostSystemInfo(data)
 
 #이후로 업데이트를 통해 data 값 갱신
-def updateWebInfo(analyst_result, input_url, packet_indexes):
+def updateWebInfo(analyst_result):
     db_connect, db_table = connect("systeminfo")
     data = {
+        "id": 1,
         "data": analyst_result
     }
     SystemInfo.PUTSystemInfo(data)
