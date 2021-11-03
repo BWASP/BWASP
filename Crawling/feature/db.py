@@ -7,6 +7,7 @@ import requests
 from Crawling.feature import func
 from Crawling.attack_vector import *
 import requests
+from Crawling.feature.api import *
 
 
 def connect(table_name):
@@ -33,9 +34,10 @@ def insertPackets(req_res_packets):
             "responseBody" : packet["response"]["body"]
         }
         data.append(params)
-    
-    res = requests.post(api_url, headers=headers, data=json.dumps(data))
-    print(res)
+
+    Packets.PostAutomation(json.dumps(data))
+    #res = requests.post(api_url, headers=headers, data=json.dumps(data))
+    #print(res)
 
 #REST API: 주원 CSP, Ports
 def insertCSP(csp_result):
@@ -157,7 +159,7 @@ def insertPorts(port_list, target_url):
             "result": "Open"
         }
         data.append(value)
-        Ports.PostPort(data)
+        Ports.PostPorts(data)
     else:
         value = {
             "service": "None",
@@ -166,7 +168,7 @@ def insertPorts(port_list, target_url):
             "result": "None"
         }
         data.append(value)
-        Ports.PostPort(data)
+        Ports.PostPorts(data)
 
 
 #REST API: 주명 WebInfo
@@ -176,7 +178,7 @@ def postWebInfo(analyst_result, input_url, packet_indexes):
         "url": input_url,
         "data": analyst_result
         }  
-    PostSystemInfo(data) 
+    SystemInfo.PostSystemInfo(data)
 
 #이후로 업데이트를 통해 data 값 갱신
 def updateWebInfo(analyst_result, input_url, packet_indexes):
@@ -184,7 +186,7 @@ def updateWebInfo(analyst_result, input_url, packet_indexes):
     data = {
         "data": analyst_result
     }
-    PUTSystemInfo(data)
+    SystemInfo.PUTSystemInfo(data)
 
 
 

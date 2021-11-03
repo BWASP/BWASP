@@ -22,6 +22,7 @@ sysinfo_detectlist = {}
 loadpacket_indexes = list() # automation packet indexes 
 
 def start(url, depth, options):
+    print("check")
     global start_options
     driver = initSelenium()
     visit(driver, url, depth, options)
