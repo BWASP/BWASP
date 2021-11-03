@@ -135,11 +135,10 @@ class single_DomainList(Resource):
 @ns.param('start', 'domain data paging start')
 @ns.param('end', 'domain data paging end')
 class paging_DomainList(Resource):
-    """Show a single domain data"""
+    """Show a domain data of start, end"""
 
     @ns.doc('Get domain data on paging')
     @ns.marshal_with(domain)
     def get(self, start, end):
-        print(start, end)
         """Fetch a given resource"""
         return Domain_DAO.get(start, end)

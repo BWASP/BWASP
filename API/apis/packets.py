@@ -198,7 +198,7 @@ class automation_packetID(Resource):
     @ns.marshal_list_with(packetID)
     def get(self):
         """Shows automation packets id list"""
-        return {"id": Packet_DAO.automation_index_get()}
+        return {"id": str(Packet_DAO.automation_index_get()).replace("(", "").replace(",)", "")}
 
 
 @ns.route('/manual/index')
@@ -209,7 +209,7 @@ class manual_packetID(Resource):
     @ns.marshal_list_with(packetID)
     def get(self):
         """Shows manual packets id list"""
-        return {"id": Packet_DAO.manual_index_get()}
+        return {"id": str(Packet_DAO.manual_index_get()).replace("(", "").replace(",)", "")}
 
 
 @ns.route('/automation/<int:id>')
