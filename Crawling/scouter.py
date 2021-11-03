@@ -22,7 +22,6 @@ sysinfo_detectlist = {}
 loadpacket_indexes = list() # automation packet indexes 
 
 def start(url, depth, options):
-    print("check")
     global start_options
     driver = initSelenium()
     visit(driver, url, depth, options)
@@ -38,7 +37,7 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     global sysinfo_detectlist
     global loadpacket_indexes
 
-    recent_packet_count =  len(req_res_packets) + len(previous_packet_count)
+    recent_packet_count =  len(req_res_packets) + previous_packet_count
     # {"id": "[1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]"}     
     if len(loadpacket_indexes) < recent_packet_count:
         # rest api 개발되면 사용 loadpacket_indexes= json.loads(db.Packets.GetAutomationIndex()["id"])
