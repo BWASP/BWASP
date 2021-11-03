@@ -41,7 +41,7 @@ def start(detect_list, url, cur_page_links, req_res_packets,packet_indexes_,opti
     global cat_meta
     cat_meta=loadCategory_meta()
     global packet_indexes
-    packet_indexes = packet_indexes_
+    packet_indexes = packet_indexes_[:]
 
     #detect_list
 

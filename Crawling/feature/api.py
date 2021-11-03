@@ -50,9 +50,9 @@ class Packets:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.json()}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
 
     def PostManual(self, data):  # Manual data insert
         self.responseObj = self.requestObj.post(

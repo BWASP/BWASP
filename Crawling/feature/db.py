@@ -41,21 +41,6 @@ def insertPackets(req_res_packets):
 
 #REST API: 주원 CSP, Ports
 def insertCSP(csp_result):
-    db_connect, db_table = connect("CSPEvaluator")
-    UUID = 0
-
-    query = db.select([db_table]).where(db_table.columns.UUID == UUID)
-    row = db_connect.execute(query).fetchall()
-
-    if len(row) != 0:
-        query = db.update(db_table).where(db_table.columns.UUID == UUID).values(header=json.dumps(csp_result))
-        result = db_connect.execute(query)
-        result.close()
-    else:
-        query = db.insert(db_table).values(UUID=0, header=json.dumps(csp_result), analysis='None', status='None')
-        result = db_connect.execute(query)
-        result.close()
-
     ### REST API Code
     #url = "http://localhost:20102/api/csp_evaluator"
     CSPEvaluator().PostCSPEvaluator(csp_result)
@@ -136,20 +121,6 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
 
 #REST API: 주원 CSP, Ports
 def insertPorts(port_list, target_url):
-    db_connect, db_table = connect("ports")
-
-    for service in port_list.keys():
-        query = db.insert(db_table).values(service=service, target=target_url,
-                                           port=port_list[service], result="Open")
-        result = db_connect.execute(query)
-        result.close()
-    else:
-        query = db.insert(db_table).values(service="None", target=target_url,
-                                           port="None", result="None")
-        result = db_connect.execute(query)
-        result.close()
-
-    ### REST API Code
     data = []
     for service in port_list.keys():
         value={
@@ -159,7 +130,7 @@ def insertPorts(port_list, target_url):
             "result": "Open"
         }
         data.append(value)
-        Ports().PostPorts(data)
+        Ports().PostPorts(json.dumps(data))
     else:
         value = {
             "service": "None",
@@ -168,7 +139,7 @@ def insertPorts(port_list, target_url):
             "result": "None"
         }
         data.append(value)
-        Ports().PostPorts(data)
+        Ports().PostPorts(json.dumps(data))
 
 
 #REST API: 주명 WebInfo
