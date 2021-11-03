@@ -2,10 +2,11 @@ from seleniumwire import webdriver
 from multiprocessing import Process
 from urllib.parse import urlparse
 from webdriver_manager.chrome import ChromeDriverManager
-import re
+import re,json
 
 from Crawling import analyst
 from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
+from Crawling.feature.api import *
 from Crawling.attack_vector import attack_header
 
 # TODO
@@ -40,8 +41,7 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     recent_packet_count =  len(req_res_packets) + previous_packet_count
     # {"id": "[1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]"}     
     if len(loadpacket_indexes) < recent_packet_count:
-        # rest api 개발되면 사용 loadpacket_indexes= json.loads(db.Packets.GetAutomationIndex()["id"])
-        loadpacket_indexes = list(range(1,len(loadpacket_indexes)*2)) # rest api 전 호환을 위한 위의 임시 코드 
+        loadpacket_indexes= json.loads(Packets().GetAutomationIndex()["id"])
     
     packet_indexes = loadpacket_indexes[previous_packet_count:recent_packet_count]
     analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
