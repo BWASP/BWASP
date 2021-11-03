@@ -98,3 +98,23 @@ def corsCheck(req_res_packets):
         cors_check = "CORS Misconfiguration: *"
 
     return cors_check
+
+
+#input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
+"""
+{
+  "tag": [
+    "tag A",
+    "tag B"
+  ],
+  "cookie": {
+    "PHPSESSID": "8a7s6f89sd6fg98f6s98d",
+    "JSESSIONID": "abcdefghijklmnop"
+  },
+  "queryString": {
+    "hello": "world"
+  }
+}
+
+?hello=world
+"""
