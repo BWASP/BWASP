@@ -35,7 +35,7 @@ def insertPackets(req_res_packets):
         }
         data.append(params)
 
-    Packets.PostAutomation(json.dumps(data))
+    Packets().PostAutomation(json.dumps(data))
     #res = requests.post(api_url, headers=headers, data=json.dumps(data))
     #print(res)
 
@@ -58,7 +58,7 @@ def insertCSP(csp_result):
 
     ### REST API Code
     #url = "http://localhost:20102/api/csp_evaluator"
-    CSPEvaluator.PostCSPEvaluator(csp_result)
+    CSPEvaluator().PostCSPEvaluator(csp_result)
 
 
 #REST API: 도훈 Domains
@@ -132,7 +132,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
             "description": "string",
             "Details": tag_list
         }
-        Domain.PostDomain(query)
+        Domain().PostDomain(query)
 
 #REST API: 주원 CSP, Ports
 def insertPorts(port_list, target_url):
@@ -159,7 +159,7 @@ def insertPorts(port_list, target_url):
             "result": "Open"
         }
         data.append(value)
-        Ports.PostPorts(data)
+        Ports().PostPorts(data)
     else:
         value = {
             "service": "None",
@@ -168,7 +168,7 @@ def insertPorts(port_list, target_url):
             "result": "None"
         }
         data.append(value)
-        Ports.PostPorts(data)
+        Ports().PostPorts(data)
 
 
 #REST API: 주명 WebInfo
@@ -178,7 +178,7 @@ def postWebInfo(input_url):
         "url": input_url,
         "data": {}
         }  
-    SystemInfo.PostSystemInfo(data)
+    SystemInfo().PostSystemInfo(data)
 
 #이후로 업데이트를 통해 data 값 갱신
 def updateWebInfo(analyst_result):
@@ -187,7 +187,7 @@ def updateWebInfo(analyst_result):
         "id": 1,
         "data": analyst_result
     }
-    SystemInfo.PUTSystemInfo(data)
+    SystemInfo().PATCHSystemInfo(data)
 
 
 

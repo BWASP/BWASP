@@ -2,7 +2,7 @@ from flask import (
     Blueprint, render_template, request
 )
 from Web.app import AutomatedAnalysis
-import json
+import json, requests
 
 NAME = 'automation'
 bp = Blueprint(NAME, __name__, url_prefix='/automation')
@@ -11,7 +11,7 @@ bp = Blueprint(NAME, __name__, url_prefix='/automation')
 @bp.route('/options', methods=['GET', 'POST'])
 def manual_options():
     if request.method == 'POST':
-        reqJsonData = request.form["reqJsonData"]
+        reqJsonData = json.loads(request.form["reqJsonData"])
         AutomatedAnalysis(reqJsonData["target"]["url"], int(reqJsonData["tool"]["analysisLevel"]), reqJsonData["tool"]["optionalJobs"])
 
         response = requests.post(
