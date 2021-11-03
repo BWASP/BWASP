@@ -30,14 +30,18 @@ class DomainDAO(object):
         self.selectData = ""
         self.insertData = ""
 
-    def get(self, id=-1, Type=False):
-        if Type is False and id == -1:
-            domain = g.BWASP_DBObj.query(domainModel).all()
-            return domain
+    def get(self, start=0, end=0, id=0, Type=False):
+        if Type is False and id == 0 and 0 < start < end:
+            self.selectData = g.BWASP_DBObj.query(domainModel).filter(domainModel.id >= start).limit(end).all()
+            return self.selectData
+
+        if Type is False and id == 0:
+            self.selectData = g.BWASP_DBObj.query(domainModel).all()
+            return self.selectData
 
         if Type is not False and id > 0:
-            domain = g.BWASP_DBObj.query(domainModel).filter(domainModel.id == id).all()
-            return domain
+            self.selectData = g.BWASP_DBObj.query(domainModel).filter(domainModel.id == id).all()
+            return self.selectData
 
         ns.abort(404, f"domain {id} doesn't exist")
 
@@ -116,7 +120,7 @@ class domainList(Resource):
 @ns.route('/<int:id>')
 @ns.response(404, 'domain not found')
 @ns.param('id', 'domain id for unique identifier')
-class single_Domain(Resource):
+class single_DomainList(Resource):
     """Show a single domain data"""
 
     @ns.doc('Get single domain data')
@@ -124,3 +128,17 @@ class single_Domain(Resource):
     def get(self, id):
         """Fetch a given resource"""
         return Domain_DAO.get(id, Type=True)
+
+
+@ns.route('/<int:start>/<int:end>')
+@ns.response(404, 'domain not found')
+@ns.param('start', 'domain data paging start')
+@ns.param('end', 'domain data paging end')
+class paging_DomainList(Resource):
+    """Show a domain data of start, end"""
+
+    @ns.doc('Get domain data on paging')
+    @ns.marshal_with(domain)
+    def get(self, start, end):
+        """Fetch a given resource"""
+        return Domain_DAO.get(start, end)
