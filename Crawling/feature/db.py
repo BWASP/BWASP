@@ -63,7 +63,7 @@ def insertCSP(csp_result):
 # TODO
 # 중복된 url 이 있을 경우, 데이터를 넣어야 하는가?
 def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
-    db_connect, db_table = connect("domain")
+    # db_connect, db_table = connect("domain")
     '''
     [
     {
@@ -118,11 +118,19 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
         # getPacketIndex
         # TODO
         # GET 데이터를 params 에 넣어야 할까?
-        query = db.insert(db_table).values(relatePacket=packet_indexes[i], URL=domain_url,
-                                           URI=domain_uri, params=domain_params, cookie=domain_cookie, authType=0,
-                                           comment='None')
-        result = db_connect.execute(query)
-        result.close()
+        query = {
+            "relatePacket":packet_indexes[i],
+            "URL":domain_url,
+            "URI":domain_uri,
+            "params":tag_name_list,
+            "cookie":domain_cookie,
+            "comment":"None",
+            "attackVector":attack_vector,
+            "typicalServerity": "normal",
+            "description": "string",
+            "Details": tag_list
+        }
+        Domain.PostDomain(query)
 
 #REST API: 주원 CSP, Ports
 def insertPorts(port_list, target_url):
