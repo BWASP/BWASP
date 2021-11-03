@@ -27,9 +27,9 @@ class Packets:
         )
 
         if self.responseObj.status_code == 200:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
     def GetManualIndex(self):  # Manual index
         self.responseObj = self.requestObj.get(
@@ -38,9 +38,9 @@ class Packets:
         )
 
         if self.responseObj.status_code == 200:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
     def PostAutomation(self, data):  # Automation data insert
         self.responseObj = self.requestObj.post(
@@ -50,9 +50,9 @@ class Packets:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
     def PostManual(self, data):  # Manual data insert
         self.responseObj = self.requestObj.post(
@@ -62,9 +62,9 @@ class Packets:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
 
 class Domain:
@@ -86,9 +86,9 @@ class Domain:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
 
 class CSPEvaluator:
@@ -110,9 +110,9 @@ class CSPEvaluator:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
 
 class Job:
@@ -134,9 +134,9 @@ class Job:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
 
 class SystemInfo:
@@ -158,9 +158,9 @@ class SystemInfo:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
     def PATCHSystemInfo(self, data):  # SystemInfo data Update
         self.responseObj = self.requestObj.patch(
@@ -170,9 +170,9 @@ class SystemInfo:
         )
 
         if self.responseObj.status_code == 200:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
 
 class Ports:
@@ -194,7 +194,7 @@ class Ports:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
-            return {"status": self.responseObj.status_code, "message": "Failed", "retData": self.responseObj.text}
+            return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
