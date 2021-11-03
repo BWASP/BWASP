@@ -45,6 +45,9 @@ def getRequestPacket(data):
     else:
         req_headers = str(data.headers)
 
+    # TODO
+    # request body 넣기
+    # https://pypi.org/project/selenium-wire/#example-update-json-in-a-post-request-body
     return_data = { 
         "method" : data.method, 
         "url" : req_uri, 
