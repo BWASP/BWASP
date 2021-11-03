@@ -48,7 +48,7 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
     db.insertDomains(req_res_packets, cookie_result,packet_indexes , current_url)
-    db.insertWebInfo(analyst_result, input_url,packet_indexes)
+    db.updateWebInfo(analyst_result)
     
     return 1
 
@@ -65,6 +65,7 @@ def visit(driver, url, depth, options):
     if start_options["check"]:
         attack_header(driver.current_url)
         start_options["input_url"] = driver.current_url
+        db.postWebInfo(start_options["input_url"])
         start_options["visited_links"].append(start_options["input_url"])
         start_options["check"] = False
 
