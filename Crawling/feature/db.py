@@ -132,32 +132,22 @@ def insertPorts(port_list, target_url):
 
 
 #REST API: 주명 WebInfo
-def insertWebInfo(analyst_result, target_url, packet_indexes):
+# 맨처음에 url , data를 포함한 post 한번 먼저 실행
+def postWebInfo(analyst_result, input_url, packet_indexes):
+    data = {
+        "url": input_url,
+        "data": analyst_result
+        }  
+    PostSystemInfo(data) 
+
+#이후로 업데이트를 통해 data 값 갱신
+def updateWebInfo(analyst_result, input_url, packet_indexes):
     db_connect, db_table = connect("systeminfo")
+    data = {
+        "data": analyst_result
+    }
+    PUTSystemInfo(data)
 
-    query = db.select([db_table]).where(db_table.columns.url == target_url)
-    row = db_connect.execute(query).fetchall()
-
-    for category in analyst_result:
-        for key in analyst_result[category]:
-            analyst_result[category][key]["request"] = analyst_result[category][key]["request"][:1]
-            analyst_result[category][key]["response"] = analyst_result[category][key]["response"][:1]
-
-            if len(analyst_result[category][key]["request"]) != 0:
-                analyst_result[category][key]["request"][0] = getPacketIndex(
-                    analyst_result[category][key]["request"][0], previous_packet_count)
-            if len(analyst_result[category][key]["response"]) != 0:
-                analyst_result[category][key]["response"][0] = getPacketIndex(
-                    analyst_result[category][key]["response"][0], previous_packet_count)
-
-    if len(row) == 0:
-        query = db.insert(db_table).values(url=target_url, data=json.dumps(analyst_result))
-        result = db_connect.execute(query)
-        result.close()
-    else:
-        query = db.update(db_table).where(db_table.columns.url == target_url).values(data=json.dumps(analyst_result))
-        result = db_connect.execute(query)
-        result.close()
 
 
 # 한번 방문할 때마다 실행되기 때문에 느릴거 같음.
