@@ -51,9 +51,8 @@ def insertCSP(csp_result):
         result.close()
 
     ### REST API Code
-    url = "http://localhost:20102/api/csp_evaluator"
-    r = requests.post(url, data=csp_result)
-    print(r)
+    #url = "http://localhost:20102/api/csp_evaluator"
+    CSPEvaluator.PostCSPEvaluator(csp_result)
 
 
 #REST API: 도훈 Domains
@@ -146,6 +145,7 @@ def insertPorts(port_list, target_url):
             "result": "Open"
         }
         data.append(value)
+        Ports.PostPort(data)
     else:
         value = {
             "service": "None",
@@ -154,6 +154,7 @@ def insertPorts(port_list, target_url):
             "result": "None"
         }
         data.append(value)
+        Ports.PostPort(data)
 
 
 #REST API: 주명 WebInfo
