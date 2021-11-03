@@ -1,16 +1,21 @@
 from flask import g
-from flask_restx import Resource, fields, Namespace
+from flask_restx import Resource, fields, Namespace, model
+import sys, os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from models.BWASP import job as jobModel
 
 ns = Namespace('api/job', description='job operations')
 
 job = ns.model('Job', {
-    'id': fields.Integer(readonly=True, description='The task unique identifier'),
-    'targetURL': fields.String(required=True, description='The task details'),
-    'knownInfo': fields.String(required=True, description='The task details'),
-    'recursiveLevel': fields.String(required=True, description='The task details'),
-    'uriPath': fields.String(required=True, description='The task details')
+    'id': fields.Integer(readonly=True, description='setting initialization(Job) id for unique identifier'),
+    'targetURL': fields.String(required=True, description='target URL'),
+    'knownInfo': fields.String(required=True, description='Known information'),
+    'recursiveLevel': fields.String(required=True, description='recursive level'),
+    'uriPath': fields.String(required=True, description='Path on Web Server')
 })
+
 
 class JobDAO(object):
     def __init__(self):
@@ -18,59 +23,81 @@ class JobDAO(object):
         self.selectData = ""
         self.insertData = ""
 
-        self.jobs = list()
-
     def get(self, id=-1, Type=False):
         if Type is False and id == -1:
-            job = g.BWASP_DBObj.query(jobModel).all()
-            print(len(job))
-            return job
-        elif Type is not False and id > 0:
-            job = g.BWASP_DBObj.query(jobModel).filter(jobModel.id == id).all()
-            return job
-        else:
-            ns.abort(404, f"job {id} doesn't exist")
+            self.selectData = g.BWASP_DBObj.query(jobModel).all()
+            return self.selectData
+
+        if Type is not False and id > 0:
+            self.selectData = g.BWASP_DBObj.query(jobModel).filter(jobModel.id == id).all()
+            return self.selectData
+
+        ns.abort(404, f"job {id} doesn't exist")
 
     def create(self, data):
-        job = data
-        g.BWASP_DBObj.add(
-            jobModel(targetURL=job["targetURL"],
-                     knownInfo=job["knownInfo"],
-                     recursiveLevel=job["recursiveLevel"],
-                     uriPath=job["uriPath"]
-                     )
-        )
-        g.BWASP_DBObj.commit()
-        return job
+        if str(type(data)) == "<class 'list'>":
+            try:
+                self.insertData = data
+                for ListOfData in range(len(data)):
+                    g.BWASP_DBObj.add(
+                        jobModel(targetURL=self.insertData[ListOfData]["targetURL"],
+                                 knownInfo=self.insertData[ListOfData]["knownInfo"],
+                                 recursiveLevel=self.insertData[ListOfData]["recursiveLevel"],
+                                 uriPath=self.insertData[ListOfData]["uriPath"]
+                                 )
+                    )
+                    g.BWASP_DBObj.commit()
+                return self.insertData
+            except:
+                g.BWASP_DBObj.rollback()
+
+        if str(type(data)) == "<class 'dict'>":
+            self.insertData = data
+            try:
+                g.BWASP_DBObj.add(
+                    jobModel(targetURL=self.insertData["targetURL"],
+                             knownInfo=self.insertData["knownInfo"],
+                             recursiveLevel=self.insertData["recursiveLevel"],
+                             uriPath=self.insertData["uriPath"]
+                             )
+                )
+                g.BWASP_DBObj.commit()
+                return self.insertData
+            except:
+                g.BWASP_DBObj.rollback()
+
+        return self.insertData
+
 
 Job_DAO = JobDAO()
+
 
 # Job
 @ns.route('')
 class JobList(Resource):
-    """Shows a list of all packets, and lets you POST to add new tasks"""
+    """Shows a list of all job data, and lets you POST to add new data"""
 
-    @ns.doc('list_Jobs')
+    @ns.doc('List of all Job data')
     @ns.marshal_list_with(job)
     def get(self):
-        """List all tasks"""
+        """Shows Job data"""
         return Job_DAO.get()
 
-    @ns.doc('create_Jobs')
+    @ns.doc('Create Job')
     @ns.expect(job)
     @ns.marshal_with(job, code=201)
     def post(self):
-        """Create a new task"""
+        """Create Job"""
         return Job_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')
 @ns.response(404, 'Jobs not found')
-@ns.param('id', 'The task identifier')
-class Job(Resource):
-    """Show a single job item and lets you delete them"""
+@ns.param('id', 'Job id for unique identifier')
+class single_JobList(Resource):
+    """Show a single Job data"""
 
-    @ns.doc('get_packet')
+    @ns.doc('Get single Job data')
     @ns.marshal_with(job)
     def get(self, id):
         """Fetch a given resource"""

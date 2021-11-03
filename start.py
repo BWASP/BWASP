@@ -1,9 +1,11 @@
 #! BWASP/bin/python
 
-import os
+import os, sys
 import webbrowser
-from Web import create_app as app
+import subprocess
 
 if __name__ == '__main__':
     webbrowser.open("http://localhost:5000")
-    app().run(host='0.0.0.0', port=5000, debug=True)
+    webbrowser.open("http://localhost:20102")
+    subprocess.call(["python", "Web/app.py"])
+    subprocess.call(["python", "API/app.py"])

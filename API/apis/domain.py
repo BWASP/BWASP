@@ -1,18 +1,26 @@
 from flask import g
-from flask_restx import Resource, fields, Namespace
+from flask_restx import Resource, fields, Namespace, model
+import sys, os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from models.BWASP import domain as domainModel
 
 ns = Namespace('api/domain', description='domain operations')
 
 domain = ns.model('Domain', {
-    'id': fields.Integer(readonly=True, description='The task unique identifier'),
-    'relatePacket': fields.Integer(required=True, description='The task unique identifier'),
-    'URL': fields.String(required=True, description='The task details'),
-    'URI': fields.String(required=True, description='The task details'),
-    'params': fields.String(required=True, description='The task details'),
-    'cookie': fields.String(required=True, description='The task details'),
-    'comment': fields.String(required=True, description='The task details')
+    'id': fields.Integer(readonly=True, description='cve id for unique identifier'),
+    'related_Packet': fields.Integer(required=True, description='The unique identifier based on packet id'),
+    'URL': fields.String(required=True, description='target URL'),
+    'URI': fields.String(required=True, description='target URI'),
+    'params': fields.String(required=True, description='target URL parameter'),
+    'comment': fields.String(required=True, description='target Web page HTML comment'),
+    'attackVector': fields.String(required=True, description='Attack vector about CVE, Analysis data'),
+    'typicalServerity': fields.Integer(required=True, description='target attack vector Typical Serverity'),
+    'description': fields.String(required=True, description='attack vector description'),
+    'Details': fields.String(required=True, description='attack vector details')
 })
+
 
 class DomainDAO(object):
     def __init__(self):
@@ -20,61 +28,92 @@ class DomainDAO(object):
         self.selectData = ""
         self.insertData = ""
 
-        self.domains = list()
-
     def get(self, id=-1, Type=False):
         if Type is False and id == -1:
             domain = g.BWASP_DBObj.query(domainModel).all()
             return domain
-        elif Type is not False and id > 0:
+
+        if Type is not False and id > 0:
             domain = g.BWASP_DBObj.query(domainModel).filter(domainModel.id == id).all()
             return domain
-        else:
-            ns.abort(404, f"domain {id} doesn't exist")
+
+        ns.abort(404, f"domain {id} doesn't exist")
 
     def create(self, data):
-        domain = data
-        print(domain)
-        g.BWASP_DBObj.add(
-            domainModel(relatePacket=domain["relatePacket"],
-                        URL=domain["URL"],
-                        URI=domain["URI"],
-                        params=domain["params"],
-                        cookie=domain["cookie"],
-                        comment=domain["comment"]
-                        )
-        )
-        g.BWASP_DBObj.commit()
-        return domain
+        if str(type(data)) == "<class 'list'>":
+            try:
+                self.insertData = data
+                for ListOfData in range(len(data)):
+                    g.BWASP_DBObj.add(
+                        domainModel(related_Packet=self.insertData[ListOfData]["related_Packet"],
+                                    URL=self.insertData[ListOfData]["URL"],
+                                    URI=self.insertData[ListOfData]["URI"],
+                                    params=self.insertData[ListOfData]["params"],
+                                    comment=self.insertData[ListOfData]["comment"],
+                                    attackVector=self.insertData[ListOfData]["attackVector"],
+                                    typicalServerity=self.insertData[ListOfData]["typicalServerity"],
+                                    description=self.insertData[ListOfData]["description"],
+                                    Details=self.insertData[ListOfData]["Details"]
+                                    )
+                    )
+                    g.BWASP_DBObj.commit()
+                return self.insertData
+            except:
+                g.BWASP_DBObj.rollback()
+
+        if str(type(data)) == "<class 'dict'>":
+            self.insertData = data
+            try:
+                g.BWASP_DBObj.add(
+                    domainModel(related_Packet=self.insertData["related_Packet"],
+                                URL=self.insertData["URL"],
+                                URI=self.insertData["URI"],
+                                params=self.insertData["params"],
+                                comment=self.insertData["comment"],
+                                attackVector=self.insertData["attackVector"],
+                                typicalServerity=self.insertData["typicalServerity"],
+                                description=self.insertData["description"],
+                                Details=self.insertData["Details"]
+                                )
+                )
+                g.BWASP_DBObj.commit()
+                return self.insertData
+            except:
+                print("except")
+                g.BWASP_DBObj.rollback()
+
+        return self.insertData
+
 
 Domain_DAO = DomainDAO()
+
 
 # Domain
 @ns.route('')
 class domainList(Resource):
-    """Shows a list of all packets, and lets you POST to add new tasks"""
+    """Shows a list of all domain data, and lets you POST to add new data"""
 
-    @ns.doc('list_domain')
+    @ns.doc('List of all domain data')
     @ns.marshal_list_with(domain)
     def get(self):
-        """List all tasks"""
+        """Shows domain data"""
         return Domain_DAO.get()
 
-    @ns.doc('create_domain')
+    @ns.doc('Create domain data')
     @ns.expect(domain)
     @ns.marshal_with(domain, code=201)
     def post(self):
-        """Create a new task"""
+        """Create domain data"""
         return Domain_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')
 @ns.response(404, 'domain not found')
-@ns.param('id', 'The domain identifier')
-class Domain(Resource):
-    """Show a single packet item and lets you delete them"""
+@ns.param('id', 'domain id for unique identifier')
+class single_Domain(Resource):
+    """Show a single domain data"""
 
-    @ns.doc('get_domain')
+    @ns.doc('Get single domain data')
     @ns.marshal_with(domain)
     def get(self, id):
         """Fetch a given resource"""

@@ -1,11 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
 
-cve_db = SQLAlchemy()
+CVE_DB = SQLAlchemy()
 
 
-class cve(cve_db.Model):
+class cve(CVE_DB.Model):
     __tablename__ = 'CVE'
     __bind_key__ = 'CVE'
-    id = cve_db.Column(cve_db.Integer, primary_key=True, autoincrement=True)
-    year = cve_db.Column(cve_db.TEXT, nullable=False)
-    description = cve_db.Column(cve_db.TEXT, nullable=False)
+    id = CVE_DB.Column(CVE_DB.Integer, primary_key=True, autoincrement=True)
+    year = CVE_DB.Column(CVE_DB.TEXT, nullable=False)
+    description = CVE_DB.Column(CVE_DB.TEXT, nullable=False)
