@@ -4,6 +4,7 @@ import json
 from urllib.parse import urlparse,urlunparse
 from Crawling.feature import func
 from Crawling.attack_vector import *
+import requests
 
 
 def connect(table_name):
@@ -48,6 +49,10 @@ def insertCSP(csp_result):
         query = db.insert(db_table).values(UUID=0, header=json.dumps(csp_result), analysis='None', status='None')
         result = db_connect.execute(query)
         result.close()
+
+    ### REST API Code
+    #url = "http://localhost:20102/api/csp_evaluator"
+    CSPEvaluator.PostCSPEvaluator(csp_result)
 
 
 #REST API: 도훈 Domains
@@ -129,6 +134,27 @@ def insertPorts(port_list, target_url):
                                            port="None", result="None")
         result = db_connect.execute(query)
         result.close()
+
+    ### REST API Code
+    data = []
+    for service in port_list.keys():
+        value={
+            "service": service,
+            "target": target_url,
+            "port": port_list[service],
+            "result": "Open"
+        }
+        data.append(value)
+        Ports.PostPort(data)
+    else:
+        value = {
+            "service": "None",
+            "target": target_url,
+            "port": "None",
+            "result": "None"
+        }
+        data.append(value)
+        Ports.PostPort(data)
 
 
 #REST API: 주명 WebInfo
