@@ -30,14 +30,18 @@ class DomainDAO(object):
         self.selectData = ""
         self.insertData = ""
 
-    def get(self, id=-1, Type=False):
-        if Type is False and id == -1:
-            domain = g.BWASP_DBObj.query(domainModel).all()
-            return domain
+    def get(self, start=0, end=0, id=0, Type=False):
+        if Type is False and id == 0:
+            self.selectData = g.BWASP_DBObj.query(domainModel).all()
+            return self.selectData
+
+        if Type is False and id == 0 and (start < 1 and end > start):
+            self.selectData = g.BWASP_DBObj.query(attackVectorModel).filter(attackVectorModel.id >= start).limit(end).all()
+            return self.selectData
 
         if Type is not False and id > 0:
-            domain = g.BWASP_DBObj.query(domainModel).filter(domainModel.id == id).all()
-            return domain
+            self.selectData = g.BWASP_DBObj.query(domainModel).filter(domainModel.id == id).all()
+            return self.selectData
 
         ns.abort(404, f"domain {id} doesn't exist")
 
@@ -124,3 +128,17 @@ class single_Domain(Resource):
     def get(self, id):
         """Fetch a given resource"""
         return Domain_DAO.get(id, Type=True)
+
+
+@ns.route('/<int:start>/<int:end>')
+@ns.response(404, 'domain not found')
+@ns.param('start', 'domain data paging start')
+@ns.param('emd', 'domain data paging end')
+class single_Domain(Resource):
+    """Show a single domain data"""
+
+    @ns.doc('Get single domain data')
+    @ns.marshal_with(domain)
+    def get(self, start, end):
+        """Fetch a given resource"""
+        return Domain_DAO.get(start, end)
