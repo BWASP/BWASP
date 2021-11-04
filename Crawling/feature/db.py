@@ -115,12 +115,11 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
             "action_URL": action_page,
             "action_URL_Type": action_type,
             "params": tag_name_list,
-            "cookie": domain_cookie,
             "comment": "None",
             "attackVector": attack_vector,
             "typicalServerity": 0,
             "description": "string",
-            "Details": tag_list
+            "Details": tag_list #domain_cookie 양식에 맞춰서 포함해야 함
         }
         Domain().PostDomain(query)
 
