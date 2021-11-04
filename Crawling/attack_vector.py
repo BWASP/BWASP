@@ -84,9 +84,10 @@ def input_tag(response_body):
 
     if form != "none":
         for tag in form:
-            action_page= tag.attrs['action']
+            action_page = tag.attrs['action']
+            action_type = tag.attrs['method']
 
-    return tag_list, tag_name_list, attack_vector, action_page
+    return tag_list, tag_name_list, attack_vector, action_page, action_type
 
 def corsCheck(req_res_packets):
     cors_check = "None"
