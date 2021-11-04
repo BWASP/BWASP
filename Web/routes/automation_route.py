@@ -22,6 +22,6 @@ def manual_options():
                                  "uriPath": reqJsonData["target"]["path"]})
             )
         except:
-            exit(1)
+            abort(500)
 
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")
