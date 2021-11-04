@@ -13,39 +13,15 @@ def manual_options():
     if request.method == 'POST':
         reqJsonData = request.form["reqJsonData"]
         AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
-        # AutomatedAnalysis(reqJsonData["target"]["url"], int(reqJsonData["tool"]["analysisLevel"]), reqJsonData["tool"]["optionalJobs"])
 
-        response = requests.post(
-            url="http://localhost:20102/api/job",
-            headers={"accept": "application/json", "Content-Type": "application/json"},
-            data=json.dumps({"targetURL": reqJsonData["target"]["url"], "knownInfo": reqJsonData["info"], "recursiveLevel": int(reqJsonData["tool"]["analysisLevel"]),
-                  "uriPath": reqJsonData["target"]["path"]})
-        )
-        print(response.status_code)
+        try:
+            requests.post(
+                url="http://localhost:20102/api/job",
+                headers={"accept": "application/json", "Content-Type": "application/json"},
+                data=json.dumps({"targetURL": reqJsonData["target"]["url"], "knownInfo": reqJsonData["info"], "recursiveLevel": int(reqJsonData["tool"]["analysisLevel"]),
+                                 "uriPath": reqJsonData["target"]["path"]})
+            )
+        except:
+            exit(1)
 
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")
-
-
-"""
-def AutomatedAnalysis(url, depth, options):
-    start(url, int(depth), options)
-
-reqJsonData: 
-{
-  "tool": {
-    "analysisLevel": "1",
-    "optionalJobs": []
-  },
-  "info": {
-    "server": [],
-    "framework": [],
-    "backend": []
-  },
-  "target": {
-    "url": "http://testphp.vulnweb.com/",
-    "path": [
-      ""
-    ]
-  }
-}
-"""
