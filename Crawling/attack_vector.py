@@ -84,8 +84,15 @@ def input_tag(response_body):
 
     if form != "none":
         for tag in form:
-            action_page = tag.attrs['action']
-            action_type = tag.attrs['method']
+            try:
+                action_page = tag.attrs['action']
+            except:
+                action_page = "None"
+
+            try:
+                action_type = tag.attrs['method']
+            except:
+                action_type = "None"
 
     return tag_list, tag_name_list, attack_vector, action_page, action_type
 
@@ -93,10 +100,13 @@ def corsCheck(req_res_packets):
     cors_check = "None"
 
     for packet in req_res_packets:
-        resonse_header = json.dumps(packet["response"]["headers"])
+        resonse_header = packet["response"]["headers"]
 
-    if resonse_header['access-control-allow-origin'] == "*":
-        cors_check = "CORS Misconfiguration: *"
+        try:
+            if resonse_header['access-control-allow-origin'] == "*":
+                cors_check = "CORS Misconfiguration: *"
+        except:
+            pass
 
     return cors_check
 
