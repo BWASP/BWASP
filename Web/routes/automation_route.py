@@ -11,7 +11,7 @@ bp = Blueprint(NAME, __name__, url_prefix='/automation')
 @bp.route('/options', methods=['GET', 'POST'])
 def manual_options():
     if request.method == 'POST':
-        reqJsonData = request.form["reqJsonData"]
+        reqJsonData = json.loads(request.form["reqJsonData"])
         AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
         # AutomatedAnalysis(reqJsonData["target"]["url"], int(reqJsonData["tool"]["analysisLevel"]), reqJsonData["tool"]["optionalJobs"])
 
