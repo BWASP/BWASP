@@ -83,6 +83,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
     Details: input tag, cookie, query string(get params) json 형태로
     '''
 
+    data = []
+
     for i, packet in enumerate(req_res_packets):
         if not func.isSameDomain(target_url, packet["request"]["full_url"]):
             continue
@@ -109,7 +111,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
         # TODO
         # GET 데이터를 params 에 넣어야 할까?
         query = {
-            "relatePacket": packet_indexes[i],
+            "related_Packet": packet_indexes[i],
             "URL": domain_url,
             "URI": domain_uri,
             "action_URL": action_page,
@@ -119,9 +121,11 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
             "attackVector": attack_vector,
             "typicalServerity": 0,
             "description": "string",
-            "Details": tag_list #domain_cookie 양식에 맞춰서 포함해야 함
+            "Details": "" #tag_list + domain_cookie 양식에 맞춰서 포함해야 함
         }
-        Domain().PostDomain(query)
+        data.append(query)
+
+    Domain().PostDomain(json.dumps(data))
 
 
 # REST API: 주원 CSP, Ports

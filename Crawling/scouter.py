@@ -42,17 +42,19 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     # {"id": "[1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]"}     
     if len(loadpacket_indexes) < recent_packet_count:
         print("@@@@@@@@@@@")
-        print(Packets().GetAutomationIndex()["retData"]["id"])
-        loadpacket_indexes = json.loads(Packets().GetAutomationIndex()["retData"])["id"]
-        print("!!!!!!!!!!!!!")
-        print(loadpacket_indexes)
-        #loadpacket_indexes = json.loads(Packets().GetAutomationIndex()["retData"]["id"])
+        try:
+            print(json.loads(Packets().GetAutomationIndex()["retData"]["id"])[0])
+        except:
+            print(json.loads(Packets().GetAutomationIndex()["retData"]))
+        #수정 후 loadpacket_indexes = json.loads(Packets().GetAutomationIndex()["retData"])["id"]
+        loadpacket_indexes = json.loads(Packets().GetAutomationIndex()["retData"]["id"])
     
     packet_indexes = loadpacket_indexes[previous_packet_count:recent_packet_count]
-    analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
+    #analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
+    analyst.start(sysinfo_detectlist, input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
     db.insertDomains(req_res_packets, cookie_result,packet_indexes , current_url)
-    db.updateWebInfo(analyst_result)
+    db.updateWebInfo(sysinfo_detectlist)
     
     return 1
 
