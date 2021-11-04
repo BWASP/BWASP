@@ -33,15 +33,14 @@ def create_app(config=None):
     # Database initialization
     BWASP_DB.init_app(app)
     CVE_DB.init_app(app)
+    BWASP_DB.app = app
+    CVE_DB.app = app
+
+    # Database create
+    BWASP_DB.create_all()
 
     @app.before_request
     def before_request():
-        BWASP_DB.app = app
-        CVE_DB.app = app
-
-        # Database create
-        BWASP_DB.create_all()
-
         # g object session initialization
         g.BWASP_DBObj = BWASP_DB.session
         g.CVE_DBObj = CVE_DB.session
