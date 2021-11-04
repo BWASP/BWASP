@@ -164,7 +164,7 @@ def detectHeaders(detect_list,packet, data, index, cats, app):
             continue
 
         regex = data[app]["headers"][header]
-        pattern = re.compile(regex.split("\\;")[0])
+        pattern = re.compile(regex.split("\\;")[0],re.I)
         regex_result = pattern.search(packet["response"]["headers"][header.lower()])
 
         if regex_result:
@@ -175,7 +175,7 @@ def detectHeaders(detect_list,packet, data, index, cats, app):
 def detectHtml(detect_list, packet, data, index, cats, app):
     if type(data[app]["html"]) == str:
         regex=data[app]["html"]
-        pattern = re.compile(regex.split("\\;")[0])
+        pattern = re.compile(regex.split("\\;")[0],re.I)
         regex_result = pattern.search(packet["response"]["body"])
         if regex_result:
             version = detectVersion(regex, regex_result)
@@ -183,7 +183,7 @@ def detectHtml(detect_list, packet, data, index, cats, app):
             appendImplies(detect_list,app,-1,index)
     else:
         for regex in data[app]["html"]:
-            pattern = re.compile(regex.split("\\;")[0])
+            pattern = re.compile(regex.split("\\;")[0],re.I)
             regex_result = pattern.search(packet["response"]["body"])
             if regex_result:
                 version = detectVersion(regex, regex_result)
@@ -210,7 +210,7 @@ def detectUrl(detect_list, cur_page_links, data, cats, app):
     for url in cur_page_links:
         if type(data[app]["url"]) == str:
             regex=data[app]["url"]
-            pattern = re.compile(data[app]["url"].split('\\;')[0])
+            pattern = re.compile(data[app]["url"].split('\\;')[0],re.I)
             regex_result = pattern.search(url)
             
             if regex_result:
@@ -220,7 +220,7 @@ def detectUrl(detect_list, cur_page_links, data, cats, app):
                 return
         else:
             for url_regex in data[app]["url"]:
-                pattern = re.compile(url_regex.split('\\;')[0])
+                pattern = re.compile(url_regex.split('\\;')[0],re.I)
                 regex_result = pattern.search(url)
 
                 if regex_result:
@@ -233,7 +233,7 @@ def detectScripts(detect_list, cur_page_links, data, cats, app):
     for url in cur_page_links:
         if type(data[app]["scripts"]) == str:
             regex=data[app]["scripts"]
-            pattern = re.compile(data[app]["scripts"].split('\\;')[0])
+            pattern = re.compile(data[app]["scripts"].split('\\;')[0],re.I)
             regex_result = pattern.search(url)
             if regex_result:
                 version = detectVersion(regex, regex_result)
@@ -242,7 +242,7 @@ def detectScripts(detect_list, cur_page_links, data, cats, app):
                 return
         else:
             for url_regex in data[app]["scripts"]:
-                pattern = re.compile(url_regex.split('\\;')[0])
+                pattern = re.compile(url_regex.split('\\;')[0],re.I)
                 regex_result = pattern.search(url)
                 if regex_result:
                     version = detectVersion(url_regex,regex_result)
@@ -273,7 +273,7 @@ def detectMeta(detect_list, packet, data, index, cats, app):
     html = BeautifulSoup(packet["response"]["body"], features="html.parser")
     for meta_regex in data[app]["meta"].values():
         try:
-            pattern = re.compile(meta_regex.split('\\;')[0])
+            pattern = re.compile(meta_regex.split('\\;')[0],re.I)
         except: 
             pattern = "DonotD!ete!ct"
         meta_tag = html.find("meta", {"name":data[app]["meta"].keys()})
