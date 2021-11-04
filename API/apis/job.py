@@ -40,10 +40,10 @@ class JobDAO(object):
                 self.insertData = data
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
-                        jobModel(targetURL=self.insertData[ListOfData]["targetURL"],
-                                 knownInfo=self.insertData[ListOfData]["knownInfo"],
-                                 recursiveLevel=self.insertData[ListOfData]["recursiveLevel"],
-                                 uriPath=self.insertData[ListOfData]["uriPath"]
+                        jobModel(targetURL=str(self.insertData[ListOfData]["targetURL"]),
+                                 knownInfo=str(self.insertData[ListOfData]["knownInfo"]),
+                                 recursiveLevel=str(self.insertData[ListOfData]["recursiveLevel"]),
+                                 uriPath=str(self.insertData[ListOfData]["uriPath"])
                                  )
                     )
                     g.BWASP_DBObj.commit()
@@ -55,15 +55,16 @@ class JobDAO(object):
             self.insertData = data
             try:
                 g.BWASP_DBObj.add(
-                    jobModel(targetURL=self.insertData["targetURL"],
-                             knownInfo=self.insertData["knownInfo"],
-                             recursiveLevel=self.insertData["recursiveLevel"],
-                             uriPath=self.insertData["uriPath"]
+                    jobModel(targetURL=str(self.insertData["targetURL"]),
+                             knownInfo=str(self.insertData["knownInfo"]),
+                             recursiveLevel=str(self.insertData["recursiveLevel"]),
+                             uriPath=str(self.insertData["uriPath"])
                              )
                 )
                 g.BWASP_DBObj.commit()
                 return self.insertData
             except:
+                print("exception")
                 g.BWASP_DBObj.rollback()
 
         return self.insertData

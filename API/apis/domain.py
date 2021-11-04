@@ -51,17 +51,17 @@ class DomainDAO(object):
                 self.insertData = data
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
-                        domainModel(related_Packet=self.insertData[ListOfData]["related_Packet"],
-                                    URL=self.insertData[ListOfData]["URL"],
-                                    URI=self.insertData[ListOfData]["URI"],
-                                    action_URL=self.insertData[ListOfData]["action_URL"],
-                                    action_URL_Type=self.insertData[ListOfData]["action_URL_Type"],
-                                    params=self.insertData[ListOfData]["params"],
-                                    comment=self.insertData[ListOfData]["comment"],
-                                    attackVector=self.insertData[ListOfData]["attackVector"],
-                                    typicalServerity=self.insertData[ListOfData]["typicalServerity"],
-                                    description=self.insertData[ListOfData]["description"],
-                                    Details=self.insertData[ListOfData]["Details"]
+                        domainModel(related_Packet=int(self.insertData[ListOfData]["related_Packet"]),
+                                    URL=str(self.insertData[ListOfData]["URL"]),
+                                    URI=str(self.insertData[ListOfData]["URI"]),
+                                    action_URL=str(self.insertData[ListOfData]["action_URL"]),
+                                    action_URL_Type=str(self.insertData[ListOfData]["action_URL_Type"]),
+                                    params=str(self.insertData[ListOfData]["params"]),
+                                    comment=str(self.insertData[ListOfData]["comment"]),
+                                    attackVector=str(self.insertData[ListOfData]["attackVector"]),
+                                    typicalServerity=int(self.insertData[ListOfData]["typicalServerity"]),
+                                    description=str(self.insertData[ListOfData]["description"]),
+                                    Details=str(self.insertData[ListOfData]["Details"])
                                     )
                     )
                     g.BWASP_DBObj.commit()
@@ -73,23 +73,22 @@ class DomainDAO(object):
             self.insertData = data
             try:
                 g.BWASP_DBObj.add(
-                    domainModel(related_Packet=self.insertData["related_Packet"],
-                                URL=self.insertData["URL"],
-                                URI=self.insertData["URI"],
-                                action_URL=self.insertData["action_URL"],
-                                action_URL_Type=self.insertData["action_URL_Type"],
-                                params=self.insertData["params"],
-                                comment=self.insertData["comment"],
-                                attackVector=self.insertData["attackVector"],
-                                typicalServerity=self.insertData["typicalServerity"],
-                                description=self.insertData["description"],
-                                Details=self.insertData["Details"]
+                    domainModel(related_Packet=int(self.insertData["related_Packet"]),
+                                URL=str(self.insertData["URL"]),
+                                URI=str(self.insertData["URI"]),
+                                action_URL=str(self.insertData["action_URL"]),
+                                action_URL_Type=str(self.insertData["action_URL_Type"]),
+                                params=str(self.insertData["params"]),
+                                comment=str(self.insertData["comment"]),
+                                attackVector=str(self.insertData["attackVector"]),
+                                typicalServerity=int(self.insertData["typicalServerity"]),
+                                description=str(self.insertData["description"]),
+                                Details=str(self.insertData["Details"])
                                 )
                 )
                 g.BWASP_DBObj.commit()
                 return self.insertData
             except:
-                print("except")
                 g.BWASP_DBObj.rollback()
 
         return self.insertData
