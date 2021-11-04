@@ -78,7 +78,7 @@ def visit(driver, url, depth, options):
     if "CSPEvaluate" in options["tool"]["optionalJobs"]:
         csp_result = csp_evaluator.start(driver.current_url)
         db.insertCSP(csp_result)
-
+        
     req_res_packets = packet_capture.start(driver)
 
     # 다른 사이트로 Redirect 되었는지 검증.
@@ -152,8 +152,10 @@ def initSelenium():
     chrome_options.add_experimental_option("prefs", {
         "download_restrictions": 3
     })
+    # https://github.com/wkeeling/selenium-wire#in-memory-storage
     options = {
-        "disable_encoding": True
+        "disable_encoding": True,
+        'request_storage': 'memory'
     }
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), seleniumwire_options=options, chrome_options=chrome_options)

@@ -27,7 +27,7 @@ def start(driver):
             })
         else:
             print("[!] Response is empty.")
-
+    del driver.requests
     return network_packet
 
 def getRequestPacket(data):
