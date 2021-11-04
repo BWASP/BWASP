@@ -39,12 +39,11 @@ class PortsDAO(object):
             try:
                 self.insertData = data
                 for ListOfData in range(len(data)):
-
                     g.BWASP_DBObj.add(
-                        portsModel(service=self.insertData[ListOfData]["service"],
-                                   target=self.insertData[ListOfData]["target"],
-                                   port=self.insertData[ListOfData]["port"],
-                                   result=self.insertData[ListOfData]["result"]
+                        portsModel(service=str(self.insertData[ListOfData]["service"]),
+                                   target=str(self.insertData[ListOfData]["target"]),
+                                   port=str(self.insertData[ListOfData]["port"]),
+                                   result=str(self.insertData[ListOfData]["result"])
                                    )
                     )
                     g.BWASP_DBObj.commit()
@@ -56,10 +55,10 @@ class PortsDAO(object):
             self.insertData = data
             try:
                 g.BWASP_DBObj.add(
-                    portsModel(service=self.insertData["service"],
-                               target=self.insertData["target"],
-                               port=self.insertData["port"],
-                               result=self.insertData["result"]
+                    portsModel(service=str(self.insertData["service"]),
+                               target=str(self.insertData["target"]),
+                               port=str(self.insertData["port"]),
+                               result=str(self.insertData["result"])
                                )
                 )
                 g.BWASP_DBObj.commit()

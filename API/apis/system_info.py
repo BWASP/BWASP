@@ -44,8 +44,8 @@ class SysteminfoDAO(object):
                 self.insertData = data
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
-                        systeminfoModel(url=self.insertData[ListOfData]["url"],
-                                        data=self.insertData[ListOfData]["data"]
+                        systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
+                                        data=str(self.insertData[ListOfData]["data"])
                                         )
                     )
                     g.BWASP_DBObj.commit()
@@ -57,8 +57,8 @@ class SysteminfoDAO(object):
             self.insertData = data
             try:
                 g.BWASP_DBObj.add(
-                    systeminfoModel(url=self.insertData["url"],
-                                    data=self.insertData["data"]
+                    systeminfoModel(url=str(self.insertData["url"]),
+                                    data=str(self.insertData["data"])
                                     )
                 )
                 g.BWASP_DBObj.commit()
@@ -71,7 +71,7 @@ class SysteminfoDAO(object):
     def update(self, data):
         try:
             self.updateData = data
-            g.BWASP_DBObj.query(systeminfoModel).filter(systeminfoModel.id == self.updateData["id"]).update({'data': self.updateData["data"]})
+            g.BWASP_DBObj.query(systeminfoModel).filter(systeminfoModel.id == int(self.updateData["id"])).update({'data': str(self.updateData["data"])})
             g.BWASP_DBObj.commit()
             return self.insertData
         except:

@@ -1,6 +1,6 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
-import sys, os
+import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -79,11 +79,11 @@ class PacketDAO(object):
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
                         packetsModel(category=0,
-                                     statusCode=self.insertData[ListOfData]['statusCode'],
-                                     requestType=self.insertData[ListOfData]['requestType'],
-                                     requestJson=self.insertData[ListOfData]['requestJson'],
-                                     responseHeader=self.insertData[ListOfData]['responseHeader'],
-                                     responseBody=self.insertData[ListOfData]['responseBody']
+                                     statusCode=int(self.insertData[ListOfData]['statusCode']),
+                                     requestType=str(self.insertData[ListOfData]['requestType']),
+                                     requestJson=str(self.insertData[ListOfData]['requestJson']),
+                                     responseHeader=str(self.insertData[ListOfData]['responseHeader']),
+                                     responseBody=str(self.insertData[ListOfData]['responseBody'])
                                      )
                     )
                     g.BWASP_DBObj.commit()
@@ -96,11 +96,11 @@ class PacketDAO(object):
             try:
                 g.BWASP_DBObj.add(
                     packetsModel(category=0,
-                                 statusCode=self.insertData['statusCode'],
-                                 requestType=self.insertData['requestType'],
-                                 requestJson=self.insertData['requestJson'],
-                                 responseHeader=self.insertData['responseHeader'],
-                                 responseBody=self.insertData['responseBody']
+                                 statusCode=int(self.insertData['statusCode']),
+                                 requestType=str(self.insertData['requestType']),
+                                 requestJson=str(self.insertData['requestJson']),
+                                 responseHeader=str(self.insertData['responseHeader']),
+                                 responseBody=str(self.insertData['responseBody'])
                                  )
                 )
                 g.BWASP_DBObj.commit()
@@ -113,16 +113,15 @@ class PacketDAO(object):
     def manual_create(self, data):
         if str(type(data)) == "<class 'list'>":
             try:
+                self.insertData = data
                 for ListOfData in range(len(data)):
-                    self.insertData = data
-
                     g.BWASP_DBObj.add(
                         packetsModel(category=1,
-                                     statusCode=self.insertData[ListOfData]['statusCode'],
-                                     requestType=self.insertData[ListOfData]['requestType'],
-                                     requestJson=self.insertData[ListOfData]['requestJson'],
-                                     responseHeader=self.insertData[ListOfData]['responseHeader'],
-                                     responseBody=self.insertData[ListOfData]['responseBody']
+                                     statusCode=int(self.insertData[ListOfData]['statusCode']),
+                                     requestType=str(self.insertData[ListOfData]['requestType']),
+                                     requestJson=str(self.insertData[ListOfData]['requestJson']),
+                                     responseHeader=str(self.insertData[ListOfData]['responseHeader']),
+                                     responseBody=str(self.insertData[ListOfData]['responseBody'])
                                      )
                     )
                     g.BWASP_DBObj.commit()
@@ -135,11 +134,11 @@ class PacketDAO(object):
             try:
                 g.BWASP_DBObj.add(
                     packetsModel(category=1,
-                                 statusCode=self.insertData['statusCode'],
-                                 requestType=self.insertData['requestType'],
-                                 requestJson=self.insertData['requestJson'],
-                                 responseHeader=self.insertData['responseHeader'],
-                                 responseBody=self.insertData['responseBody']
+                                 statusCode=int(self.insertData['statusCode']),
+                                 requestType=str(self.insertData['requestType']),
+                                 requestJson=str(self.insertData['requestJson']),
+                                 responseHeader=str(self.insertData['responseHeader']),
+                                 responseBody=str(self.insertData['responseBody'])
                                  )
                 )
                 g.BWASP_DBObj.commit()

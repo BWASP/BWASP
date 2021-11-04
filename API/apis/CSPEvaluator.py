@@ -10,10 +10,7 @@ ns = Namespace('api/cspevaluator', description='csp evaluator operations')
 
 csp_evaluator = ns.model('CspEvaluator', {
     'id': fields.Integer(readonly=True, description='CspEvaluator id for unique identifier'),
-    'UUID': fields.Integer(required=True, description='The unique identifier of CSPEvaluator data'),
-    'header': fields.String(required=True, description='Content-Security Policy in HTTP header'),
-    'analysis': fields.String(required=True, description='Content-Security Policy secure analysis'),
-    'status': fields.String(required=True, description='Result status about Content-Security Policy secure analysis')
+    'header': fields.String(required=True, description='Content-Security Policy in HTTP header')
 })
 
 
@@ -40,10 +37,8 @@ class CSPEvaluatorDAO(object):
                 self.insertData = data
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
-                        CSPEvaluatorModel(UUID=self.insertData[ListOfData]["UUID"],
-                                          header=self.insertData[ListOfData]["header"],
-                                          analysis=self.insertData[ListOfData]["analysis"],
-                                          status=self.insertData[ListOfData]["status"]
+                        CSPEvaluatorModel(
+                                          header=str(self.insertData[ListOfData]["header"])
                                           )
                     )
                     g.BWASP_DBObj.commit()
@@ -55,11 +50,7 @@ class CSPEvaluatorDAO(object):
             self.insertData = data
             try:
                 g.BWASP_DBObj.add(
-                    CSPEvaluatorModel(UUID=self.insertData["UUID"],
-                                      header=self.insertData["header"],
-                                      analysis=self.insertData["analysis"],
-                                      status=self.insertData["status"]
-                                      )
+                    CSPEvaluatorModel(header=str(self.insertData["header"]))
                 )
                 g.BWASP_DBObj.commit()
                 return self.insertData
