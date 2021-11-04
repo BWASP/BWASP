@@ -46,7 +46,7 @@ class Packets:
         self.responseObj = self.requestObj.post(
             url=self.URL_PREFIX + self.URL_PREFIX_Automation["POST"],
             headers=self.requestHeaders,
-            data=json.dumps(data)
+            data=data
         )
 
         if self.responseObj.status_code == 201:
@@ -58,7 +58,7 @@ class Packets:
         self.responseObj = self.requestObj.post(
             url=self.URL_PREFIX + self.URL_PREFIX_Manual["POST"],
             headers=self.requestHeaders,
-            data=json.dumps(data)
+            data=data
         )
 
         if self.responseObj.status_code == 201:
@@ -82,7 +82,7 @@ class Domain:
         self.responseObj = self.requestObj.post(
             url=self.URL_PREFIX,
             headers=self.requestHeaders,
-            data=json.dumps(data)
+            data=data
         )
 
         if self.responseObj.status_code == 201:
@@ -106,7 +106,7 @@ class CSPEvaluator:
         self.responseObj = self.requestObj.post(
             url=self.URL_PREFIX,
             headers=self.requestHeaders,
-            data=json.dumps(data)
+            data=data
         )
 
         if self.responseObj.status_code == 201:
@@ -130,7 +130,7 @@ class Job:
         self.responseObj = self.requestObj.post(
             url=self.URL_PREFIX,
             headers=self.requestHeaders,
-            data=json.dumps(data)
+            data=data
         )
 
         if self.responseObj.status_code == 201:
@@ -154,7 +154,7 @@ class SystemInfo:
         self.responseObj = self.requestObj.post(
             url=self.URL_PREFIX,
             headers=self.requestHeaders,
-            data=json.dumps(data)
+            data=data
         )
 
         if self.responseObj.status_code == 201:
@@ -166,7 +166,7 @@ class SystemInfo:
         self.responseObj = self.requestObj.patch(
             url=self.URL_PREFIX,
             headers=self.requestHeaders,
-            data=json.dumps(data)
+            data=data
         )
 
         if self.responseObj.status_code == 200:
@@ -190,7 +190,7 @@ class Ports:
         self.responseObj = self.requestObj.post(
             url=self.URL_PREFIX,
             headers=self.requestHeaders,
-            data=json.dumps(data)
+            data=data
         )
 
         if self.responseObj.status_code == 201:
