@@ -49,6 +49,8 @@ def input_tag(response_body):
     tag_list=[]
     tag_name_list=[]
     attack_vector = "SQL Injection, XSS"
+    action_page = "None"
+    action_type = "None"
     try:
         text = soup.find_all('input')
         text_length = len(text)
