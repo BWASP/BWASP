@@ -150,7 +150,7 @@ def insertPorts(port_list, target_url):
 def postWebInfo(input_url):
     data = {
         "url": input_url,
-        "data": {}
+        "data": "None"
         }  
     SystemInfo().PostSystemInfo(data)
 
