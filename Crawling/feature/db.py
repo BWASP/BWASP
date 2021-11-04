@@ -152,7 +152,7 @@ def postWebInfo(input_url):
         "url": input_url,
         "data": "None"
         }  
-    SystemInfo().PostSystemInfo(data)
+    SystemInfo().PostSystemInfo(json.dumps(data))
 
 #이후로 업데이트를 통해 data 값 갱신
 def updateWebInfo(analyst_result):
@@ -161,7 +161,7 @@ def updateWebInfo(analyst_result):
         "id": 1,
         "data": analyst_result
     }
-    SystemInfo().PATCHSystemInfo(data)
+    SystemInfo().PATCHSystemInfo(json.dumps(data))
 
 
 
