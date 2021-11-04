@@ -156,7 +156,7 @@ def postWebInfo(input_url):
 
 #이후로 업데이트를 통해 data 값 갱신
 def updateWebInfo(analyst_result):
-    db_connect, db_table = connect("systeminfo")
+    #db_connect, db_table = connect("systeminfo")
     data = {
         "id": 1,
         "data": analyst_result
