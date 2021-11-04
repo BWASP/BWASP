@@ -28,7 +28,7 @@ class Packets:
 
         if self.responseObj.status_code == 200:
             json = self.responseObj.json()
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": str(self.responseObj.json())}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
@@ -39,7 +39,7 @@ class Packets:
         )
 
         if self.responseObj.status_code == 200:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": str(self.responseObj.json())}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
@@ -51,7 +51,7 @@ class Packets:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": str(self.responseObj.json())}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
@@ -63,7 +63,7 @@ class Packets:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": str(self.responseObj.json())}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
@@ -87,7 +87,7 @@ class Domain:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": str(self.responseObj.json())}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
@@ -111,7 +111,7 @@ class CSPEvaluator:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": str(self.responseObj.json())}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
@@ -135,7 +135,7 @@ class Job:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": str(self.responseObj.json())}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
@@ -159,7 +159,7 @@ class SystemInfo:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": str(self.responseObj.json())}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
@@ -171,7 +171,7 @@ class SystemInfo:
         )
 
         if self.responseObj.status_code == 200:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": str(self.responseObj.json())}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
@@ -195,7 +195,7 @@ class Ports:
         )
 
         if self.responseObj.status_code == 201:
-            return {"status": self.responseObj.status_code, "message": "Success", "retData": str(self.responseObj.json())}
+            return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
