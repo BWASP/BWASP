@@ -12,10 +12,8 @@ bp = Blueprint(NAME, __name__, url_prefix='/automation')
 def manual_options():
     if request.method == 'POST':
         reqJsonData = json.loads(request.form["reqJsonData"])
-        AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
-
         try:
-            requests.post(
+            response = requests.post(
                 url="http://localhost:20102/api/job",
                 headers={"accept": "application/json", "Content-Type": "application/json"},
                 data=json.dumps({"targetURL": reqJsonData["target"]["url"], "knownInfo": reqJsonData["info"], "recursiveLevel": int(reqJsonData["tool"]["analysisLevel"]),
@@ -24,4 +22,5 @@ def manual_options():
         except:
             abort(500)
 
+        AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")
