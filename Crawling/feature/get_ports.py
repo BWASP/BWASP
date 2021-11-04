@@ -9,17 +9,20 @@ def getPortsOnline(target_ip):
     if pattern.match(target_ip) is None:
         target_ip = gethostbyname(urlparse(target_ip).netloc)
     
-    html = BeautifulSoup(requests.get("https://censys.io/ipv4/" + target_ip).text, features="html.parser")
-
-    #censys.io/ipv4/ vs search.censys.io/hosts/   // suninatas.com, webhacking.kr 기준 search.censys.io가 더 정확
+    html = BeautifulSoup(requests.get("https://search.censys.io/hosts/" + target_ip).text, features="html.parser")
 
     for i in html.select('h2'):
         port = i.get_text().replace('\n','').split('/')[0]
-        try:
-            service = getservbyport(int(port))
-            open_ports[str(port)] = service
-        except:
-            open_ports[str(port)] = "Unknown"
+        port_num = port.replace(" ", "")
+        port_service = i.get_text().replace('\n','').split('/')[1].split(" ")[0]
+
+        open_ports[str(port_num)] = port_service
+
+        #try:
+        #    service = getservbyport(int(port))
+        #    open_ports[str(port)] = service
+        #except:
+        #    open_ports[str(port)] = "Unknown"
 
     return open_ports
 

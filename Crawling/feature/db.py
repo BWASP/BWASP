@@ -122,15 +122,14 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
 #REST API: 주원 CSP, Ports
 def insertPorts(port_list, target_url):
     data = []
-    for service in port_list.keys():
+    for port in port_list.keys():
         value={
-            "service": service,
+            "service": port_list[port],
             "target": target_url,
-            "port": port_list[service],
+            "port": port,
             "result": "Open"
         }
         data.append(value)
-        Ports().PostPorts(json.dumps(data))
     else:
         value = {
             "service": "None",
@@ -139,7 +138,7 @@ def insertPorts(port_list, target_url):
             "result": "None"
         }
         data.append(value)
-        Ports().PostPorts(json.dumps(data))
+    Ports().PostPorts(json.dumps(data))
 
 
 #REST API: 주명 WebInfo
