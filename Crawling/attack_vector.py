@@ -42,68 +42,48 @@ def attack_header(target_url):
     return http_method, infor_vector
 
 
-
 def input_tag(response_body):
     # form tag action and input tag and input name parse
     soup = BeautifulSoup(response_body, 'html.parser')
-    tag_list=[]
-    tag_name_list=[]
-    attack_vector = "None"
-    action_page = "None"
-    action_type = "None"
-    try:
-        text = soup.find_all('input')
-        text_length = len(text)
-    except:
-        text_length = 0
 
-    try:
-        form = soup.find_all('form')
-    except:
-        form = "none"
+    tag_list = list()
+    tag_name_list = list()
+    action_page = list()
+    action_type = list()
+
+    attack_vector = "None"
+
+    text = soup.find_all('input')
+    form = soup.find_all('form')
 
     for tag in text:
-
         try:
-            tag.attrs['type']
-
-            if tag.attrs['type'] != "submit" and text_length != 0:
+            if tag.attrs['type'] != "submit" and len(text) != 0:
                 tag_list.append(tag)  # input tag 값 ex) <input ~
+                tag_name_list.append(tag.attrs['name'])
 
-                attack_vector = "SQL Injection, XSS"
-
-                try:
-                    tag_name_list.append(tag.attrs['name'])  # parameter name 값 ex) uname
-                except:
-                    print("name option No: " + str(tag))
+                attack_vector = "SQL Injection, XSS"  # TODO: attack vector initialization
 
                 # th tag check (board) and type="password" check (login)
-                if "<th" in response_body:
-                    if " (board)" in attack_vector:
-                        pass
-                    attack_vector += " (board)"
+                if "<th" in response_body:  # TODO: bs4 use
+                    if "(board)" not in attack_vector:
+                        attack_vector += " (board)"
 
+                print(f"tag.attrs['type']: {tag.attrs['type']}")
                 if tag.attrs['type'] == "password":
-                    if " (login)" in attack_vector:
-                        pass
-                    attack_vector += " (login)"
-
+                    if "(login)" not in attack_vector:
+                        attack_vector += " (login)"
+                print(f"attack_vector: {attack_vector}")
         except:
             pass
 
-    if form != "none":
+    if form != "None":
         for tag in form:
-            try:
-                action_page = tag.attrs['action']
-            except:
-                action_page = "None"
-
-            try:
-                action_type = tag.attrs['method']
-            except:
-                action_type = "None"
+            action_page.append(tag.attrs['action'])
+            action_type.append(tag.attrs['method'])
 
     return tag_list, tag_name_list, attack_vector, action_page, action_type
+
 
 def corsCheck(req_res_packets):
     cors_check = "None"
@@ -120,7 +100,7 @@ def corsCheck(req_res_packets):
     return cors_check
 
 
-#input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
+# input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
 """
 {
   "tag": [

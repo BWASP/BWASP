@@ -92,13 +92,16 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
         response_body = packet["response"]["body"]
         tag_list, tag_name_list, attack_vector, action_page, action_type = input_tag(response_body)
+
+        print(f"db.py; attack_vector : {attack_vector}")
+
         cors_check = corsCheck(req_res_packets)
         if cors_check != "None":
             attack_vector += " (" + cors_check + ")"
 
         url_part = urlparse(packet["request"]["full_url"])
-        domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
-        domain_uri = urlunparse(url_part._replace(scheme="", netloc=""))
+        domain_url = urlunparse(url_part.replace(params="", query="", fragment="", path=""))
+        domain_uri = urlunparse(url_part.replace(scheme="", netloc=""))
         domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
 
         if not packet["request"]["full_url"] in cookie_result.keys():
@@ -121,7 +124,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
             "attackVector": attack_vector,
             "typicalServerity": 0,
             "description": "string",
-            "Details": "" #tag_list + domain_cookie 양식에 맞춰서 포함해야 함
+            "Details": ""  # tag_list + domain_cookie 양식에 맞춰서 포함해야 함
         }
         data.append(query)
 
