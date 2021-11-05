@@ -48,7 +48,7 @@ def input_tag(response_body):
     soup = BeautifulSoup(response_body, 'html.parser')
     tag_list=[]
     tag_name_list=[]
-    attack_vector = "SQL Injection, XSS"
+    attack_vector = "None"
     action_page = "None"
     action_type = "None"
     try:
@@ -69,6 +69,9 @@ def input_tag(response_body):
 
             if tag.attrs['type'] != "submit" and text_length != 0:
                 tag_list.append(tag)  # input tag 값 ex) <input ~
+
+                attack_vector = "SQL Injection, XSS"
+
                 try:
                     tag_name_list.append(tag.attrs['name'])  # parameter name 값 ex) uname
                 except:
@@ -76,9 +79,13 @@ def input_tag(response_body):
 
                 # th tag check (board) and type="password" check (login)
                 if "<th" in response_body:
+                    if " (board)" in attack_vector:
+                        pass
                     attack_vector += " (board)"
 
                 if tag.attrs['type'] == "password":
+                    if " (login)" in attack_vector:
+                        pass
                     attack_vector += " (login)"
 
         except:
