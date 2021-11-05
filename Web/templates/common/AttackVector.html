@@ -45,7 +45,7 @@
                         <h3 class="mb-0">
                             <i class="fa fa-ban"></i>
                         </h3>
-                        <h3 class="ms-3 mb-0">No data.</h3>
+                        <h3 class="ms-3 mb-0" id="errorMessagePlace">No data.</h3>
                     </div>
                 </div>
                 <div class="table-responsive" id="tablePlace"></div>
@@ -67,8 +67,8 @@
 
 <script type="module" src="{{ url_for('static', filename='js/page/attackVector.js') }}"></script>
 <script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
 </script>
