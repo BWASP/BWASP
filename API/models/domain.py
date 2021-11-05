@@ -9,23 +9,29 @@ class domain(BWASP_DB.Model):
     related_Packet = BWASP_DB.Column(BWASP_DB.Integer, nullable=False)
     URL = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
     URI = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
+    action_URL = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
+    action_URL_Type = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
     params = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
     comment = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
     attackVector = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    typicalServerity = BWASP_DB.Column(BWASP_DB.INT, nullable=False)
+    typicalServerity = BWASP_DB.Column(BWASP_DB.Integer, nullable=False)
     description = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
     Details = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
 
-    def __init__(self, relatePacket, URL, URI, params, comment, attackVector, typicalServer, description, Details, **kwargs):
-        self.relatePacket = relatePacket
+    def __init__(self, related_Packet, URL, URI, action_URL, action_URL_Type, params, comment, attackVector, typicalServerity, description, Details, **kwargs):
+        self.related_Packet = related_Packet
         self.URL = URL
         self.URI = URI
+        self.action_URL = action_URL
+        self.action_URL_Type = action_URL_Type
         self.params = params
         self.comment = comment
         self.attackVector = attackVector
-        self.typicalServerity = typicalServer
+        self.typicalServerity = typicalServerity
         self.description = description
         self.Details = Details
 
     def __repr__(self):
-        return f"<domain('{self.relatePacket}', '{self.URL}', '{self.URI}', '{self.params}', '{self.comment}', '{self.attackVector}', '{self.typicalServerity}', '{self.description}', '{self.Details}')>"
+        return f"<domain('{self.related_Packet}', '{self.URL}', '{self.URI}', '{self.action_URL}', '{self.action_URL_Type}', '{self.params}', '{self.comment}', " \
+               f"'{self.attackVector}', '{self.typicalServerity}', '{self.description}', '{self.Details}')>"
+

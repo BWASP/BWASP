@@ -14,3 +14,4 @@ class systeminfo(BWASP_DB.Model):
 
     def __repr__(self):
         return f"<systeminfo('{self.url}', '{self.data}')>"
+

@@ -23,4 +23,4 @@ class packets(BWASP_DB.Model):
 
     def __repr__(self):
         return f"<packets('{self.category}', '{self.statusCode}', '{self.requestType}', '{self.requestJson}', " \
-               f"{self.responseHeader}', '{self.responseBody}')>"
+               f"'{self.responseHeader}', '{self.responseBody}')>"
