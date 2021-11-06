@@ -8,8 +8,7 @@ class CSPEvaluator(BWASP_DB.Model):
     id = BWASP_DB.Column(BWASP_DB.Integer, primary_key=True, autoincrement=True)
     header = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
 
-    def __init__(self, UUID, header, **kwargs):
-        self.UUID = UUID
+    def __init__(self, header, **kwargs):
         self.header = header
 
     def __repr__(self):

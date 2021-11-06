@@ -1,5 +1,6 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
+from .api_returnObj import ReturnObject
 import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -23,6 +24,14 @@ domain = ns.model('Domain', {
     'Details': fields.String(required=True, description='attack vector details')
 })
 
+domain_returnPost = ns.model('domain_returnPost', {
+    "message": fields.String(readonly=True, description='message of return data')
+})
+
+domain_RowCount = ns.model('domain_RowCount', {
+    'RowCount': fields.Integer(readonly=True, description='Count of all CspEvaluator id data')
+})
+
 
 class DomainDAO(object):
     def __init__(self):
@@ -30,20 +39,24 @@ class DomainDAO(object):
         self.selectData = ""
         self.insertData = ""
 
-    def get(self, start=0, end=0, id=0, Type=False):
-        if Type is False and id == 0 and 0 < start < end:
-            self.selectData = g.BWASP_DBObj.query(domainModel).filter(domainModel.id >= start).limit(end).all()
-            return self.selectData
+    def get_retRowCount(self):
+        self.counter = g.BWASP_DBObj.query(domainModel).count()
+        return self.counter
 
-        if Type is False and id == 0:
+    def get(self, id=None, Type=False):
+        if Type is False and id is None:
             self.selectData = g.BWASP_DBObj.query(domainModel).all()
             return self.selectData
 
-        if Type is not False and id > 0:
+        if Type is not False and self.get_retRowCount() >= id > 0:
             self.selectData = g.BWASP_DBObj.query(domainModel).filter(domainModel.id == id).all()
             return self.selectData
 
         ns.abort(404, f"domain {id} doesn't exist")
+
+    def get_retRowData_for_Pagination(self, start, end):
+        self.selectData = g.BWASP_DBObj.query(domainModel).filter(domainModel.id >= start).limit(end)
+        return self.selectData
 
     def create(self, data):
         if str(type(data)) == "<class 'list'>":
@@ -65,33 +78,11 @@ class DomainDAO(object):
                                     )
                     )
                     g.BWASP_DBObj.commit()
-                return self.insertData
+                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
 
-        if str(type(data)) == "<class 'dict'>":
-            self.insertData = data
-            try:
-                g.BWASP_DBObj.add(
-                    domainModel(related_Packet=int(self.insertData["related_Packet"]),
-                                URL=str(self.insertData["URL"]),
-                                URI=str(self.insertData["URI"]),
-                                action_URL=str(self.insertData["action_URL"]),
-                                action_URL_Type=str(self.insertData["action_URL_Type"]),
-                                params=str(self.insertData["params"]),
-                                comment=str(self.insertData["comment"]),
-                                attackVector=str(self.insertData["attackVector"]),
-                                typicalServerity=int(self.insertData["typicalServerity"]),
-                                description=str(self.insertData["description"]),
-                                Details=str(self.insertData["Details"])
-                                )
-                )
-                g.BWASP_DBObj.commit()
-                return self.insertData
-            except:
-                g.BWASP_DBObj.rollback()
-
-        return self.insertData
+        return ReturnObject().Return_POST_POST_HTTPStatusMessage(Type=False)
 
 
 Domain_DAO = DomainDAO()
@@ -110,10 +101,12 @@ class domainList(Resource):
 
     @ns.doc('Create domain data')
     @ns.expect(domain)
-    @ns.marshal_with(domain, code=201)
+    @ns.marshal_with(domain_returnPost)
+    # @ns.marshal_with(domain, code=201)
     def post(self):
         """Create domain data"""
-        return Domain_DAO.create(ns.payload), 201
+        return Domain_DAO.create(ns.payload)
+        # return Domain_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')
@@ -140,4 +133,16 @@ class paging_DomainList(Resource):
     @ns.marshal_with(domain)
     def get(self, start, end):
         """Fetch a given resource"""
-        return Domain_DAO.get(start, end)
+        return Domain_DAO.get_retRowData_for_Pagination(start, end)
+
+
+@ns.route('/count')
+class count_CSPEvaluatorList(Resource):
+    """Show count of all domain data"""
+
+    @ns.doc('Get count of all domain data')
+    @ns.marshal_with(domain_RowCount)
+    def get(self):
+        """Fetch a given resource"""
+        return {"RowCount": Domain_DAO.get_retRowCount()}
+        # TODO: Return Type

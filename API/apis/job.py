@@ -1,5 +1,6 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
+from .api_returnObj import ReturnObject
 import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -16,6 +17,10 @@ job = ns.model('Job', {
     'uriPath': fields.String(required=True, description='Path on Web Server')
 })
 
+job_returnPost = ns.model('job_returnPost', {
+    "message": fields.String(readonly=True, description='message of return data')
+})
+
 
 class JobDAO(object):
     def __init__(self):
@@ -23,12 +28,16 @@ class JobDAO(object):
         self.selectData = ""
         self.insertData = ""
 
-    def get(self, id=-1, Type=False):
-        if Type is False and id == -1:
+    def get_retRowCount(self):
+        self.counter = g.BWASP_DBObj.query(domainModel).count()
+        return self.counter
+
+    def get(self, id=None, Type=False):
+        if Type is False and id is None:
             self.selectData = g.BWASP_DBObj.query(jobModel).all()
             return self.selectData
 
-        if Type is not False and id > 0:
+        if Type is not False and self.get_retRowCount() >= id > 0:
             self.selectData = g.BWASP_DBObj.query(jobModel).filter(jobModel.id == id).all()
             return self.selectData
 
@@ -47,27 +56,11 @@ class JobDAO(object):
                                  )
                     )
                     g.BWASP_DBObj.commit()
-                return self.insertData
+                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
 
-        if str(type(data)) == "<class 'dict'>":
-            self.insertData = data
-            try:
-                g.BWASP_DBObj.add(
-                    jobModel(targetURL=str(self.insertData["targetURL"]),
-                             knownInfo=str(self.insertData["knownInfo"]),
-                             recursiveLevel=str(self.insertData["recursiveLevel"]),
-                             uriPath=str(self.insertData["uriPath"])
-                             )
-                )
-                g.BWASP_DBObj.commit()
-                return self.insertData
-            except:
-                print("exception")
-                g.BWASP_DBObj.rollback()
-
-        return self.insertData
+        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
 
 
 Job_DAO = JobDAO()
@@ -86,10 +79,12 @@ class JobList(Resource):
 
     @ns.doc('Create Job')
     @ns.expect(job)
-    @ns.marshal_with(job, code=201)
+    @ns.marshal_with(job_returnPost)
+    # @ns.marshal_with(job, code=201)
     def post(self):
         """Create Job"""
-        return Job_DAO.create(ns.payload), 201
+        return Job_DAO.create(ns.payload)
+        # return Job_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')

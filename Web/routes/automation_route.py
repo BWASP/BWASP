@@ -13,11 +13,11 @@ def manual_options():
     if request.method == 'POST':
         reqJsonData = json.loads(request.form["reqJsonData"])
         try:
-            response = requests.post(
+            requests.post(
                 url="http://localhost:20102/api/job",
                 headers={"accept": "application/json", "Content-Type": "application/json"},
-                data=json.dumps({"targetURL": reqJsonData["target"]["url"], "knownInfo": reqJsonData["info"], "recursiveLevel": int(reqJsonData["tool"]["analysisLevel"]),
-                                 "uriPath": reqJsonData["target"]["path"]})
+                data=[json.dumps({"targetURL": reqJsonData["target"]["url"], "knownInfo": reqJsonData["info"], "recursiveLevel": int(reqJsonData["tool"]["analysisLevel"]),
+                                 "uriPath": reqJsonData["target"]["path"]})]
             )
         except:
             abort(500)

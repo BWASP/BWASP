@@ -1,0 +1,11 @@
+{
+  "API": {
+    "base": "http://localhost:20102"
+  },
+  "debug": {
+    "mode": true,
+    "functions": {
+      "printAllOutput": false
+    }
+  }
+}

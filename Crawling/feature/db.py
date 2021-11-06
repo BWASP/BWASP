@@ -100,6 +100,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         url_part = urlparse(packet["request"]["full_url"])
         domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
         domain_uri = urlunparse(url_part._replace(scheme="", netloc=""))
+
         #if len(domain_params) > 0:
 
 
@@ -186,10 +187,11 @@ def updateWebInfo(analyst_result):
         "data": analyst_result
     }
     data.append(value)
-    #api 수정 전 
-    SystemInfo().PATCHSystemInfo(json.dumps(value))
-    #api 수정후 아래 코드로 바꾸기
-    #SystemInfo().PATCHSystemInfo(json.dumps(data))
+    # api 수정 전
+    # $SystemInfo().PATCHSystemInfo(json.dumps(value))
+    # api 수정후 아래 코드로 바꾸기
+    SystemInfo().PATCHSystemInfo(json.dumps(data))
+
 
 # 한번 방문할 때마다 실행되기 때문에 느릴거 같음.
 # def getPacketsCount():
