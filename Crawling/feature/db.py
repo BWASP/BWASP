@@ -186,8 +186,10 @@ def updateWebInfo(analyst_result):
         "data": analyst_result
     }
     data.append(value)
-    SystemInfo().PATCHSystemInfo(json.dumps(data))
-
+    #api 수정 전 
+    SystemInfo().PATCHSystemInfo(json.dumps(value))
+    #api 수정후 아래 코드로 바꾸기
+    #SystemInfo().PATCHSystemInfo(json.dumps(data))
 
 # 한번 방문할 때마다 실행되기 때문에 느릴거 같음.
 # def getPacketsCount():
