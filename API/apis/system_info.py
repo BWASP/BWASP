@@ -19,7 +19,6 @@ systeminfo_returnPost = ns.model('systeminfo_returnPost', {
     "message": fields.String(readonly=True, description='message of return data')
 })
 
-
 Update_SystemInfo = ns.model('Update_SystemInfo', {
     'id': fields.Integer(required=True, description='system-info id for unique identifier'),
     'data': fields.String(required=True, description='target system information')
@@ -54,9 +53,15 @@ class SysteminfoDAO(object):
                 self.insertData = data
 
                 for ListOfData in range(len(data)):
+                    if str(type(self.insertData[ListOfData]["data"])) == "<class 'dict'>":
+                        g.BWASP_DBObj.add(
+                            systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
+                                            data=json.dumps(self.insertData[ListOfData]["data"])
+                                            )
+                        )
                     g.BWASP_DBObj.add(
                         systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
-                                        data=json.dumps(self.insertData[ListOfData]["data"])
+                                        data=self.insertData[ListOfData]["data"]
                                         )
                     )
                     g.BWASP_DBObj.commit()
@@ -110,6 +115,7 @@ class SystemInfoList(Resource):
         return Systeminfo_DAO.create(ns.payload)
         # return Systeminfo_DAO.create(ns.payload), 201
 
+    @ns.doc('Update system information')
     @ns.expect(Update_SystemInfo)
     @ns.marshal_with(Update_SystemInfo)
     def patch(self):
