@@ -80,6 +80,10 @@ def visit(driver, url, depth, options):
     except:
         pass
 
+    if driver.current_url in start_options["visited_links"]:
+        # print("이미 방문한 페이지")
+        return
+
     if start_options["check"]:
         http_method, infor_vector = attack_header(driver.current_url)
         start_options["input_url"] = driver.current_url
@@ -98,14 +102,14 @@ def visit(driver, url, depth, options):
     if "CSPEvaluate" in options["tool"]["optionalJobs"]:
         csp_result = csp_evaluator.start(driver.current_url)
         db.insertCSP(csp_result)
-        
+
     req_res_packets = packet_capture.start(driver)
 
     # 다른 사이트로 Redirect 되었는지 검증.
     if isOpenRedirection(url, driver.current_url, start_options["input_url"]):
-        print("Open Redirect Detect: {}".format(url))
-        req_res_packets = packet_capture.filterDomain(req_res_packets, start_options["input_url"])
-        # req_res_packets[0]["open_redirect"] = True
+        # print("Open Redirect Detect: {}".format(url))
+        req_res_packets = packet_capture.filterDomain(req_res_packets, url)
+        req_res_packets[0]["open_redirect"] = True
         cur_page_links = list()
     else:
         cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
