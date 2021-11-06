@@ -54,13 +54,13 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     if len(loadpacket_indexes) < recent_packet_count:
         #수정 후 loadpacket_indexes = json.loads(Packets().GetAutomationIndex()["retData"])["id"]
         loadpacket_indexes = json.loads(Packets().GetAutomationIndex()["retData"]["id"])
-    
+
     packet_indexes = loadpacket_indexes[previous_packet_count:recent_packet_count]
     #analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
     analyst.start(detect_list,lock, input_url, req_res_packets, cur_page_links, current_url, packet_indexes,options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
-    db.insertDomains(req_res_packets, cookie_result,packet_indexes , current_url, http_method, infor_vector)
+    db.insertDomains(req_res_packets, cookie_result,packet_indexes , input_url, http_method, infor_vector)
     db.updateWebInfo(detect_list[0])
     
     return 1
@@ -104,7 +104,7 @@ def visit(driver, url, depth, options):
     # 다른 사이트로 Redirect 되었는지 검증.
     if isOpenRedirection(url, driver.current_url, start_options["input_url"]):
         # print("Open Redirect Detect: {}".format(url))
-        req_res_packets = packet_capture.filterDomain(req_res_packets, url)
+        req_res_packets = packet_capture.filterPath(req_res_packets, url)
         req_res_packets[0]["open_redirect"] = True
         cur_page_links = list()
     else:

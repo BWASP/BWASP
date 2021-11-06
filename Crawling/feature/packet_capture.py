@@ -108,12 +108,11 @@ def getResponsePacket(data):
 
         - return:       list (req, res packet)
 """
-def filterDomain(packets, target_url):
-    target_domain = urlparse(target_url).netloc
+def filterPath(packets, target_url):
     result_packet = []
 
     for packet in packets:
-        if packet["request"]["headers"]["host"] == target_domain:
+        if packet["request"]["full_url"] == target_url:
             result_packet.append(packet)
     
     return result_packet
