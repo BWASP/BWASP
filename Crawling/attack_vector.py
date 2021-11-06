@@ -5,7 +5,7 @@ import re
 
 
 def attack_header(target_url):
-    r = requests.get(target_url)
+    r = requests.get(target_url, verify=False)
     dict_data = r.headers
     infor_data = ""
     infor_vector = ""
@@ -111,7 +111,7 @@ def input_tag(response_body, http_method, infor_vector):
                     data[1]["Header"]["HttpOnly"] = False
                     data[1]["impactRate"] = 2
                     '''
-                elif "Not_X-Frame-Options" in infor_vector:
+                if "Not_X-Frame-Options" in infor_vector:
                     data["XSS"]["header"]["X-Frame-Options"] = True
 
                     ''' 제거 예정
@@ -162,8 +162,6 @@ def corsCheck(packet):
 def openRedirectionCheck(packet):
     try:
         if packet["open_redirect"]:
-            print(packet["request"]["full_url"])
-            input()
             return packet["request"]["full_url"]
     except:
         return ""

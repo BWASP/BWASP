@@ -60,7 +60,8 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     analyst.start(detect_list,lock, input_url, req_res_packets, cur_page_links, current_url, packet_indexes,options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
-    db.insertDomains(req_res_packets, cookie_result,packet_indexes , input_url, http_method, infor_vector)
+
+    db.insertDomains(req_res_packets, cookie_result,packet_indexes , input_url, http_method, infor_vector) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
     db.updateWebInfo(detect_list[0])
     
     return 1
