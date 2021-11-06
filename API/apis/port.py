@@ -41,7 +41,7 @@ class PortsDAO(object):
             self.selectData = g.BWASP_DBObj.query(portsModel).all()
             return self.selectData
 
-        if Type is not False and id > 0:
+        if Type is not False and self.get_retRowCount() >= id > 0:
             self.selectData = g.BWASP_DBObj.query(portsModel).filter(portsModel.id == id).all()
             return self.selectData
 

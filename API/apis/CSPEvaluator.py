@@ -26,14 +26,16 @@ class CSPEvaluatorDAO(object):
         self.selectData = ""
         self.insertData = ""
 
-        returnObject = ReturnObject()
+    def get_retRowCount(self):
+        self.counter = g.BWASP_DBObj.query(CSPEvaluatorModel).count()
+        return self.counter
 
     def get(self, id=None, Type=False):
         if Type is False and id is None:
             self.selectData = g.BWASP_DBObj.query(CSPEvaluatorModel).all()
             return self.selectData
 
-        if Type is not False and id > 0:
+        if Type is not False and self.get_retRowCount() >= id > 0:
             self.selectData = g.BWASP_DBObj.query(CSPEvaluatorModel).filter(CSPEvaluatorModel.id == id).all()
             return self.selectData
 

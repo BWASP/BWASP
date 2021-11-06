@@ -28,12 +28,16 @@ class JobDAO(object):
         self.selectData = ""
         self.insertData = ""
 
+    def get_retRowCount(self):
+        self.counter = g.BWASP_DBObj.query(domainModel).count()
+        return self.counter
+
     def get(self, id=None, Type=False):
         if Type is False and id is None:
             self.selectData = g.BWASP_DBObj.query(jobModel).all()
             return self.selectData
 
-        if Type is not False and id > 0:
+        if Type is not False and self.get_retRowCount() >= id > 0:
             self.selectData = g.BWASP_DBObj.query(jobModel).filter(jobModel.id == id).all()
             return self.selectData
 
