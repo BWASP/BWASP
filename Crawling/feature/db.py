@@ -101,9 +101,9 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             attack_vector[2]["CORS"] = False
             '''
             
-        url_part = urlparse(packet["request"]["full_url"])
-        domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
-        domain_uri = urlunparse(url_part._replace(scheme="", netloc=""))
+        # url_part = urlparse(packet["request"]["full_url"])
+        # domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
+        # domain_uri = urlunparse(url_part._replace(scheme="", netloc=""))
 
         #if len(domain_params) > 0:
 
