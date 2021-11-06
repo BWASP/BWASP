@@ -80,9 +80,9 @@ def visit(driver, url, depth, options):
     except:
         pass
 
-    if driver.current_url in start_options["visited_links"]:
-        # print("이미 방문한 페이지")
-        return
+    # if driver.current_url in start_options["visited_links"]:
+    #     # print("이미 방문한 페이지")
+    #     return
 
     if start_options["check"]:
         http_method, infor_vector = attack_header(driver.current_url)
