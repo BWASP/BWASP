@@ -1,9 +1,17 @@
 import os, requests, datetime
 
 
+class Config(object):
+    def __init__(self):
+        self.API_URL_PREFIX = "http://localhost:20102"
+
+    def ret_API_URL_PREFIX(self):
+        return self.API_URL_PREFIX
+
+
 class Packets:
     def __init__(self):
-        self.URL_PREFIX = "http://localhost:20102/api/packet"
+        self.URL_PREFIX = Config().ret_API_URL_PREFIX() + "/api/packet"
         self.URL_PREFIX_Automation = {
             "GET": "/automation/index",
             "POST": "/automation"
@@ -70,7 +78,7 @@ class Packets:
 
 class Domain:
     def __init__(self):
-        self.URL_PREFIX = "http://localhost:20102/api/domain"
+        self.URL_PREFIX = Config().ret_API_URL_PREFIX() + "/api/domain"
 
         self.requestObj = requests
         self.responseObj = ""
@@ -94,7 +102,7 @@ class Domain:
 
 class CSPEvaluator:
     def __init__(self):
-        self.URL_PREFIX = "http://localhost:20102/api/cspevaluator"
+        self.URL_PREFIX = Config().ret_API_URL_PREFIX() + "/api/cspevaluator"
 
         self.requestObj = requests
         self.responseObj = ""
@@ -118,7 +126,7 @@ class CSPEvaluator:
 
 class Job:
     def __init__(self):
-        self.URL_PREFIX = "http://localhost:20102/api/job"
+        self.URL_PREFIX = Config().ret_API_URL_PREFIX() + "/api/job"
 
         self.requestObj = requests
         self.responseObj = ""
@@ -142,7 +150,7 @@ class Job:
 
 class SystemInfo:
     def __init__(self):
-        self.URL_PREFIX = "http://localhost:20102/api/systeminfo"
+        self.URL_PREFIX = Config().ret_API_URL_PREFIX() + "/api/systeminfo"
 
         self.requestObj = requests
         self.responseObj = ""
@@ -178,7 +186,7 @@ class SystemInfo:
 
 class Ports:
     def __init__(self):
-        self.URL_PREFIX = "http://localhost:20102/api/ports"
+        self.URL_PREFIX = Config().ret_API_URL_PREFIX() + "/api/ports"
 
         self.requestObj = requests
         self.responseObj = ""
@@ -198,4 +206,3 @@ class Ports:
             return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
-
