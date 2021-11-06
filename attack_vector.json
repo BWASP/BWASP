@@ -1,14 +1,22 @@
-{
-  "SQL injection": {
-    "type" : []
+[
+  {
+    "vuln": "None",
+    "Type": "None",
+    "impactRate": 0
   },
-  "XSS" : {
-    "type": [],
-    "header": {
-      "HttpOnly": false,
-      "X-Frame-Options": false
-    }
+  {
+    "vuln": "None",
+    "Type": "None",
+    "Header": {
+      "HttpOnly": true,
+      "X-Frame-Options": true
+    },
+    "impactRate": 0
   },
-  "CORS" : false,
-  "Allow Method": []
-}
+  {
+    "CORS": true
+  },
+  {
+    "Allow Method": []
+  }
+]
