@@ -87,6 +87,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
 
     for i, packet in enumerate(req_res_packets):
         if not func.isSameDomain(target_url, packet["request"]["full_url"]):
+            print("asldfjoaisdfjalewfjlejfalkdjflaksdjflaksfjkljfkl")
+            print(packet["request"]["full_url"], target_url)
             continue
 
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
@@ -94,8 +96,6 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         tag_list, tag_name_list, attack_vector, action_page, action_type = input_tag(response_body, http_method, infor_vector)
 
         cors_check = corsCheck(packet)
-        print("asjflkajflkajflkdajflkadjflkaejlkjlkaewjflaejrlkas: "+cors_check)
-        print("domain URL: "+packet["request"]["full_url"])
         if cors_check != "None":
             attack_vector["CORS"] = True
 
@@ -125,7 +125,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         else:
             domain_cookie = json.dumps(cookie_result[packet["request"]["full_url"]])
 
-        # attack_vector["Open Redirect"] = openRedirectionCheck(packet)
+        attack_vector["Open Redirect"] = openRedirectionCheck(packet)
         # attack_vector["s3"] = s3BucketCheck(packet)
         # attack_vector["jwt"] = jwtCheck(packet)
         
