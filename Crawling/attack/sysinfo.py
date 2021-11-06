@@ -57,7 +57,7 @@ def start(detect_list,lock,url, cur_page_links,current_url, req_res_packets,pack
             # 이미 탐지한 app일 때
             if cats in detect_list[0] and app in detect_list[0][cats]:
                 # version 까지 획득했다면 더 이상 조회 x 
-                    if detect_list[0][cats][app]["version"] != False:
+                    if detect_list[0][cats][app]["version"] != 0:
                         continue
             # Including external domain as well as including same domain
             if not func.isSameDomain(url, packet["request"]["full_url"]):
@@ -108,11 +108,11 @@ def initResult(detect_list,cats,app):
 
         detect_temp[cats][app]=dict()
         detect_temp[cats][app]["detect"]=list()
-        detect_temp[cats][app]["version"]= False
+        detect_temp[cats][app]["version"]= 0
         detect_temp[cats][app]["request"]=list()
         detect_temp[cats][app]["response"]=list()
         detect_temp[cats][app]["url"]=list()
-        detect_temp[cats][app]["icon"]= False
+        detect_temp[cats][app]["icon"]= ""
     detect_list[0] = detect_temp
 
 def retRelatedpacketidx(index):
@@ -129,10 +129,10 @@ def appendResult(detect_list, lock,cats,app,detectype,version,request_index=-1,r
 
     if cats in detect_list[0] and app in detect_list[0][cats]:
         # version 까지 획득했다면 더 이상 조회 x 
-        if detect_list[0][cats][app]["version"] != False:
+        if detect_list[0][cats][app]["version"] != 0:
             return lock.release()
         else:
-            if version == False:
+            if version == 0:
                 return lock.release()    
     request_index =retRelatedpacketidx(request_index)
     response_index = retRelatedpacketidx(response_index)
@@ -141,7 +141,7 @@ def appendResult(detect_list, lock,cats,app,detectype,version,request_index=-1,r
     if detectype and detectype not in detect_temp[cats][app]["detect"]:
         detect_temp[cats][app]["detect"] = detectype
         #detect_temp[cats][app]["detect"].append(detectype)
-    if version != False and detect_temp[cats][app]["version"] == False:
+    if version != 0 and detect_temp[cats][app]["version"] == 0:
         detect_temp[cats][app]["version"]=version
     if request_index and request_index not in detect_temp[cats][app]["request"]:
         detect_temp[cats][app]["request"].append(request_index)
@@ -150,7 +150,7 @@ def appendResult(detect_list, lock,cats,app,detectype,version,request_index=-1,r
     if url and url not in detect_temp[cats][app]["url"]:
         detect_temp[cats][app]["url"].append(url)
     if "icon" in data[app].keys():
-        if detect_temp[cats][app]["icon"] == False:
+        if detect_temp[cats][app]["icon"] == "":
             detect_temp[cats][app]["icon"] = data[app]["icon"]
     detect_list[0] = detect_temp
     return lock.release()
@@ -162,12 +162,12 @@ def  appendImplies(detect_list, lock,app,request_index=-1,response_index=-1,url=
         if type(implies_list) is str:
             implies_split=implies_list.split('\\;')
             implies_list=implies_split[0]
-            appendResult(detect_list, lock,cat_meta[str(retCatrepresnt(data[implies_list]["cats"]))]["name"],implies_list,"implies",False,request_index,response_index)
+            appendResult(detect_list, lock,cat_meta[str(retCatrepresnt(data[implies_list]["cats"]))]["name"],implies_list,"implies",0,request_index,response_index)
         else:
-            for implies_line in	implies_list:
+            for implies_line in implies_list:
                 implies_split=implies_line.split('\\;')
                 implies_line=implies_split[0]
-                appendResult(detect_list, lock,cat_meta[str(retCatrepresnt(data[implies_line]["cats"]))]["name"],implies_line,"implies",False,request_index,response_index)
+                appendResult(detect_list, lock,cat_meta[str(retCatrepresnt(data[implies_line]["cats"]))]["name"],implies_line,"implies",0,request_index,response_index)
 
 # check response Header
 def detectHeaders(detect_list, lock, packet, data, index, cats, app):
@@ -205,7 +205,7 @@ def detectHtml(detect_list, lock,  packet, data, index, cats, app):
 def detectCookies(detect_list, lock,  packet, data, index, cats, app):
     cookies = dict()
     # cookie에서 버전있는 경우는 한가지 CodeIgniter , ci_csrf_token
-    version = False
+    version = 0
     if "cookie" not in list(packet["request"]["headers"].keys()):
         return
     for i in packet["request"]["headers"]["cookie"].split('; '):
@@ -218,7 +218,7 @@ def detectCookies(detect_list, lock,  packet, data, index, cats, app):
 
 def detectUrl(detect_list, lock, target_url, cur_page_links, data, cats, app):
     #version false 이유 : url은 \\;version 없음
-    version = False
+    version = 0
     for url in cur_page_links:
         url_part = urlparse(url)
         url_comp = urlunparse(url_part._replace(params="", query="", fragment=""))
@@ -266,7 +266,7 @@ def detectScripts(detect_list, lock,  cur_page_links, data, cats, app):
                     return
 
 def detectWebsite(detect_list, lock,  cur_page_links, data, cats, app):
-    version= False
+    version= 0
      #version 비어 있는 문제
     for url in cur_page_links:
         if type(data[app]["website"]) == str:
@@ -284,7 +284,7 @@ def detectWebsite(detect_list, lock,  cur_page_links, data, cats, app):
                     return
 
 def detectMeta(detect_list, lock,  packet, data, index, cats, app):
-    version= False
+    version= 0
     html = BeautifulSoup(packet["response"]["body"], features="html.parser")
     for meta_regex in data[app]["meta"].values():
         try:
@@ -333,7 +333,7 @@ def detectDom(detect_list, lock,  packet, data, index, cats, app):
                                 #match 값 존재하면 넣기
 
                         if subkey_name == "exists":
-                            appendResult(detect_list, lock, cats,app,"dom",False,-1,index)
+                            appendResult(detect_list, lock, cats,app,"dom",0,-1,index)
                             appendImplies(detect_list, lock, app,-1,index)
 
                         if subkey_name == "src":
@@ -355,13 +355,13 @@ def detectDom(detect_list, lock,  packet, data, index, cats, app):
             html = BeautifulSoup(packet["response"]["body"], features="html.parser")
             for line_list in data[app]["dom"]:
                 if html.select(line_list):
-                    appendResult(detect_list, lock, cats,app,"dom",False,-1,index)
+                    appendResult(detect_list, lock, cats,app,"dom",0,-1,index)
                     appendImplies(detect_list, lock, app,-1,index)
 
         elif type(data[app]["dom"]) is str:
             html = BeautifulSoup(packet["response"]["body"], features="html.parser")
             if html.select(data[app]["dom"]):
-                appendResult(detect_list, lock, cats,app,"dom",False,-1,index)
+                appendResult(detect_list, lock, cats,app,"dom",0,-1,index)
                 appendImplies(detect_list, lock, app,-1,index)
 
 def detectVersion(regex,regex_results,type="search"):
@@ -369,7 +369,7 @@ def detectVersion(regex,regex_results,type="search"):
     version_group= False
     result = regex.split('\\;')
     if "\\;version" not in regex:
-        return False
+        return 0
     if len(result) > 1: 
         for result_line in result[1:]:
             if "version:" in result_line:
@@ -402,5 +402,5 @@ def detectVersion(regex,regex_results,type="search"):
             version=re.sub("[^0-9\.]","",str(version))
             
     if not version:
-        version = False
+        version = 0
     return version
