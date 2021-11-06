@@ -61,7 +61,7 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
 
-    db.insertDomains(req_res_packets, cookie_result,packet_indexes , input_url, http_method, infor_vector) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
+    db.insertDomains(req_res_packets, cookie_result,packet_indexes , input_url, http_method, infor_vector)
     db.updateWebInfo(detect_list[0])
     
     return 1
@@ -121,7 +121,7 @@ def visit(driver, url, depth, options):
     start_options["previous_packet_count"] += len(req_res_packets)
     p.start()
     process_list.append(p)
-    
+    return
     if depth == 0:
         return
 

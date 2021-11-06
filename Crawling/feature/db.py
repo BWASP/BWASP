@@ -87,8 +87,6 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
 
     for i, packet in enumerate(req_res_packets):
         if not func.isSameDomain(target_url, packet["request"]["full_url"]):
-            print("asldfjoaisdfjalewfjlejfalkdjflaksdjflaksfjkljfkl")
-            print(packet["request"]["full_url"], target_url)
             continue
 
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
@@ -126,10 +124,14 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             domain_cookie = json.dumps(cookie_result[packet["request"]["full_url"]])
 
         open_redirect = openRedirectionCheck(packet)
+        s3_bucket = s3BucketCheck(packet)
+        jwt_token = jwtCheck(packet)
         if open_redirect:
             attack_vector["Open Redirect"] = open_redirect
-        # attack_vector["s3"] = s3BucketCheck(packet)
-        # attack_vector["jwt"] = jwtCheck(packet)
+        if s3_bucket:
+            attack_vector["s3"] = s3BucketCheck(packet)
+        if jwt_token:
+            attack_vector["jwt"] = jwt_token
         
         # 패킷 url이 중복된다면 ??
         # json.dumps()
