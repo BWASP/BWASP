@@ -69,7 +69,6 @@ def input_tag(response_body, http_method, infor_vector):
                     data = json.load(f)
 
                 # attack_vector.append(data["SQL Injection"])
-                attack_vector.append(data["0"][])
 
                 if "HttpOnly" in infor_vector:
                     attack_vector.append(data["XSS"]["type"]["None"]["Header"][0]["typicalServerity"][0])
@@ -94,10 +93,16 @@ def input_tag(response_body, http_method, infor_vector):
         except:
             pass
 
-    if form != "None":
+    if form:
         for tag in form:
-            action_page.append(tag.attrs['action'])
-            action_type.append(tag.attrs['method'])
+            try:
+                action_page.append(tag.attrs['action'])
+            except:
+                action_page.append("None")
+            try:
+                action_type.append(tag.attrs['method'])
+            except:
+                action_type.append("None")
 
     return tag_list, tag_name_list, attack_vector, action_page, action_type
 

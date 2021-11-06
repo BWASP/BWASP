@@ -93,8 +93,6 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         response_body = packet["response"]["body"]
         tag_list, tag_name_list, attack_vector, action_page, action_type = input_tag(response_body, http_method, infor_vector)
 
-        print(f"db.py; attack_vector : {attack_vector}")
-
         cors_check = corsCheck(req_res_packets)
         if cors_check != "None":
             attack_vector += " (" + cors_check + ")"

@@ -52,11 +52,6 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     recent_packet_count =  len(req_res_packets) + previous_packet_count
     # {"id": "[1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]"}     
     if len(loadpacket_indexes) < recent_packet_count:
-        print("@@@@@@@@@@@")
-        try:
-            print(json.loads(Packets().GetAutomationIndex()["retData"]["id"])[0])
-        except:
-            print(json.loads(Packets().GetAutomationIndex()["retData"]))
         #수정 후 loadpacket_indexes = json.loads(Packets().GetAutomationIndex()["retData"])["id"]
         loadpacket_indexes = json.loads(Packets().GetAutomationIndex()["retData"]["id"])
     

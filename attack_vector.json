@@ -1,37 +1,4 @@
 {
-  "0": {
-    "Vlun": "SQL Injection",
-    "type": {
-      "board": {
-        "typicalServerity": 2
-      },
-      "account": {
-        "typicalServerity": 2
-      }
-    }
-  },
-  "1"
-}
-
-{
-  "0": {
-    "vuln": "SQL Injection",
-    "type": {
-      "0": {
-        "board": {
-          "typicalServerity": 2
-        }
-      },
-      "1": {
-        "account": {
-          "typicalServerity": 2
-        }
-      }
-    }
-  }
-}
-
-{
   "SQL Injection": {
     "type": {
       "board": {
