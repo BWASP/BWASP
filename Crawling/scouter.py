@@ -104,7 +104,7 @@ def visit(driver, url, depth, options):
     # 다른 사이트로 Redirect 되었는지 검증.
     if isOpenRedirection(url, driver.current_url, start_options["input_url"]):
         # print("Open Redirect Detect: {}".format(url))
-        req_res_packets = packet_capture.filterDomain(req_res_packets, url)
+        req_res_packets = packet_capture.filterPath(req_res_packets, url)
         req_res_packets[0]["open_redirect"] = True
         cur_page_links = list()
     else:

@@ -125,7 +125,9 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         else:
             domain_cookie = json.dumps(cookie_result[packet["request"]["full_url"]])
 
-        attack_vector["Open Redirect"] = openRedirectionCheck(packet)
+        open_redirect = openRedirectionCheck(packet)
+        if open_redirect:
+            attack_vector["Open Redirect"] = open_redirect
         # attack_vector["s3"] = s3BucketCheck(packet)
         # attack_vector["jwt"] = jwtCheck(packet)
         
