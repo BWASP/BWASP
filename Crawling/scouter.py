@@ -1,6 +1,6 @@
 from seleniumwire import webdriver
 from multiprocessing import Process, Manager , Lock
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 from webdriver_manager.chrome import ChromeDriverManager
 import re,json
 
@@ -102,8 +102,10 @@ def visit(driver, url, depth, options):
     req_res_packets = packet_capture.start(driver)
 
     # 다른 사이트로 Redirect 되었는지 검증.
-    if isRedirection(driver.current_url, start_options["input_url"]):
+    if isOpenRedirection(url, driver.current_url, start_options["input_url"]):
+        print("Open Redirect Detect: {}".format(url))
         req_res_packets = packet_capture.filterDomain(req_res_packets, start_options["input_url"])
+        # req_res_packets[0]["open_redirect"] = True
         cur_page_links = list()
     else:
         cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
@@ -150,21 +152,27 @@ def checkCountLink(visit_url, count_links):
 
     return False
 
-# TODO
-# 주명님께 질문 (정규표현식 관련)
-def isRedirection(visit_url, target_url):
-    # 다른 도메인으로 이동한 경우
-    if not func.isSameDomain(visit_url, target_url):
-        pattern = re.compile('((?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)')
-        query = urlparse(visit_url).query
+'''
+    String visit_url: 방문한 url
+    String current_url: 현재 페이지의 url
+    String target_url: 사용자가 입력한 url 
+'''
+def isOpenRedirection(visit_url, current_url, target_url):
+    url = urlparse(visit_url)
+    if url.query:
+        url_query = url.query.split("&")
 
-        # 방문한 URL의 query에 url 값이 있는지 확인
-        if pattern.findall(query):
-            return True
-        
-        # 서버 설정으로 이동된 경우 ex) naver.com/test => test.naver.com/test
-        return False
+        if not func.isSameDomain(current_url, target_url) or not func.isSamePath(visit_url, current_url):
+            pattern_url = re.compile("((?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)")
+            
+            for query in url_query:
+                value = query.split("=")[1]
 
+                if pattern_url.findall(value):
+                    return True
+                if urljoin(target_url, value) == current_url:
+                    return True
+            return False
     return False
 
 def initSelenium():

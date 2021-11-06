@@ -10,7 +10,7 @@ def attack_header(target_url):
     infor_vector = ""
     http_method = requests.options(target_url)
     try:
-        http_method = http_method.headers['Allow']
+        http_method = http_method.headers['Allow'].replace(",", "").split(" ")
     except:
         http_method = "private"
 
@@ -58,39 +58,48 @@ def input_tag(response_body, http_method, infor_vector):
     text = soup.find_all('input')
     form = soup.find_all('form')
 
+    with open("./attack_vector.json", 'r', encoding='UTF8') as f:
+        data = json.load(f)
+
     for tag in text:
         try:
             if tag.attrs['type'] != "submit" and len(text) != 0:
                 tag_list.append(tag)  # input tag 값 ex) <input ~
                 tag_name_list.append(tag.attrs['name'])
 
-                with open("./attack_vector.json", 'r', encoding='UTF8') as f:
-                    data = json.load(f)
-
-                # attack_vector.append(data["SQL Injection"])
-
-                if "Not_HttpOnly" in infor_vector:
-                    attack_vector.append(data["XSS"]["type"]["None"]["Header"][0]["typicalServerity"][0])
-
-                elif "Not_X-Frame-Options" in infor_vector:
-                    attack_vector.append(data["XSS"]["type"]["None"]["Header"][1]["typicalServerity"][1])
-
-                elif "Not_HttpOnly" in infor_vector and "Not_X-Frame-Options" in infor_vector:
-                    attack_vector.append(data["XSS"]["type"]["None"])
-
-                else:
-                    attack_vector.append(data["XSS"]["type"]["None"]["typicalServerity"][0])
-
-                #attack_vector = "SQL Injection, XSS"  # TODO: attack vector initialization
+                #~~~~~~~~~~~~SQL Injection
+                data[0]["vuln"] = "SQL Injection"
+                data[0]["impactRate"] = 1
 
                 # th tag check (board) and type="password" check (login)
                 if "<th" in response_body:  # TODO: bs4 use
-                    attack_vector.append(data["SQL Injection"]["type"]["board"])
+                    data[0]["Type"] = "board"
+                    data[0]["impactRate"] = 2
 
                 if tag.attrs['type'] == "password":
-                    attack_vector.append(data["SQL Injection"]["type"]["account"])
+                    data[0]["Type"] = "account"
+                    data[0]["impactRate"] = 2
+
+                #~~~~~~~~~~~~XSS
+                data[1]["vuln"] = "XSS"
+                data[1]["impactRate"] = 1
+                
+                if "Not_HttpOnly" in infor_vector:
+                    data[1]["Header"]["HttpOnly"] = False
+                    data[1]["impactRate"] = 2
+                elif "Not_X-Frame-Options" in infor_vector:
+                    data[1]["Header"]["HttpOnly"] = False
+                    data[1]["impactRate"] = 2
+
+                
+                #~~~~~~~~~~~~Allow Method
+                if "private" not in http_method:
+                    data[3]["Allow Method"] = http_method
+
         except:
             pass
+
+        attack_vector.append(data)
 
     if form:
         for tag in form:
