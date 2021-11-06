@@ -51,7 +51,7 @@ def insertCSP(csp_result):
 # REST API: 도훈 Domains
 # TODO
 # 중복된 url 이 있을 경우, 데이터를 넣어야 하는가?
-def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
+def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, http_method, infor_vector):
     # db_connect, db_table = connect("domain")
     '''
     [
@@ -91,18 +91,21 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
 
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
         response_body = packet["response"]["body"]
-        tag_list, tag_name_list, attack_vector, action_page, action_type = input_tag(response_body)
-
-        print(f"db.py; attack_vector : {attack_vector}")
+        tag_list, tag_name_list, attack_vector, action_page, action_type = input_tag(response_body, http_method, infor_vector)
 
         cors_check = corsCheck(req_res_packets)
         if cors_check != "None":
             attack_vector += " (" + cors_check + ")"
 
         url_part = urlparse(packet["request"]["full_url"])
-        domain_url = urlunparse(url_part.replace(params="", query="", fragment="", path=""))
-        domain_uri = urlunparse(url_part.replace(scheme="", netloc=""))
-        domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
+        domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
+        domain_uri = urlunparse(url_part._replace(scheme="", netloc=""))
+        domain_params = url_part.query
+        #if len(domain_params) > 0:
+
+
+        tag_name_list.append(domain_params)
+        #domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
 
         if not packet["request"]["full_url"] in cookie_result.keys():
             domain_cookie = 'None'
@@ -124,7 +127,16 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url):
             "attackVector": attack_vector,
             "typicalServerity": 0,
             "description": "string",
-            "Details": ""  # tag_list + domain_cookie 양식에 맞춰서 포함해야 함
+            "Details": ""
+                       '''{
+                "tag": tag_list,
+                "cookie": {
+                    domain_cookie
+                },
+                "queryString": {
+                    domain_params
+                }
+            }'''  # tag_list + domain_cookie + #domain_params 양식에 맞춰서 포함해야 함
         }
         data.append(query)
 
@@ -156,22 +168,28 @@ def insertPorts(port_list, target_url):
 # REST API: 주명 WebInfo
 # 맨처음에 url , data를 포함한 post 한번 먼저 실행
 def postWebInfo(input_url):
-    data = {
+    data = []
+    value = {
         "url": input_url,
         "data": "None"
     }
+    data.append(value)
     SystemInfo().PostSystemInfo(json.dumps(data))
 
 
 # 이후로 업데이트를 통해 data 값 갱신
 def updateWebInfo(analyst_result):
+    data = []
     # db_connect, db_table = connect("systeminfo")
-    data = {
+    value = {
         "id": 1,
         "data": analyst_result
     }
-    SystemInfo().PATCHSystemInfo(json.dumps(data))
-
+    data.append(value)
+    #api 수정 전 
+    SystemInfo().PATCHSystemInfo(json.dumps(value))
+    #api 수정후 아래 코드로 바꾸기
+    #SystemInfo().PATCHSystemInfo(json.dumps(data))
 
 # 한번 방문할 때마다 실행되기 때문에 느릴거 같음.
 # def getPacketsCount():

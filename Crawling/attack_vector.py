@@ -12,7 +12,7 @@ def attack_header(target_url):
     try:
         http_method = http_method.headers['Allow']
     except:
-        http_method = "http method private data :("
+        http_method = "private"
 
     try:
         tmp_data = dict_data['Set-Cookie']
@@ -42,7 +42,7 @@ def attack_header(target_url):
     return http_method, infor_vector
 
 
-def input_tag(response_body):
+def input_tag(response_body, http_method, infor_vector):
     # form tag action and input tag and input name parse
     soup = BeautifulSoup(response_body, 'html.parser')
 
@@ -51,7 +51,9 @@ def input_tag(response_body):
     action_page = list()
     action_type = list()
 
-    attack_vector = "None"
+    attack_vector = list()
+
+    data = dict()
 
     text = soup.find_all('input')
     form = soup.find_all('form')
@@ -62,25 +64,44 @@ def input_tag(response_body):
                 tag_list.append(tag)  # input tag 값 ex) <input ~
                 tag_name_list.append(tag.attrs['name'])
 
-                attack_vector = "SQL Injection, XSS"  # TODO: attack vector initialization
+                with open("./attack_vector.json", 'r', encoding='UTF8') as f:
+                    data = json.load(f)
+
+                # attack_vector.append(data["SQL Injection"])
+
+                if "Not_HttpOnly" in infor_vector:
+                    attack_vector.append(data["XSS"]["type"]["None"]["Header"][0]["typicalServerity"][0])
+
+                elif "Not_X-Frame-Options" in infor_vector:
+                    attack_vector.append(data["XSS"]["type"]["None"]["Header"][1]["typicalServerity"][1])
+
+                elif "Not_HttpOnly" in infor_vector and "Not_X-Frame-Options" in infor_vector:
+                    attack_vector.append(data["XSS"]["type"]["None"])
+
+                else:
+                    attack_vector.append(data["XSS"]["type"]["None"]["typicalServerity"][0])
+
+                #attack_vector = "SQL Injection, XSS"  # TODO: attack vector initialization
 
                 # th tag check (board) and type="password" check (login)
                 if "<th" in response_body:  # TODO: bs4 use
-                    if "(board)" not in attack_vector:
-                        attack_vector += " (board)"
+                    attack_vector.append(data["SQL Injection"]["type"]["board"])
 
-                print(f"tag.attrs['type']: {tag.attrs['type']}")
                 if tag.attrs['type'] == "password":
-                    if "(login)" not in attack_vector:
-                        attack_vector += " (login)"
-                print(f"attack_vector: {attack_vector}")
+                    attack_vector.append(data["SQL Injection"]["type"]["account"])
         except:
             pass
 
-    if form != "None":
+    if form:
         for tag in form:
-            action_page.append(tag.attrs['action'])
-            action_type.append(tag.attrs['method'])
+            try:
+                action_page.append(tag.attrs['action'])
+            except:
+                action_page.append("None")
+            try:
+                action_type.append(tag.attrs['method'])
+            except:
+                action_type.append("None")
 
     return tag_list, tag_name_list, attack_vector, action_page, action_type
 

@@ -1,0 +1,25 @@
+[
+  {
+    "vuln": "SQL Injection",
+    "Type": "None",
+    "impactRate": 0
+  },
+  {
+    "vuln": "XSS",
+    "Type": "None",
+    "Header": {
+      "HttpOnly": true,
+      "X-Frame-Options": true
+    },
+    "impactRate": 0
+  },
+  {
+    "CORS": true
+  },
+  {
+    "Allow Method": "None"
+  },
+  {
+    "CVE": "CVE-2021-2111"
+  }
+]
