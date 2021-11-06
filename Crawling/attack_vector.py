@@ -146,17 +146,16 @@ def input_tag(response_body, http_method, infor_vector):
     return tag_list, tag_name_list, attack_vector, action_page, action_type
 
 
-def corsCheck(req_res_packets):
+def corsCheck(packet):
     cors_check = "None"
 
-    for packet in req_res_packets:
-        response_header = packet["response"]["headers"]
+    response_header = packet["response"]["headers"]
 
-        try:
-            if response_header['access-control-allow-origin'] == "*":
-                cors_check = "CORS Misconfiguration: *"
-        except:
-            pass
+    try:
+        if response_header['access-control-allow-origin'] == "*":
+            cors_check = "CORS Misconfiguration: *"
+    except:
+        pass
 
     return cors_check
 

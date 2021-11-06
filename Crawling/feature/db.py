@@ -93,8 +93,9 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         response_body = packet["response"]["body"]
         tag_list, tag_name_list, attack_vector, action_page, action_type = input_tag(response_body, http_method, infor_vector)
 
-        cors_check = corsCheck(req_res_packets)
-
+        cors_check = corsCheck(packet)
+        print("asjflkajflkajflkdajflkadjflkaejlkjlkaewjflaejrlkas: "+cors_check)
+        print("domain URL: "+packet["request"]["full_url"])
         if cors_check != "None":
             attack_vector["CORS"] = True
 
@@ -199,7 +200,7 @@ def updateWebInfo(analyst_result):
     }
     data.append(value)
     # api 수정 전
-    # $SystemInfo().PATCHSystemInfo(json.dumps(value))
+    #SystemInfo().PATCHSystemInfo(json.dumps(value))
     # api 수정후 아래 코드로 바꾸기
     SystemInfo().PATCHSystemInfo(json.dumps(data))
 
