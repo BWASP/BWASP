@@ -1,0 +1,103 @@
+{
+  "0": {
+    "Vlun": "SQL Injection",
+    "type": {
+      "board": {
+        "typicalServerity": 2
+      },
+      "account": {
+        "typicalServerity": 2
+      }
+    }
+  },
+  "1"
+}
+
+{
+  "0": {
+    "vuln": "SQL Injection",
+    "type": {
+      "0": {
+        "board": {
+          "typicalServerity": 2
+        }
+      },
+      "1": {
+        "account": {
+          "typicalServerity": 2
+        }
+      }
+    }
+  }
+}
+
+{
+  "SQL Injection": {
+    "type": {
+      "board": {
+        "typicalServerity": 2
+      },
+      "account": {
+        "typicalServerity": [
+          2,
+          2
+        ]
+      },
+      "None": {
+        "typicalServerity": [
+          1,
+          1
+        ]
+      }
+    }
+  },
+  "XSS": {
+    "type": {
+      "board": {
+        "Header": [
+          "Not HttpOnly",
+          "Not X-Frame-Options"
+        ],
+        "typicalServerity": [
+          2,
+          2
+        ]
+      },
+      "account": {
+        "Header": [
+          "Not HttpOnly",
+          "Not X-Frame-Options"
+        ],
+        "typicalServerity": [
+          2,
+          2
+        ]
+      },
+      "None": {
+        "Header": [
+          "Not HttpOnly",
+          "Not X-Frame-Options"
+        ],
+        "typicalServerity": [
+          1,
+          1
+        ]
+      }
+    }
+  },
+  "CORS": {
+    "type": [
+      "CORS Misconfiguration: *"
+    ]
+  },
+  "Allow Method": {
+    "type": [
+      "Open: "
+    ]
+  },
+  "CVE": {
+    "type": [
+      "Number: "
+    ]
+  }
+}
