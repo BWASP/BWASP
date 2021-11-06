@@ -255,11 +255,12 @@ document.getElementById("submitJobRequest").addEventListener("click", function (
     document.getElementById("modal-start-job").addEventListener("click", () => {
         document.getElementById("modal-start-job").setAttribute("disabled", "true");
         jobSubmitVerifyModal.hide();
-
-        API.communicate("/api/job", "POST", (err, res)=>{
-
-        })
-
+        let data = {
+            targetURL: requestData.target.url,
+            knownInfo: requestData.info,
+            recursiveLevel: Number(requestData.tool.analysisLevel),
+            uriPath: requestData.target.path
+        };
         fetch("/automation/options", {
             method: 'POST',
             headers: {

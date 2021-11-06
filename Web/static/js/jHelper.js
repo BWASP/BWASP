@@ -16,10 +16,9 @@ class API {
     /**
      * Communicate with API
      * @param {string} endpoint
-     * @param {string} type GET
      * @param {function} callback
      */
-    communicate(endpoint, type="GET", callback) {
+    communicate(endpoint, callback) {
         if(typeof(this.API)==="undefined") this.getConfig();
         fetch(this.API.base + endpoint, {
             method: "GET",
@@ -28,6 +27,35 @@ class API {
                 "Content-Type": "application/json",
                 "accept": "application/json"
             }
+        })
+            .then(blob => blob.json())
+            .then(res => {
+                if (this.debug.mode === true
+                    && this.debug.functions.printAllOutput === true) console.log(`:: DEBUG : RETURN ::\n${res}`);
+                callback(null, res);
+            })
+            .catch(error => {
+                console.log(`:: DEBUG : ERROR ::\n${error}`);
+                callback(error)
+            })
+    }
+
+    /**
+     * Send data to API
+     * @param {string} endpoint
+     * @param {string} type POST
+     * @param {object} data null
+     * @param {function} callback
+     */
+    relativeCommunication(endpoint, type="POST", data=null, callback){
+        fetch(this.API.base + endpoint, {
+            method: type,
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json",
+                "accept": "application/json"
+            },
+            body: JSON.stringify(data)
         })
             .then(blob => blob.json())
             .then(res => {
