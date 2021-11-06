@@ -56,7 +56,7 @@ class SysteminfoDAO(object):
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
                         systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
-                                        data=str(self.insertData[ListOfData]["data"])
+                                        data=json.dumps(self.insertData[ListOfData]["data"])
                                         )
                     )
                     g.BWASP_DBObj.commit()
@@ -74,9 +74,9 @@ class SysteminfoDAO(object):
 
                 for ListofData in range(len(data)):
                     g.BWASP_DBObj.query(systeminfoModel).filter(
-                        systeminfoModel.id == int(self.updateData["id"])
+                        systeminfoModel.id == int(self.updateData[ListofData]["id"])
                     ).update(
-                        {'data': str(self.updateData["data"])}
+                        {'data': str(self.updateData[ListofData]["data"])}
                     )
                     g.BWASP_DBObj.commit()
 
