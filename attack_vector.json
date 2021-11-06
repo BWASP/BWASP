@@ -1,22 +1,21 @@
-[
-  {
-    "vuln": "None",
-    "Type": "None",
-    "impactRate": 0
+{
+  "SQL injection": {
+    "type" : []
   },
-  {
-    "vuln": "None",
-    "Type": "None",
-    "Header": {
-      "HttpOnly": true,
-      "X-Frame-Options": true
-    },
-    "impactRate": 0
+  "XSS" : {
+    "type": [],
+    "header": {
+      "HttpOnly": false,
+      "X-Frame-Options": false
+    }
   },
-  {
-    "CORS": true
-  },
-  {
-    "Allow Method": []
+  "CORS" : false,
+  "Allow Method": [],
+  "Open Redirect": "url",
+  "s3" : [],
+  "jwt" : [],
+  "subdomain" : [],
+  "api_key" : {
+    "facebook" : "asdf"
   }
-]
+}
