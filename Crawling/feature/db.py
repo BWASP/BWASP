@@ -95,17 +95,22 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
 
         cors_check = corsCheck(req_res_packets)
         if cors_check != "None":
-            attack_vector += " (" + cors_check + ")"
+            attack_vector[2]["CORS"] = False
 
         url_part = urlparse(packet["request"]["full_url"])
         domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
         domain_uri = urlunparse(url_part._replace(scheme="", netloc=""))
-        domain_params = url_part.query
         #if len(domain_params) > 0:
 
 
-        tag_name_list.append(domain_params)
+        tag_name_list.append(url_part.query) # hello=world&a=b
         #domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
+
+        #Query String 정리
+        param_list = url_part.query.split("&")
+        domain_params = dict()
+        for param in param_list:
+            domain_params[param.split('=')[0]] = param.split('=')[1]
 
         if not packet["request"]["full_url"] in cookie_result.keys():
             domain_cookie = 'None'
@@ -127,16 +132,11 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             "attackVector": attack_vector,
             "typicalServerity": 0,
             "description": "string",
-            "Details": ""
-                       '''{
+            "Details": {
                 "tag": tag_list,
-                "cookie": {
-                    domain_cookie
-                },
-                "queryString": {
-                    domain_params
-                }
-            }'''  # tag_list + domain_cookie + #domain_params 양식에 맞춰서 포함해야 함
+                "cookie": domain_cookie,
+                "queryString": domain_params
+            }  # tag_list + domain_cookie + #domain_params 양식에 맞춰서 포함해야 함
         }
         data.append(query)
 
