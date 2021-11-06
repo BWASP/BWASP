@@ -13,15 +13,16 @@ def manual_options():
     if request.method == 'POST':
         reqJsonData = json.loads(request.form["reqJsonData"])
 
-        data = [{"targetURL": f"{reqJsonData['target']['url']}",
-                 "knownInfo": f"{reqJsonData['info']}",
-                 "recursiveLevel": f"{int(reqJsonData['tool']['analysisLevel'])}",
-                 "uriPath": f"{reqJsonData['target']['path']}"}]
+        data = [{"targetURL": reqJsonData['target']['url'],
+                 "knownInfo": json.dumps(reqJsonData['info']),
+                 "recursiveLevel": reqJsonData['tool']['analysisLevel'],
+                 "uriPath": reqJsonData['target']['path']
+                 }]
 
         requests.post(
             url="http://localhost:20102/api/job",
             headers={"accept": "application/json", "Content-Type": "application/json"},
-            data=str(data)
+            data=json.dumps(data)
         )
 
         AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)

@@ -114,8 +114,8 @@ class PacketDAO(object):
                         packetsModel(category=1,
                                      statusCode=int(self.insertData[ListOfData]['statusCode']),
                                      requestType=str(self.insertData[ListOfData]['requestType']),
-                                     requestJson=str(self.insertData[ListOfData]['requestJson']),
-                                     responseHeader=str(self.insertData[ListOfData]['responseHeader']),
+                                     requestJson=json.dumps(self.insertData[ListOfData]['requestJson']),
+                                     responseHeader=json.dumps(self.insertData[ListOfData]['responseHeader']),
                                      responseBody=str(self.insertData[ListOfData]['responseBody'])
                                      )
                     )
