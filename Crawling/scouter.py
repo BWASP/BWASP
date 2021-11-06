@@ -1,5 +1,5 @@
 from seleniumwire import webdriver
-from multiprocessing import Process
+from multiprocessing import Process, Manager , Lock
 from urllib.parse import urlparse
 from webdriver_manager.chrome import ChromeDriverManager
 import re,json
@@ -19,15 +19,25 @@ start_options = {
     "previous_packet_count" : 0 #누적 패킷 개수
 }
 
-sysinfo_detectlist = {}
-loadpacket_indexes = list() # automation packet indexes
+loadpacket_indexes = list() # automation packet indexes 
+process_list = list()
 http_method = "None"
 infor_vector = "None"
 
 def start(url, depth, options):
     global start_options
+    global process_list
+    global detect_list
+    global lock
+
+    manager = Manager()
+    detect_list = manager.list()
+    detect_list.append({})
+    lock = manager.Lock()
     driver = initSelenium()
     visit(driver, url, depth, options)
+    for each_process in process_list:
+        each_process.join()
     driver.quit()
     
     start_options["check"] = True
@@ -35,9 +45,8 @@ def start(url, depth, options):
     start_options["visited_links"] = []
     start_options["count_links"] = {}
 
-def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url,previous_packet_count, http_method, infor_vector):
+def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,current_url,previous_packet_count,http_method, infor_vector):
     global start_options
-    global sysinfo_detectlist
     global loadpacket_indexes
 
     recent_packet_count =  len(req_res_packets) + previous_packet_count
@@ -53,15 +62,19 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     
     packet_indexes = loadpacket_indexes[previous_packet_count:recent_packet_count]
     #analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
-    analyst.start(sysinfo_detectlist, input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
+    analyst.start(detect_list,lock, input_url, req_res_packets, cur_page_links, current_url, packet_indexes,options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
+
     db.insertDomains(req_res_packets, cookie_result,packet_indexes , current_url, http_method, infor_vector)
-    db.updateWebInfo(sysinfo_detectlist)
+    db.updateWebInfo(detect_list[0])
     
     return 1
 
 def visit(driver, url, depth, options):
     global start_options
+    global process_list
+    global detect_list
+    global lock
     global http_method
     global infor_vector
 
@@ -77,6 +90,7 @@ def visit(driver, url, depth, options):
         start_options["input_url"] = driver.current_url
         db.postWebInfo(start_options["input_url"])
         start_options["visited_links"].append(start_options["input_url"])
+
         start_options["check"] = False
 
         if "portScan" in options["tool"]["optionalJobs"]:
@@ -105,9 +119,10 @@ def visit(driver, url, depth, options):
 
     req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
     db.insertPackets(req_res_packets)
-    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result, driver.page_source, driver.current_url,start_options["previous_packet_count"], http_method, infor_vector)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,driver.current_url,start_options["previous_packet_count"],http_method, infor_vector)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
     start_options["previous_packet_count"] += len(req_res_packets)
     p.start()
+    process_list.append(p)
     
     if depth == 0:
         return
