@@ -1,70 +1,25 @@
-{
-  "SQL Injection": {
-    "type": {
-      "board": {
-        "typicalServerity": 2
-      },
-      "account": {
-        "typicalServerity": [
-          2,
-          2
-        ]
-      },
-      "None": {
-        "typicalServerity": [
-          1,
-          1
-        ]
-      }
-    }
+[
+  {
+    "vuln": "SQL Injection",
+    "Type": "None",
+    "impactRate": 0
   },
-  "XSS": {
-    "type": {
-      "board": {
-        "Header": [
-          "Not HttpOnly",
-          "Not X-Frame-Options"
-        ],
-        "typicalServerity": [
-          2,
-          2
-        ]
-      },
-      "account": {
-        "Header": [
-          "Not HttpOnly",
-          "Not X-Frame-Options"
-        ],
-        "typicalServerity": [
-          2,
-          2
-        ]
-      },
-      "None": {
-        "Header": [
-          "Not HttpOnly",
-          "Not X-Frame-Options"
-        ],
-        "typicalServerity": [
-          1,
-          1
-        ]
-      }
-    }
+  {
+    "vuln": "XSS",
+    "Type": "None",
+    "Header": {
+      "HttpOnly": true,
+      "X-Frame-Options": true
+    },
+    "impactRate": 0
   },
-  "CORS": {
-    "type": [
-      "CORS Misconfiguration: *"
-    ]
+  {
+    "CORS": true
   },
-  "Allow Method": {
-    "type": [
-      "Open: "
-    ]
+  {
+    "Allow Method": "None"
   },
-  "CVE": {
-    "type": [
-      "Number: "
-    ]
+  {
+    "CVE": "CVE-2021-2111"
   }
-}
+]

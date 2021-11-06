@@ -57,7 +57,6 @@ def input_tag(response_body, http_method, infor_vector):
 
     text = soup.find_all('input')
     form = soup.find_all('form')
-    th = soup.get('th')
 
     for tag in text:
         try:
@@ -70,13 +69,13 @@ def input_tag(response_body, http_method, infor_vector):
 
                 # attack_vector.append(data["SQL Injection"])
 
-                if "HttpOnly" in infor_vector:
+                if "Not_HttpOnly" in infor_vector:
                     attack_vector.append(data["XSS"]["type"]["None"]["Header"][0]["typicalServerity"][0])
 
-                elif "X-Frame-Options" in infor_vector:
+                elif "Not_X-Frame-Options" in infor_vector:
                     attack_vector.append(data["XSS"]["type"]["None"]["Header"][1]["typicalServerity"][1])
 
-                elif "HttpOnly" in infor_vector and "X-Frame-Options" in infor_vector:
+                elif "Not_HttpOnly" in infor_vector and "Not_X-Frame-Options" in infor_vector:
                     attack_vector.append(data["XSS"]["type"]["None"])
 
                 else:
@@ -85,7 +84,7 @@ def input_tag(response_body, http_method, infor_vector):
                 #attack_vector = "SQL Injection, XSS"  # TODO: attack vector initialization
 
                 # th tag check (board) and type="password" check (login)
-                if th in response_body:  # TODO: bs4 use
+                if "<th" in response_body:  # TODO: bs4 use
                     attack_vector.append(data["SQL Injection"]["type"]["board"])
 
                 if tag.attrs['type'] == "password":
