@@ -128,7 +128,6 @@ def appendResult(detect_list, lock,cats,app,detectype,version,request_index=-1,r
     lock.acquire()
 
     if cats in detect_list[0] and app in detect_list[0][cats]:
-        print("pass pass")
         # version 까지 획득했다면 더 이상 조회 x 
         if detect_list[0][cats][app]["version"] != False:
             return lock.release()

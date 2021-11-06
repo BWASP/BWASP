@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import json
+import re
 
 
 def attack_header(target_url):
@@ -67,35 +68,65 @@ def input_tag(response_body, http_method, infor_vector):
                 tag_list.append(str(tag))  # input tag 값 ex) <input ~
                 tag_name_list.append(tag.attrs['name'])
 
-                #~~~~~~~~~~~~SQL Injection
+                #~~~~~~~~~~~~SQL Injection and XSS
+
+                ''' 제거 예정
                 data[0]["vuln"] = "SQL Injection"
                 data[0]["impactRate"] = 1
+                '''
+
+                if "<th" in response_body and tag.attrs['type'] == "password":
+                    data["SQL injection"]["type"].append("board")
+                    data["SQL injection"]["type"].append("account")
+                    data["XSS"]["type"].append("board")
+                    data["XSS"]["type"].append("account")
 
                 # th tag check (board) and type="password" check (login)
-                if "<th" in response_body:  # TODO: bs4 use
+                elif "<th" in response_body:
+                    data["SQL injection"]["type"].append("board")
+                    data["XSS"]["type"].append("board")
+
+                    ''' 제거 예정
                     data[0]["Type"] = "board"
                     data[0]["impactRate"] = 2
+                    '''
 
-                if tag.attrs['type'] == "password":
+                elif tag.attrs['type'] == "password":
+                    data["SQL injection"]["type"].append("account")
+                    data["XSS"]["type"].append("account")
+
+                    ''' 제거 예정
                     data[0]["Type"] = "account"
                     data[0]["impactRate"] = 2
+                    '''
 
-                #~~~~~~~~~~~~XSS
-                data[1]["vuln"] = "XSS"
-                data[1]["impactRate"] = 1
+                else:
+                    data["SQL injection"]["type"].append("None")
+                    data["XSS"]["type"].append("None")
                 
                 if "Not_HttpOnly" in infor_vector:
-                    data[1]["Header"]["HttpOnly"] = False
-                    data[1]["impactRate"] = 2
-                elif "Not_X-Frame-Options" in infor_vector:
-                    data[1]["Header"]["HttpOnly"] = False
-                    data[1]["impactRate"] = 2
+                    data["XSS"]["header"]["HttpOnly"] = True
 
+                    ''' 제거 예정
+                    data[1]["Header"]["HttpOnly"] = False
+                    data[1]["impactRate"] = 2
+                    '''
+                elif "Not_X-Frame-Options" in infor_vector:
+                    data["XSS"]["header"]["X-Frame-Options"] = True
+
+                    ''' 제거 예정
+                    data[1]["Header"]["HttpOnly"] = False
+                    data[1]["impactRate"] = 2
+                    '''
                 
                 #~~~~~~~~~~~~Allow Method
                 if "private" not in http_method:
-                    data[3]["Allow Method"] = http_method
+                    data["Allow Method"] = http_method
 
+                    ''' 제거 예정
+                    data[3]["Allow Method"] = http_method
+                    '''
+                    
         except:
             pass
 
@@ -128,6 +159,66 @@ def corsCheck(req_res_packets):
             pass
 
     return cors_check
+
+def openRedirectionCheck(packet):
+    try:
+        if packet["open_redirect"]:
+            print(packet["request"]["full_url"])
+            input()
+            return packet["request"]["full_url"]
+    except:
+        return ""
+
+def s3BucketCheck(packet):
+    return_s3_url = []
+    patterns = [    "[a-z0-9.-]+\.s3\.amazonaws\.com[\/]?",
+                    "[a-z0-9.-]+\.s3-[a-z0-9-]\.amazonaws\.com[\/]?",
+                    "[a-z0-9.-]+\.s3-website[.-](eu|ap|us|ca|sa|cn)",
+                    "[\/\/]?s3\.amazonaws\.com\/[a-z0-9._-]+",
+                    "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-z0-9._-]+",
+                    "[a-z0-9-]+\.s3-[a-z0-9-]+\.amazonaws\.com/[a-z0-9._-]+",
+                    "[a-z0-9-]+\.s3-[a-z0-9-]+\.amazonaws\.com[\/]?",
+                    "[a-z0-9\.\-]{3,63}\.s3[\.-](eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?",
+                    "[a-z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?",
+                    "[a-z0-9\.\-]{3,63}\.s3-website[\.-](eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?"]
+    
+    for pattern in patterns:
+        regex = re.compile(pattern)
+        res_body = regex.findall(packet["request"]["body"])
+        req_body = regex.findall(packet["response"]["body"])
+
+        if res_body:
+            return_s3_url += res_body
+        if req_body:
+            return_s3_url += req_body
+
+    print(list(set(return_s3_url)))
+    input()
+    return list(set(return_s3_url))
+
+def jwtCheck(packet):
+    return_jwt = []
+    patterns = ["^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$"]
+
+    for pattern in patterns:
+        regex = re.compile(pattern)
+        req_header = []
+        req_body = []
+        res_header = []
+        res_body = []
+
+        for header_key in packet["request"]["headers"].keys():
+            req_header += regex.findall(packet["request"]["headers"][header_key])
+        for header_key in packet["response"]["headers"].keys():
+            res_header += regex.findall(packet["response"]["headers"][header_key])
+        req_body = regex.findall(packet["request"]["body"])
+        res_body = regex.findall(packet["response"]["body"])
+        
+        return_jwt += req_header + req_body + res_header + res_body
+    
+    print(list(set(return_jwt)))
+    input()
+    return list(set(return_jwt))
 
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
