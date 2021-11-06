@@ -17,7 +17,6 @@ class dashboard {
                 data: API.jsonDataHandler(res[0].data)
             };
             document.getElementById("webEnvURLPlace").innerText = res.target;
-            console.log(res);
             document.getElementById("webEnvDataPlace").innerHTML = "";
             Object.keys(res.data).forEach((key) => {
                 document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, res.data[key]));
@@ -51,7 +50,7 @@ class dashboard {
             localSkeleton.parent.href = "javascript:void(0);";
             localSkeleton.productImage.width = 30;
             localSkeleton.productImage.height = 30;
-            localSkeleton.productImage.classList.add("rounded-circle", "shadow-sm");
+            localSkeleton.productImage.classList.add("rounded-circle", "shadow-sm", "p-1");
             localSkeleton.productName.classList.add("mb-0", "ms-2");
             localSkeleton.parent.classList.add("mt-2", "sizer", "align-items-center", "text-decoration-none");
             localSkeleton.version.classList.add("mb-0", "badge", "ms-1", "text-dark", "border", "border-secondary");
@@ -67,7 +66,6 @@ class dashboard {
             );
             if(versionCase) localSkeleton.parent.appendChild(localSkeleton.version);
             skeleton.child.appendChild(localSkeleton.parent);
-            console.log(key, data, data.version !== "false");
         })
         skeleton.parent.append(
             skeleton.type,
