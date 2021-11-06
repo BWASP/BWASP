@@ -57,11 +57,11 @@ class SysteminfoDAO(object):
                     )
                     g.BWASP_DBObj.commit()
 
-                return ReturnObject.Return_POST_HTTPStatusMessage(Type=True)
+                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
 
-        return ReturnObject.Return_POST_HTTPStatusMessage(Type=False)
+        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
 
     def update(self, data):
         if str(type(data)) == "<class 'list'>":
@@ -76,11 +76,11 @@ class SysteminfoDAO(object):
                     )
                     g.BWASP_DBObj.commit()
 
-                return ReturnObject.Return_PATCH_HTTPStatusMessage(Type=True)
+                return ReturnObject().Return_PATCH_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
 
-        return ReturnObject.Return_PATCH_HTTPStatusMessage(Type=False)
+        return ReturnObject().Return_PATCH_HTTPStatusMessage(Type=False)
 
 
 Systeminfo_DAO = SysteminfoDAO()
@@ -99,7 +99,7 @@ class SystemInfoList(Resource):
 
     @ns.doc('Create system information')
     @ns.expect(systeminfo)
-    @ns.marshal_with(systeminfo_returnPost)
+    @ns.marshal_with(systeminfo)
     # @ns.marshal_with(systeminfo, code=201)
     def post(self):
         """Create system information"""

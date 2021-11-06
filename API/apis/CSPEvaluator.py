@@ -26,7 +26,7 @@ class CSPEvaluatorDAO(object):
         self.selectData = ""
         self.insertData = ""
 
-        self.returnObject = ReturnObject()
+        returnObject = ReturnObject()
 
     def get(self, id=None, Type=False):
         if Type is False and id is None:
@@ -52,11 +52,11 @@ class CSPEvaluatorDAO(object):
                     )
                     g.BWASP_DBObj.commit()
 
-                return self.returnObject.Return_POST_HTTPStatusMessage(Type=True)
+                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
 
-        return self.returnObject.Return_POST_HTTPStatusMessage(Type=False)
+        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
 
 
 CSPEvaluator_DAO = CSPEvaluatorDAO()

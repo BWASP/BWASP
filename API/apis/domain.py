@@ -78,11 +78,11 @@ class DomainDAO(object):
                                     )
                     )
                     g.BWASP_DBObj.commit()
-                return ReturnObject.Return_POST_HTTPStatusMessage(Type=True)
+                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
 
-        return ReturnObject.Return_POST_HTTPStatusMessage(Type=False)
+        return ReturnObject().Return_POST_POST_HTTPStatusMessage(Type=False)
 
 
 Domain_DAO = DomainDAO()

@@ -99,11 +99,11 @@ class PacketDAO(object):
                                      )
                     )
                     g.BWASP_DBObj.commit()
-                return ReturnObject.Return_POST_HTTPStatusMessage(Type=True)
+                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
 
-        return ReturnObject.Return_POST_HTTPStatusMessage(Type=False)
+        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
 
     def create_manual(self, data):
         if str(type(data)) == "<class 'list'>":
@@ -120,11 +120,11 @@ class PacketDAO(object):
                                      )
                     )
                     g.BWASP_DBObj.commit()
-                return ReturnObject.Return_POST_HTTPStatusMessage(Type=True)
+                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
 
-        return ReturnObject.Return_POST_HTTPStatusMessage(Type=False)
+        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
 
 
 Packet_DAO = PacketDAO()
