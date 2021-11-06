@@ -64,7 +64,7 @@ def input_tag(response_body, http_method, infor_vector):
     for tag in text:
         try:
             if tag.attrs['type'] != "submit" and len(text) != 0:
-                tag_list.append(tag)  # input tag 값 ex) <input ~
+                tag_list.append(str(tag))  # input tag 값 ex) <input ~
                 tag_name_list.append(tag.attrs['name'])
 
                 #~~~~~~~~~~~~SQL Injection
