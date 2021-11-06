@@ -115,6 +115,7 @@ class SystemInfoList(Resource):
         return Systeminfo_DAO.create(ns.payload)
         # return Systeminfo_DAO.create(ns.payload), 201
 
+    @ns.doc('Update system information')
     @ns.expect(Update_SystemInfo)
     @ns.marshal_with(Update_SystemInfo)
     def patch(self):
