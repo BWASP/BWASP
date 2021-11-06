@@ -19,25 +19,26 @@ class API {
      * @param {function} callback
      */
     communicate(endpoint, callback) {
-        if(typeof(this.API)==="undefined") this.getConfig();
-        fetch(this.API.base + endpoint, {
-            method: "GET",
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "application/json",
-                "accept": "application/json"
-            }
+        this.getConfig().then(()=>{
+            fetch(this.API.base + endpoint, {
+                method: "GET",
+                cache: "no-cache",
+                headers: {
+                    "Content-Type": "application/json",
+                    "accept": "application/json"
+                }
+            })
+                .then(blob => blob.json())
+                .then(res => {
+                    if (this.debug.mode === true
+                        && this.debug.functions.printAllOutput === true) console.log(`:: DEBUG : RETURN ::\n${res}`);
+                    callback(null, res);
+                })
+                .catch(error => {
+                    console.log(`:: DEBUG : ERROR ::\n${error}`);
+                    callback(error)
+                })
         })
-            .then(blob => blob.json())
-            .then(res => {
-                if (this.debug.mode === true
-                    && this.debug.functions.printAllOutput === true) console.log(`:: DEBUG : RETURN ::\n${res}`);
-                callback(null, res);
-            })
-            .catch(error => {
-                console.log(`:: DEBUG : ERROR ::\n${error}`);
-                callback(error)
-            })
     }
 
     /**
