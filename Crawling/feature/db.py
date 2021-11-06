@@ -168,20 +168,24 @@ def insertPorts(port_list, target_url):
 # REST API: 주명 WebInfo
 # 맨처음에 url , data를 포함한 post 한번 먼저 실행
 def postWebInfo(input_url):
-    data = {
+    data = []
+    value = {
         "url": input_url,
         "data": "None"
     }
+    data.append(value)
     SystemInfo().PostSystemInfo(json.dumps(data))
 
 
 # 이후로 업데이트를 통해 data 값 갱신
 def updateWebInfo(analyst_result):
+    data = []
     # db_connect, db_table = connect("systeminfo")
-    data = {
+    value = {
         "id": 1,
         "data": analyst_result
     }
+    data.append(value)
     SystemInfo().PATCHSystemInfo(json.dumps(data))
 
 
