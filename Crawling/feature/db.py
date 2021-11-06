@@ -121,7 +121,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
                 domain_params[param.split('=')[0]] = param.split('=')[1]
 
         if not packet["request"]["full_url"] in cookie_result.keys():
-            domain_cookie = 'None'
+            domain_cookie = {}
         else:
             domain_cookie = json.dumps(cookie_result[packet["request"]["full_url"]])
 
