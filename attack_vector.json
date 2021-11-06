@@ -10,5 +10,12 @@
     }
   },
   "CORS" : false,
-  "Allow Method": []
+  "Allow Method": [],
+  "Open Redirect": "url",
+  "s3" : [],
+  "jwt" : [],
+  "subdomain" : [],
+  "api_key" : {
+    "facebook" : "asdf"
+  }
 }
