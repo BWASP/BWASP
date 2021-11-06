@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, render_template, request
+    Blueprint, render_template, request, abort
 )
 from Web.app import AutomatedAnalysis
 import json, requests
@@ -16,8 +16,8 @@ def manual_options():
             requests.post(
                 url="http://localhost:20102/api/job",
                 headers={"accept": "application/json", "Content-Type": "application/json"},
-                data=[json.dumps({"targetURL": reqJsonData["target"]["url"], "knownInfo": reqJsonData["info"], "recursiveLevel": int(reqJsonData["tool"]["analysisLevel"]),
-                                 "uriPath": reqJsonData["target"]["path"]})]
+                data=[{"targetURL": reqJsonData["target"]["url"], "knownInfo": reqJsonData["info"], "recursiveLevel": int(reqJsonData["tool"]["analysisLevel"]),
+                       "uriPath": reqJsonData["target"]["path"]}]
             )
         except:
             abort(500)
