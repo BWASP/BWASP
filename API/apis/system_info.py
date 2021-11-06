@@ -34,7 +34,7 @@ class SysteminfoDAO(object):
         self.updateData = ""
 
     def get_retRowCount(self):
-        self.counter = g.BWASP_DBObj.query(portsModel).count()
+        self.counter = g.BWASP_DBObj.query(systeminfoModel).count()
         return self.counter
 
     def get(self, id=None, Type=False):
