@@ -67,34 +67,64 @@ def input_tag(response_body, http_method, infor_vector):
                 tag_list.append(tag)  # input tag 값 ex) <input ~
                 tag_name_list.append(tag.attrs['name'])
 
-                #~~~~~~~~~~~~SQL Injection
+                #~~~~~~~~~~~~SQL Injection and XSS
+
+                ''' 제거 예정
                 data[0]["vuln"] = "SQL Injection"
                 data[0]["impactRate"] = 1
+                '''
+
+                if "<th" in response_body and tag.attrs['type'] == "password":
+                    data["SQL injection"]["type"].append("board")
+                    data["SQL injection"]["type"].append("account")
+                    data["XSS"]["type"].append("board")
+                    data["XSS"]["type"].append("account")
 
                 # th tag check (board) and type="password" check (login)
-                if "<th" in response_body:  # TODO: bs4 use
+                elif "<th" in response_body:
+                    data["SQL injection"]["type"].append("board")
+                    data["XSS"]["type"].append("board")
+
+                    ''' 제거 예정
                     data[0]["Type"] = "board"
                     data[0]["impactRate"] = 2
+                    '''
 
-                if tag.attrs['type'] == "password":
+                elif tag.attrs['type'] == "password":
+                    data["SQL injection"]["type"].append("account")
+                    data["XSS"]["type"].append("account")
+
+                    ''' 제거 예정
                     data[0]["Type"] = "account"
                     data[0]["impactRate"] = 2
+                    '''
 
-                #~~~~~~~~~~~~XSS
-                data[1]["vuln"] = "XSS"
-                data[1]["impactRate"] = 1
+                else:
+                    data["SQL injection"]["type"].append("None")
+                    data["XSS"]["type"].append("None")
                 
                 if "Not_HttpOnly" in infor_vector:
-                    data[1]["Header"]["HttpOnly"] = False
-                    data[1]["impactRate"] = 2
-                elif "Not_X-Frame-Options" in infor_vector:
-                    data[1]["Header"]["HttpOnly"] = False
-                    data[1]["impactRate"] = 2
+                    data["XSS"]["header"]["HttpOnly"] = True
 
+                    ''' 제거 예정
+                    data[1]["Header"]["HttpOnly"] = False
+                    data[1]["impactRate"] = 2
+                    '''
+                elif "Not_X-Frame-Options" in infor_vector:
+                    data["XSS"]["header"]["X-Frame-Options"] = True
+
+                    ''' 제거 예정
+                    data[1]["Header"]["HttpOnly"] = False
+                    data[1]["impactRate"] = 2
+                    '''
                 
                 #~~~~~~~~~~~~Allow Method
                 if "private" not in http_method:
+                    data["Allow Method"] = http_method
+
+                    ''' 제거 예정
                     data[3]["Allow Method"] = http_method
+                    '''
 
         except:
             pass

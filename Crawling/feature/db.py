@@ -95,7 +95,11 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
 
         cors_check = corsCheck(req_res_packets)
         if cors_check != "None":
+            attack_vector["CORS"] = True
+
+            ''' 제거 예정
             attack_vector[2]["CORS"] = False
+            '''
 
         url_part = urlparse(packet["request"]["full_url"])
         domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
