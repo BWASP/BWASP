@@ -124,9 +124,9 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         else:
             domain_cookie = json.dumps(cookie_result[packet["request"]["full_url"]])
 
-        #attack_vector["Open Redirect"] = openRedirectionCheck(packet)
-        #attack_vector["s3"] = s3BucketCheck(packet)
-        #attack_vector["jwt"] = jwtCheck(packet)
+        # attack_vector["Open Redirect"] = openRedirectionCheck(packet)
+        # attack_vector["s3"] = s3BucketCheck(packet)
+        # attack_vector["jwt"] = jwtCheck(packet)
         
         # 패킷 url이 중복된다면 ??
         # json.dumps()
