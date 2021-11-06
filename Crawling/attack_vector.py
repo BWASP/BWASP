@@ -52,7 +52,7 @@ def input_tag(response_body, http_method, infor_vector):
     action_page = list()
     action_type = list()
 
-    attack_vector = list()
+    attack_vector = dict() #list()
 
     data = dict()
 
@@ -130,7 +130,7 @@ def input_tag(response_body, http_method, infor_vector):
         except:
             pass
 
-        attack_vector.append(data)
+        attack_vector = data
 
     if form:
         for tag in form:
@@ -150,10 +150,10 @@ def corsCheck(req_res_packets):
     cors_check = "None"
 
     for packet in req_res_packets:
-        resonse_header = packet["response"]["headers"]
+        response_header = packet["response"]["headers"]
 
         try:
-            if resonse_header['access-control-allow-origin'] == "*":
+            if response_header['access-control-allow-origin'] == "*":
                 cors_check = "CORS Misconfiguration: *"
         except:
             pass
