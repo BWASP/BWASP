@@ -168,22 +168,28 @@ def insertPorts(port_list, target_url):
 # REST API: 주명 WebInfo
 # 맨처음에 url , data를 포함한 post 한번 먼저 실행
 def postWebInfo(input_url):
-    data = {
+    data = []
+    value = {
         "url": input_url,
         "data": "None"
     }
+    data.append(value)
     SystemInfo().PostSystemInfo(json.dumps(data))
 
 
 # 이후로 업데이트를 통해 data 값 갱신
 def updateWebInfo(analyst_result):
+    data = []
     # db_connect, db_table = connect("systeminfo")
-    data = {
+    value = {
         "id": 1,
         "data": analyst_result
     }
-    SystemInfo().PATCHSystemInfo(json.dumps(data))
-
+    data.append(value)
+    #api 수정 전 
+    SystemInfo().PATCHSystemInfo(json.dumps(value))
+    #api 수정후 아래 코드로 바꾸기
+    #SystemInfo().PATCHSystemInfo(json.dumps(data))
 
 # 한번 방문할 때마다 실행되기 때문에 느릴거 같음.
 # def getPacketsCount():
