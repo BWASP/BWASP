@@ -290,7 +290,7 @@ def detectMeta(detect_list, lock,  packet, data, index, cats, app):
         try:
             pattern = re.compile(meta_regex.split('\\;')[0],re.I)
         except: 
-            pattern = "DonotD!ete!ct"
+            pattern = re.compile("DonotD!ete!ct")
         meta_tag = html.find("meta", {"name":data[app]["meta"].keys()})
         if meta_tag and meta_tag.has_attr("content"):
             regex_result = pattern.search(meta_tag['content'])
