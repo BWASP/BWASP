@@ -1,5 +1,6 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace
+from .api_returnObj import ReturnObject
 import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -16,6 +17,14 @@ ports = ns.model('Ports', {
     'result': fields.String(required=True, description='target port scanning result')
 })
 
+ports_returnPost = ns.model('ports_returnPost', {
+    "message": fields.String(readonly=True, description='message of return data')
+})
+
+ports_RowCount = ns.model('ports_RowCount', {
+    'RowCount': fields.Integer(readonly=True, description='Count of all CspEvaluator id data')
+})
+
 
 class PortsDAO(object):
     def __init__(self):
@@ -23,8 +32,12 @@ class PortsDAO(object):
         self.selectData = ""
         self.insertData = ""
 
-    def get(self, id=-1, Type=False):
-        if Type is False and id == -1:
+    def get_retRowCount(self):
+        self.counter = g.BWASP_DBObj.query(portsModel).count()
+        return self.counter
+
+    def get(self, id=None, Type=False):
+        if Type is False and id is None:
             self.selectData = g.BWASP_DBObj.query(portsModel).all()
             return self.selectData
 
@@ -47,26 +60,11 @@ class PortsDAO(object):
                                    )
                     )
                     g.BWASP_DBObj.commit()
-                return self.insertData
+                return ReturnObject.Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
 
-        if str(type(data)) == "<class 'dict'>":
-            self.insertData = data
-            try:
-                g.BWASP_DBObj.add(
-                    portsModel(service=str(self.insertData["service"]),
-                               target=str(self.insertData["target"]),
-                               port=str(self.insertData["port"]),
-                               result=str(self.insertData["result"])
-                               )
-                )
-                g.BWASP_DBObj.commit()
-                return self.insertData
-            except:
-                g.BWASP_DBObj.rollback()
-
-        return self.insertData
+        return ReturnObject.Return_POST_HTTPStatusMessage(Type=False)
 
 
 Ports_DAO = PortsDAO()
@@ -85,10 +83,12 @@ class PortsList(Resource):
 
     @ns.doc('Create Ports scanning result')
     @ns.expect(ports)
-    @ns.marshal_with(ports, code=201)
+    @ns.marshal_with(ports_returnPost)
+    # @ns.marshal_with(ports, code=201)
     def post(self):
         """Create Ports scanning result"""
-        return Ports_DAO.create(ns.payload), 201
+        return Ports_DAO.create(ns.payload)
+        # return Ports_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')
@@ -102,3 +102,15 @@ class single_PortsList(Resource):
     def get(self, id):
         """Fetch a given resource"""
         return Ports_DAO.get(id, Type=True)
+
+
+@ns.route('/count')
+class count_PortsList(Resource):
+    """Show count of all ports data"""
+
+    @ns.doc('Get count of all ports data')
+    @ns.marshal_with(ports_RowCount)
+    def get(self):
+        """Fetch a given resource"""
+        return {"RowCount": Ports_DAO.get_retRowCount()}
+        # TODO: Return Type

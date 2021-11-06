@@ -1,5 +1,6 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
+from .api_returnObj import ReturnObject
 import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -14,6 +15,11 @@ systeminfo = ns.model('SystemInfo', {
     'data': fields.String(required=True, description='target system information')
 })
 
+systeminfo_returnPost = ns.model('systeminfo_returnPost', {
+    "message": fields.String(readonly=True, description='message of return data')
+})
+
+
 Update_SystemInfo = ns.model('Update_SystemInfo', {
     'id': fields.Integer(required=True, description='system-info id for unique identifier'),
     'data': fields.String(required=True, description='target system information')
@@ -27,8 +33,8 @@ class SysteminfoDAO(object):
         self.insertData = ""
         self.updateData = ""
 
-    def get(self, id=-1, Type=False):
-        if Type is False and id == -1:
+    def get(self, id=None, Type=False):
+        if Type is False and id is None:
             self.selectData = g.BWASP_DBObj.query(systeminfoModel).all()
             return self.selectData
 
@@ -42,6 +48,7 @@ class SysteminfoDAO(object):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
+
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
                         systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
@@ -49,35 +56,31 @@ class SysteminfoDAO(object):
                                         )
                     )
                     g.BWASP_DBObj.commit()
-                return self.insertData
+
+                return ReturnObject.Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
 
-        if str(type(data)) == "<class 'dict'>":
-            self.insertData = data
-            try:
-                g.BWASP_DBObj.add(
-                    systeminfoModel(url=str(self.insertData["url"]),
-                                    data=str(self.insertData["data"])
-                                    )
-                )
-                g.BWASP_DBObj.commit()
-                return self.insertData
-            except:
-                g.BWASP_DBObj.rollback()
-
-        return self.insertData
+        return ReturnObject.Return_POST_HTTPStatusMessage(Type=False)
 
     def update(self, data):
-        try:
-            self.updateData = data
-            g.BWASP_DBObj.query(systeminfoModel).filter(systeminfoModel.id == int(self.updateData["id"])).update({'data': str(self.updateData["data"])})
-            g.BWASP_DBObj.commit()
-            return self.insertData
-        except:
-            g.BWASP_DBObj.rollback()
+        if str(type(data)) == "<class 'list'>":
+            try:
+                self.updateData = data
 
-        return self.updateData
+                for ListofData in range(len(data)):
+                    g.BWASP_DBObj.query(systeminfoModel).filter(
+                        systeminfoModel.id == int(self.updateData["id"])
+                    ).update(
+                        {'data': str(self.updateData["data"])}
+                    )
+                    g.BWASP_DBObj.commit()
+
+                return ReturnObject.Return_PATCH_HTTPStatusMessage(Type=True)
+            except:
+                g.BWASP_DBObj.rollback()
+
+        return ReturnObject.Return_PATCH_HTTPStatusMessage(Type=False)
 
 
 Systeminfo_DAO = SysteminfoDAO()
@@ -96,10 +99,12 @@ class SystemInfoList(Resource):
 
     @ns.doc('Create system information')
     @ns.expect(systeminfo)
-    @ns.marshal_with(systeminfo, code=201)
+    @ns.marshal_with(systeminfo_returnPost)
+    # @ns.marshal_with(systeminfo, code=201)
     def post(self):
         """Create system information"""
-        return Systeminfo_DAO.create(ns.payload), 201
+        return Systeminfo_DAO.create(ns.payload)
+        # return Systeminfo_DAO.create(ns.payload), 201
 
     @ns.expect(Update_SystemInfo)
     @ns.marshal_with(Update_SystemInfo)
