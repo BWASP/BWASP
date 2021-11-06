@@ -1,21 +1,34 @@
 class API {
     constructor() {
-        fetch("/static/data/frontConfig.json")
+        this.getConfig();
+        console.log(this);
+    }
+
+    async getConfig(){
+        await fetch("/static/data/frontConfig.json")
             .then(blob => blob.json())
             .then(res => {
                 this.API = res.API
                 this.debug = res.debug
-            });
-        console.log(this);
+            })
     }
 
-    /***
+    /**
      * Communicate with API
      * @param {string} endpoint
+     * @param {string} type GET
      * @param {function} callback
      */
-    communicate(endpoint, callback) {
-        fetch(this.API.base + endpoint)
+    communicate(endpoint, type="GET", callback) {
+        if(typeof(this.API)==="undefined") this.getConfig();
+        fetch(this.API.base + endpoint, {
+            method: "GET",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json",
+                "accept": "application/json"
+            }
+        })
             .then(blob => blob.json())
             .then(res => {
                 if (this.debug.mode === true

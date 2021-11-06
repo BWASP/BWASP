@@ -1,3 +1,8 @@
+// Get modules
+import {API as api} from '../jHelper.js';
+
+let API = new api();
+
 const MaximumRecursiveLevel = 5000,
     patterns = {
         targetURL: /^http[s]?:\/\//
@@ -20,22 +25,22 @@ const MaximumRecursiveLevel = 5000,
 window.onload = () => {
     // Add event handler to recursive level handler
     let RecursiveLevelHandler = ["Input", "Slider"];
-    for(let i=0; i<RecursiveLevelHandler.length; i++){
-        document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[i]}`).addEventListener("change", function(){
-            if(this.value>MaximumRecursiveLevel){
+    for (let i = 0; i < RecursiveLevelHandler.length; i++) {
+        document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[i]}`).addEventListener("change", function () {
+            if (this.value > MaximumRecursiveLevel) {
                 alert(`Analysis recursive level cannot exceed ${MaximumRecursiveLevel}.`);
                 this.value = MaximumRecursiveLevel;
             }
-            document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[+ !i]}`).value = this.value;
+            document.getElementById(`ToolRecursiveLevel${RecursiveLevelHandler[+!i]}`).value = this.value;
         });
     }
 
     // Render
     let requestToCrawler = fetch("/static/data/supportedList.json");
     fetch("/static/data/supportedList.json")
-        .then(data=>data.json())
-        .then(SupportedList=>{
-            Object.keys(SupportedList).forEach((Type)=>{
+        .then(data => data.json())
+        .then(SupportedList => {
+            Object.keys(SupportedList).forEach((Type) => {
                 let toggleTabName = `web${Type}Selection`;
                 let Skeleton = {
                     parent: document.createElement("div"),
@@ -67,12 +72,12 @@ window.onload = () => {
                 Skeleton.child.child.toggleTabText.innerHTML = SupportedList[Type][0];
 
                 Skeleton.child.child.content.parent.classList.add("collapse");
-                Skeleton.child.child.content.parent.id=toggleTabName;
+                Skeleton.child.child.content.parent.id = toggleTabName;
 
                 Skeleton.child.child.content.child.classList.add("card-body");
 
                 // Create checkbox input
-                SupportedList[Type][1].forEach((codeName)=>{
+                SupportedList[Type][1].forEach((codeName) => {
                     let localSkeleton = {
                         parent: document.createElement("div"),
                         child: {
@@ -108,9 +113,9 @@ window.onload = () => {
                     localSkeleton.child.child.versionInput.id = elementNaming.version;
 
                     // Add Event Listener for checkbox - to - version control input.
-                    localSkeleton.child.child.checkbox.addEventListener("change", function(){
+                    localSkeleton.child.child.checkbox.addEventListener("change", function () {
                         let versionInput = document.getElementById(elementNaming.version);
-                        versionInput.classList[(!this.checked)?"add":"remove"]("d-none");
+                        versionInput.classList[(!this.checked) ? "add" : "remove"]("d-none");
                         versionInput.focus();
                     })
 
@@ -129,24 +134,24 @@ window.onload = () => {
         })
 }
 
-document.getElementById("ClearAllData").addEventListener("click", function(){
+document.getElementById("ClearAllData").addEventListener("click", function () {
     let data = document.getElementsByTagName("input");
-    Object.keys(data).forEach(function(element){
-        switch(data[element].type){
+    Object.keys(data).forEach(function (element) {
+        switch (data[element].type) {
             case "text":
-                data[element].value="";
+                data[element].value = "";
                 break;
             case "number":
             case "range":
-                data[element].value="1";
+                data[element].value = "1";
                 break;
             case "checkbox":
-                data[element].checked=false;
+                data[element].checked = false;
                 break;
             default:
                 alert("Exception: Unhandled object present.");
         }
-        if(data[element].id.startsWith("info-version")){
+        if (data[element].id.startsWith("info-version")) {
             data[element].classList.add("d-none");
         }
     });
@@ -160,7 +165,7 @@ document.getElementById("ClearAllData").addEventListener("click", function(){
 let renderULElement = (target, dataPackage) => {
     let skeleton = document.createElement("ul");
     skeleton.classList.add("ps-3", "mb-0");
-    dataPackage.forEach((path)=>{
+    dataPackage.forEach((path) => {
         let localSkeleton = [document.createElement("li"), document.createElement("code")];
         localSkeleton[1].innerHTML = path;
         localSkeleton[0].appendChild(localSkeleton[1]);
@@ -171,44 +176,50 @@ let renderULElement = (target, dataPackage) => {
 }
 
 // Handler for submit check modal
-document.getElementById("submitJobRequest").addEventListener("click", function(){
+document.getElementById("submitJobRequest").addEventListener("click", function () {
     let formData = document.getElementsByTagName("input"),
         optionalJobs = [],
-        webAppInfo = {types: ["Server", "Framework", "Backend"], server:[], framework:[], backend:[], renderData: {}},
+        webAppInfo = {
+            types: ["Server", "Framework", "Backend"],
+            server: [],
+            framework: [],
+            backend: [],
+            renderData: {}
+        },
         requestData = {tool: Object(), info: Object(), target: Object()},
         renderTmpStorage = {};
 
     // Target URL
     requestData.target["url"] = document.getElementById("target-url").value;
-    if(patterns.targetURL.test(requestData.target.url)===false) {
+    if (patterns.targetURL.test(requestData.target.url) === false) {
         return document.getElementById("regexViolence-targetURL").classList.remove("d-none");
-    }else {
+    } else {
         document.getElementById("regexViolence-targetURL").classList.add("d-none");
         document.getElementById("modal-tool-targetURL").innerHTML = requestData.target.url;
     }
 
     // Pre-defined URL Path
     requestData.target["path"] = document.getElementById("target-urlPath").value.replaceAll(" ", "").split(",");
-    if(requestData.target.path.length > 0){
+    if (requestData.target.path.length > 0) {
         renderULElement(document.getElementById("modal-tool-URLPath"), requestData.target.path);
     }
 
     // Analysis recursive level
     requestData.tool["analysisLevel"] = document.getElementById("ToolRecursiveLevelSlider").value;
-    if(isNaN(requestData["tool"]["analysisLevel"])) {
+    if (isNaN(requestData["tool"]["analysisLevel"])) {
         return alert("Error!");
-    }else{
+    } else {
         document.getElementById("modal-tool-analysisLevel").innerHTML = requestData.tool.analysisLevel;
     }
 
     // Optional functions
     requestData.tool["optionalJobs"] = [];
-    Object.keys(formData).forEach((index)=>{
-        if(formData[index].id.split("-")[0]===identifier.optionalFunctions && formData[index].checked){
-            optionalJobs.push([formData[index].value, document.getElementById(formData[index].id+"-label").innerHTML]);
+    Object.keys(formData).forEach((index) => {
+        if (formData[index].id.split("-")[0] === identifier.optionalFunctions && formData[index].checked) {
+            optionalJobs.push([formData[index].value, document.getElementById(formData[index].id + "-label").innerHTML]);
         }
     })
-    if(optionalJobs.length>0) {
+    if (optionalJobs.length > 0) {
         let tmp = [];
         optionalJobs.forEach((data) => {
             requestData.tool.optionalJobs.push(data[0]);
@@ -217,21 +228,21 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
         renderULElement(document.getElementById("modal-tool-options"), tmp);
     }
 
-    webAppInfo.types.forEach((type)=>{
+    webAppInfo.types.forEach((type) => {
         requestData.info[type.toLowerCase()] = Array();
         let tempStorage = [];
-        Object.keys(formData).forEach((index)=>{
+        Object.keys(formData).forEach((index) => {
             let keySet = formData[index].id.split("-");
-            if(keySet[0]===identifier.webAppInfo.name && keySet[1]===type && formData[index].checked) {
+            if (keySet[0] === identifier.webAppInfo.name && keySet[1] === type && formData[index].checked) {
                 let localDataset = {
                     name: atob(formData[index].value),
                     version: document.getElementById(`${identifier.webAppInfo.version}-${type}-${formData[index].value}`).value
                 }
                 requestData.info[type.toLowerCase()].push(localDataset)
-                tempStorage.push(document.getElementById(formData[index].id + "-label").innerText.concat((localDataset.version.length>0)?` (Version: ${localDataset.version})`:""));
+                tempStorage.push(document.getElementById(formData[index].id + "-label").innerText.concat((localDataset.version.length > 0) ? ` (Version: ${localDataset.version})` : ""));
             }
         })
-        if(tempStorage.length > 0) renderULElement(document.getElementById(`modal-info-${type.toLowerCase()}`), tempStorage);
+        if (tempStorage.length > 0) renderULElement(document.getElementById(`modal-info-${type.toLowerCase()}`), tempStorage);
     })
 
     let jobSubmitVerifyModal = new bootstrap.Modal(document.getElementById('jobSubmitVerifyModal'), {
@@ -241,9 +252,14 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
     });
     jobSubmitVerifyModal.toggle();
 
-    document.getElementById("modal-start-job").addEventListener("click", ()=>{
-        jobSubmitVerifyModal.hide();
+    document.getElementById("modal-start-job").addEventListener("click", () => {
         document.getElementById("modal-start-job").setAttribute("disabled", "true");
+        jobSubmitVerifyModal.hide();
+
+        API.communicate("/api/job", "POST", (err, res)=>{
+
+        })
+
         fetch("/automation/options", {
             method: 'POST',
             headers: {
@@ -255,20 +271,20 @@ document.getElementById("submitJobRequest").addEventListener("click", function()
         })
             .then(response => {
                 let setResult = (result) => {
-                    if(Boolean(result)){
+                    if (Boolean(result)) {
                         alert("Job has just requested.\nRedirecting you to Dashboard...");
                         document.location.replace("/dashboard");
-                    }else{
+                    } else {
                         alert("Failed to create job.")
                     }
                 }
 
-                if(!verifyOutput) setResult(true);
-                else{
+                if (!verifyOutput) setResult(true);
+                else {
                     response.json().then(json => {
-                        if(json.success){
+                        if (json.success) {
                             setResult(true);
-                        }else{
+                        } else {
                             setResult(false);
                         }
                     });
