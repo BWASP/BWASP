@@ -3,7 +3,7 @@
     --sizing-top: 65px;
     --sizing-sidebar: calc(100% - var(--sizing-top) - var(--sizing-footer) - var(--unified-margin));
     --sizing-body: calc(100% - var(--sizing-top) - var(--unified-margin));
-    --sizing-footer: 60px;
+    --sizing-footer: 70px;
 }
 
 html, body {
@@ -43,6 +43,10 @@ body{
     height: var(--sizing-body) !important;
 }
 
+.sizer.element-objects-pagination{
+    height: calc(var(--sizing-body) - var(--sizing-footer)) !important;
+}
+
 footer{
     height: calc(var(--sizing-footer) - var(--unified-margin)) !important;
     margin-top: var(--unified-margin);
@@ -53,10 +57,9 @@ footer>div{
 }
 
 footer>div>p{
-    color: var(--material-grey);
     margin-bottom: 0 !important;
 }
 
 .separatedTab{
-    overflow: scroll !important;
+    overflow: auto !important;
 }

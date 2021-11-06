@@ -97,51 +97,19 @@
                 </div>
                 <div class="col-md-6 p-1 mt-2">
                     <div class="p-3 border-rounded shadow">
-                        <div class="sizer">
-                            <p class="mb-1 text-uppercase">Web Environment Information</p>
+                        <div class="">
+                            <p class="mb-0 text-uppercase">Web Environment Information</p>
+                            <p class="mb-1 text-muted small">of <span class="fw-bold" id="webEnvURLPlace">https://example.com/</span></p>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mt-3">
-                                <p class="text-muted small text-capitalize">Web server</p>
-                                <div>
-                                    <a href="#" class="mt-2 sizer align-items-center text-decoration-none">
-                                        <img width="30" height="30" class="rounded-circle shadow-sm" src="https://t1.daumcdn.net/cfile/tistory/116113424FCC681312">
-                                        <p class="mb-0 ms-2">Nginx</p>
-                                        <p class="mb-0 badge ms-1 text-dark border border-secondary">1.19.0</p>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mt-3">
-                                <p class="text-muted small text-capitalize">Frontend</p>
-                                <div>
-                                    <a href="#" class="mt-2 sizer align-items-center text-decoration-none">
-                                        <img width="30" height="30" class="rounded-circle shadow-sm" src="https://t1.daumcdn.net/cfile/tistory/116113424FCC681312">
-                                        <p class="mb-0 ms-2">React</p>
-                                    </a>
-                                    <a href="#" class="mt-2 sizer align-items-center text-decoration-none">
-                                        <img width="30" height="30" class="rounded-circle shadow-sm" src="https://t1.daumcdn.net/cfile/tistory/116113424FCC681312">
-                                        <p class="mb-0 ms-2">Moment.js</p>
-                                        <p class="mb-0 badge ms-1 text-dark border border-secondary">2.24.0</p>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mt-3">
-                                <p class="text-muted small text-capitalize">Backend</p>
-                                <div>
-                                    <a href="#" class="mt-2 sizer align-items-center text-decoration-none">
-                                        <img width="30" height="30" class="rounded-circle shadow-sm" src="https://t1.daumcdn.net/cfile/tistory/116113424FCC681312">
-                                        <p class="mb-0 ms-2">PHP</p>
-                                        <p class="mb-0 badge ms-1 text-dark border border-secondary">5.6.40</p>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="row" id="webEnvDataPlace"></div>
                     </div>
                 </div>
             </section>
         </div>
     </div>
 </div>
+
+<script type="module" src="{{ url_for('static', filename='js/page/dashboard.js') }}"></script>
 
 <script>
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
