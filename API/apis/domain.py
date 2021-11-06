@@ -55,7 +55,7 @@ class DomainDAO(object):
         ns.abort(404, f"domain {id} doesn't exist")
 
     def get_retRowData_for_Pagination(self, start, end):
-        self.selectData = g.BWASP_DBObj.query(domainModel).filter(domainModel.id >= start).limit(end)
+        self.selectData = g.BWASP_DBObj.query(domainModel).filter(domainModel.id >= start).limit(end).all()
         return self.selectData
 
     def create(self, data):
@@ -82,7 +82,7 @@ class DomainDAO(object):
             except:
                 g.BWASP_DBObj.rollback()
 
-        return ReturnObject().Return_POST_POST_HTTPStatusMessage(Type=False)
+        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
 
 
 Domain_DAO = DomainDAO()
@@ -130,7 +130,7 @@ class paging_DomainList(Resource):
     """Show a domain data of start, end"""
 
     @ns.doc('Get domain data on paging')
-    @ns.marshal_with(domain)
+    @ns.marshal_list_with(domain)
     def get(self, start, end):
         """Fetch a given resource"""
         return Domain_DAO.get_retRowData_for_Pagination(start, end)
