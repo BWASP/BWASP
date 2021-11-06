@@ -108,10 +108,11 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         #domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
 
         #Query String 정리
-        param_list = url_part.query.split("&")
         domain_params = dict()
-        for param in param_list:
-            domain_params[param.split('=')[0]] = param.split('=')[1]
+        if url_part.query != "":
+            param_list = url_part.query.split("&")
+            for param in param_list:
+                domain_params[param.split('=')[0]] = param.split('=')[1]
 
         if not packet["request"]["full_url"] in cookie_result.keys():
             domain_cookie = 'None'
