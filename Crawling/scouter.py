@@ -20,7 +20,9 @@ start_options = {
 }
 
 sysinfo_detectlist = {}
-loadpacket_indexes = list() # automation packet indexes 
+loadpacket_indexes = list() # automation packet indexes
+http_method = "None"
+infor_vector = "None"
 
 def start(url, depth, options):
     global start_options
@@ -33,7 +35,7 @@ def start(url, depth, options):
     start_options["visited_links"] = []
     start_options["count_links"] = {}
 
-def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url,previous_packet_count):
+def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, page_source, current_url,previous_packet_count, http_method, infor_vector):
     global start_options
     global sysinfo_detectlist
     global loadpacket_indexes
@@ -53,13 +55,15 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     #analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
     analyst.start(sysinfo_detectlist, input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
-    db.insertDomains(req_res_packets, cookie_result,packet_indexes , current_url)
+    db.insertDomains(req_res_packets, cookie_result,packet_indexes , current_url, http_method, infor_vector)
     db.updateWebInfo(sysinfo_detectlist)
     
     return 1
 
 def visit(driver, url, depth, options):
     global start_options
+    global http_method
+    global infor_vector
 
     try:
         driver.get(url)
@@ -69,7 +73,7 @@ def visit(driver, url, depth, options):
         pass
 
     if start_options["check"]:
-        attack_header(driver.current_url)
+        http_method, infor_vector = attack_header(driver.current_url)
         start_options["input_url"] = driver.current_url
         db.postWebInfo(start_options["input_url"])
         start_options["visited_links"].append(start_options["input_url"])
@@ -101,7 +105,7 @@ def visit(driver, url, depth, options):
 
     req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
     db.insertPackets(req_res_packets)
-    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result, driver.page_source, driver.current_url,start_options["previous_packet_count"])) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result, driver.page_source, driver.current_url,start_options["previous_packet_count"], http_method, infor_vector)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
     start_options["previous_packet_count"] += len(req_res_packets)
     p.start()
     
