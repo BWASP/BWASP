@@ -12,19 +12,16 @@ bp = Blueprint(NAME, __name__, url_prefix='/automation')
 def manual_options():
     if request.method == 'POST':
         reqJsonData = json.loads(request.form["reqJsonData"])
-        data = list()
-        data.append(json.dumps(
-            {
+
+        requests.post(
+            url="http://localhost:20102/api/job",
+            headers={"accept": "application/json", "Content-Type": "application/json"},
+            data={
                 "targetURL": reqJsonData["target"]["url"],
                 "knownInfo": reqJsonData["info"],
                 "recursiveLevel": int(reqJsonData["tool"]["analysisLevel"]),
                 "uriPath": reqJsonData["target"]["path"]
             }
-        ))
-        requests.post(
-            url="http://localhost:20102/api/job",
-            headers={"accept": "application/json", "Content-Type": "application/json"},
-            data=data
         )
 
         AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
