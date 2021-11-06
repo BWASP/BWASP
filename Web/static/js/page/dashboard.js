@@ -44,7 +44,7 @@ class dashboard {
                     productName: document.createElement("p"),
                     version: document.createElement("p")
                 },
-                versionCase = (data.version !== "0");
+                versionCase = (data.version !== 0);
 
             // set classes
             localSkeleton.parent.href = "javascript:void(0);";
