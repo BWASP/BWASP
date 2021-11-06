@@ -100,7 +100,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             ''' 제거 예정
             attack_vector[2]["CORS"] = False
             '''
-
+            
         url_part = urlparse(packet["request"]["full_url"])
         domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
         domain_uri = urlunparse(url_part._replace(scheme="", netloc=""))
@@ -121,6 +121,11 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             domain_cookie = 'None'
         else:
             domain_cookie = json.dumps(cookie_result[packet["request"]["full_url"]])
+
+        attack_vector["Open Redirect"] = openRedirectionCheck(packet)
+        attack_vector["s3"] = s3BucketCheck(packet)
+        attack_vector["jwt"] = jwtCheck(packet)
+        
         # 패킷 url이 중복된다면 ??
         # json.dumps()
         # getPacketIndex

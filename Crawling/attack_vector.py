@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import json
+import re
 
 
 def attack_header(target_url):
@@ -125,7 +126,7 @@ def input_tag(response_body, http_method, infor_vector):
                     ''' 제거 예정
                     data[3]["Allow Method"] = http_method
                     '''
-
+                    
         except:
             pass
 
@@ -158,6 +159,66 @@ def corsCheck(req_res_packets):
             pass
 
     return cors_check
+
+def openRedirectionCheck(packet):
+    try:
+        if packet["open_redirect"]:
+            print(packet["request"]["full_url"])
+            input()
+            return packet["request"]["full_url"]
+    except:
+        return ""
+
+def s3BucketCheck(packet):
+    return_s3_url = []
+    patterns = [    "[a-z0-9.-]+\.s3\.amazonaws\.com[\/]?",
+                    "[a-z0-9.-]+\.s3-[a-z0-9-]\.amazonaws\.com[\/]?",
+                    "[a-z0-9.-]+\.s3-website[.-](eu|ap|us|ca|sa|cn)",
+                    "[\/\/]?s3\.amazonaws\.com\/[a-z0-9._-]+",
+                    "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-z0-9._-]+",
+                    "[a-z0-9-]+\.s3-[a-z0-9-]+\.amazonaws\.com/[a-z0-9._-]+",
+                    "[a-z0-9-]+\.s3-[a-z0-9-]+\.amazonaws\.com[\/]?",
+                    "[a-z0-9\.\-]{3,63}\.s3[\.-](eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?",
+                    "[a-z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?",
+                    "[a-z0-9\.\-]{3,63}\.s3-website[\.-](eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?"]
+    
+    for pattern in patterns:
+        regex = re.compile(pattern)
+        res_body = regex.findall(packet["request"]["body"])
+        req_body = regex.findall(packet["response"]["body"])
+
+        if res_body:
+            return_s3_url += res_body
+        if req_body:
+            return_s3_url += req_body
+
+    print(list(set(return_s3_url)))
+    input()
+    return list(set(return_s3_url))
+
+def jwtCheck(packet):
+    return_jwt = []
+    patterns = ["^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$"]
+
+    for pattern in patterns:
+        regex = re.compile(pattern)
+        req_header = []
+        req_body = []
+        res_header = []
+        res_body = []
+
+        for header_key in packet["request"]["headers"].keys():
+            req_header += regex.findall(packet["request"]["headers"][header_key])
+        for header_key in packet["response"]["headers"].keys():
+            res_header += regex.findall(packet["response"]["headers"][header_key])
+        req_body = regex.findall(packet["request"]["body"])
+        res_body = regex.findall(packet["response"]["body"])
+        
+        return_jwt += req_header + req_body + res_header + res_body
+    
+    print(list(set(return_jwt)))
+    input()
+    return list(set(return_jwt))
 
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
