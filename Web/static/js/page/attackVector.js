@@ -3,83 +3,163 @@ import {API as api, createKey} from '../jHelper.js';
 
 // Define API Endpoints
 const APIEndpoints = {
-    vectors: "/api/domain",
-    packets: "/api/packets"
-}
+        vectors: "/api/domain",
+        packets: {
+            base: "/api/packet",
+            type: {
+                auto: "automation",
+                manual: "manual"
+            }
+        }
+    },
+    elements = {
+        vectors: ["Category", "URL", "Action", "Params", "Vulnerability Doubt", "Method", "Impact"],
+        packets: []
+    };
 
 let stateHandler = {
-    isVector: true
-};
-
-let returnError = (errorMessage = "No data") => {
-    document.getElementById("loadingProgress").classList.add("d-none");
-    document.getElementById("resultNoData").classList.remove("d-none");
-    document.getElementById("errorMessagePlace").innerText = errorMessage;
-    console.error(`:: ERROR :: ${errorMessage}`);
-}
+        isVector: true
+    },
+    keyAndStrings = [
+        {
+            type: "packets",
+            viewString: "Packets"
+        },
+        {
+            type: "vectors",
+            viewString: "Attack Vectors"
+        }
+    ],
+    pagination = {
+        currentPage: 1,
+        rowPerPage: 10
+    },
+    returnError = (errorMessage = "No data") => {
+        document.getElementById("loadingProgress").classList.add("d-none");
+        document.getElementById("resultNoData").classList.remove("d-none");
+        document.getElementById("errorMessagePlace").innerText = errorMessage;
+        console.error(`:: ERROR :: ${errorMessage}`);
+    };
 
 // API Communicator.
 let API = new api();
 
-let dataUpdater = (requestType, requestPage, rowPerPage) => {
+async function dataUpdater(requestType, requestPage, rowPerPage) {
     let currentState = (stateHandler.isVector) ? "vectors" : "packets",
         dataPackage = Array();
-    API.communicate(
-        APIEndpoints[currentState] + `/${requestPage * rowPerPage + 1}/${(requestPage + 1) * rowPerPage}`,
+    await API.communicate(
+        APIEndpoints.vectors + `/${requestPage * rowPerPage + (requestPage === 0) ? 1 : 0}/${(requestPage + 1) * rowPerPage}`,
         (error, res) => {
-            console.log(res);
-            if(error) return returnError(error);
+            console.log("Domain data: ", res);
+            if (error) return returnError(error);
             if (res.length <= 0) console.error(":: ERROR :: No data");
-            res.forEach((data) => {
+            res.forEach((domainData) => {
                 let skeleton = {
                     category: String(),
                     url: {
-                        url: String(),
-                        uri: String()
+                        url: domainData.URL,
+                        uri: domainData.URI
                     },
                     payloads: Array(),
                     action: {
-                        target: String(),
-                        type: String()
+                        target: API.jsonDataHandler(domainData["action_URL"]),
+                        type: API.jsonDataHandler(domainData["action_URL_Type"])
                     },
-                    params: Array(),
+                    params: API.jsonDataHandler(domainData["params"]),
                     vulnerability: {
                         type: String(),
                         cve: Array()
                     },
                     method: String(),
-                    impactRate: Number(),
-                    details: {
-                        inputTag: Array(),
-                        cookie: Object(),
-                        queryString: Object()
-                    }
-                };
-                [skeleton.url, skeleton.uri] = [data.URL, data.URI];
-                skeleton.action.target = API.jsonDataHandler(data.action_URL);
-                skeleton.action.type = API.jsonDataHandler(data.action_URL_Type);
-                skeleton.params = API.jsonDataHandler(data.params);
-                skeleton.impactRate = data["typicalServerity"];
+                    impactRate: 0,
+                    details: API.jsonDataHandler(domainData["Details"])
+                }, packetData = Array();
+
+
+                // Packet - when Automatic
+                API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.auto}/${domainData["related_Packet"]}`, (err, res) => {
+                    if (!err) packetData.push(res);
+                    else API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.manual}/${domainData["related_Packet"]}`, (err, res) => {
+                        if (!err) packetData.push(res);
+                    });
+                    console.log(`Packet data of No. ${domainData["related_Packet"]}`, packetData);
+                    skeleton.category = packetData[0]["category"];
+                    skeleton.method = packetData[0]["requestType"];
+                    // console.log("Packet: ", packetData[0]);
+                });
 
                 dataPackage.push(skeleton);
             });
 
         });
-    console.log(dataPackage);
-
-
     return dataPackage;
 }
 
-document.getElementById("switchToPacket").addEventListener("click", function () {
-    let tableID = createKey(),
-        tablePlace = document.getElementById("tablePlace"),
+class tableBuilder {
+    /**
+     * Builds table <thead> element
+     * @param {Array} elements
+     * @return {Object} thead
+     */
+    buildHead(elements) {
+        if (typeof (elements) !== "object" || elements.length === 0) return Error("tableBuilder.buildHead() : Expected array of heading elements");
+        let thead = {
+            parent: document.createElement("thead"),
+            child: document.createElement("tr")
+        };
+        elements.forEach((currentElement) => {
+            let tmpElement = document.createElement("th");
+            tmpElement.innerText = currentElement;
+            thead.child.appendChild(tmpElement);
+        })
+        thead.parent.appendChild(thead.child);
+        return thead.parent;
+    }
+}
+
+document.getElementById("switchToPacket").addEventListener("click", () => {
+    let builder = new tableBuilder(),
         table = {
-            table: document.createElement("table"),
-            thead: document.createElement("thead"),
-            tbody: document.createElement("tbody")
+            ID: createKey(),
+            place: document.getElementById("tablePlace"),
+            elements: {
+                table: document.createElement("table"),
+                tbody: document.createElement("tbody")
+            }
         },
-        newThead = document.createElement("tr"),
+        currentState = keyAndStrings[Number(stateHandler.isVector)];
+
+    // Update title bar string and
+    document.getElementById("pageTitle").innerHTML = currentState.viewString;
+    document.title = `${currentState.viewString} - BWASP`;
+
+    // Initialize tablePlace DIV
+    table.place.innerHTML = "";
+
+    // Toggle loading screen
+    document.getElementById("loadingProgress").classList.remove("d-none");
+    document.getElementById("resultNoData").classList.add("d-none");
+
+    // Set default table classes
+    table.elements.table.classList.add("table");
+
+    // Build thead
+    table.elements.table.appendChild(
+        builder.buildHead(elements[currentState.type])
+    )
+
+    // Get data by pagination
+    dataUpdater(null, pagination.currentPage, pagination.rowPerPage).then((res) => {
+        console.log("Data Result : ", res);
+    })
+
+
+    // =================================================================================
+    //   LEGACY BELOW
+    // =================================================================================
+
+    /*
+    let newThead = document.createElement("tr"),
         element = [
             ["URL", "Vulnerability Doubt", "Method", "Date", "Impact"],
             ["URL", "Packet", "Vulnerability Doubt", "Method", "Related Data", "Date", "Impact"]
@@ -91,6 +171,7 @@ document.getElementById("switchToPacket").addEventListener("click", function () 
             type: "packets",
             viewString: "Packets"
         };
+
 
     // Update texts from DOM
     // document.getElementById("switchToType").innerText = currentState.viewString;
@@ -334,5 +415,4 @@ window.onload = () => {
     });
     document.getElementById("openHelpModal").addEventListener("click", () => userHelpModal.toggle());
     document.getElementById("switchToPacket").click();
-    dataUpdater(null, 1, 10);
 };
