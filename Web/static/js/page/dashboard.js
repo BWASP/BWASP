@@ -64,7 +64,7 @@ class dashboard {
                 localSkeleton.productImage,
                 localSkeleton.productName
             );
-            if(versionCase) localSkeleton.parent.appendChild(localSkeleton.version);
+            if (versionCase) localSkeleton.parent.appendChild(localSkeleton.version);
             skeleton.child.appendChild(localSkeleton.parent);
         })
         skeleton.parent.append(

@@ -7,6 +7,6 @@ let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
 })
 
-document.getElementById("BWASP-Version").addEventListener("click", ()=>{
+document.getElementById("BWASP-Version").addEventListener("click", () => {
     versionCheckModal.show();
 })

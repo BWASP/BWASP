@@ -1,10 +1,9 @@
 class API {
     constructor() {
         this.getConfig();
-        console.log(this);
     }
 
-    async getConfig(){
+    async getConfig() {
         await fetch("/static/data/frontConfig.json")
             .then(blob => blob.json())
             .then(res => {
@@ -19,7 +18,7 @@ class API {
      * @param {function} callback
      */
     communicate(endpoint, callback) {
-        this.getConfig().then(()=>{
+        this.getConfig().then(() => {
             fetch(this.API.base + endpoint, {
                 method: "GET",
                 cache: "no-cache",
@@ -48,7 +47,7 @@ class API {
      * @param {object} data null
      * @param {function} callback
      */
-    relativeCommunication(endpoint, type="POST", data=null, callback){
+    relativeCommunication(endpoint, type = "POST", data = null, callback) {
         fetch(this.API.base + endpoint, {
             method: type,
             cache: "no-cache",
@@ -73,12 +72,18 @@ class API {
     /**
      * JSON Data handling
      * @param {string} str Malformed JSON
+     * @param {boolean} parseJSON true
      * @returns {string} Pure JSON
      */
-    jsonDataHandler(str) {
-        let replaceKeyword = "::SINGLE-QUOTE::";
-        str = str.replaceAll("\\'", replaceKeyword).replaceAll("'", "\"").replaceAll(replaceKeyword, "\\'");
-        return JSON.parse(str);
+    jsonDataHandler(str, parseJSON = true) {
+        let replaceKeyword = ["::SINGLE-QUOTE::","::DOUBLE-QUOTE::"];
+        str = str
+            .replaceAll("\"", replaceKeyword[1])
+            .replaceAll("\\'", replaceKeyword[0])
+            .replaceAll("'", "\"")
+            .replaceAll(replaceKeyword[0], "\\'")
+            .replaceAll(replaceKeyword[1], "\'");
+        return (parseJSON) ? JSON.parse(str) : str;
     }
 }
 
