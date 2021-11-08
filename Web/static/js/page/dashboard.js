@@ -6,7 +6,7 @@ const APIEndpoints = {
     webEnvironments: "/api/systeminfo"
 }
 
-let API = new api();
+let API = await new api();
 
 class dashboard {
     webEnvironments() {
