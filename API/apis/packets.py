@@ -49,28 +49,29 @@ class PacketDAO(object):
         self.Manual_Counter = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineManual).count()
 
         if Type is True:
-            return int(self.Automation_Counter)
+            return {"RowCount": int(self.Automation_Counter)}
 
         if Type is False:
-            return int(self.Manual_Counter)
+            return {"RowCount": int(self.Manual_Counter)}
 
     def get_automation(self, id=None, Type=False):
         if Type is False and id is None:
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation).all()
             return self.selectData
 
-        if Type is not False and self.get_retRowCount(Type=True) >= id > 0:
+        if Type is not False and self.get_retRowCount(Type=True)["RowCount"] >= id > 0:
+            print(self.Automation_Counter)
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineAutomation).first()
             return self.selectData
 
         ns.abort(404, f"packet {id} doesn't exist")
 
-    def get_manual(self, id=0, Type=False):
-        if Type is False and self.get_retRowCount(Type=False) > 0:
+    def get_manual(self, id=None, Type=False):
+        if Type is False and id is None:
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineManual).all()
             return self.selectData
 
-        if Type is not False and self.get_retRowCount(Type=False) > 0:
+        if Type is not False and self.get_retRowCount(Type=False)["RowCount"] >= id > 0:
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineManual).first()
             return self.selectData
 
@@ -78,11 +79,21 @@ class PacketDAO(object):
 
     def get_automationIndex(self):
         self.selectData = g.BWASP_DBObj.query(packetsModel.id).filter(packetsModel.category == self.DefineAutomation).all()
-        return self.selectData  # automaton id of packet list
+        retIndex = list()
+
+        for idx in range(len(self.selectData)):
+            retIndex.append(self.selectData[idx].id)
+
+        return {"id": retIndex}  # automaton id of packet list
 
     def get_manualIndex(self):
         self.selectData = g.BWASP_DBObj.query(packetsModel.id).filter(packetsModel.category == self.DefineManual).all()
-        return self.selectData  # manual id of packet list
+        retIndex = list()
+
+        for idx in range(len(self.selectData)):
+            retIndex.append(self.selectData[idx].id)
+
+        return {"id": retIndex}  # manual id of packet list
 
     def create_automation(self, data):
         if str(type(data)) == "<class 'list'>":
@@ -144,11 +155,9 @@ class automation_packetList(Resource):
     @ns.doc('Create automation packet')
     @ns.expect(packet)
     @ns.marshal_with(packet_returnPost)
-    # @ns.marshal_with(packet, code=201)
     def post(self):
         """Create automation packet"""
         return Packet_DAO.create_automation(ns.payload)
-        # return Packet_DAO.create_automation(ns.payload), 201
 
 
 @ns.route('/manual')
@@ -164,11 +173,9 @@ class manual_packetList(Resource):
     @ns.doc('Create manual packet')
     @ns.expect(packet)
     @ns.marshal_with(packet)
-    # @ns.marshal_with(packet, code=201)
     def post(self):
         """Create manual packet"""
         return Packet_DAO.create_manual(ns.payload)
-        # return Packet_DAO.create_manual(ns.payload), 201
 
 
 @ns.route('/automation/index')
@@ -179,7 +186,7 @@ class automation_packetIndex(Resource):
     @ns.marshal_list_with(packetIndex)
     def get(self):
         """Shows automation packets id list"""
-        return {"id": str(Packet_DAO.get_automationIndex()).replace("(", "").replace(",)", "")}
+        return Packet_DAO.get_automationIndex()
 
 
 @ns.route('/manual/index')
@@ -190,7 +197,7 @@ class manual_packetIndex(Resource):
     @ns.marshal_list_with(packetIndex)
     def get(self):
         """Shows manual packets id list"""
-        return {"id": str(Packet_DAO.get_manualIndex()).replace("(", "").replace(",)", "")}
+        return Packet_DAO.get_manualIndex()
 
 
 @ns.route('/automation/<int:id>')
@@ -227,7 +234,7 @@ class count_automation_packetList(Resource):
     @ns.marshal_with(packet_RowCount)
     def get(self):
         """Fetch a given resource"""
-        return {"RowCount": Packet_DAO.get_retRowCount(Type=True)}
+        return Packet_DAO.get_retRowCount(Type=True)
         # TODO: Return Type
 
 
@@ -239,5 +246,5 @@ class count_manual_packetList(Resource):
     @ns.marshal_with(packet_RowCount)
     def get(self):
         """Fetch a given resource"""
-        return {"RowCount": Packet_DAO.get_retRowCount(Type=False)}
+        return Packet_DAO.get_retRowCount(Type=False)
         # TODO: Return Type

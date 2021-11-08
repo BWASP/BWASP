@@ -20,11 +20,3 @@ class ReturnObject:
 
         if Type is False:
             return self.Failed_returnData, 500
-
-    def Return_HTTPStatusMessage(self, Type=bool):
-        if Type is True:
-            return self.Success_returnData, 201
-
-        if Type is False:
-            return self.Failed_returnData, 500
-

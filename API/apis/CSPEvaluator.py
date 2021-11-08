@@ -78,11 +78,9 @@ class CSPEvaluatorList(Resource):
     @ns.doc('Create CSP data')
     @ns.expect(CSPEvaluator)
     @ns.marshal_with(CSPEvaluator_returnPost)
-    # @ns.marshal_with(CSPEvaluator_returnPost, code=201)
     def post(self):
         """Create CSPEvaluator data"""
         return CSPEvaluator_DAO.create(ns.payload)
-        # return CSPEvaluator_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')
@@ -92,7 +90,7 @@ class single_CSPEvaluatorList(Resource):
     """Show a single CSPEvaluator data"""
 
     @ns.doc('Get single CSPEvaluator data')
-    @ns.marshal_list_with(CSPEvaluator)
+    @ns.marshal_with(CSPEvaluator)
     def get(self, id):
         """Fetch a given resource"""
         return CSPEvaluator_DAO.get(id, Type=True)
