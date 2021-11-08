@@ -21,10 +21,10 @@ def create_app(config=None):
     app.config.from_object(config)
 
     # route initialization
-    from routes import index_route, automation_route, common_route
+    from routes import index_route, common_route, automation_route, manual_route
     app.register_blueprint(index_route.bp)
-    app.register_blueprint(automation_route.bp)
     app.register_blueprint(common_route.bp)
+    app.register_blueprint(manual_route.bp)
 
     @app.errorhandler(404)
     def NotFound(error):
@@ -35,6 +35,9 @@ def create_app(config=None):
 
 def AutomatedAnalysis(url, depth, options):
     start(url, int(depth), options)
+
+def ManualAnalysis(url, depth, options):
+    pass
 
 
 if __name__ == '__main__':
