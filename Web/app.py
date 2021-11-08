@@ -36,6 +36,7 @@ def create_app(config=None):
 def AutomatedAnalysis(url, depth, options):
     start(url, int(depth), options)
 
+
 def ManualAnalysis(url, depth, options):
     pass
 
@@ -43,3 +44,4 @@ def ManualAnalysis(url, depth, options):
 if __name__ == '__main__':
     application = create_app()
     application.run(host="0.0.0.0", port=5000, debug=True)
+
