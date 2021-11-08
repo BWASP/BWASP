@@ -56,6 +56,8 @@ def input_tag(response_body, http_method, infor_vector):
 
     data = dict()
 
+    impactRate = 0
+
     text = soup.find_all('input')
     form = soup.find_all('form')
 
@@ -81,10 +83,14 @@ def input_tag(response_body, http_method, infor_vector):
                     data["XSS"]["type"].append("board")
                     data["XSS"]["type"].append("account")
 
+                    impactRate = 2
+
                 # th tag check (board) and type="password" check (login)
                 elif "<th" in response_body:
                     data["SQL injection"]["type"].append("board")
                     data["XSS"]["type"].append("board")
+
+                    impactRate = 2
 
                     ''' 제거 예정
                     data[0]["Type"] = "board"
@@ -95,6 +101,8 @@ def input_tag(response_body, http_method, infor_vector):
                     data["SQL injection"]["type"].append("account")
                     data["XSS"]["type"].append("account")
 
+                    impactRate = 2
+
                     ''' 제거 예정
                     data[0]["Type"] = "account"
                     data[0]["impactRate"] = 2
@@ -103,9 +111,14 @@ def input_tag(response_body, http_method, infor_vector):
                 else:
                     data["SQL injection"]["type"].append("None")
                     data["XSS"]["type"].append("None")
+
+                    impactRate = 1
                 
                 if "Not_HttpOnly" in infor_vector:
                     data["XSS"]["header"]["HttpOnly"] = True
+
+                    if impactRate != 2:
+                        impactRate = 1
 
                     ''' 제거 예정
                     data[1]["Header"]["HttpOnly"] = False
@@ -113,6 +126,9 @@ def input_tag(response_body, http_method, infor_vector):
                     '''
                 if "Not_X-Frame-Options" in infor_vector:
                     data["XSS"]["header"]["X-Frame-Options"] = True
+
+                    if impactRate != 2:
+                        impactRate = 1
 
                     ''' 제거 예정
                     data[1]["Header"]["HttpOnly"] = False
@@ -143,7 +159,7 @@ def input_tag(response_body, http_method, infor_vector):
             except:
                 action_type.append("None")
 
-    return tag_list, tag_name_list, attack_vector, action_page, action_type
+    return tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate
 
 
 def corsCheck(packet):
