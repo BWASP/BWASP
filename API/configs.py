@@ -16,6 +16,7 @@ class Config(object):
     }
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    ERROR_404_HELP = False
 
     def __init__(self):
         pass

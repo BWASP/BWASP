@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, render_template, g
+    Blueprint, render_template
 )
 
 NAME = 'result'
@@ -14,23 +14,4 @@ def mode_selection():
 
 @bp.route('/dashboard')
 def index():
-    return render_template('index.html', Title="홈 - BWASP",
-                           area_Chart={
-                               "All_Result": 183,
-                               "Web_Information": 20,
-                               "Vulnerability_Doubt": 40,
-                               "Attack_Vector": 50,
-                               "Related_CVE": 16
-                           },
-                           header_box={
-                               "Received": 426,
-                               "Average_first_response_time": "1 min",
-                               "Average_response_time": "3 min",
-                               "Resolution_within_SLA": "94%"
-                           },
-                           pie_chart={
-                               "data1": 80,
-                               "data2": 5,
-                               "data3": 15,
-                           }
-                           )
+    return render_template('index.html', Title="홈 - BWASP")
