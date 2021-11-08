@@ -24,6 +24,7 @@ def create_app(config=None):
     from routes import index_route, common_route, automation_route, manual_route
     app.register_blueprint(index_route.bp)
     app.register_blueprint(common_route.bp)
+    app.register_blueprint(automation_route.bp)
     app.register_blueprint(manual_route.bp)
 
     @app.errorhandler(404)
