@@ -60,7 +60,6 @@ class PacketDAO(object):
             return self.selectData
 
         if Type is not False and self.get_retRowCount(Type=True)["RowCount"] >= id > 0:
-            print(self.Automation_Counter)
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineAutomation).first()
             return self.selectData
 
@@ -183,7 +182,7 @@ class automation_packetIndex(Resource):
     """Shows a list of all automation packet id"""
 
     @ns.doc('List of all automation packet id')
-    @ns.marshal_list_with(packetIndex)
+    @ns.marshal_with(packetIndex)
     def get(self):
         """Shows automation packets id list"""
         return Packet_DAO.get_automationIndex()
@@ -194,7 +193,7 @@ class manual_packetIndex(Resource):
     """Shows a list of all manual packet id"""
 
     @ns.doc('List of all manual packet id')
-    @ns.marshal_list_with(packetIndex)
+    @ns.marshal_with(packetIndex)
     def get(self):
         """Shows manual packets id list"""
         return Packet_DAO.get_manualIndex()
