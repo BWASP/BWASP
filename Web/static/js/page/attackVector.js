@@ -1,5 +1,5 @@
 // Get modules
-import {API as api, createKey} from '../jHelper.js';
+import {API as api, createKey, tableBuilder} from '../jHelper.js';
 
 // Define API Endpoints
 const APIEndpoints = {
@@ -41,21 +41,20 @@ let stateHandler = {
         console.error(`:: ERROR :: ${errorMessage}`);
     };
 
-// API Communicator.
-let API = new api();
+// define api communicator
+let API = await new api();
 
-async function dataUpdater(requestType, requestPage, rowPerPage) {
-    let currentState = (stateHandler.isVector) ? "vectors" : "packets",
-        dataPackage = Array();
+async function dataUpdater(requestType, requestPage, rowPerPage, callback) {
+    let localDataPack = [], hello = "";
     await API.communicate(
-        APIEndpoints.vectors + `/${requestPage * rowPerPage + (requestPage === 0) ? 1 : 0}/${(requestPage + 1) * rowPerPage}`,
-        (error, res) => {
-            console.log("Domain data: ", res);
+        APIEndpoints.vectors + `/${(requestPage - 1) * rowPerPage}/${rowPerPage}`,
+        async (error, res) => {
+            // console.log("Domain data: ", res);
             if (error) return returnError(error);
             if (res.length <= 0) console.error(":: ERROR :: No data");
-            res.forEach((domainData) => {
+            await res.forEach((domainData) => {
                 let skeleton = {
-                    category: String(),
+                    category: Number(),
                     url: {
                         url: domainData.URL,
                         uri: domainData.URI
@@ -75,6 +74,8 @@ async function dataUpdater(requestType, requestPage, rowPerPage) {
                     details: API.jsonDataHandler(domainData["Details"])
                 }, packetData = Array();
 
+                // Reengineer details.
+                Object.keys(skeleton.details).forEach((key) => skeleton.details[key] = API.jsonDataHandler(skeleton.details[key]));
 
                 // Packet - when Automatic
                 API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.auto}/${domainData["related_Packet"]}`, (err, res) => {
@@ -82,39 +83,13 @@ async function dataUpdater(requestType, requestPage, rowPerPage) {
                     else API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.manual}/${domainData["related_Packet"]}`, (err, res) => {
                         if (!err) packetData.push(res);
                     });
-                    console.log(`Packet data of No. ${domainData["related_Packet"]}`, packetData);
                     skeleton.category = packetData[0]["category"];
                     skeleton.method = packetData[0]["requestType"];
-                    // console.log("Packet: ", packetData[0]);
                 });
-
-                dataPackage.push(skeleton);
+                localDataPack.push(skeleton);
             });
-
+            callback(localDataPack);
         });
-    return dataPackage;
-}
-
-class tableBuilder {
-    /**
-     * Builds table <thead> element
-     * @param {Array} elements
-     * @return {Object} thead
-     */
-    buildHead(elements) {
-        if (typeof (elements) !== "object" || elements.length === 0) return Error("tableBuilder.buildHead() : Expected array of heading elements");
-        let thead = {
-            parent: document.createElement("thead"),
-            child: document.createElement("tr")
-        };
-        elements.forEach((currentElement) => {
-            let tmpElement = document.createElement("th");
-            tmpElement.innerText = currentElement;
-            thead.child.appendChild(tmpElement);
-        })
-        thead.parent.appendChild(thead.child);
-        return thead.parent;
-    }
 }
 
 document.getElementById("switchToPacket").addEventListener("click", () => {
@@ -141,18 +116,119 @@ document.getElementById("switchToPacket").addEventListener("click", () => {
     document.getElementById("resultNoData").classList.add("d-none");
 
     // Set default table classes
-    table.elements.table.classList.add("table");
-
-    // Build thead
-    table.elements.table.appendChild(
-        builder.buildHead(elements[currentState.type])
-    )
+    table.elements.table.classList.add("table", "table-hover");
 
     // Get data by pagination
-    dataUpdater(null, pagination.currentPage, pagination.rowPerPage).then((res) => {
-        console.log("Data Result : ", res);
-    })
+    dataUpdater(null, pagination.currentPage, pagination.rowPerPage, (res) => {
+        res.forEach((dataSet) => {
+            let rowElement = {
+                    parent: document.createElement("tr"),
+                    child: {
+                        category: document.createElement("th"),
+                        URL: document.createElement("td"),
+                        action: {
+                            parent: document.createElement("td"),
+                            target: document.createElement("span"),
+                            method: document.createElement("span")
+                        },
+                        params: document.createElement("td"),
+                        doubt: document.createElement("td"),
+                        method: {
+                            parent: document.createElement("td"),
+                            method: document.createElement("span")
+                        },
+                        impact: {
+                            parent: document.createElement("td"),
+                            rate: document.createElement("span")
+                        }
+                    },
+                    lineBreak: document.createElement("br")
+                },
+                impactRate = [["success", "Low"], ["warning", "Normal"], ["danger", "High"]];
 
+            // Build category
+            rowElement.child.category.innerText = (dataSet.category === 0)
+                ? "Auto"
+                : "Manual";
+            rowElement.child.category.classList.add("text-muted", "text-center", "small");
+            rowElement.parent.appendChild(rowElement.child.category);
+
+            // Build URL
+            rowElement.child.URL.innerText = dataSet.url.url + dataSet.url.uri;
+            // rowElement.child.URL.classList.add("text-break");
+            rowElement.parent.appendChild(rowElement.child.URL);
+
+            // Build action if present
+            if (dataSet.action.target.length !== 0) {
+                rowElement.child.action.method.innerText = dataSet.action.type[0];
+                rowElement.child.action.target.innerText = dataSet.action.target[0];
+
+                rowElement.child.action.method.classList.add("badge", "bg-success", "text-uppercase", "me-2");
+
+                rowElement.child.action.parent.append(
+                    rowElement.child.action.method,
+                    rowElement.child.action.target
+                );
+                rowElement.parent.appendChild(rowElement.child.action.parent);
+            } else {
+                rowElement.parent.appendChild(builder.dataNotPresent());
+            }
+
+            // Build params if present
+            let paramSet = Array();
+            dataSet.params.forEach((param) => {
+                if (param !== "") {
+                    if (param.includes("=")) param = param.split("=")[0];
+                    paramSet.push(param);
+                }
+            });
+
+            if (paramSet.length !== 0) {
+                paramSet.forEach((param) => {
+                    let codeElement = document.createElement("code");
+                    codeElement.innerText = param;
+                    rowElement.child.params.appendChild(codeElement);
+                    if (paramSet[paramSet.length - 1] !== param) rowElement.child.params.appendChild(builder.commaAsElement());
+                })
+                rowElement.parent.appendChild(rowElement.child.params);
+            } else {
+                rowElement.parent.appendChild(builder.dataNotPresent());
+            }
+
+            // Build vulnerability doubt
+            rowElement.child.doubt.innerText = dataSet.vulnerability.type;
+            rowElement.parent.appendChild(rowElement.child.doubt);
+
+            // Build Method
+            rowElement.child.method.method.innerText = dataSet.method;
+            rowElement.child.method.method.classList.add("badge", "bg-success");
+            rowElement.child.method.parent.appendChild(rowElement.child.method.method);
+            rowElement.parent.appendChild(rowElement.child.method.parent);
+
+            // Build Impact
+
+            rowElement.child.impact.rate.innerText = impactRate[dataSet.impactRate][1];
+            rowElement.child.impact.rate.classList.add("badge", "rounded-pill", `bg-${impactRate[dataSet.impactRate][0]}`, "small")
+            rowElement.child.impact.parent.appendChild(rowElement.child.impact.rate);
+            rowElement.parent.appendChild(rowElement.child.impact.parent);
+
+            console.log(dataSet.category);
+
+            // Add current row to main tbody
+            table.elements.tbody.append(rowElement.parent);
+            console.log("Data Result : ", dataSet);
+        });
+
+        // Build table element
+        table.elements.table.append(
+            builder.buildHead(elements[currentState.type]),
+            table.elements.tbody
+        )
+
+        // Finalize jobs
+        table.place.appendChild(table.elements.table);
+        document.getElementById("loadingProgress").classList.add("d-none");
+    }).then(() => console.info("Data updated successfully"));
 
     // =================================================================================
     //   LEGACY BELOW
