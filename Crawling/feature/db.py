@@ -115,9 +115,17 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         #Query String 정리
         domain_params = dict()
         if url_part.query != "":
-            param_list = url_part.query.split("&")
-            for param in param_list:
-                domain_params[param.split('=')[0]] = param.split('=')[1]
+            try:
+                if "&" in url_part.query:
+                    param_list = url_part.query.split("&")
+                    for param in param_list:
+                        domain_params[param.split('=')[0]] = param.split('=')[1]
+                else:
+                    param = url_part.query
+                    domain_params[param.split('=')[0]] = param.split('=')[1]
+            except:
+                domain_params[param.split('=')[0]] = "None"
+            
 
         if not packet["request"]["full_url"] in cookie_result.keys():
             domain_cookie = {}
