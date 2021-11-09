@@ -169,18 +169,17 @@ def openRedirectionCheck(packet):
 def s3BucketCheck(packet):
     return_s3_url = []
     patterns = [    "s3\.[a-zA-Z0-9.-]+\.com",
-                    "s3[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\.com"
-                    "[a-zA-Z0-9.-]+\.s3\.amazonaws\.com[\/]?",
-                    "[a-zA-Z0-9.-]+\.amazonaws\.com[\/]?"
-                    "[a-zA-Z0-9.-]+\.s3-[a-zA-Z0-9-]\.amazonaws\.com[\/]?",
+                    "[a-zA-Z0-9.-]+\.s3\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                    "[a-zA-Z0-9.-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*"
+                    "[a-zA-Z0-9.-]+\.s3-[a-zA-Z0-9-]\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
                     "[a-zA-Z0-9.-]+\.s3-website[.-](eu|ap|us|ca|sa|cn)",
-                    "[\/\/]?s3\.amazonaws\.com\/[a-zA-Z0-9._-]+",
-                    "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-zA-Z0-9._-]+",
-                    "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com/[a-zA-Z0-9._-]+",
-                    "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com[\/]?",
-                    "[a-zA-Z0-9\.\-]{3,63}\.s3[\.-](eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?",
-                    "[a-zA-Z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?",
-                    "[a-zA-Z0-9\.\-]{3,63}\.s3-website[\.-](eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?"]
+                    "[\/\/]?s3\.amazonaws\.com\/[a-zA-Z0-9\-\/]*",
+                    "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
+                    "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
+                    "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                    "[a-zA-Z0-9\.\-]{3,63}\.s3[\.-](eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*",
+                    "[a-zA-Z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                    "[a-zA-Z0-9\.\-]{3,63}\.s3-website[\.-](eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*"]
     
     for pattern in patterns:
         regex = re.compile(pattern)
