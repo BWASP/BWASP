@@ -87,8 +87,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
 
     for i, packet in enumerate(req_res_packets):
         if not func.isSameDomain(target_url, packet["request"]["full_url"]):
-            print("asldfjoaisdfjalewfjlejfalkdjflaksdjflaksfjkljfkl")
-            print(packet["request"]["full_url"], target_url)
+            # print("asldfjoaisdfjalewfjlejfalkdjflaksdjflaksfjkljfkl")
+            # print(packet["request"]["full_url"], target_url)
             continue
 
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
