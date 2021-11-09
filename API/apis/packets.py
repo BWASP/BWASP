@@ -59,7 +59,7 @@ class PacketDAO(object):
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation).all()
             return self.selectData
 
-        if Type is not False and self.get_retRowCount(Type=True)["RowCount"] >= id > 0:
+        if Type is not False and id > 0:
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineAutomation).first()
             return self.selectData
 
@@ -70,7 +70,7 @@ class PacketDAO(object):
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineManual).all()
             return self.selectData
 
-        if Type is not False and self.get_retRowCount(Type=False)["RowCount"] >= id > 0:
+        if Type is not False and id > 0:
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineManual).first()
             return self.selectData
 
@@ -171,7 +171,7 @@ class manual_packetList(Resource):
 
     @ns.doc('Create manual packet')
     @ns.expect(packet)
-    @ns.marshal_with(packet)
+    @ns.marshal_with(packet_returnPost)
     def post(self):
         """Create manual packet"""
         return Packet_DAO.create_manual(ns.payload)
@@ -247,3 +247,4 @@ class count_manual_packetList(Resource):
         """Fetch a given resource"""
         return Packet_DAO.get_retRowCount(Type=False)
         # TODO: Return Type
+
