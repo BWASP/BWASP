@@ -325,11 +325,10 @@ def detectMeta(detect_list, lock, packet, data, index, cats, app):
     html = BeautifulSoup(packet["response"]["body"], features="html.parser")
     for meta_regex in data[app]["meta"].values():
         try:
-            pattern = re.compile(meta_regex.split('\\;')[0], re.I)
-        except:
-            pattern = "DonotD!ete!ct"
-
-        meta_tag = html.find("meta", {"name": data[app]["meta"].keys()})
+            pattern = re.compile(meta_regex.split('\\;')[0],re.I)
+        except: 
+            pattern = re.compile("DonotD!ete!ct")
+        meta_tag = html.find("meta", {"name":data[app]["meta"].keys()})
 
         if meta_tag and meta_tag.has_attr("content"):
             regex_result = pattern.search(meta_tag['content'])
