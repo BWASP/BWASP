@@ -98,7 +98,7 @@ class single_PortsList(Resource):
     """Show a single Ports item"""
 
     @ns.doc('Get single Ports')
-    @ns.marshal_with(ports)
+    @ns.marshal_list_with(ports)
     def get(self, id):
         """Fetch a given resource"""
         return Ports_DAO.get(id, Type=True)

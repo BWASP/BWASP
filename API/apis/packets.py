@@ -221,7 +221,7 @@ class automation_single_packetList(Resource):
     """Show a single packet data for automation"""
 
     @ns.doc('Get single packet data for automation')
-    @ns.marshal_with(packet)
+    @ns.marshal_list_with(packet)
     def get(self, id):
         """Fetch a given resource"""
         return Packet_DAO.get_automation(id, Type=True)
@@ -234,7 +234,7 @@ class manual_single_packetList(Resource):
     """Show a single packet data for manual"""
 
     @ns.doc('Get single packet data for manual')
-    @ns.marshal_with(packet)
+    @ns.marshal_list_with(packet)
     def get(self, id):
         """Fetch a given resource"""
         return Packet_DAO.get_manual(id, Type=True)

@@ -90,7 +90,7 @@ class single_CSPEvaluatorList(Resource):
     """Show a single CSPEvaluator data"""
 
     @ns.doc('Get single CSPEvaluator data')
-    @ns.marshal_with(CSPEvaluator)
+    @ns.marshal_list_with(CSPEvaluator)
     def get(self, id):
         """Fetch a given resource"""
         return CSPEvaluator_DAO.get(id, Type=True)

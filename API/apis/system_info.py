@@ -1,7 +1,7 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
 from .api_returnObj import ReturnObject
-import sys, os
+import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -58,9 +58,11 @@ class SysteminfoDAO(object):
                                         data=json.dumps(self.insertData[ListOfData]["data"])
                                         )
                     )
+                    g.BWASP_DBObj.commit()
 
                 return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
+                print("except")
                 g.BWASP_DBObj.rollback()
 
         return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
@@ -121,7 +123,7 @@ class single_SystemInfoList(Resource):
     """Show a single system-info item"""
 
     @ns.doc('Get single system-info')
-    @ns.marshal_with(systeminfo)
+    @ns.marshal_list_with(systeminfo)
     def get(self, id):
         """Fetch a given resource"""
         return Systeminfo_DAO.get(id, Type=True)

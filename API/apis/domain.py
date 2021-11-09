@@ -64,22 +64,24 @@ class DomainDAO(object):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
+
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
                         domainModel(related_Packet=int(self.insertData[ListOfData]["related_Packet"]),
-                                    URL=self.insertData[ListOfData]["URL"],
-                                    URI=self.insertData[ListOfData]["URI"],
-                                    action_URL=self.insertData[ListOfData]["action_URL"],
-                                    action_URL_Type=self.insertData[ListOfData]["action_URL_Type"],
-                                    params=self.insertData[ListOfData]["params"],
-                                    comment=self.insertData[ListOfData]["comment"],
+                                    URL=str(self.insertData[ListOfData]["URL"]),
+                                    URI=str(self.insertData[ListOfData]["URI"]),
+                                    action_URL=str(self.insertData[ListOfData]["action_URL"]),
+                                    action_URL_Type=str(self.insertData[ListOfData]["action_URL_Type"]),
+                                    params=str(self.insertData[ListOfData]["params"]),
+                                    comment=str(self.insertData[ListOfData]["comment"]),
                                     attackVector=json.dumps(self.insertData[ListOfData]["attackVector"]),
                                     typicalServerity=int(self.insertData[ListOfData]["typicalServerity"]),
-                                    description=self.insertData[ListOfData]["description"],
+                                    description=str(self.insertData[ListOfData]["description"]),
                                     Details=json.dumps(self.insertData[ListOfData]["Details"])
                                     )
                     )
                     g.BWASP_DBObj.commit()
+
                 return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
@@ -116,18 +118,18 @@ class single_DomainList(Resource):
     """Show a single domain data"""
 
     @ns.doc('Get single domain data')
-    @ns.marshal_with(domain)
+    @ns.marshal_list_with(domain)
     def get(self, id):
         """Fetch a given resource"""
         return Domain_DAO.get(id, Type=True)
 
 
-@ns.route('/<int:start>/<int:end>')
+@ns.route('/<int:start>/<int:counting>')
 @ns.response(404, 'domain not found')
 @ns.param('start', 'domain data paging start')
 @ns.param('counting', 'domain data paging end')
 class paging_DomainList(Resource):
-    """Show a domain data of start, end"""
+    """Show a domain data of start, counting"""
 
     @ns.doc('Get domain data on paging')
     @ns.marshal_list_with(domain)
