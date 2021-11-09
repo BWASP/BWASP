@@ -21,7 +21,7 @@ domain = ns.model('Domain', {
     'params': fields.String(required=True, description='target URL parameter'),
     'comment': fields.String(required=True, description='target Web page HTML comment'),
     'attackVector': fields.String(required=True, description='Attack vector about CVE, Analysis data'),
-    'typicalServerity': fields.Integer(required=True, description='target attack vector Typical Serverity'),
+    'impactRate': fields.Integer(required=True, description='target attack vector Typical Serverity'),
     'description': fields.String(required=True, description='attack vector description'),
     'Details': fields.String(required=True, description='attack vector details')
 })
@@ -75,7 +75,7 @@ class DomainDAO(object):
                                     params=str(self.insertData[ListOfData]["params"]),
                                     comment=str(self.insertData[ListOfData]["comment"]),
                                     attackVector=json.dumps(self.insertData[ListOfData]["attackVector"]),
-                                    typicalServerity=int(self.insertData[ListOfData]["typicalServerity"]),
+                                    impactRate=int(self.insertData[ListOfData]["impactRate"]),
                                     description=str(self.insertData[ListOfData]["description"]),
                                     Details=json.dumps(self.insertData[ListOfData]["Details"])
                                     )
