@@ -1,7 +1,7 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
 from .api_returnObj import ReturnObject
-import sys, os
+import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -53,21 +53,16 @@ class SysteminfoDAO(object):
                 self.insertData = data
 
                 for ListOfData in range(len(data)):
-                    if str(type(self.insertData[ListOfData]["data"])) == "<class 'dict'>":
-                        g.BWASP_DBObj.add(
-                            systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
-                                            data=json.dumps(self.insertData[ListOfData]["data"])
-                                            )
-                        )
                     g.BWASP_DBObj.add(
                         systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
-                                        data=self.insertData[ListOfData]["data"]
+                                        data=json.dumps(self.insertData[ListOfData]["data"])
                                         )
                     )
                     g.BWASP_DBObj.commit()
 
                 return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
+                print("except")
                 g.BWASP_DBObj.rollback()
 
         return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
@@ -81,7 +76,7 @@ class SysteminfoDAO(object):
                     g.BWASP_DBObj.query(systeminfoModel).filter(
                         systeminfoModel.id == int(self.updateData[ListofData]["id"])
                     ).update(
-                        {'data': str(self.updateData[ListofData]["data"])}
+                        {'data': json.dumps(self.updateData[ListofData]["data"])}
                     )
                     g.BWASP_DBObj.commit()
 
@@ -108,16 +103,14 @@ class SystemInfoList(Resource):
 
     @ns.doc('Create system information')
     @ns.expect(systeminfo)
-    @ns.marshal_with(systeminfo)
-    # @ns.marshal_with(systeminfo, code=201)
+    @ns.marshal_with(systeminfo_returnPost)
     def post(self):
         """Create system information"""
         return Systeminfo_DAO.create(ns.payload)
-        # return Systeminfo_DAO.create(ns.payload), 201
 
     @ns.doc('Update system information')
     @ns.expect(Update_SystemInfo)
-    @ns.marshal_with(Update_SystemInfo)
+    @ns.marshal_with(systeminfo_returnPost)
     def patch(self):
         """Update a data given its identifier"""
         return Systeminfo_DAO.update(ns.payload)
@@ -130,7 +123,7 @@ class single_SystemInfoList(Resource):
     """Show a single system-info item"""
 
     @ns.doc('Get single system-info')
-    @ns.marshal_with(systeminfo)
+    @ns.marshal_list_with(systeminfo)
     def get(self, id):
         """Fetch a given resource"""
         return Systeminfo_DAO.get(id, Type=True)

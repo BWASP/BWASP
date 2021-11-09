@@ -4,12 +4,12 @@ from flask import (
 import json, requests
 from Web.app import AutomatedAnalysis
 
-NAME = 'automation'
-bp = Blueprint(NAME, __name__, url_prefix='/automation')
+NAME = 'manual'
+bp = Blueprint(NAME, __name__, url_prefix='/manual')
 
 
 @bp.route('/options', methods=['GET', 'POST'])
-def automation_options():
+def manual_options():
     if request.method == 'POST':
         reqJsonData = json.loads(request.form["reqJsonData"])
 
@@ -28,6 +28,6 @@ def automation_options():
         except:
             abort(500, "Automation option setting data request error")
 
-        AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
+        ManualAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
 
-    return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")
+    return render_template('manual/options.html', Title="Option for Manual analysis - BWASP")

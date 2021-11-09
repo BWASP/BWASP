@@ -1,16 +1,14 @@
 class API {
     constructor() {
-        this.getConfig();
-        console.log(this);
-    }
-
-    async getConfig(){
-        await fetch("/static/data/frontConfig.json")
-            .then(blob => blob.json())
-            .then(res => {
-                this.API = res.API
-                this.debug = res.debug
-            })
+        return (async () => {
+            await fetch("/static/data/frontConfig.json")
+                .then(blob => blob.json())
+                .then(res => {
+                    this.API = res.API
+                    this.debug = res.debug
+                })
+            return this;
+        })();
     }
 
     /**
@@ -19,7 +17,6 @@ class API {
      * @param {function} callback
      */
     communicate(endpoint, callback) {
-        if(typeof(this.API)==="undefined") this.getConfig();
         fetch(this.API.base + endpoint, {
             method: "GET",
             cache: "no-cache",
@@ -47,7 +44,7 @@ class API {
      * @param {object} data null
      * @param {function} callback
      */
-    relativeCommunication(endpoint, type="POST", data=null, callback){
+    relativeCommunication(endpoint, type = "POST", data = null, callback) {
         fetch(this.API.base + endpoint, {
             method: type,
             cache: "no-cache",
@@ -72,12 +69,54 @@ class API {
     /**
      * JSON Data handling
      * @param {string} str Malformed JSON
+     * @param {boolean} parseJSON true
      * @returns {string} Pure JSON
      */
-    jsonDataHandler(str) {
-        let replaceKeyword = "::SINGLE-QUOTE::";
-        str = str.replaceAll("\\'", replaceKeyword).replaceAll("'", "\"").replaceAll(replaceKeyword, "\\'");
-        return JSON.parse(str);
+    jsonDataHandler(str, parseJSON = true) {
+        if (typeof (str) === "object") return str;
+        let replaceKeyword = ["::SINGLE-QUOTE::", "::DOUBLE-QUOTE::"];
+        str = str
+            .replaceAll("\"", replaceKeyword[1])
+            .replaceAll("\\'", replaceKeyword[0])
+            .replaceAll("'", "\"")
+            .replaceAll(replaceKeyword[0], "\\'")
+            .replaceAll(replaceKeyword[1], "\'");
+        return (parseJSON) ? JSON.parse(str) : str;
+    }
+}
+
+class tableBuilder {
+    /**
+     * Builds table <thead> element
+     * @param {Array} elements
+     * @return {Object} thead
+     */
+    buildHead(elements) {
+        if (typeof (elements) !== "object" || elements.length === 0) return Error("tableBuilder.buildHead() : Expected array of heading elements");
+        let thead = {
+            parent: document.createElement("thead"),
+            child: document.createElement("tr")
+        };
+        elements.forEach((currentElement) => {
+            let tmpElement = document.createElement("th");
+            tmpElement.innerText = currentElement;
+            thead.child.appendChild(tmpElement);
+        })
+        thead.parent.appendChild(thead.child);
+        return thead.parent;
+    }
+
+    dataNotPresent(){
+        let noData = document.createElement("td");
+        noData.innerText = " - ";
+        noData.classList.add("text-muted", "text-center");
+        return noData;
+    }
+
+    commaAsElement(){
+        let comma = document.createElement("span");
+        comma.innerText = ", ";
+        return comma;
     }
 }
 
@@ -96,4 +135,4 @@ let createKey = (level = 2, keyPrefix = "anonID") => {
     return createdKey;
 }
 
-export {API, createKey};
+export {API, createKey, tableBuilder};

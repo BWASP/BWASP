@@ -1,7 +1,7 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
 from .api_returnObj import ReturnObject
-import sys, os
+import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -29,7 +29,7 @@ class JobDAO(object):
         self.insertData = ""
 
     def get_retRowCount(self):
-        self.counter = g.BWASP_DBObj.query(domainModel).count()
+        self.counter = g.BWASP_DBObj.query(jobModel).count()
         return self.counter
 
     def get(self, id=None, Type=False):
@@ -47,15 +47,17 @@ class JobDAO(object):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
+
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
                         jobModel(targetURL=str(self.insertData[ListOfData]["targetURL"]),
-                                 knownInfo=str(self.insertData[ListOfData]["knownInfo"]),
+                                 knownInfo=json.dumps(self.insertData[ListOfData]["knownInfo"]),
                                  recursiveLevel=str(self.insertData[ListOfData]["recursiveLevel"]),
                                  uriPath=str(self.insertData[ListOfData]["uriPath"])
                                  )
                     )
                     g.BWASP_DBObj.commit()
+
                 return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
@@ -80,11 +82,9 @@ class JobList(Resource):
     @ns.doc('Create Job')
     @ns.expect(job)
     @ns.marshal_with(job_returnPost)
-    # @ns.marshal_with(job, code=201)
     def post(self):
         """Create Job"""
         return Job_DAO.create(ns.payload)
-        # return Job_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')
@@ -94,7 +94,7 @@ class single_JobList(Resource):
     """Show a single Job data"""
 
     @ns.doc('Get single Job data')
-    @ns.marshal_with(job)
+    @ns.marshal_list_with(job)
     def get(self, id):
         """Fetch a given resource"""
         return Job_DAO.get(id, Type=True)

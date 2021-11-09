@@ -1,85 +1,241 @@
 // Get modules
-import {API as api, createKey} from '../jHelper.js';
+import {API as api, createKey, tableBuilder} from '../jHelper.js';
 
 // Define API Endpoints
 const APIEndpoints = {
-    vectors: "/api/domain",
-    packets: "/api/packets"
-}
+        vectors: "/api/domain",
+        packets: {
+            base: "/api/packet",
+            type: {
+                auto: "automation",
+                manual: "manual"
+            }
+        }
+    },
+    elements = {
+        vectors: ["Category", "URL", "Action", "Params", "Vulnerability Doubt", "Method", "Impact"],
+        packets: []
+    };
 
 let stateHandler = {
-    isVector: true
-};
+        isVector: true
+    },
+    keyAndStrings = [
+        {
+            type: "packets",
+            viewString: "Packets"
+        },
+        {
+            type: "vectors",
+            viewString: "Attack Vectors"
+        }
+    ],
+    pagination = {
+        currentPage: 1,
+        rowPerPage: 10
+    },
+    returnError = (errorMessage = "No data") => {
+        document.getElementById("loadingProgress").classList.add("d-none");
+        document.getElementById("resultNoData").classList.remove("d-none");
+        document.getElementById("errorMessagePlace").innerText = errorMessage;
+        console.error(`:: ERROR :: ${errorMessage}`);
+    };
 
-let returnError = (errorMessage = "No data") => {
-    document.getElementById("loadingProgress").classList.add("d-none");
-    document.getElementById("resultNoData").classList.remove("d-none");
-    document.getElementById("errorMessagePlace").innerText = errorMessage;
-    console.error(`:: ERROR :: ${errorMessage}`);
-}
+// define api communicator
+let API = await new api();
 
-// API Communicator.
-let API = new api();
-
-let dataUpdater = (requestType, requestPage, rowPerPage) => {
-    let currentState = (stateHandler.isVector) ? "vectors" : "packets",
-        dataPackage = Array();
-    API.communicate(
-        APIEndpoints[currentState] + `/${requestPage * rowPerPage + 1}/${(requestPage + 1) * rowPerPage}`,
-        (error, res) => {
-            console.log(res);
-            if(error) return returnError(error);
+async function dataUpdater(requestType, requestPage, rowPerPage, callback) {
+    let localDataPack = [], hello = "";
+    await API.communicate(
+        APIEndpoints.vectors + `/${(requestPage - 1) * rowPerPage}/${rowPerPage}`,
+        async (error, res) => {
+            // console.log("Domain data: ", res);
+            if (error) return returnError(error);
             if (res.length <= 0) console.error(":: ERROR :: No data");
-            res.forEach((data) => {
+            await res.forEach((domainData) => {
                 let skeleton = {
-                    category: String(),
+                    category: Number(),
                     url: {
-                        url: String(),
-                        uri: String()
+                        url: domainData.URL,
+                        uri: domainData.URI
                     },
                     payloads: Array(),
                     action: {
-                        target: String(),
-                        type: String()
+                        target: API.jsonDataHandler(domainData["action_URL"]),
+                        type: API.jsonDataHandler(domainData["action_URL_Type"])
                     },
-                    params: Array(),
+                    params: API.jsonDataHandler(domainData["params"]),
                     vulnerability: {
                         type: String(),
                         cve: Array()
                     },
                     method: String(),
-                    impactRate: Number(),
-                    details: {
-                        inputTag: Array(),
-                        cookie: Object(),
-                        queryString: Object()
-                    }
-                };
-                [skeleton.url, skeleton.uri] = [data.URL, data.URI];
-                skeleton.action.target = API.jsonDataHandler(data.action_URL);
-                skeleton.action.type = API.jsonDataHandler(data.action_URL_Type);
-                skeleton.params = API.jsonDataHandler(data.params);
-                skeleton.impactRate = data["typicalServerity"];
+                    impactRate: 0,
+                    details: API.jsonDataHandler(domainData["Details"])
+                }, packetData = Array();
 
-                dataPackage.push(skeleton);
+                // Reengineer details.
+                Object.keys(skeleton.details).forEach((key) => skeleton.details[key] = API.jsonDataHandler(skeleton.details[key]));
+
+                // Packet - when Automatic
+                API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.auto}/${domainData["related_Packet"]}`, (err, res) => {
+                    if (!err) packetData.push(res);
+                    else API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.manual}/${domainData["related_Packet"]}`, (err, res) => {
+                        if (!err) packetData.push(res);
+                    });
+                    skeleton.category = packetData[0]["category"];
+                    skeleton.method = packetData[0]["requestType"];
+                });
+                localDataPack.push(skeleton);
             });
-
+            callback(localDataPack);
         });
-    console.log(dataPackage);
-
-
-    return dataPackage;
 }
 
-document.getElementById("switchToPacket").addEventListener("click", function () {
-    let tableID = createKey(),
-        tablePlace = document.getElementById("tablePlace"),
+document.getElementById("switchToPacket").addEventListener("click", () => {
+    let builder = new tableBuilder(),
         table = {
-            table: document.createElement("table"),
-            thead: document.createElement("thead"),
-            tbody: document.createElement("tbody")
+            ID: createKey(),
+            place: document.getElementById("tablePlace"),
+            elements: {
+                table: document.createElement("table"),
+                tbody: document.createElement("tbody")
+            }
         },
-        newThead = document.createElement("tr"),
+        currentState = keyAndStrings[Number(stateHandler.isVector)];
+
+    // Update title bar string and
+    document.getElementById("pageTitle").innerHTML = currentState.viewString;
+    document.title = `${currentState.viewString} - BWASP`;
+
+    // Initialize tablePlace DIV
+    table.place.innerHTML = "";
+
+    // Toggle loading screen
+    document.getElementById("loadingProgress").classList.remove("d-none");
+    document.getElementById("resultNoData").classList.add("d-none");
+
+    // Set default table classes
+    table.elements.table.classList.add("table", "table-hover");
+
+    // Get data by pagination
+    dataUpdater(null, pagination.currentPage, pagination.rowPerPage, (res) => {
+        res.forEach((dataSet) => {
+            let rowElement = {
+                    parent: document.createElement("tr"),
+                    child: {
+                        category: document.createElement("th"),
+                        URL: document.createElement("td"),
+                        action: {
+                            parent: document.createElement("td"),
+                            target: document.createElement("span"),
+                            method: document.createElement("span")
+                        },
+                        params: document.createElement("td"),
+                        doubt: document.createElement("td"),
+                        method: {
+                            parent: document.createElement("td"),
+                            method: document.createElement("span")
+                        },
+                        impact: {
+                            parent: document.createElement("td"),
+                            rate: document.createElement("span")
+                        }
+                    },
+                    lineBreak: document.createElement("br")
+                },
+                impactRate = [["success", "Low"], ["warning", "Normal"], ["danger", "High"]];
+
+            // Build category
+            rowElement.child.category.innerText = (dataSet.category === 0)
+                ? "Auto"
+                : "Manual";
+            rowElement.child.category.classList.add("text-muted", "text-center", "small");
+            rowElement.parent.appendChild(rowElement.child.category);
+
+            // Build URL
+            rowElement.child.URL.innerText = dataSet.url.url + dataSet.url.uri;
+            // rowElement.child.URL.classList.add("text-break");
+            rowElement.parent.appendChild(rowElement.child.URL);
+
+            // Build action if present
+            if (dataSet.action.target.length !== 0) {
+                rowElement.child.action.method.innerText = dataSet.action.type[0];
+                rowElement.child.action.target.innerText = dataSet.action.target[0];
+
+                rowElement.child.action.method.classList.add("badge", "bg-success", "text-uppercase", "me-2");
+
+                rowElement.child.action.parent.append(
+                    rowElement.child.action.method,
+                    rowElement.child.action.target
+                );
+                rowElement.parent.appendChild(rowElement.child.action.parent);
+            } else {
+                rowElement.parent.appendChild(builder.dataNotPresent());
+            }
+
+            // Build params if present
+            let paramSet = Array();
+            dataSet.params.forEach((param) => {
+                if (param !== "") {
+                    if (param.includes("=")) param = param.split("=")[0];
+                    paramSet.push(param);
+                }
+            });
+
+            if (paramSet.length !== 0) {
+                paramSet.forEach((param) => {
+                    let codeElement = document.createElement("code");
+                    codeElement.innerText = param;
+                    rowElement.child.params.appendChild(codeElement);
+                    if (paramSet[paramSet.length - 1] !== param) rowElement.child.params.appendChild(builder.commaAsElement());
+                })
+                rowElement.parent.appendChild(rowElement.child.params);
+            } else {
+                rowElement.parent.appendChild(builder.dataNotPresent());
+            }
+
+            // Build vulnerability doubt
+            rowElement.child.doubt.innerText = dataSet.vulnerability.type;
+            rowElement.parent.appendChild(rowElement.child.doubt);
+
+            // Build Method
+            rowElement.child.method.method.innerText = dataSet.method;
+            rowElement.child.method.method.classList.add("badge", "bg-success");
+            rowElement.child.method.parent.appendChild(rowElement.child.method.method);
+            rowElement.parent.appendChild(rowElement.child.method.parent);
+
+            // Build Impact
+
+            rowElement.child.impact.rate.innerText = impactRate[dataSet.impactRate][1];
+            rowElement.child.impact.rate.classList.add("badge", "rounded-pill", `bg-${impactRate[dataSet.impactRate][0]}`, "small")
+            rowElement.child.impact.parent.appendChild(rowElement.child.impact.rate);
+            rowElement.parent.appendChild(rowElement.child.impact.parent);
+
+            console.log(dataSet.category);
+
+            // Add current row to main tbody
+            table.elements.tbody.append(rowElement.parent);
+            console.log("Data Result : ", dataSet);
+        });
+
+        // Build table element
+        table.elements.table.append(
+            builder.buildHead(elements[currentState.type]),
+            table.elements.tbody
+        )
+
+        // Finalize jobs
+        table.place.appendChild(table.elements.table);
+        document.getElementById("loadingProgress").classList.add("d-none");
+    }).then(() => console.info("Data updated successfully"));
+
+    // =================================================================================
+    //   LEGACY BELOW
+    // =================================================================================
+
+    /*
+    let newThead = document.createElement("tr"),
         element = [
             ["URL", "Vulnerability Doubt", "Method", "Date", "Impact"],
             ["URL", "Packet", "Vulnerability Doubt", "Method", "Related Data", "Date", "Impact"]
@@ -91,6 +247,7 @@ document.getElementById("switchToPacket").addEventListener("click", function () 
             type: "packets",
             viewString: "Packets"
         };
+
 
     // Update texts from DOM
     // document.getElementById("switchToType").innerText = currentState.viewString;
@@ -334,5 +491,4 @@ window.onload = () => {
     });
     document.getElementById("openHelpModal").addEventListener("click", () => userHelpModal.toggle());
     document.getElementById("switchToPacket").click();
-    dataUpdater(null, 1, 10);
 };

@@ -6,7 +6,7 @@ const APIEndpoints = {
     webEnvironments: "/api/systeminfo"
 }
 
-let API = new api();
+let API = await new api();
 
 class dashboard {
     webEnvironments() {
@@ -44,7 +44,7 @@ class dashboard {
                     productName: document.createElement("p"),
                     version: document.createElement("p")
                 },
-                versionCase = (data.version !== "false");
+                versionCase = (data.version !== 0);
 
             // set classes
             localSkeleton.parent.href = "javascript:void(0);";
@@ -64,7 +64,7 @@ class dashboard {
                 localSkeleton.productImage,
                 localSkeleton.productName
             );
-            if(versionCase) localSkeleton.parent.appendChild(localSkeleton.version);
+            if (versionCase) localSkeleton.parent.appendChild(localSkeleton.version);
             skeleton.child.appendChild(localSkeleton.parent);
         })
         skeleton.parent.append(
