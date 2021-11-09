@@ -49,7 +49,7 @@ class CSPEvaluatorDAO(object):
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
                         CSPEvaluatorModel(
-                            header=self.insertData[ListOfData]["header"]
+                            header=json.dumps(self.insertData[ListOfData]["header"])
                         )
                     )
                     g.BWASP_DBObj.commit()

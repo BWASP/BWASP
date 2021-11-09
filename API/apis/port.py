@@ -51,15 +51,17 @@ class PortsDAO(object):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
+
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
-                        portsModel(service=str(self.insertData[ListOfData]["service"]),
-                                   target=str(self.insertData[ListOfData]["target"]),
-                                   port=str(self.insertData[ListOfData]["port"]),
-                                   result=str(self.insertData[ListOfData]["result"])
+                        portsModel(service=self.insertData[ListOfData]["service"],
+                                   target=self.insertData[ListOfData]["target"],
+                                   port=self.insertData[ListOfData]["port"],
+                                   result=self.insertData[ListOfData]["result"]
                                    )
                     )
                     g.BWASP_DBObj.commit()
+
                 return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
                 g.BWASP_DBObj.rollback()
@@ -84,11 +86,9 @@ class PortsList(Resource):
     @ns.doc('Create Ports scanning result')
     @ns.expect(ports)
     @ns.marshal_with(ports_returnPost)
-    # @ns.marshal_with(ports, code=201)
     def post(self):
         """Create Ports scanning result"""
         return Ports_DAO.create(ns.payload)
-        # return Ports_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')

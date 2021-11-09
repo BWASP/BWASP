@@ -29,7 +29,7 @@ class JobDAO(object):
         self.insertData = ""
 
     def get_retRowCount(self):
-        self.counter = g.BWASP_DBObj.query(domainModel).count()
+        self.counter = g.BWASP_DBObj.query(jobModel).count()
         return self.counter
 
     def get(self, id=None, Type=False):
@@ -50,9 +50,9 @@ class JobDAO(object):
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
                         jobModel(targetURL=str(self.insertData[ListOfData]["targetURL"]),
-                                 knownInfo=str(self.insertData[ListOfData]["knownInfo"]),
+                                 knownInfo=json.dumps(self.insertData[ListOfData]["knownInfo"]),
                                  recursiveLevel=str(self.insertData[ListOfData]["recursiveLevel"]),
-                                 uriPath=str(self.insertData[ListOfData]["uriPath"])
+                                 uriPath=self.insertData[ListOfData]["uriPath"]
                                  )
                     )
                     g.BWASP_DBObj.commit()
@@ -80,11 +80,9 @@ class JobList(Resource):
     @ns.doc('Create Job')
     @ns.expect(job)
     @ns.marshal_with(job_returnPost)
-    # @ns.marshal_with(job, code=201)
     def post(self):
         """Create Job"""
         return Job_DAO.create(ns.payload)
-        # return Job_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')

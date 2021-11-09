@@ -1,3 +1,5 @@
+import json
+
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
 from .api_returnObj import ReturnObject
@@ -54,8 +56,8 @@ class DomainDAO(object):
 
         ns.abort(404, f"domain {id} doesn't exist")
 
-    def get_retRowData_for_Pagination(self, start, end):
-        self.selectData = g.BWASP_DBObj.query(domainModel).filter(domainModel.id >= start).limit(end).all()
+    def get_retRowData_for_Pagination(self, start, counting):
+        self.selectData = g.BWASP_DBObj.query(domainModel).filter(domainModel.id >= start).limit(counting).all()
         return self.selectData
 
     def create(self, data):
@@ -65,16 +67,16 @@ class DomainDAO(object):
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
                         domainModel(related_Packet=int(self.insertData[ListOfData]["related_Packet"]),
-                                    URL=str(self.insertData[ListOfData]["URL"]),
-                                    URI=str(self.insertData[ListOfData]["URI"]),
-                                    action_URL=str(self.insertData[ListOfData]["action_URL"]),
-                                    action_URL_Type=str(self.insertData[ListOfData]["action_URL_Type"]),
-                                    params=str(self.insertData[ListOfData]["params"]),
-                                    comment=str(self.insertData[ListOfData]["comment"]),
-                                    attackVector=str(self.insertData[ListOfData]["attackVector"]),
+                                    URL=self.insertData[ListOfData]["URL"],
+                                    URI=self.insertData[ListOfData]["URI"],
+                                    action_URL=self.insertData[ListOfData]["action_URL"],
+                                    action_URL_Type=self.insertData[ListOfData]["action_URL_Type"],
+                                    params=self.insertData[ListOfData]["params"],
+                                    comment=self.insertData[ListOfData]["comment"],
+                                    attackVector=json.dumps(self.insertData[ListOfData]["attackVector"]),
                                     typicalServerity=int(self.insertData[ListOfData]["typicalServerity"]),
-                                    description=str(self.insertData[ListOfData]["description"]),
-                                    Details=str(self.insertData[ListOfData]["Details"])
+                                    description=self.insertData[ListOfData]["description"],
+                                    Details=json.dumps(self.insertData[ListOfData]["Details"])
                                     )
                     )
                     g.BWASP_DBObj.commit()
@@ -102,11 +104,9 @@ class domainList(Resource):
     @ns.doc('Create domain data')
     @ns.expect(domain)
     @ns.marshal_with(domain_returnPost)
-    # @ns.marshal_with(domain, code=201)
     def post(self):
         """Create domain data"""
         return Domain_DAO.create(ns.payload)
-        # return Domain_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')
@@ -125,15 +125,15 @@ class single_DomainList(Resource):
 @ns.route('/<int:start>/<int:end>')
 @ns.response(404, 'domain not found')
 @ns.param('start', 'domain data paging start')
-@ns.param('end', 'domain data paging end')
+@ns.param('counting', 'domain data paging end')
 class paging_DomainList(Resource):
     """Show a domain data of start, end"""
 
     @ns.doc('Get domain data on paging')
     @ns.marshal_list_with(domain)
-    def get(self, start, end):
+    def get(self, start, counting):
         """Fetch a given resource"""
-        return Domain_DAO.get_retRowData_for_Pagination(start, end)
+        return Domain_DAO.get_retRowData_for_Pagination(start, counting)
 
 
 @ns.route('/count')

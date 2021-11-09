@@ -43,8 +43,23 @@ class PacketDAO(object):
         self.selectData = ""
         self.insertData = ""
 
+    def get_RowID_InvalidCheck(self, id=None, Type=None):
+        if id is not None and Type is True:
+            self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation, packetsModel.id == id).count()
+            if self.selectData != 0:
+                return True
+            else:
+                return False
+
+        if id is not None and Type is False:
+            self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineManual, packetsModel.id == id).count()
+            if self.selectData != 0:
+                return True
+            else:
+                return False
+
     # id count in table of packets
-    def get_retRowCount(self, Type=True):
+    def get_retRowCount(self, Type=None):
         self.Automation_Counter = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation).count()
         self.Manual_Counter = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineManual).count()
 
@@ -59,7 +74,7 @@ class PacketDAO(object):
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation).all()
             return self.selectData
 
-        if Type is not False and id > 0:
+        if Type is not False and self.get_RowID_InvalidCheck(id, Type=True) and id > 0:
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineAutomation).first()
             return self.selectData
 
@@ -70,7 +85,7 @@ class PacketDAO(object):
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineManual).all()
             return self.selectData
 
-        if Type is not False and id > 0:
+        if Type is not False and self.get_RowID_InvalidCheck(id, Type=False) and id > 0:
             self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineManual).first()
             return self.selectData
 
@@ -102,10 +117,10 @@ class PacketDAO(object):
                     g.BWASP_DBObj.add(
                         packetsModel(category=0,
                                      statusCode=int(self.insertData[ListOfData]['statusCode']),
-                                     requestType=str(self.insertData[ListOfData]['requestType']),
-                                     requestJson=str(self.insertData[ListOfData]['requestJson']),
-                                     responseHeader=str(self.insertData[ListOfData]['responseHeader']),
-                                     responseBody=str(self.insertData[ListOfData]['responseBody'])
+                                     requestType=self.insertData[ListOfData]['requestType'],
+                                     requestJson=json.dumps(self.insertData[ListOfData]['requestJson']),
+                                     responseHeader=json.dumps(self.insertData[ListOfData]['responseHeader']),
+                                     responseBody=self.insertData[ListOfData]['responseBody']
                                      )
                     )
                     g.BWASP_DBObj.commit()
@@ -123,10 +138,10 @@ class PacketDAO(object):
                     g.BWASP_DBObj.add(
                         packetsModel(category=1,
                                      statusCode=int(self.insertData[ListOfData]['statusCode']),
-                                     requestType=str(self.insertData[ListOfData]['requestType']),
+                                     requestType=self.insertData[ListOfData]['requestType'],
                                      requestJson=json.dumps(self.insertData[ListOfData]['requestJson']),
                                      responseHeader=json.dumps(self.insertData[ListOfData]['responseHeader']),
-                                     responseBody=str(self.insertData[ListOfData]['responseBody'])
+                                     responseBody=self.insertData[ListOfData]['responseBody']
                                      )
                     )
                     g.BWASP_DBObj.commit()
@@ -247,4 +262,3 @@ class count_manual_packetList(Resource):
         """Fetch a given resource"""
         return Packet_DAO.get_retRowCount(Type=False)
         # TODO: Return Type
-
