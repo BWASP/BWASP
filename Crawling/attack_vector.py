@@ -77,37 +77,62 @@ def input_tag(response_body, http_method, infor_vector):
                 data[0]["impactRate"] = 1
                 '''
 
+                '''
                 if "<th" in response_body and tag.attrs['type'] == "password":
+
                     data["SQL injection"]["type"].append("board")
                     data["SQL injection"]["type"].append("account")
                     data["XSS"]["type"].append("board")
                     data["XSS"]["type"].append("account")
 
                     impactRate = 2
+                '''
 
                 # th tag check (board) and type="password" check (login)
-                elif "<th" in response_body:
-                    data["SQL injection"]["type"].append("board")
-                    data["XSS"]["type"].append("board")
+                if "<th" in response_body:
+                    if "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
+                        index_sql = data["SQL injection"]["type"].index("None")
+                        index_xss = data["XSS"]["type"].index("None")
+                        del (data["SQL injection"]["type"][index_sql])
+                        del (data["XSS"]["type"][index_xss])
 
-                    impactRate = 2
+                    if "board" in data["SQL injection"]["type"] or "board" in data["XSS"]["type"]:
+                        pass
+                    else:
+                        data["SQL injection"]["type"].append("board")
+                        data["XSS"]["type"].append("board")
+
+                        impactRate = 2
 
                     ''' 제거 예정
                     data[0]["Type"] = "board"
                     data[0]["impactRate"] = 2
                     '''
 
-                elif tag.attrs['type'] == "password":
-                    data["SQL injection"]["type"].append("account")
-                    data["XSS"]["type"].append("account")
+                if tag.attrs['type'] == "password":
+                    if "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
+                        index_sql = data["SQL injection"]["type"].index("None")
+                        index_xss = data["XSS"]["type"].index("None")
+                        del (data["SQL injection"]["type"][index_sql])
+                        del (data["XSS"]["type"][index_xss])
 
-                    impactRate = 2
+                    if "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"]:
+                        pass
+                    else:
+                        data["SQL injection"]["type"].append("account")
+                        data["XSS"]["type"].append("account")
+
+                        impactRate = 2
 
                     ''' 제거 예정
                     data[0]["Type"] = "account"
                     data[0]["impactRate"] = 2
                     '''
 
+                if "board" in data["SQL injection"]["type"] or "board" in data["XSS"]["type"] \
+                        or "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"] \
+                        or "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
+                    pass
                 else:
                     data["SQL injection"]["type"].append("None")
                     data["XSS"]["type"].append("None")
