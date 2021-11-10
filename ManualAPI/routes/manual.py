@@ -7,7 +7,7 @@ bp = Blueprint(NAME, __name__, url_prefix='/manual')
 
 
 @bp.route('/Send', methods=['GET', 'POST'])
-def Receive():
+def Send():
     return "/manual/Send"
 
 
