@@ -1,6 +1,7 @@
 import requests
 
 
+
 class Config(object):
     def __init__(self):
         self.API_URL_PREFIX = "http://localhost:20102"
