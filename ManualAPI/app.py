@@ -1,5 +1,5 @@
 from flask import (
-    Flask, render_template
+    Flask, Blueprint, g
 )
 import sys, os
 
@@ -18,13 +18,10 @@ def create_app(config=None):
     # config type
     app.config.from_object(config)
 
-    @app.route('/')
-    def index():
-        return "hello world"
-
-    @app.errorhandler(404)
-    def NotFound(error):
-        return "error", 404
+    # routes initialization
+    from routes import manual, crx
+    app.register_blueprint(manual.bp)
+    app.register_blueprint(crx.bp)
 
     return app
 

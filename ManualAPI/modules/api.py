@@ -1,4 +1,4 @@
-import os, requests, datetime
+import requests
 
 
 class Config(object):
