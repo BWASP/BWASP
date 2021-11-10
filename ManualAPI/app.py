@@ -18,13 +18,10 @@ def create_app(config=None):
     # config type
     app.config.from_object(config)
 
-    @app.route('/')
-    def index():
-        return "hello world"
-
-    @app.errorhandler(404)
-    def NotFound(error):
-        return "error", 404
+    # route initialization
+    from routes import crx, manual
+    app.register_blueprint(crx.bp)
+    app.register_blueprint(manual.bp)
 
     return app
 
