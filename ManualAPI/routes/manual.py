@@ -6,19 +6,14 @@ NAME = 'manual'
 bp = Blueprint(NAME, __name__, url_prefix='/manual')
 
 
-@bp.route('')
-def manual():
-    pass
-
-
-@bp.route('/Receive')
+@bp.route('/Send', methods=['GET', 'POST'])
 def Receive():
-    return "Receive"
+    return "/manual/Send"
 
 
-@bp.route('/Send')
-def Send():
-    return "Send"
+@bp.route('/Receive', methods=['GET', 'POST'])
+def Receive():
+    return "/manual/Receive"
 
 
 """

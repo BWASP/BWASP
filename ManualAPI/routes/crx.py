@@ -6,16 +6,11 @@ NAME = 'crx'
 bp = Blueprint(NAME, __name__, url_prefix='/crx')
 
 
-@bp.route('')
-def crx():
-    pass
-
-
-@bp.route('/Receive')
+@bp.route('/Send', methods=['GET', 'POST'])
 def Receive():
-    return "Receive"
+    return "/crx/Send"
 
 
-@bp.route('/Send')
-def Send():
-    return "Send"
+@bp.route('/Receive', methods=['GET', 'POST'])
+def Receive():
+    return "/crx/Receive"
