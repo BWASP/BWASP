@@ -142,9 +142,16 @@ def visit(driver, url, depth, options):
 
 def checkCountLink(visit_url, count_links):
     visit_path = urlparse(visit_url).path
+    tmp_path = visit_path.split("/")
+
+    for path in tmp_path[::-1]:
+        if path.isnumeric():
+            tmp_path.pop()
+
+    visit_path = "/".join(tmp_path)
 
     try:
-        if count_links[visit_path]["count"] > 10:
+        if count_links[visit_path]["count"] > 5:
             return True
 
         count_links[visit_path]["count"] += 1

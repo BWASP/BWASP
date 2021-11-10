@@ -195,7 +195,7 @@ def s3BucketCheck(packet):
 
 def jwtCheck(packet):
     return_jwt = []
-    patterns = ["^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$"]
+    patterns = ["([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]*)"]
 
     for pattern in patterns:
         regex = re.compile(pattern)
@@ -213,7 +213,6 @@ def jwtCheck(packet):
         
         return_jwt += req_header + req_body + res_header + res_body
     
-    print(list(set(return_jwt)))
     return list(set(return_jwt))
 
 

@@ -125,13 +125,13 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
 
         open_redirect = openRedirectionCheck(packet)
         s3_bucket = s3BucketCheck(packet)
-        jwt_token = jwtCheck(packet)
+        # jwt_token = jwtCheck(packet)
         if open_redirect:
             attack_vector["Open Redirect"] = open_redirect
         if s3_bucket:
             attack_vector["s3"] = s3BucketCheck(packet)
-        if jwt_token:
-            attack_vector["jwt"] = jwt_token
+        # if jwt_token:
+        #     attack_vector["jwt"] = jwt_token
         
         # 패킷 url이 중복된다면 ??
         # json.dumps()
