@@ -37,28 +37,35 @@
     </div>
     <div class="bg-white shadow text-dark sizer element-objects-pagination border-rounded separatedTab">
         <div id="loadingProgress" class="d-flex align-items-center justify-content-center w-100">
-            <div class="d-inline-flex pt-5 pb-5">
-                <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span>
+            <div>
+                <div class="d-inline-flex pt-5 pb-2">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <h3 class="ms-3 mb-0 text-dark">Loading in progress...</h3>
                 </div>
-                <h3 class="ms-3 mb-0 text-dark">Loading in progress...</h3>
+                <p class="pt-3 text-muted text-center">Refresh it if this screen lasts for a long time</p>
             </div>
         </div>
-        <div id="resultNoData" class="d-flex align-items-center justify-content-center w-100 d-none">
-            <div class="pt-5 pb-5 d-flex align-items-center justify-content-center text-danger">
-                <h3 class="mb-0">
-                    <i class="fa fa-ban"></i>
-                </h3>
-                <h3 class="ms-3 mb-0" id="errorMessagePlace">No data.</h3>
+        <div id="resultNoData" class="d-flex text-danger align-items-center justify-content-center w-100 d-none">
+            <div>
+                <div class="d-inline-flex pt-5 pb-2">
+                    <h3 class="mb-0">
+                        <i class="fa fa-ban"></i>
+                    </h3>
+                    <h3 class="ms-3 mb-0" id="errMsgTitle">No data.</h3>
+                </div>
+                <p class="pt-3 text-muted text-center" id="errMsgDesc">Refresh it if this screen lasts for a long time</p>
             </div>
         </div>
-        <div class="table-responsive w-100 p-4 pt-3 pb-3" id="tablePlace"></div>
+        <div class="table-responsive w-100 p-4 pt-3 pb-3 d-none" id="tablePlace"></div>
     </div>
     <footer>
         <div class="shadow border-rounded p-2 sizer center-vertical center-horizontal">
             <div class="d-inline-flex m-2">
-                <input class="border border-white w-25 ps-1" width="1" value="1">
-                <p class="ms-2 mb-0">rows per page</p>
+                <p class="mb-0" id="rowPerPage">0</p>
+                <p class="mb-0 ms-1 me-1">/</p>
+                <p class="mb-0" id="allRowsCount">1000</p>
             </div>
             <ul class="ms-auto pagination m-2">
                 <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
