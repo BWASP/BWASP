@@ -17,11 +17,11 @@ class dashboard {
                     return window.setTimeout(() => {
                         this.webEnvironments();
                     }, 500);
-                }
-                else res = {
+                } else res = {
                     target: res[0].url,
-                    data: API.jsonDataHandler(res[0].data)
+                    data: JSON.parse(res[0].data)
                 };
+
                 document.getElementById("webEnvURLPlace").innerText = res.target;
                 document.getElementById("webEnvDataPlace").innerHTML = "";
                 Object.keys(res.data).forEach((key) => {
