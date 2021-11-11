@@ -49,7 +49,7 @@ class CSPEvaluatorDAO(object):
                 for ListOfData in range(len(data)):
                     g.BWASP_DBObj.add(
                         CSPEvaluatorModel(
-                            header=self.insertData[ListOfData]["header"]
+                            header=json.dumps(self.insertData[ListOfData]["header"])
                         )
                     )
                     g.BWASP_DBObj.commit()
@@ -78,11 +78,9 @@ class CSPEvaluatorList(Resource):
     @ns.doc('Create CSP data')
     @ns.expect(CSPEvaluator)
     @ns.marshal_with(CSPEvaluator_returnPost)
-    # @ns.marshal_with(CSPEvaluator_returnPost, code=201)
     def post(self):
         """Create CSPEvaluator data"""
         return CSPEvaluator_DAO.create(ns.payload)
-        # return CSPEvaluator_DAO.create(ns.payload), 201
 
 
 @ns.route('/<int:id>')

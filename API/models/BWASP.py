@@ -42,11 +42,11 @@ class domain(BWASP_DB.Model):
     params = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
     comment = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
     attackVector = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    typicalServerity = BWASP_DB.Column(BWASP_DB.Integer, nullable=False)
+    impactRate = BWASP_DB.Column(BWASP_DB.Integer, nullable=False)
     description = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
     Details = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
 
-    def __init__(self, related_Packet, URL, URI, action_URL, action_URL_Type, params, comment, attackVector, typicalServerity, description, Details, **kwargs):
+    def __init__(self, related_Packet, URL, URI, action_URL, action_URL_Type, params, comment, attackVector, impactRate, description, Details, **kwargs):
         self.related_Packet = related_Packet
         self.URL = URL
         self.URI = URI
@@ -55,13 +55,13 @@ class domain(BWASP_DB.Model):
         self.params = params
         self.comment = comment
         self.attackVector = attackVector
-        self.typicalServerity = typicalServerity
+        self.impactRate = impactRate
         self.description = description
         self.Details = Details
 
     def __repr__(self):
         return f"<domain('{self.related_Packet}', '{self.URL}', '{self.URI}', '{self.action_URL}', '{self.action_URL_Type}', '{self.params}', '{self.comment}', " \
-               f"'{self.attackVector}', '{self.typicalServerity}', '{self.description}', '{self.Details}')>"
+               f"'{self.attackVector}', '{self.impactRate}', '{self.description}', '{self.Details}')>"
 
 
 class job(BWASP_DB.Model):

@@ -56,8 +56,6 @@ def input_tag(response_body, http_method, infor_vector):
 
     data = dict()
 
-    impactRate = 0
-
     text = soup.find_all('input')
     form = soup.find_all('form')
 
@@ -77,73 +75,37 @@ def input_tag(response_body, http_method, infor_vector):
                 data[0]["impactRate"] = 1
                 '''
 
-                '''
                 if "<th" in response_body and tag.attrs['type'] == "password":
-
                     data["SQL injection"]["type"].append("board")
                     data["SQL injection"]["type"].append("account")
                     data["XSS"]["type"].append("board")
                     data["XSS"]["type"].append("account")
 
-                    impactRate = 2
-                '''
-
                 # th tag check (board) and type="password" check (login)
-                if "<th" in response_body:
-                    if "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
-                        index_sql = data["SQL injection"]["type"].index("None")
-                        index_xss = data["XSS"]["type"].index("None")
-                        del (data["SQL injection"]["type"][index_sql])
-                        del (data["XSS"]["type"][index_xss])
-
-                    if "board" in data["SQL injection"]["type"] or "board" in data["XSS"]["type"]:
-                        pass
-                    else:
-                        data["SQL injection"]["type"].append("board")
-                        data["XSS"]["type"].append("board")
-
-                        impactRate = 2
+                elif "<th" in response_body:
+                    data["SQL injection"]["type"].append("board")
+                    data["XSS"]["type"].append("board")
 
                     ''' 제거 예정
                     data[0]["Type"] = "board"
                     data[0]["impactRate"] = 2
                     '''
 
-                if tag.attrs['type'] == "password":
-                    if "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
-                        index_sql = data["SQL injection"]["type"].index("None")
-                        index_xss = data["XSS"]["type"].index("None")
-                        del (data["SQL injection"]["type"][index_sql])
-                        del (data["XSS"]["type"][index_xss])
-
-                    if "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"]:
-                        pass
-                    else:
-                        data["SQL injection"]["type"].append("account")
-                        data["XSS"]["type"].append("account")
-
-                        impactRate = 2
+                elif tag.attrs['type'] == "password":
+                    data["SQL injection"]["type"].append("account")
+                    data["XSS"]["type"].append("account")
 
                     ''' 제거 예정
                     data[0]["Type"] = "account"
                     data[0]["impactRate"] = 2
                     '''
 
-                if "board" in data["SQL injection"]["type"] or "board" in data["XSS"]["type"] \
-                        or "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"] \
-                        or "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
-                    pass
                 else:
                     data["SQL injection"]["type"].append("None")
                     data["XSS"]["type"].append("None")
-
-                    impactRate = 1
                 
                 if "Not_HttpOnly" in infor_vector:
                     data["XSS"]["header"]["HttpOnly"] = True
-
-                    if impactRate != 2:
-                        impactRate = 1
 
                     ''' 제거 예정
                     data[1]["Header"]["HttpOnly"] = False
@@ -151,9 +113,6 @@ def input_tag(response_body, http_method, infor_vector):
                     '''
                 if "Not_X-Frame-Options" in infor_vector:
                     data["XSS"]["header"]["X-Frame-Options"] = True
-
-                    if impactRate != 2:
-                        impactRate = 1
 
                     ''' 제거 예정
                     data[1]["Header"]["HttpOnly"] = False
@@ -184,7 +143,7 @@ def input_tag(response_body, http_method, infor_vector):
             except:
                 action_type.append("None")
 
-    return tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate
+    return tag_list, tag_name_list, attack_vector, action_page, action_type
 
 
 def corsCheck(packet):
@@ -209,18 +168,16 @@ def openRedirectionCheck(packet):
 
 def s3BucketCheck(packet):
     return_s3_url = []
-    patterns = [    "s3\.[a-zA-Z0-9.-]+\.com",
-                    "[a-zA-Z0-9.-]+\.s3\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9.-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*"
-                    "[a-zA-Z0-9.-]+\.s3-[a-zA-Z0-9-]\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9.-]+\.s3-website[.-](eu|ap|us|ca|sa|cn)",
-                    "[\/\/]?s3\.amazonaws\.com\/[a-zA-Z0-9\-\/]*",
-                    "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{3,63}\.s3[\.-](eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{3,63}\.s3-website[\.-](eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*"]
+    patterns = [    "[a-z0-9.-]+\.s3\.amazonaws\.com[\/]?",
+                    "[a-z0-9.-]+\.s3-[a-z0-9-]\.amazonaws\.com[\/]?",
+                    "[a-z0-9.-]+\.s3-website[.-](eu|ap|us|ca|sa|cn)",
+                    "[\/\/]?s3\.amazonaws\.com\/[a-z0-9._-]+",
+                    "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-z0-9._-]+",
+                    "[a-z0-9-]+\.s3-[a-z0-9-]+\.amazonaws\.com/[a-z0-9._-]+",
+                    "[a-z0-9-]+\.s3-[a-z0-9-]+\.amazonaws\.com[\/]?",
+                    "[a-z0-9\.\-]{3,63}\.s3[\.-](eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?",
+                    "[a-z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?",
+                    "[a-z0-9\.\-]{3,63}\.s3-website[\.-](eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?"]
     
     for pattern in patterns:
         regex = re.compile(pattern)
@@ -232,11 +189,13 @@ def s3BucketCheck(packet):
         if req_body:
             return_s3_url += req_body
 
+    print(list(set(return_s3_url)))
+    input()
     return list(set(return_s3_url))
 
 def jwtCheck(packet):
     return_jwt = []
-    patterns = ["([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]*)"]
+    patterns = ["^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$"]
 
     for pattern in patterns:
         regex = re.compile(pattern)
@@ -254,6 +213,8 @@ def jwtCheck(packet):
         
         return_jwt += req_header + req_body + res_header + res_body
     
+    print(list(set(return_jwt)))
+    input()
     return list(set(return_jwt))
 
 

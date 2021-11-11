@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, render_template, g
+    Blueprint, render_template
 )
 
 NAME = 'common'

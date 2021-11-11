@@ -91,11 +91,12 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
 
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
         response_body = packet["response"]["body"]
-        tag_list, tag_name_list, attack_vector, action_page, action_type = input_tag(response_body, http_method, infor_vector)
+        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = input_tag(response_body, http_method, infor_vector)
 
         cors_check = corsCheck(packet)
         if cors_check != "None":
             attack_vector["CORS"] = True
+            impactRate = 2
 
             ''' 제거 예정
             attack_vector[2]["CORS"] = False
@@ -114,12 +115,20 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         #Query String 정리
         domain_params = dict()
         if url_part.query != "":
-            param_list = url_part.query.split("&")
-            for param in param_list:
-                domain_params[param.split('=')[0]] = param.split('=')[1]
+            try:
+                if "&" in url_part.query:
+                    param_list = url_part.query.split("&")
+                    for param in param_list:
+                        domain_params[param.split('=')[0]] = param.split('=')[1]
+                else:
+                    param = url_part.query
+                    domain_params[param.split('=')[0]] = param.split('=')[1]
+            except:
+                domain_params[param.split('=')[0]] = "None"
+            
 
         if not packet["request"]["full_url"] in cookie_result.keys():
-            domain_cookie = 'None'
+            domain_cookie = {}
         else:
             domain_cookie = json.dumps(cookie_result[packet["request"]["full_url"]])
 
@@ -128,10 +137,10 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         # jwt_token = jwtCheck(packet)
         if open_redirect:
             attack_vector["Open Redirect"] = open_redirect
+
         if s3_bucket:
             attack_vector["s3"] = s3BucketCheck(packet)
-        # if jwt_token:
-        #     attack_vector["jwt"] = jwt_token
+            impactRate = 2
         
         # 패킷 url이 중복된다면 ??
         # json.dumps()
@@ -147,7 +156,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             "params": tag_name_list,
             "comment": "None",
             "attackVector": attack_vector,
-            "typicalServerity": 0,
+            "impactRate": impactRate,
             "description": "string",
             "Details": {
                 "tag": tag_list,
