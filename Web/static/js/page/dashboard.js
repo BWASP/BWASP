@@ -10,19 +10,25 @@ let API = await new api();
 
 class dashboard {
     webEnvironments() {
-        API.communicate(APIEndpoints.webEnvironments + "/1", (err, res) => {
-            if (err) return console.error(err);
-            else res = {
-                target: res[0].url,
-                data: API.jsonDataHandler(res[0].data)
-            };
-            document.getElementById("webEnvURLPlace").innerText = res.target;
-            document.getElementById("webEnvDataPlace").innerHTML = "";
-            Object.keys(res.data).forEach((key) => {
-                document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, res.data[key]));
-            });
+        API.communicate(
+            APIEndpoints.webEnvironments + "/1",
+            (err, res) => {
+                if (err) {
+                    return window.setTimeout(() => {
+                        this.webEnvironments();
+                    }, 500);
+                }
+                else res = {
+                    target: res[0].url,
+                    data: API.jsonDataHandler(res[0].data)
+                };
+                document.getElementById("webEnvURLPlace").innerText = res.target;
+                document.getElementById("webEnvDataPlace").innerHTML = "";
+                Object.keys(res.data).forEach((key) => {
+                    document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, res.data[key]));
+                });
 
-        })
+            })
     }
 
     buildWebEnvCard(type, dataPackage) {
