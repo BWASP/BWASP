@@ -144,7 +144,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
 
         #robots.txt check
         if robots_result == True:
-            attack_vector["info"]["robots.txt"] = robots_result
+            attack_vector["misc"]["robots.txt"] = robots_result
         # 패킷 url이 중복된다면 ??
         # json.dumps()
         # getPacketIndex
