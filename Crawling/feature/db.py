@@ -96,6 +96,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         if cors_check != "None":
             attack_vector["doubt"]["CORS"] = True
             impactRate = 2
+        else:
+            attack_vector["doubt"].pop("CORS")
             
         url_part = urlparse(packet["request"]["full_url"])
         domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
@@ -145,6 +147,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         #robots.txt check
         if robots_result == True:
             attack_vector["misc"]["robots.txt"] = robots_result
+        else:
+            attack_vector["misc"].pop("robots.txt")
         # 패킷 url이 중복된다면 ??
         # json.dumps()
         # getPacketIndex

@@ -12,10 +12,7 @@
       "type": [
         "None"
       ],
-      "header": {
-        "HttpOnly": false,
-        "X-Frame-Options": false
-      }
+      "required": []
     },
     "CORS": false,
     "Open Redirect": "url",
