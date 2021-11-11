@@ -1,7 +1,10 @@
 from bs4 import BeautifulSoup
+from bs4.builder import TreeBuilderRegistry
 import requests
 import json
 import re
+
+from Crawling.feature import func
 
 
 def attack_header(target_url):
@@ -215,6 +218,16 @@ def jwtCheck(packet):
     
     return list(set(return_jwt))
 
+def findUploadFunc(packet, target_url):
+    if not func.isSameDomain(target_url, packet["request"]["full_url"]):
+        return
+
+    html = BeautifulSoup(packet["response"]["body"], "html.parser")
+    upload_tag = html.find("input", {"type" : "file"})
+
+    if upload_tag:
+        return True
+    return False
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
 """
