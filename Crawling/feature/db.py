@@ -38,7 +38,6 @@ def insertPackets(req_res_packets):
 
     Packets().PostAutomation(json.dumps(data))
     # res = requests.post(api_url, headers=headers, data=json.dumps(data))
-    # print(res)
 
 
 # REST API: 주원 CSP, Ports
@@ -131,21 +130,21 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         open_redirect = openRedirectionCheck(packet)
         s3_bucket = s3BucketCheck(packet)
         # jwt_token = jwtCheck(packet)
-        if open_redirect:
+        if len(open_redirect) != 0:
             attack_vector["doubt"]["Open Redirect"] = open_redirect
             impactRate = 2
         else:
-            attack_vector["doubt"].pop("Open Redirect")
+            attack_vector["doubt"].pop("Open Redirect", None)
 
-        if s3_bucket:
-            attack_vector["doubt"]["s3"] = s3BucketCheck(packet)
+        if len(s3_bucket) != 0:
+            attack_vector["doubt"]["s3"] = s3_bucket
             impactRate = 2
-        # attack_vector["jwt"] = jwtCheck(packet)
+        else:
+            attack_vector["doubt"].pop("s3", None)
 
         #robots.txt check
         if robots_result == True:
             attack_vector["info"]["robots.txt"] = robots_result
-        
         # 패킷 url이 중복된다면 ??
         # json.dumps()
         # getPacketIndex

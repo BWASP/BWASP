@@ -23,6 +23,7 @@ loadpacket_indexes = list() # automation packet indexes
 process_list = list()
 http_method = "None"
 infor_vector = "None"
+robots_result = False
 
 def start(url, depth, options):
     global start_options
@@ -73,6 +74,7 @@ def visit(driver, url, depth, options):
     global lock
     global http_method
     global infor_vector
+    global robots_result
 
     try:
         driver.get(url)

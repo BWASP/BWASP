@@ -44,17 +44,17 @@ def attack_header(target_url):
 
 def input_tag(response_body, http_method, infor_vector):
     # form tag action and input tag and input name parse
-    soup = BeautifulSoup(response_body, 'html.parser')
+    try:
+        soup = BeautifulSoup(response_body, 'html.parser')
+    except:
+        soup = BeautifulSoup("", 'html.parser')
 
     tag_list = list()
     tag_name_list = list()
     action_page = list()
     action_type = list()
-
     attack_vector = dict() #list()
-
     data = dict()
-
     impactRate = 0
 
     text = soup.find_all('input')
@@ -62,7 +62,6 @@ def input_tag(response_body, http_method, infor_vector):
 
     with open("./attack_vector.json", 'r', encoding='UTF8') as f:
         data = json.load(f)
-
     for tag in text:
         try:
             if tag.attrs['type'] != "submit" and len(text) != 0:
@@ -129,7 +128,6 @@ def input_tag(response_body, http_method, infor_vector):
                     data["info"]["allowMethod"] = http_method
                 else:
                     data["info"].pop("allowMethod")
-
                 #~~~~~~~~~~~~File Upload
                 if tag.attrs['type'] == "file":
                     data["doubt"]["File Upload"] = True
@@ -138,9 +136,14 @@ def input_tag(response_body, http_method, infor_vector):
 
         except:
             pass
-
+        
         attack_vector = data
-
+    else:
+        attack_vector = data
+        try:
+            attack_vector["info"].pop("allowMethod")
+        except:
+            pass
     if form:
         for tag in form:
             try:
@@ -151,7 +154,7 @@ def input_tag(response_body, http_method, infor_vector):
                 action_type.append(tag.attrs['method'])
             except:
                 action_type.append("None")
-
+                
     return tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate
 
 
@@ -181,14 +184,14 @@ def s3BucketCheck(packet):
                     "[a-zA-Z0-9.-]+\.s3\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
                     "[a-zA-Z0-9.-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*"
                     "[a-zA-Z0-9.-]+\.s3-[a-zA-Z0-9-]\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9.-]+\.s3-website[.-](eu|ap|us|ca|sa|cn)",
+                    "[a-zA-Z0-9.-]+\.s3-website[.-](?: eu|ap|us|ca|sa|cn)",
                     "[\/\/]?s3\.amazonaws\.com\/[a-zA-Z0-9\-\/]*",
                     "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
                     "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
                     "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{3,63}\.s3[\.-](eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*",
+                    "[a-zA-Z0-9\.\-]{3,63}\.s3[\.-](?: eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*",
                     "[a-zA-Z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{3,63}\.s3-website[\.-](eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*"]
+                    "[a-zA-Z0-9\.\-]{3,63}\.s3-website[\.-](?: eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*"]
     
 
     for pattern in patterns:
