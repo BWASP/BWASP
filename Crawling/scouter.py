@@ -177,8 +177,11 @@ def isOpenRedirection(visit_url, current_url, target_url):
             pattern_url = re.compile("((?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)")
             
             for query in url_query:
-                value = query.split("=")[1]
-
+                value = query.split("=")
+                if len(value) == 1:
+                    continue
+                
+                value = value[1]
                 if pattern_url.findall(value):
                     return True
                 if urljoin(target_url, value) == current_url:
