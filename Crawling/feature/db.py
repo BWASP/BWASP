@@ -130,9 +130,11 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
                 if "<th" in response_body:
                     attack_vector["doubt"]["SQL injection"] = {"type": ["board"]}
                     attack_vector["doubt"]["XSS"] = {"type": ["board"]}
+                    impactRate = 2
                 else:
                     attack_vector["doubt"]["SQL injection"] = {"type": ["None"]}
                     attack_vector["doubt"]["XSS"] = {"type": ["None"]}
+                    impactRate = 1
             
 
         if not packet["request"]["full_url"] in cookie_result.keys():
