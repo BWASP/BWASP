@@ -122,6 +122,17 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
                     domain_params[param.split('=')[0]] = param.split('=')[1]
             except:
                 domain_params[param.split('=')[0]] = "None"
+
+        if domain_params:
+            if "SQL injection" in attack_vector["doubt"]:
+                pass
+            else:
+                if "<th" in response_body:
+                    attack_vector["doubt"]["SQL injection"] = {"type": ["board"]}
+                    attack_vector["doubt"]["XSS"] = {"type": ["board"]}
+                else:
+                    attack_vector["doubt"]["SQL injection"] = {"type": ["None"]}
+                    attack_vector["doubt"]["XSS"] = {"type": ["None"]}
             
 
         if not packet["request"]["full_url"] in cookie_result.keys():
