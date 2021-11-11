@@ -19,7 +19,8 @@ def create_app(config=None):
     app.config.from_object(config)
 
     # route initialization
-    from routes import crx, manual
+    from routes import index, crx, manual
+    app.register_blueprint(index.bp)
     app.register_blueprint(crx.bp)
     app.register_blueprint(manual.bp)
 
