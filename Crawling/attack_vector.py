@@ -127,6 +127,8 @@ def input_tag(response_body, http_method, infor_vector):
                 #~~~~~~~~~~~~Allow Method
                 if "private" not in http_method:
                     data["info"]["allowMethod"] = http_method
+                else:
+                    data["info"].pop("allowMethod")
 
                 #~~~~~~~~~~~~File Upload
                 if tag.attrs['type'] == "file":
@@ -196,8 +198,6 @@ def s3BucketCheck(packet):
         if req_body:
             return_s3_url += req_body
 
-    print(list(set(return_s3_url)))
-    input()
     return list(set(return_s3_url))
 
 def jwtCheck(packet):

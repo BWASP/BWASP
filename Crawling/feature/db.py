@@ -132,7 +132,11 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         if open_redirect:
             attack_vector["doubt"]["Open Redirect"] = open_redirect
             impactRate = 2
-        # attack_vector["s3"] = s3BucketCheck(packet)
+        else:
+            attack_vector["doubt"].pop("Open Redirect")
+
+        #수정 필요
+        attack_vector["s3"] = s3BucketCheck(packet)
         # attack_vector["jwt"] = jwtCheck(packet)
 
         #robots.txt check
