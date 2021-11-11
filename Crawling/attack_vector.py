@@ -62,8 +62,15 @@ def input_tag(response_body, http_method, infor_vector):
 
     with open("./attack_vector.json", 'r', encoding='UTF8') as f:
         data = json.load(f)
-    for tag in text:
-        try:
+
+    # ~~~~~~~~~~~~Allow Method
+    if "private" not in http_method:
+        data["info"]["allowMethod"] = http_method
+    else:
+        data["info"].pop("allowMethod")
+
+    if len(text) != 0:
+        for tag in text:
             if tag.attrs['type'] != "submit" and len(text) != 0:
                 tag_list.append(str(tag))  # input tag 값 ex) <input ~
                 tag_name_list.append(tag.attrs['name'])
@@ -86,20 +93,23 @@ def input_tag(response_body, http_method, infor_vector):
 
                         impactRate = 2
 
-                if tag.attrs['type'] == "password":
-                    if "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
-                        index_sql = data["doubt"]["SQL injection"]["type"].index("None")
-                        index_xss = data["doubt"]["XSS"]["type"].index("None")
-                        del (data["doubt"]["SQL injection"]["type"][index_sql])
-                        del (data["doubt"]["XSS"]["type"][index_xss])
+                try:
+                    if tag.attrs['type'] == "password":
+                        if "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
+                            index_sql = data["doubt"]["SQL injection"]["type"].index("None")
+                            index_xss = data["doubt"]["XSS"]["type"].index("None")
+                            del (data["doubt"]["SQL injection"]["type"][index_sql])
+                            del (data["doubt"]["XSS"]["type"][index_xss])
 
-                    if "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"]["type"]:
-                        pass
-                    else:
-                        data["doubt"]["SQL injection"]["type"].append("account")
-                        data["doubt"]["XSS"]["type"].append("account")
+                        if "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"]["type"]:
+                            pass
+                        else:
+                            data["doubt"]["SQL injection"]["type"].append("account")
+                            data["doubt"]["XSS"]["type"].append("account")
 
-                        impactRate = 2
+                            impactRate = 2
+                except:
+                    pass
 
                 if "board" in data["doubt"]["SQL injection"]["type"] or "board" in data["doubt"]["XSS"]["type"] \
                         or "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"]["type"] \
@@ -112,38 +122,48 @@ def input_tag(response_body, http_method, infor_vector):
                     impactRate = 1
 
                 if "Not_HttpOnly" in infor_vector:
-                    data["doubt"]["XSS"]["header"]["HttpOnly"] = True
+                    if "HttpOnly" not in data["doubt"]["XSS"]["required"]:
+                        data["doubt"]["XSS"]["required"].append("HttpOnly")
 
                     if impactRate != 2:
                         impactRate = 1
 
                 if "Not_X-Frame-Options" in infor_vector:
-                    data["doubt"]["XSS"]["header"]["X-Frame-Options"] = True
+                    if "X-Frame-Options" not in data["doubt"]["XSS"]["required"]:
+                        data["doubt"]["XSS"]["required"].append("X-Frame-Options")
 
                     if impactRate != 2:
                         impactRate = 1
 
-                #~~~~~~~~~~~~Allow Method
-                if "private" not in http_method:
-                    data["info"]["allowMethod"] = http_method
-                else:
-                    data["info"].pop("allowMethod")
-                #~~~~~~~~~~~~File Upload
-                if tag.attrs['type'] == "file":
-                    data["doubt"]["File Upload"] = True
+                try:
+                    #~~~~~~~~~~~~File Upload
+                    if tag.attrs['type'] == "file":
+                        data["doubt"]["File Upload"] = True
 
-                    impactRate = 2
+                        impactRate = 2
+                    else:
+                        data["doubt"].pop("File Upload")
+                except:
+                    if "File Upload" in data["doubt"]:
+                        data["doubt"].pop("File Upload")
 
-        except:
-            pass
-        
         attack_vector = data
+
     else:
         attack_vector = data
         try:
-            attack_vector["info"].pop("allowMethod")
+            attack_vector["doubt"].pop("SQL injection")
         except:
             pass
+        try:
+            attack_vector["doubt"].pop("XSS")
+        except:
+            pass
+        try:
+            attack_vector["doubt"].pop("File Upload")
+        except:
+            pass
+
     if form:
         for tag in form:
             try:
