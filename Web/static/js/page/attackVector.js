@@ -168,7 +168,7 @@ class pagerTools {
                             cve: Array()
                         },
                         method: String(),
-                        impactRate: 0,
+                        impactRate: domainData["impactRate"],
                         details: API.jsonDataHandler(domainData["Details"])
                     };
 
