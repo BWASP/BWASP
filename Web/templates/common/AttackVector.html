@@ -4,6 +4,40 @@
 {% include 'components/head.html' %}
 
 <body>
+<div class="modal fade" id="viewEnginePrefModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="border-rounded shadow modal-storage">
+                <section class="mb-3">
+                    <h3 class="text-dark fw-bolder mb-0 font-logo">View Configuration</h3>
+                    <p class="text-capitalize text-muted small">Change the view config below</p>
+                </section>
+                <section>
+                    <div>
+                        <div class="d-flex">
+                            <label for="viewPref-input-rowPerPage" class="form-label">Row per page</label>
+                            <p class="ms-auto mb-0"><span class="text-primary" id="viewPref-modal-rowPerPage">10</span> / <span id="viewPref-modal-allRowCount">1</span></p>
+                        </div>
+                        <input type="range" class="form-range" id="viewPref-input-rowPerPage" value="5" max="0" min="5" step="5">
+                    </div>
+                    <div class="mt-3">
+                        <div class="d-flex">
+                            <label for="viewPref-input-currentPage" class="form-label">Current page</label>
+                            <p class="ms-auto mb-0"><span class="text-primary" id="viewPref-modal-currentPage">0</span> / <span id="viewPref-modal-pageCount">0</span></p>
+                        </div>
+                        <input type="range" class="form-range" id="viewPref-input-currentPage" value="0" max="0" min="1" step="1">
+                    </div>
+                </section>
+            </div>
+            <div class="mt-3">
+                <div class="sizer">
+                    <button type="button" class="col btn btn-warning border border-rounded border-white shadow m-1" data-bs-dismiss="modal">Back</button>
+                    <button type="button" id="viewPref-button-save" class="col btn btn-success border border-rounded border-white shadow m-1">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -28,6 +62,11 @@
                 class="bg-white p-4 pt-3 pb-3 ms-2 btn btn-link border-rounded shadow"
                 data-bs-toggle="tooltip" data-bs-placement="bottom" title="Help">
             <h4 class="mb-0"><i class="fas fa-question text-success"></i></h4>
+        </button>
+        <button type="button" id="openPrefModal"
+                class="bg-white p-4 pt-3 pb-3 ms-2 btn btn-link border-rounded shadow"
+                data-bs-toggle="tooltip" data-bs-placement="bottom" title="View preferences">
+            <h4 class="mb-0"><i class="fas fa-cog text-secondary"></i></h4>
         </button>
         <button type="button" id="switchToPacket"
                 class="bg-white p-4 pt-3 pb-3 ms-2 btn btn-link border-rounded shadow"
@@ -58,14 +97,14 @@
                 <p class="pt-3 text-muted text-center" id="errMsgDesc">Refresh it if this screen lasts for a long time</p>
             </div>
         </div>
-        <div class="table-responsive w-100 p-4 pt-3 pb-3 d-none" id="tablePlace"></div>
+        <div class="w-100 p-4 pt-3 pb-3 d-none" id="tablePlaceHolder">
+            <div class="table-responsive d-none" id="tablePlace"></div>
+        </div>
     </div>
     <footer>
         <div class="shadow border-rounded p-2 sizer center-vertical center-horizontal">
             <div class="d-inline-flex m-2">
-                <p class="mb-0" id="rowPerPage">0</p>
-                <p class="mb-0 ms-1 me-1">/</p>
-                <p class="mb-0" id="allRowsCount">1000</p>
+                <p class="mb-0"><span id="rowPerPage">0</span> Rows</p>
             </div>
             <ul class="ms-auto pagination m-2">
                 <li class="page-item disabled"><a class="page-link" href="#">&lt;</a></li>
