@@ -1,6 +1,16 @@
 // Get modules
 import {API as api, createKey, tableBuilder} from '../jHelper.js';
 
+// Define Modals
+let viewEnginePrefModal = new bootstrap.Modal(document.getElementById("viewEnginePrefModal"), {
+    keyboard: false,
+    backdrop: 'static',
+    show: true
+});
+let userHelpModal = new bootstrap.Modal(document.getElementById('helpModal'), {
+    show: true
+});
+
 // Define API Endpoints
 const APIEndpoints = {
         vectors: "/api/domain",
@@ -13,7 +23,7 @@ const APIEndpoints = {
         }
     },
     elements = {
-        vectors: ["Category", "URL", "Action", "Params", "Vulnerability Doubt", "Method", "Impact"],
+        vectors: ["Category", "URL", "Action", "Params", "Threat", "Method", "Impact"],
         packets: []
     };
 
@@ -30,13 +40,9 @@ let stateHandler = {
             viewString: "Attack Vectors"
         }
     ],
-    pagination = {
-        currentPage: 1,
-        rowPerPage: 10
-    },
     returnError = (errorMessage = ["No data", ""]) => {
-        let condition = (typeof(errorMessage)!=="string");
-        console.log(errorMessage, typeof(errorMessage), condition);
+        let condition = (typeof (errorMessage) !== "string");
+        console.log(errorMessage, typeof (errorMessage), condition);
         document.getElementById("errMsgTitle").innerText = (condition)
             ? errorMessage[0]
             : errorMessage;
@@ -49,7 +55,7 @@ let stateHandler = {
     };
 
 // define api communicator
-let API = await new api()
+let API = await new api();
 
 class pagerTools {
     constructor() {
@@ -59,28 +65,84 @@ class pagerTools {
             currentPage: 1,
             rowPerPage: 10
         };
+        this.data = {
+            rowCount: Number(),
+            pageCount: 1
+        }
     }
+
+    buildPaginationButton() {
+
+    }
+
+    async updateRowCount() {
+        await this.getRowCount((rowCount) => {
+            let maxPageCount = (Math.round(rowCount / this.paging.rowPerPage)).toLocaleString(),
+                formattedRowCount = rowCount.toLocaleString();
+            console.log(rowCount, maxPageCount, this.data.rowCount);
+            document.getElementById("viewPref-modal-allRowCount").innerText = formattedRowCount;
+            console.log(maxPageCount);
+            document.getElementById("viewPref-input-rowPerPage").max = rowCount;
+            document.getElementById("viewPref-input-rowPerPage").value = this.paging.rowPerPage;
+            document.getElementById("viewPref-input-currentPage").value = this.paging.currentPage;
+            console.log("Current page: ", this.paging.currentPage);
+            this.updateMaxPage();
+        });
+        return true;
+    }
+
+    updateMaxPage() {
+        this.data.pageCount = Math.round(this.data.rowCount / this.paging.rowPerPage);
+        console.log("Page: ", this.data.pageCount);
+        this.data.pageCount += (this.data.rowCount % document.getElementById("viewPref-input-rowPerPage").value === 0) ? 0 : 1;
+        document.getElementById("viewPref-modal-pageCount").innerText = String(this.data.pageCount);
+        document.getElementById("viewPref-input-currentPage").max = this.data.pageCount;
+        document.getElementById("viewPref-input-currentPage").value = this.paging.currentPage;
+        document.getElementById("viewPref-modal-currentPage").innerText = this.paging.currentPage;
+    }
+
+    async openPagingOption() {
+        await this.updateRowCount();
+        viewEnginePrefModal.show();
+    }
+
 
     toggleLoader(type) {
         document.getElementById("loadingProgress").classList[(type) ? "add" : "remove"]("d-none");
     }
 
-    updatePager(page, rowCount){
-
+    updatePager(page = this.paging.currentPage, rowCount = this.paging.rowPerPage) {
+        this.paging = {
+            currentPage: page,
+            rowPerPage: rowCount
+        };
+        this.buildPage().then(() => {
+            console.info("updatePager() : Called buildPage()");
+        });
     }
 
     async buildPage() {
+        // Add loading
+        document.getElementById("loadingProgress").classList.remove("d-none");
+        document.getElementById("tablePlace").classList.add("d-none");
+        document.getElementById("tablePlaceHolder").classList.add("d-none");
+
+        // Update value
+        document.getElementById("rowPerPage").innerText = this.paging.rowPerPage;
+
+        // Do job
         await this.syncData(this.paging.currentPage, this.paging.rowPerPage, this.buildTable);
+        viewEnginePrefModal.hide();
     }
 
     async syncData(requestPage, rowPerPage, callback) {
         let localDataPack = [],
             counter = Number();
         await API.communicate(
-            APIEndpoints.vectors + `/${((requestPage - 1) * rowPerPage)+1}/${rowPerPage}`,
+            APIEndpoints.vectors + `/${((requestPage - 1) * rowPerPage) + 1}/${rowPerPage}`,
             (err, res) => {
                 if (err) {
-                    let redoJob = window.setTimeout(()=>{
+                    let redoJob = window.setTimeout(() => {
                         this.syncData(requestPage, rowPerPage, callback);
                     }, 500);
                     return returnError(err);
@@ -150,6 +212,7 @@ class pagerTools {
             table = {
                 ID: createKey(),
                 place: document.getElementById("tablePlace"),
+                holder: document.getElementById("tablePlaceHolder"),
                 elements: {
                     table: document.createElement("table"),
                     tbody: document.createElement("tbody")
@@ -211,15 +274,17 @@ class pagerTools {
 
             // Build action if present
             if (dataSet.action.target.length !== 0) {
-                rowElement.child.action.method.innerText = dataSet.action.type[0];
-                rowElement.child.action.target.innerText = dataSet.action.target[0];
+                let target = document.createElement("p"),
+                    method = document.createElement("p")
+                method.innerText = dataSet.action.type[0];
+                target.innerText = dataSet.action.target[0];
 
-                rowElement.child.action.method.classList.add("badge", "bg-success", "text-uppercase", "me-2", "mb-1");
-                rowElement.child.action.target.classList.add("mb-0");
+                method.classList.add("badge", "bg-success", "text-uppercase", "me-2", "mb-1");
+                target.classList.add("mb-0");
 
                 rowElement.child.action.parent.append(
-                    rowElement.child.action.method,
-                    rowElement.child.action.target
+                    method,
+                    target
                 );
                 rowElement.parent.appendChild(rowElement.child.action.parent);
             } else {
@@ -248,31 +313,35 @@ class pagerTools {
             }
 
             // Build vulnerability doubt
-            paramSet = Object.keys(dataSet.vulnerability.type);
+            paramSet = Object.keys(dataSet.vulnerability.type.doubt);
             paramSet.forEach((param) => {
                 let codeElement = document.createElement("code");
                 codeElement.innerText = param;
                 rowElement.child.doubt.appendChild(codeElement);
                 if (paramSet[paramSet.length - 1] !== param) rowElement.child.doubt.appendChild(builder.commaAsElement());
             })
-            rowElement.parent.appendChild(rowElement.child.doubt);
+            rowElement.parent.appendChild((paramSet.length !== 0)
+                ? rowElement.child.doubt
+                : builder.dataNotPresent()
+            );
 
             // Build Method
             rowElement.child.method.method.innerText = dataSet.method;
             rowElement.child.method.method.classList.add("badge", "bg-success");
+            rowElement.child.method.parent.classList.add("text-center");
             rowElement.child.method.parent.appendChild(rowElement.child.method.method);
             rowElement.parent.appendChild(rowElement.child.method.parent);
 
             // Build Impact
-
             rowElement.child.impact.rate.innerText = impactRate[dataSet.impactRate][1];
-            rowElement.child.impact.rate.classList.add("badge", "rounded-pill", `bg-${impactRate[dataSet.impactRate][0]}`, "small")
+            rowElement.child.impact.rate.classList.add("badge", "rounded-pill", `bg-${impactRate[dataSet.impactRate][0]}`, "small");
+            rowElement.child.impact.parent.classList.add("text-center");
             rowElement.child.impact.parent.appendChild(rowElement.child.impact.rate);
             rowElement.parent.appendChild(rowElement.child.impact.parent);
 
             // Add current row to main tbody
             table.elements.tbody.append(rowElement.parent);
-            console.log(dataSet);
+            // console.log(dataSet);
         });
         // Build table element
         table.elements.table.append(
@@ -284,13 +353,16 @@ class pagerTools {
         table.place.appendChild(table.elements.table);
         document.getElementById("loadingProgress").classList.add("d-none");
         document.getElementById("tablePlace").classList.remove("d-none");
+        document.getElementById("tablePlaceHolder").classList.remove("d-none");
     }
 
-    getRowCount() {
-        API.communicate(
+    async getRowCount(callback) {
+        await API.communicate(
             "/api/domain/count",
             (err, res) => {
                 console.log(res);
+                this.data.rowCount = res.RowCount;
+                callback(Number(res.RowCount));
             });
     }
 
@@ -298,11 +370,25 @@ class pagerTools {
 
 let pager = new pagerTools();
 
+document.getElementById("openPrefModal").addEventListener("click", () => pager.openPagingOption());
+
+document.getElementById("viewPref-input-rowPerPage").addEventListener("change", function () {
+    document.getElementById("viewPref-modal-rowPerPage").innerText = this.value;
+    pager.paging.rowPerPage = Number(this.value);
+    pager.updateMaxPage();
+})
+
+document.getElementById("viewPref-input-currentPage").addEventListener("change", function () {
+    document.getElementById("viewPref-modal-currentPage").innerText = this.value;
+    pager.paging.currentPage = this.value;
+})
+
+document.getElementById("viewPref-button-save").addEventListener("click", () => pager.buildPage());
+
 window.onload = () => {
-    let userHelpModal = new bootstrap.Modal(document.getElementById('helpModal'), {
-        show: true
-    });
-    pager.buildPage().then(() => console.log(`Called data handlers`));
-    document.getElementById("openHelpModal").addEventListener("click", () => userHelpModal.toggle());
-    document.getElementById("switchToPacket").click();
+    pager.buildPage().then(()=>{
+        document.getElementById("openHelpModal").addEventListener("click", () => userHelpModal.toggle());
+        // document.getElementById("viewPref-input-rowPerPage").value = 12;
+        console.log("rowPerPage", document.getElementById("viewPref-input-rowPerPage").value, pager.paging.rowPerPage);
+    })
 };
