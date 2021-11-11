@@ -128,14 +128,6 @@ def input_tag(response_body, http_method, infor_vector):
                     data[0]["impactRate"] = 2
                     '''
 
-                if tag.attrs['type'] == "file":
-                    if "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"]:
-                        pass
-                    else:
-                        data["File Upload"] = True
-
-                        impactRate = 2
-
                 if "board" in data["SQL injection"]["type"] or "board" in data["XSS"]["type"] \
                         or "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"] \
                         or "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
@@ -145,7 +137,7 @@ def input_tag(response_body, http_method, infor_vector):
                     data["XSS"]["type"].append("None")
 
                     impactRate = 1
-                
+
                 if "Not_HttpOnly" in infor_vector:
                     data["XSS"]["header"]["HttpOnly"] = True
 
@@ -166,7 +158,7 @@ def input_tag(response_body, http_method, infor_vector):
                     data[1]["Header"]["HttpOnly"] = False
                     data[1]["impactRate"] = 2
                     '''
-                
+
                 #~~~~~~~~~~~~Allow Method
                 if "private" not in http_method:
                     data["Allow Method"] = http_method
@@ -174,7 +166,13 @@ def input_tag(response_body, http_method, infor_vector):
                     ''' 제거 예정
                     data[3]["Allow Method"] = http_method
                     '''
-                    
+
+                #~~~~~~~~~~~~File Upload
+                if tag.attrs['type'] == "file":
+                    data["File Upload"] = True
+
+                    impactRate = 2
+
         except:
             pass
 
@@ -226,7 +224,7 @@ def s3BucketCheck(packet):
                     "[a-z0-9\.\-]{3,63}\.s3[\.-](eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?",
                     "[a-z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?",
                     "[a-z0-9\.\-]{3,63}\.s3-website[\.-](eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?"]
-    
+
     for pattern in patterns:
         regex = re.compile(pattern)
         res_body = regex.findall(packet["request"]["body"])
@@ -258,12 +256,19 @@ def jwtCheck(packet):
             res_header += regex.findall(packet["response"]["headers"][header_key])
         req_body = regex.findall(packet["request"]["body"])
         res_body = regex.findall(packet["response"]["body"])
-        
+
         return_jwt += req_header + req_body + res_header + res_body
-    
+
     print(list(set(return_jwt)))
     input()
     return list(set(return_jwt))
+
+def robots_txt(url):
+    # 주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf [page 726] robots.txt not set
+    url = url.split("/")[0] + "//" + url.split("/")[2] + "/robots.txt"
+    return True if "user-agent" not in requests.get(url).text.lower() or 404 == requests.get(url).status_code else False
+
+
 
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼

@@ -18,5 +18,6 @@
   "api_key" : {
     "facebook" : "asdf"
   },
-  "File Upload": false
+  "File Upload": false,
+  "robots.txt": false
 }
