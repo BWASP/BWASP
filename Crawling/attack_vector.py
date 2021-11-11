@@ -9,9 +9,8 @@ def attack_header(target_url):
     dict_data = r.headers
     infor_data = ""
     infor_vector = ""
-    http_method = requests.options(target_url)
     try:
-        http_method = http_method.headers['Allow'].replace(",", "").split(" ")
+        http_method = requests.options(target_url).headers['Allow'].replace(",", "").split(" ")
     except:
         http_method = "private"
 
@@ -128,6 +127,14 @@ def input_tag(response_body, http_method, infor_vector):
                     data[0]["Type"] = "account"
                     data[0]["impactRate"] = 2
                     '''
+
+                if tag.attrs['type'] == "file":
+                    if "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"]:
+                        pass
+                    else:
+                        data["File Upload"] = True
+
+                        impactRate = 2
 
                 if "board" in data["SQL injection"]["type"] or "board" in data["XSS"]["type"] \
                         or "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"] \

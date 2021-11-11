@@ -17,5 +17,6 @@
   "subdomain" : [],
   "api_key" : {
     "facebook" : "asdf"
-  }
+  },
+  "File Upload": false
 }
