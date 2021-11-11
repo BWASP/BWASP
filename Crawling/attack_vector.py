@@ -9,9 +9,8 @@ def attack_header(target_url):
     dict_data = r.headers
     infor_data = ""
     infor_vector = ""
-    http_method = requests.options(target_url)
     try:
-        http_method = http_method.headers['Allow'].replace(",", "").split(" ")
+        http_method = requests.options(target_url).headers['Allow'].replace(",", "").split(" ")
     except:
         http_method = "private"
 
@@ -72,102 +71,71 @@ def input_tag(response_body, http_method, infor_vector):
 
                 #~~~~~~~~~~~~SQL Injection and XSS
 
-                ''' 제거 예정
-                data[0]["vuln"] = "SQL Injection"
-                data[0]["impactRate"] = 1
-                '''
-
-                '''
-                if "<th" in response_body and tag.attrs['type'] == "password":
-
-                    data["SQL injection"]["type"].append("board")
-                    data["SQL injection"]["type"].append("account")
-                    data["XSS"]["type"].append("board")
-                    data["XSS"]["type"].append("account")
-
-                    impactRate = 2
-                '''
-
                 # th tag check (board) and type="password" check (login)
                 if "<th" in response_body:
-                    if "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
-                        index_sql = data["SQL injection"]["type"].index("None")
-                        index_xss = data["XSS"]["type"].index("None")
-                        del (data["SQL injection"]["type"][index_sql])
-                        del (data["XSS"]["type"][index_xss])
+                    if "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
+                        index_sql = data["doubt"]["SQL injection"]["type"].index("None")
+                        index_xss = data["doubt"]["XSS"]["type"].index("None")
+                        del (data["doubt"]["SQL injection"]["type"][index_sql])
+                        del (data["doubt"]["XSS"]["type"][index_xss])
 
-                    if "board" in data["SQL injection"]["type"] or "board" in data["XSS"]["type"]:
+                    if "board" in data["doubt"]["SQL injection"]["type"] or "board" in data["doubt"]["XSS"]["type"]:
                         pass
                     else:
-                        data["SQL injection"]["type"].append("board")
-                        data["XSS"]["type"].append("board")
+                        data["doubt"]["SQL injection"]["type"].append("board")
+                        data["doubt"]["XSS"]["type"].append("board")
 
                         impactRate = 2
-
-                    ''' 제거 예정
-                    data[0]["Type"] = "board"
-                    data[0]["impactRate"] = 2
-                    '''
 
                 if tag.attrs['type'] == "password":
-                    if "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
-                        index_sql = data["SQL injection"]["type"].index("None")
-                        index_xss = data["XSS"]["type"].index("None")
-                        del (data["SQL injection"]["type"][index_sql])
-                        del (data["XSS"]["type"][index_xss])
+                    if "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
+                        index_sql = data["doubt"]["SQL injection"]["type"].index("None")
+                        index_xss = data["doubt"]["XSS"]["type"].index("None")
+                        del (data["doubt"]["SQL injection"]["type"][index_sql])
+                        del (data["doubt"]["XSS"]["type"][index_xss])
 
-                    if "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"]:
+                    if "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"]["type"]:
                         pass
                     else:
-                        data["SQL injection"]["type"].append("account")
-                        data["XSS"]["type"].append("account")
+                        data["doubt"]["SQL injection"]["type"].append("account")
+                        data["doubt"]["XSS"]["type"].append("account")
 
                         impactRate = 2
 
-                    ''' 제거 예정
-                    data[0]["Type"] = "account"
-                    data[0]["impactRate"] = 2
-                    '''
-
-                if "board" in data["SQL injection"]["type"] or "board" in data["XSS"]["type"] \
-                        or "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"] \
-                        or "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
+                if "board" in data["doubt"]["SQL injection"]["type"] or "board" in data["doubt"]["XSS"]["type"] \
+                        or "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"]["type"] \
+                        or "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
                     pass
                 else:
-                    data["SQL injection"]["type"].append("None")
-                    data["XSS"]["type"].append("None")
+                    data["doubt"]["SQL injection"]["type"].append("None")
+                    data["doubt"]["XSS"]["type"].append("None")
 
                     impactRate = 1
-                
+
                 if "Not_HttpOnly" in infor_vector:
-                    data["XSS"]["header"]["HttpOnly"] = True
+                    data["doubt"]["XSS"]["header"]["HttpOnly"] = True
 
                     if impactRate != 2:
                         impactRate = 1
 
-                    ''' 제거 예정
-                    data[1]["Header"]["HttpOnly"] = False
-                    data[1]["impactRate"] = 2
-                    '''
                 if "Not_X-Frame-Options" in infor_vector:
-                    data["XSS"]["header"]["X-Frame-Options"] = True
+                    data["doubt"]["XSS"]["header"]["X-Frame-Options"] = True
 
                     if impactRate != 2:
                         impactRate = 1
 
-                    ''' 제거 예정
-                    data[1]["Header"]["HttpOnly"] = False
-                    data[1]["impactRate"] = 2
-                    '''
-                
                 #~~~~~~~~~~~~Allow Method
                 if "private" not in http_method:
-                    data["Allow Method"] = http_method
+                    data["info"]["allowMethod"] = http_method
+                else:
+                    data["info"].pop("allowMethod")
 
-                    ''' 제거 예정
-                    data[3]["Allow Method"] = http_method
-                    '''
-                    
+                #~~~~~~~~~~~~File Upload
+                if tag.attrs['type'] == "file":
+                    data["doubt"]["File Upload"] = True
+
+                    impactRate = 2
+
         except:
             pass
 
@@ -222,6 +190,7 @@ def s3BucketCheck(packet):
                     "[a-zA-Z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
                     "[a-zA-Z0-9\.\-]{3,63}\.s3-website[\.-](eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*"]
     
+
     for pattern in patterns:
         regex = re.compile(pattern)
         res_body = regex.findall(packet["request"]["body"])
@@ -251,10 +220,16 @@ def jwtCheck(packet):
             res_header += regex.findall(packet["response"]["headers"][header_key])
         req_body = regex.findall(packet["request"]["body"])
         res_body = regex.findall(packet["response"]["body"])
-        
+
         return_jwt += req_header + req_body + res_header + res_body
-    
     return list(set(return_jwt))
+
+def robots_txt(url):
+    # 주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf [page 726] robots.txt not set
+    url = url.split("/")[0] + "//" + url.split("/")[2] + "/robots.txt"
+    return True if "user-agent" not in requests.get(url).text.lower() or 404 == requests.get(url).status_code else False
+
+
 
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
