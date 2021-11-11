@@ -269,7 +269,11 @@ document.getElementById("submitJobRequest").addEventListener("click", function (
             body: new URLSearchParams({
                 reqJsonData: JSON.stringify(requestData)
             })
-        })
+        }).then(()=>console.log("Done"));
+
+        alert("Job has just started!\nRedirecting to dashboard");
+        document.location.replace("/dashboard");
+            /*
             .then(response => {
                 let setResult = (result) => {
                     if (Boolean(result)) {
@@ -291,5 +295,6 @@ document.getElementById("submitJobRequest").addEventListener("click", function (
                     });
                 }
             })
+             */
     })
 })
