@@ -1,23 +1,28 @@
 {
-  "SQL injection": {
-    "type" : []
+  "info": {
+    "allowMethod": []
   },
-  "XSS" : {
-    "type": [],
-    "header": {
-      "HttpOnly": false,
-      "X-Frame-Options": false
-    }
+  "doubt": {
+    "SQL injection": {
+      "type": [
+        "None"
+      ]
+    },
+    "XSS": {
+      "type": [
+        "None"
+      ],
+      "header": {
+        "HttpOnly": false,
+        "X-Frame-Options": false
+      }
+    },
+    "CORS": false,
+    "Open Redirect": "url",
+    "s3": [],
+    "File Upload": false
   },
-  "CORS" : false,
-  "Allow Method": [],
-  "Open Redirect": "url",
-  "s3" : [],
-  "jwt" : [],
-  "subdomain" : [],
-  "api_key" : {
-    "facebook" : "asdf"
-  },
-  "File Upload": false,
-  "robots.txt": false
+  "misc": {
+    "robots.txt": false
+  }
 }

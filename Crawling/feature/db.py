@@ -95,12 +95,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
 
         cors_check = corsCheck(packet)
         if cors_check != "None":
-            attack_vector["CORS"] = True
+            attack_vector["doubt"]["CORS"] = True
             impactRate = 2
-
-            ''' 제거 예정
-            attack_vector[2]["CORS"] = False
-            '''
             
         url_part = urlparse(packet["request"]["full_url"])
         domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
@@ -134,14 +130,14 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
 
         open_redirect = openRedirectionCheck(packet)
         if open_redirect:
-            attack_vector["Open Redirect"] = open_redirect
+            attack_vector["doubt"]["Open Redirect"] = open_redirect
             impactRate = 2
         # attack_vector["s3"] = s3BucketCheck(packet)
         # attack_vector["jwt"] = jwtCheck(packet)
 
         #robots.txt check
         if robots_result == True:
-            attack_vector["robots.txt"] = robots_result
+            attack_vector["info"]["robots.txt"] = robots_result
         
         # 패킷 url이 중복된다면 ??
         # json.dumps()

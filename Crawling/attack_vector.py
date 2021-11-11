@@ -71,105 +71,66 @@ def input_tag(response_body, http_method, infor_vector):
 
                 #~~~~~~~~~~~~SQL Injection and XSS
 
-                ''' 제거 예정
-                data[0]["vuln"] = "SQL Injection"
-                data[0]["impactRate"] = 1
-                '''
-
-                '''
-                if "<th" in response_body and tag.attrs['type'] == "password":
-
-                    data["SQL injection"]["type"].append("board")
-                    data["SQL injection"]["type"].append("account")
-                    data["XSS"]["type"].append("board")
-                    data["XSS"]["type"].append("account")
-
-                    impactRate = 2
-                '''
-
                 # th tag check (board) and type="password" check (login)
                 if "<th" in response_body:
-                    if "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
-                        index_sql = data["SQL injection"]["type"].index("None")
-                        index_xss = data["XSS"]["type"].index("None")
-                        del (data["SQL injection"]["type"][index_sql])
-                        del (data["XSS"]["type"][index_xss])
+                    if "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
+                        index_sql = data["doubt"]["SQL injection"]["type"].index("None")
+                        index_xss = data["doubt"]["XSS"]["type"].index("None")
+                        del (data["doubt"]["SQL injection"]["type"][index_sql])
+                        del (data["doubt"]["XSS"]["type"][index_xss])
 
-                    if "board" in data["SQL injection"]["type"] or "board" in data["XSS"]["type"]:
+                    if "board" in data["doubt"]["SQL injection"]["type"] or "board" in data["doubt"]["XSS"]["type"]:
                         pass
                     else:
-                        data["SQL injection"]["type"].append("board")
-                        data["XSS"]["type"].append("board")
+                        data["doubt"]["SQL injection"]["type"].append("board")
+                        data["doubt"]["XSS"]["type"].append("board")
 
                         impactRate = 2
-
-                    ''' 제거 예정
-                    data[0]["Type"] = "board"
-                    data[0]["impactRate"] = 2
-                    '''
 
                 if tag.attrs['type'] == "password":
-                    if "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
-                        index_sql = data["SQL injection"]["type"].index("None")
-                        index_xss = data["XSS"]["type"].index("None")
-                        del (data["SQL injection"]["type"][index_sql])
-                        del (data["XSS"]["type"][index_xss])
+                    if "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
+                        index_sql = data["doubt"]["SQL injection"]["type"].index("None")
+                        index_xss = data["doubt"]["XSS"]["type"].index("None")
+                        del (data["doubt"]["SQL injection"]["type"][index_sql])
+                        del (data["doubt"]["XSS"]["type"][index_xss])
 
-                    if "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"]:
+                    if "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"]["type"]:
                         pass
                     else:
-                        data["SQL injection"]["type"].append("account")
-                        data["XSS"]["type"].append("account")
+                        data["doubt"]["SQL injection"]["type"].append("account")
+                        data["doubt"]["XSS"]["type"].append("account")
 
                         impactRate = 2
 
-                    ''' 제거 예정
-                    data[0]["Type"] = "account"
-                    data[0]["impactRate"] = 2
-                    '''
-
-                if "board" in data["SQL injection"]["type"] or "board" in data["XSS"]["type"] \
-                        or "account" in data["SQL injection"]["type"] or "account" in data["XSS"]["type"] \
-                        or "None" in data["SQL injection"]["type"] or "None" in data["XSS"]["type"]:
+                if "board" in data["doubt"]["SQL injection"]["type"] or "board" in data["doubt"]["XSS"]["type"] \
+                        or "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"]["type"] \
+                        or "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
                     pass
                 else:
-                    data["SQL injection"]["type"].append("None")
-                    data["XSS"]["type"].append("None")
+                    data["doubt"]["SQL injection"]["type"].append("None")
+                    data["doubt"]["XSS"]["type"].append("None")
 
                     impactRate = 1
 
                 if "Not_HttpOnly" in infor_vector:
-                    data["XSS"]["header"]["HttpOnly"] = True
+                    data["doubt"]["XSS"]["header"]["HttpOnly"] = True
 
                     if impactRate != 2:
                         impactRate = 1
 
-                    ''' 제거 예정
-                    data[1]["Header"]["HttpOnly"] = False
-                    data[1]["impactRate"] = 2
-                    '''
                 if "Not_X-Frame-Options" in infor_vector:
-                    data["XSS"]["header"]["X-Frame-Options"] = True
+                    data["doubt"]["XSS"]["header"]["X-Frame-Options"] = True
 
                     if impactRate != 2:
                         impactRate = 1
-
-                    ''' 제거 예정
-                    data[1]["Header"]["HttpOnly"] = False
-                    data[1]["impactRate"] = 2
-                    '''
 
                 #~~~~~~~~~~~~Allow Method
                 if "private" not in http_method:
-                    data["Allow Method"] = http_method
-
-                    ''' 제거 예정
-                    data[3]["Allow Method"] = http_method
-                    '''
+                    data["info"]["allowMethod"] = http_method
 
                 #~~~~~~~~~~~~File Upload
                 if tag.attrs['type'] == "file":
-                    data["File Upload"] = True
+                    data["doubt"]["File Upload"] = True
 
                     impactRate = 2
 
