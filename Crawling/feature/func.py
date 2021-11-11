@@ -22,14 +22,11 @@ def isSamePath(visit_url, previous_urls):
         for link in previous_urls:
             previous = urlparse(link)
 
-            if (visit.path == previous.path) and (visit.query == previous.query):
-                return True
-
             # https://naver.com 과 https://naver.com/ 는 같은 url 이므로 검증하는 코드 작성.
-            visit_path_len = len(visit.path.replace("/", ""))
-            previous_path_len = len(previous.path.replace("/", ""))
+            visit_path_len = len(visit.path.replace("/", "", 1))
+            previous_path_len = len(previous.path.replace("/", "", 1))
 
-            if visit_path_len == 0 and previous_path_len == 0:
+            if visit.query == previous.query and visit_path_len == 0 and previous_path_len == 0:
                 return True
         else:
             return False

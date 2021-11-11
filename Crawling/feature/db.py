@@ -129,14 +129,17 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             domain_cookie = json.dumps(cookie_result[packet["request"]["full_url"]])
 
         open_redirect = openRedirectionCheck(packet)
+        s3_bucket = s3BucketCheck(packet)
+        # jwt_token = jwtCheck(packet)
         if open_redirect:
             attack_vector["doubt"]["Open Redirect"] = open_redirect
             impactRate = 2
         else:
             attack_vector["doubt"].pop("Open Redirect")
 
-        #수정 필요
-        attack_vector["s3"] = s3BucketCheck(packet)
+        if s3_bucket:
+            attack_vector["doubt"]["s3"] = s3BucketCheck(packet)
+            impactRate = 2
         # attack_vector["jwt"] = jwtCheck(packet)
 
         #robots.txt check
