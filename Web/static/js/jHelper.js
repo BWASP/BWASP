@@ -1,14 +1,11 @@
 class API {
     constructor() {
-        return (async () => {
-            await fetch("/static/data/frontConfig.json")
-                .then(blob => blob.json())
-                .then(res => {
-                    this.API = res.API
-                    this.debug = res.debug
-                })
-            return this;
-        })();
+        fetch("/static/data/frontConfig.json")
+            .then(blob => blob.json())
+            .then(res => {
+                this.API = res.API
+                this.debug = res.debug
+            })
     }
 
     /**
@@ -17,6 +14,7 @@ class API {
      * @param {function} callback
      */
     communicate(endpoint, callback) {
+        if(typeof(this.API)==="undefined") return callback(["API Communication error", "Please wait until it retries."]);
         fetch(this.API.base + endpoint, {
             method: "GET",
             cache: "no-cache",
@@ -33,7 +31,7 @@ class API {
             })
             .catch(error => {
                 console.log(`:: DEBUG : ERROR ::\n${error}`);
-                callback(error)
+                callback(error.toString().split(": "))
             })
     }
 
@@ -79,6 +77,8 @@ class API {
             .replaceAll("\"", replaceKeyword[1])
             .replaceAll("\\'", replaceKeyword[0])
             .replaceAll("'", "\"")
+            .replaceAll("True", "true")
+            .replaceAll("False", "false")
             .replaceAll(replaceKeyword[0], "\\'")
             .replaceAll(replaceKeyword[1], "\'");
         return (parseJSON) ? JSON.parse(str) : str;
@@ -99,6 +99,7 @@ class tableBuilder {
         };
         elements.forEach((currentElement) => {
             let tmpElement = document.createElement("th");
+            tmpElement.classList.add("text-center");
             tmpElement.innerText = currentElement;
             thead.child.appendChild(tmpElement);
         })
@@ -106,14 +107,14 @@ class tableBuilder {
         return thead.parent;
     }
 
-    dataNotPresent(){
+    dataNotPresent() {
         let noData = document.createElement("td");
         noData.innerText = " - ";
         noData.classList.add("text-muted", "text-center");
         return noData;
     }
 
-    commaAsElement(){
+    commaAsElement() {
         let comma = document.createElement("span");
         comma.innerText = ", ";
         return comma;
@@ -134,5 +135,13 @@ let createKey = (level = 2, keyPrefix = "anonID") => {
     for (let i = 0; i < level; i++) createdKey += `-${gen()}`;
     return createdKey;
 }
+
+String.prototype.format = function () {
+    let outputText = this;
+    for (let arg in arguments) {
+        outputText = outputText.replace("{" + arg + "}", arguments[arg]);
+    }
+    return outputText;
+};
 
 export {API, createKey, tableBuilder};
