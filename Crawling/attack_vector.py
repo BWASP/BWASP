@@ -172,11 +172,11 @@ def input_tag(response_body, http_method, infor_vector):
             try:
                 action_page.append(tag.attrs['action'])
             except:
-                action_page.append("None")
+                pass
             try:
                 action_type.append(tag.attrs['method'])
             except:
-                action_type.append("None")
+                pass
                 
     return tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate
 
