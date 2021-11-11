@@ -293,6 +293,7 @@ class pagerTools {
 
             // Build params if present
             let paramSet = Array();
+            rowElement.child.params.classList.add("text-center");
             dataSet.params.forEach((param) => {
                 if (param !== "") {
                     if (param.includes("=")) param = param.split("=")[0];
@@ -314,6 +315,7 @@ class pagerTools {
 
             // Build vulnerability doubt
             paramSet = Object.keys(dataSet.vulnerability.type.doubt);
+            rowElement.child.doubt.classList.add("text-center");
             paramSet.forEach((param) => {
                 let codeElement = document.createElement("code");
                 codeElement.innerText = param;
