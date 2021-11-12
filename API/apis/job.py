@@ -1,6 +1,6 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
-from .api_returnObj import ReturnObject
+from .api_returnObj import Return_object
 import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -9,7 +9,7 @@ from models.BWASP import job as jobModel
 
 ns = Namespace('api/job', description='job operations')
 
-job = ns.model('Job', {
+job = ns.model('job model', {
     'id': fields.Integer(readonly=True, description='setting initialization(Job) id for unique identifier'),
     'targetURL': fields.String(required=True, description='target URL'),
     'knownInfo': fields.String(required=True, description='Known information'),
@@ -17,28 +17,28 @@ job = ns.model('Job', {
     'uriPath': fields.String(required=True, description='Path on Web Server')
 })
 
-job_returnPost = ns.model('job_returnPost', {
+job_return_post_method = ns.model('Job Return Post Message', {
     "message": fields.String(readonly=True, description='message of return data')
 })
 
 
-class JobDAO(object):
+class Job_data_access_object(object):
     def __init__(self):
         self.counter = 0
         self.selectData = ""
         self.insertData = ""
 
-    def get_retRowCount(self):
-        self.counter = g.BWASP_DBObj.query(jobModel).count()
+    def get_return_row_count(self):
+        self.counter = g.bwasp_db_obj.query(jobModel).count()
         return self.counter
 
     def get(self, id=None, Type=False):
         if Type is False and id is None:
-            self.selectData = g.BWASP_DBObj.query(jobModel).all()
+            self.selectData = g.bwasp_db_obj.query(jobModel).all()
             return self.selectData
 
-        if Type is not False and self.get_retRowCount() >= id > 0:
-            self.selectData = g.BWASP_DBObj.query(jobModel).filter(jobModel.id == id).all()
+        if Type is not False and self.get_return_row_count() >= id > 0:
+            self.selectData = g.bwasp_db_obj.query(jobModel).filter(jobModel.id == id).all()
             return self.selectData
 
         ns.abort(404, f"job {id} doesn't exist")
@@ -49,52 +49,52 @@ class JobDAO(object):
                 self.insertData = data
 
                 for ListOfData in range(len(data)):
-                    g.BWASP_DBObj.add(
+                    g.bwasp_db_obj.add(
                         jobModel(targetURL=str(self.insertData[ListOfData]["targetURL"]),
                                  knownInfo=json.dumps(self.insertData[ListOfData]["knownInfo"]),
                                  recursiveLevel=str(self.insertData[ListOfData]["recursiveLevel"]),
                                  uriPath=str(self.insertData[ListOfData]["uriPath"])
                                  )
                     )
-                    g.BWASP_DBObj.commit()
+                    g.bwasp_db_obj.commit()
 
-                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
+                return Return_object().return_post_http_status_message(Type=True)
             except:
-                g.BWASP_DBObj.rollback()
+                g.bwasp_db_obj.rollback()
 
-        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
+        return Return_object().return_post_http_status_message(Type=False)
 
 
-Job_DAO = JobDAO()
+data_access_object_for_job = Job_data_access_object()
 
 
 # Job
 @ns.route('')
-class JobList(Resource):
+class Job_list(Resource):
     """Shows a list of all job data, and lets you POST to add new data"""
 
     @ns.doc('List of all Job data')
     @ns.marshal_list_with(job)
     def get(self):
         """Shows Job data"""
-        return Job_DAO.get()
+        return data_access_object_for_job.get(id=None, Type=False)
 
     @ns.doc('Create Job')
     @ns.expect(job)
-    @ns.marshal_with(job_returnPost)
+    @ns.marshal_with(job_return_post_method)
     def post(self):
         """Create Job"""
-        return Job_DAO.create(ns.payload)
+        return data_access_object_for_job.create(ns.payload)
 
 
 @ns.route('/<int:id>')
 @ns.response(404, 'Jobs not found')
 @ns.param('id', 'Job id for unique identifier')
-class single_JobList(Resource):
+class Single_job_list(Resource):
     """Show a single Job data"""
 
     @ns.doc('Get single Job data')
     @ns.marshal_list_with(job)
     def get(self, id):
         """Fetch a given resource"""
-        return Job_DAO.get(id, Type=True)
+        return data_access_object_for_job.get(id=id, Type=True)

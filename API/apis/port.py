@@ -1,6 +1,6 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace
-from .api_returnObj import ReturnObject
+from .api_returnObj import Return_object
 import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -17,32 +17,32 @@ ports = ns.model('Ports', {
     'result': fields.String(required=True, description='target port scanning result')
 })
 
-ports_returnPost = ns.model('ports_returnPost', {
+ports_return_post_method = ns.model('Ports Return Post Message', {
     "message": fields.String(readonly=True, description='message of return data')
 })
 
-ports_RowCount = ns.model('ports_RowCount', {
-    'RowCount': fields.Integer(readonly=True, description='Count of all CspEvaluator id data')
+ports_row_count = ns.model('Ports row count', {
+    'count': fields.Integer(readonly=True, description='Count of all CspEvaluator id data')
 })
 
 
-class PortsDAO(object):
+class Ports_data_access_object(object):
     def __init__(self):
         self.counter = 0
         self.selectData = ""
         self.insertData = ""
 
-    def get_retRowCount(self):
-        self.counter = g.BWASP_DBObj.query(portsModel).count()
-        return self.counter
+    def get_return_row_count(self):
+        self.counter = g.bwasp_db_obj.query(portsModel).count()
+        return {"count": self.counter}
 
     def get(self, id=None, Type=False):
         if Type is False and id is None:
-            self.selectData = g.BWASP_DBObj.query(portsModel).all()
+            self.selectData = g.bwasp_db_obj.query(portsModel).all()
             return self.selectData
 
-        if Type is not False and self.get_retRowCount() >= id > 0:
-            self.selectData = g.BWASP_DBObj.query(portsModel).filter(portsModel.id == id).all()
+        if Type is not False and self.get_return_row_count()["count"] >= id > 0:
+            self.selectData = g.bwasp_db_obj.query(portsModel).filter(portsModel.id == id).all()
             return self.selectData
 
         ns.abort(404, f"Port {id} doesn't exist")
@@ -53,64 +53,64 @@ class PortsDAO(object):
                 self.insertData = data
 
                 for ListOfData in range(len(data)):
-                    g.BWASP_DBObj.add(
+                    g.bwasp_db_obj.add(
                         portsModel(service=self.insertData[ListOfData]["service"],
                                    target=self.insertData[ListOfData]["target"],
                                    port=self.insertData[ListOfData]["port"],
                                    result=self.insertData[ListOfData]["result"]
                                    )
                     )
-                    g.BWASP_DBObj.commit()
+                    g.bwasp_db_obj.commit()
 
-                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
+                return Return_object().return_post_http_status_message(Type=True)
             except:
-                g.BWASP_DBObj.rollback()
+                g.bwasp_db_obj.rollback()
 
-        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
+        return Return_object().return_post_http_status_message(Type=False)
 
 
-Ports_DAO = PortsDAO()
+data_access_object_for_ports = Ports_data_access_object()
 
 
 # ports
 @ns.route('')
-class PortsList(Resource):
+class Ports_list(Resource):
     """Shows a list of all Ports data, and lets you POST to add new data"""
 
     @ns.doc('List of all ports data')
     @ns.marshal_list_with(ports)
     def get(self):
         """Shows Ports data"""
-        return Ports_DAO.get()
+        return data_access_object_for_ports.get(id=None, Type=False)
 
     @ns.doc('Create Ports scanning result')
     @ns.expect(ports)
-    @ns.marshal_with(ports_returnPost)
+    @ns.marshal_with(ports_return_post_method)
     def post(self):
         """Create Ports scanning result"""
-        return Ports_DAO.create(ns.payload)
+        return data_access_object_for_ports.create(ns.payload)
 
 
 @ns.route('/<int:id>')
 @ns.response(404, 'ports not found')
 @ns.param('id', 'Ports id for unique identifier')
-class single_PortsList(Resource):
+class Single_Ports_list(Resource):
     """Show a single Ports item"""
 
     @ns.doc('Get single Ports')
     @ns.marshal_list_with(ports)
     def get(self, id):
         """Fetch a given resource"""
-        return Ports_DAO.get(id, Type=True)
+        return data_access_object_for_ports.get(id, Type=True)
 
 
 @ns.route('/count')
-class count_PortsList(Resource):
+class Count_Ports_list(Resource):
     """Show count of all ports data"""
 
     @ns.doc('Get count of all ports data')
-    @ns.marshal_with(ports_RowCount)
+    @ns.marshal_with(ports_row_count)
     def get(self):
         """Fetch a given resource"""
-        return {"RowCount": Ports_DAO.get_retRowCount()}
+        return data_access_object_for_ports.get_return_row_count()
         # TODO: Return Type
