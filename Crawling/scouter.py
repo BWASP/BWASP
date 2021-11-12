@@ -125,11 +125,8 @@ def visit(driver, url, depth, options):
     p.start()
     process_list.append(p)
     if len(process_list) > 3:
-        i = 1
         for process in process_list:
             process.join()
-            print(i)
-            i += 1
         process_list = list()
 
     if depth == 0:
