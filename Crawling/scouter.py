@@ -124,7 +124,11 @@ def visit(driver, url, depth, options):
     start_options["previous_packet_count"] += len(req_res_packets)
     p.start()
     process_list.append(p)
-    
+    if len(process_list) > 3:
+        for process in process_list:
+            process.join()
+        process_list = list()
+
     if depth == 0:
         return
 
