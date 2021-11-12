@@ -72,7 +72,30 @@ class pagerTools {
         this.data = {
             rowCount: Number(),
             pageCount: 1
-        }
+        };
+        this.directories = Object();
+    }
+
+    insertURL(URL, URI) {
+        if (typeof (this.directories[URL]) === "undefined") this.directories[URL] = Object();
+
+        // URI to array
+        URI = URI.split("/");
+        URI.splice(0, 1);
+
+        URI.forEach((currentURI) => {
+            let splitURIPiece = URI[0].split(".");
+            console.log(splitURIPiece);
+            // if(splitURIPiece.length !== 0) return this.directories[URL][URI[0]]
+            if(currentURI[0].split("."))
+            this.directories[URL][URI[0]] = Object();
+
+            console.log(currentURI);
+        })
+
+        // this.directories[URL].
+        console.log(URI);
+        console.log(this.directories);
     }
 
     buildPaginationButton() {
@@ -176,6 +199,8 @@ class pagerTools {
                         details: API.jsonDataHandler(domainData["Details"])
                     };
 
+                    // this.insertURL(skeleton.url.url, skeleton.url.uri);
+
                     // Reengineer details.
                     Object.keys(skeleton.details).forEach((key) => skeleton.details[key] = API.jsonDataHandler(skeleton.details[key]));
 
@@ -278,11 +303,11 @@ class pagerTools {
 
             // Build action if present
             if (dataSet.action.target.length !== 0) {
-                for(let rowNum=0; rowNum<=dataSet.action.target.length-1; rowNum++) {
+                for (let rowNum = 0; rowNum <= dataSet.action.target.length - 1; rowNum++) {
                     let localSkeleton = {
                         parent: document.createElement("div"),
-                        target : document.createElement("p"),
-                        method : document.createElement("p")
+                        target: document.createElement("p"),
+                        method: document.createElement("p")
                     }
                     localSkeleton.method.innerText = dataSet.action.type[rowNum];
                     localSkeleton.target.innerText = dataSet.action.target[rowNum];
