@@ -25,6 +25,10 @@ const APIEndpoints = {
     elements = {
         vectors: ["Category", "URL", "Action", "Params", "Threat", "Method", "Impact"],
         packets: []
+    },
+    coloring = {
+        post: "bg-primary",
+        get: "bg-success"
     };
 
 let stateHandler = {
@@ -274,18 +278,25 @@ class pagerTools {
 
             // Build action if present
             if (dataSet.action.target.length !== 0) {
-                let target = document.createElement("p"),
-                    method = document.createElement("p")
-                method.innerText = dataSet.action.type[0];
-                target.innerText = dataSet.action.target[0];
+                for(let rowNum=0; rowNum<=dataSet.action.target.length-1; rowNum++) {
+                    let localSkeleton = {
+                        parent: document.createElement("div"),
+                        target : document.createElement("p"),
+                        method : document.createElement("p")
+                    }
+                    localSkeleton.method.innerText = dataSet.action.type[rowNum];
+                    localSkeleton.target.innerText = dataSet.action.target[rowNum];
 
-                method.classList.add("badge", "bg-success", "text-uppercase", "me-2", "mb-1");
-                target.classList.add("mb-0");
+                    localSkeleton.parent.classList.add("mt-1", "mb-1");
+                    localSkeleton.method.classList.add("badge", coloring[dataSet.action.type[0].toLowerCase()], "text-uppercase", "me-2", "mb-1");
+                    localSkeleton.target.classList.add("mb-0");
 
-                rowElement.child.action.parent.append(
-                    method,
-                    target
-                );
+                    localSkeleton.parent.append(
+                        localSkeleton.method,
+                        localSkeleton.target
+                    )
+                    rowElement.child.action.parent.appendChild(localSkeleton.parent);
+                }
                 rowElement.parent.appendChild(rowElement.child.action.parent);
             } else {
                 rowElement.parent.appendChild(builder.dataNotPresent());
@@ -388,7 +399,7 @@ document.getElementById("viewPref-input-currentPage").addEventListener("change",
 document.getElementById("viewPref-button-save").addEventListener("click", () => pager.buildPage());
 
 window.onload = () => {
-    pager.buildPage().then(()=>{
+    pager.buildPage().then(() => {
         document.getElementById("openHelpModal").addEventListener("click", () => userHelpModal.toggle());
         // document.getElementById("viewPref-input-rowPerPage").value = 12;
         console.log("rowPerPage", document.getElementById("viewPref-input-rowPerPage").value, pager.paging.rowPerPage);
