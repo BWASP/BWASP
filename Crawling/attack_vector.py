@@ -4,9 +4,8 @@ import json
 import re
 
 
-def attack_header(target_url):
-    r = requests.get(target_url, verify=False)
-    dict_data = r.headers
+def attackHeader(target_url):
+    dict_data = requests.get(target_url, verify=False).headers
     infor_data = ""
     infor_vector = ""
     try:
@@ -42,7 +41,7 @@ def attack_header(target_url):
     return http_method, infor_vector
 
 
-def input_tag(response_body, http_method, infor_vector):
+def inputTag(response_body, http_method, infor_vector):
     # form tag action and input tag and input name parse
     try:
         soup = BeautifulSoup(response_body, 'html.parser')
@@ -250,7 +249,7 @@ def jwtCheck(packet):
         return_jwt += req_header + req_body + res_header + res_body
     return list(set(return_jwt))
 
-def robots_txt(url):
+def robotsTxt(url):
     # 주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf [page 726] robots.txt not set
     url = url.split("/")[0] + "//" + url.split("/")[2] + "/robots.txt"
     return True if "user-agent" not in requests.get(url).text.lower() or 404 == requests.get(url).status_code else False

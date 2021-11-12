@@ -62,7 +62,6 @@ class SysteminfoDAO(object):
 
                 return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
             except:
-                print("except")
                 g.BWASP_DBObj.rollback()
 
         return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
