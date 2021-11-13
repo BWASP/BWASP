@@ -1,7 +1,5 @@
 import requests
 
-
-
 class Config(object):
     def __init__(self):
         self.API_URL_PREFIX = "http://localhost:20102"
@@ -21,6 +19,10 @@ class Packets:
             "GET": "/manual/index",
             "POST": "/manual"
         }
+        self.URL_PREFIX_Count = {
+            "Automation": "/automation/count",
+            "Manual": "/manual/count",
+        }
 
         self.requestObj = requests
         self.responseObj = ""
@@ -28,6 +30,27 @@ class Packets:
             "accept": "application/json",
             "Content-Type": "application/json"
         }
+    
+    def GetAutomationCount(self):  # Automation count
+        self.responseObj = self.requestObj.get(
+            url=self.URL_PREFIX + self.URL_PREFIX_Count["Automation"],
+            headers=self.requestHeaders
+        )
+
+        return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
+
+    def GetManualCount(self):  # Manual count
+        self.responseObj = self.requestObj.get(
+            url=self.URL_PREFIX + self.URL_PREFIX_Count["Manual"],
+            headers=self.requestHeaders
+        )
+        """
+        {
+            "count": 3
+        }
+        """
+
+        return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
 
     def GetAutomationIndex(self):  # Automation index
         self.responseObj = self.requestObj.get(
