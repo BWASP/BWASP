@@ -45,32 +45,34 @@ def get_dbpath(repo_name="BWASP",prefix="sqlite:///",sub_path="Web\databases\BWA
         - key: String
         - return: boolean
 """
-def isExistExtension(url, key):
+def isExistExtension(url, keys):
     extensions_dict = {
-        "image" : ["png", "gif", "jpg", "jpeg", "webp", "tiff", "bmp", "svg", "jpe", "jif", "jfif", "jfi", "ico"]
+        "image" : ["png", "gif", "jpg", "jpeg", "webp", "tiff", "bmp", "svg", "jpe", "jif", "jfif", "jfi", "ico"],
+        "style" : ["css", "scss"]
     }
-
-    if not key in list(extensions_dict.keys()):
-        return False
     
-    extension_list = extensions_dict[key]
-    parse_url = urlparse(url)
+    for key in keys:
+        if not key in list(extensions_dict.keys()):
+            return False
+        
+        extension_list = extensions_dict[key]
+        parse_url = urlparse(url)
 
-    # Check only path
-    url_path_extension = parse_url.path.split(".")[::-1][0]
-    if url_path_extension in extension_list:
-        return True
-    
-    # Check only query
-    url_query = parse_url.query.split("&")
-    for query in url_query:
-        value = query.split("=")
-
-        if len(value) == 2:
-            query_extension = value[1].split(".")[::-1][0]
-        else:
-            query_extension = value[0].split(".")[::-1][0]
-        if query_extension in extension_list:
+        # Check only path
+        url_path_extension = parse_url.path.split(".")[::-1][0]
+        if url_path_extension in extension_list:
             return True
+        
+        # Check only query
+        # url_query = parse_url.query.split("&")
+        # for query in url_query:
+        #     value = query.split("=")
+
+        #     if len(value) == 2:
+        #         query_extension = value[1].split(".")[::-1][0]
+        #     else:
+        #         query_extension = value[0].split(".")[::-1][0]
+        #     if query_extension in extension_list:
+        #         return True
 
     return False
