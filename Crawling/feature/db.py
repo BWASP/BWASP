@@ -50,7 +50,7 @@ def insertCSP(csp_result):
 # REST API: 도훈 Domains
 # TODO
 # 중복된 url 이 있을 경우, 데이터를 넣어야 하는가?
-def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, http_method, infor_vector, robots_result):
+def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, http_method, infor_vector, robots_result, error_result):
     # db_connect, db_table = connect("domain")
     '''
     [
@@ -87,10 +87,11 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
     for i, packet in enumerate(req_res_packets):
         if not func.isSameDomain(target_url, packet["request"]["full_url"]):
             continue
-
+        if func.isExistExtension(packet["request"]["full_url"], ["image", "style", "font"]):
+            continue
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
         response_body = packet["response"]["body"]
-        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = input_tag(response_body, http_method, infor_vector)
+        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = inputTag(response_body, http_method, infor_vector)
 
         cors_check = corsCheck(packet)
         if cors_check != "None":
@@ -162,6 +163,13 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             attack_vector["misc"]["robots.txt"] = robots_result
         else:
             attack_vector["misc"].pop("robots.txt")
+
+        #Error Page check
+        if error_result == True:
+            attack_vector["misc"]["error"] = error_result
+        else:
+            attack_vector["misc"].pop("error")
+
         # 패킷 url이 중복된다면 ??
         # json.dumps()
         # getPacketIndex

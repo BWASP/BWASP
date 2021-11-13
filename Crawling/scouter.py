@@ -5,9 +5,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 import re,json
 
 from Crawling import analyst
-from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
+from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, csp_evaluator, db, func
 from Crawling.feature.api import *
-from Crawling.attack_vector import attack_header, robots_txt
+from Crawling.attack_vector import attackHeader, robotsTxt, errorPage
 
 # TODO
 # 사용자가 여러개의 사이트를 동시에 테스트 할 때, 전역 변수의 관리 문제
@@ -24,6 +24,7 @@ process_list = list()
 http_method = "None"
 infor_vector = "None"
 robots_result = False
+error_result = False
 
 def start(url, depth, options):
     global start_options
@@ -46,7 +47,7 @@ def start(url, depth, options):
     start_options["visited_links"] = []
     start_options["count_links"] = {}
 
-def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,current_url,previous_packet_count,http_method, infor_vector, robots_result):
+def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,current_url,previous_packet_count,http_method, infor_vector, robots_result, error_result):
     global start_options
     global loadpacket_indexes
 
@@ -62,7 +63,7 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
 
-    db.insertDomains(req_res_packets, cookie_result,packet_indexes , input_url, http_method, infor_vector, robots_result) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
+    db.insertDomains(req_res_packets, cookie_result,packet_indexes , input_url, http_method, infor_vector, robots_result, error_result) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
     db.updateWebInfo(detect_list[0])
     
     return 1
@@ -75,6 +76,7 @@ def visit(driver, url, depth, options):
     global http_method
     global infor_vector
     global robots_result
+    global error_result
 
     try:
         driver.get(url)
@@ -84,8 +86,9 @@ def visit(driver, url, depth, options):
         pass
 
     if start_options["check"]:
-        http_method, infor_vector = attack_header(driver.current_url)
-        robots_result = robots_txt(driver.current_url)
+        http_method, infor_vector = attackHeader(driver.current_url)
+        robots_result = robotsTxt(driver.current_url)
+        error_result = errorPage(driver.current_url)
         start_options["input_url"] = driver.current_url
         db.postWebInfo(start_options["input_url"])
         start_options["visited_links"].append(start_options["input_url"])
@@ -115,15 +118,15 @@ def visit(driver, url, depth, options):
         cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
         cur_page_links += get_res_links.start(driver.current_url, req_res_packets, driver.page_source)
         cur_page_links = list(set(packet_capture.deleteFragment(cur_page_links)))
-        # domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
     cookie_result = get_cookies.start(driver.current_url, req_res_packets)
 
     req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
     db.insertPackets(req_res_packets)
-    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,driver.current_url,start_options["previous_packet_count"],http_method, infor_vector, robots_result)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,driver.current_url,start_options["previous_packet_count"],http_method, infor_vector, robots_result, error_result)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
     start_options["previous_packet_count"] += len(req_res_packets)
     p.start()
     process_list.append(p)
+
     if len(process_list) > 3:
         for process in process_list:
             process.join()
@@ -139,7 +142,7 @@ def visit(driver, url, depth, options):
             continue
         if func.isSamePath(visit_url, start_options["visited_links"]):
             continue
-        if func.isExistExtension(visit_url, "image"):
+        if func.isExistExtension(visit_url, ["image"]):
             continue
         if checkCountLink(visit_url, start_options["count_links"]):
             continue
