@@ -1,10 +1,10 @@
 import json
-import os
 import re
 from urllib.parse import urlparse, urlunparse
 from bs4 import BeautifulSoup
-from Crawling.feature import func
 from multiprocessing import Lock
+
+from Crawling.feature import func
 
 
 # Main Function
@@ -51,6 +51,8 @@ def start(detect_list, lock, url, cur_page_links, current_url, req_res_packets, 
 
     # TODO: 이미 찾은 패킷은 더 이상 진행 x, detect 들 append 호출 했을 때 리턴값으로 구분 하면 가능
     for i, packet in enumerate(req_res_packets):
+        if func.isExistExtension(packet["request"]["full_url"], ["image", "style"]):
+            continue
         for app in data:
             cats = cat_meta[str(retCatrepresnt(data[app]['cats']))]["name"]
             for option in options:
