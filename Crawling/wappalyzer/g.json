@@ -1330,6 +1330,17 @@
     "scripts": "w\\.gumstack\\.com",
     "website": "https://gumstack.com/"
   },
+  "gnuboard": {
+    "cats": [
+      1
+    ],
+    "description": "",
+    "icon": "gnuboard.png",
+    "html" : [
+      "<script(.*)src=\"(.*)\/js\/wrest.js[^>]*>"
+    ],
+    "website": "https://sir.kr"
+  },
   "git": {
     "cats": [
       47
