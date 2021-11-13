@@ -1,13 +1,14 @@
 # https://marketology.co.kr/all-category/tag-manager/gtm-%ED%81%B4%EB%A6%AD-%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EC%B6%94%EC%A0%81%EC%9D%98-%EC%A0%95%EC%9D%98-%EB%AA%A9%EC%A0%81-%EB%B0%A9%EB%B2%95/
 
-import requests, ast
+from os import path
+import ast
 from bs4 import BeautifulSoup
 from selenium.common.exceptions import WebDriverException
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 '''
 def parsingURL(url):
@@ -66,18 +67,11 @@ def checkURLFormat(origin, url):
     if parsed_url.scheme == '':
         parsed_url = parsed_url._replace(scheme=parsed_origin.scheme)
         parsed_url = urlparse(parsed_url.geturl())
-        # print(parsed_url.geturl())
 
+    # 상대경로 예외처리
     if parsed_url.netloc == '':
-        if parsed_url.path.split('/')[0] != '':
-            parsed_url = parsed_url._replace(
-                scheme=parsed_origin.scheme, 
-                netloc=parsed_url.path.split('/')[0],
-                path=parsed_url.path[parsed_url.path.find('/'):]
-            )
-        else:
-            parsed_url = parsed_url._replace(netloc=parsed_origin.netloc)
-
+        parsed_url = urljoin(parsed_origin.geturl(), parsed_url.path)
+        
     return parsed_url.geturl()
 
 
