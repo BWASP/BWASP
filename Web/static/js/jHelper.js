@@ -77,8 +77,6 @@ class API {
             .replaceAll("\"", replaceKeyword[1])
             .replaceAll("\\'", replaceKeyword[0])
             .replaceAll("'", "\"")
-            .replaceAll("True", "true")
-            .replaceAll("False", "false")
             .replaceAll(replaceKeyword[0], "'")
             .replaceAll(replaceKeyword[1], "\"");
         ["True", "False"].forEach((currentKeyword)=>{

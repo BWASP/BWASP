@@ -36,7 +36,6 @@ window.onload = () => {
     }
 
     // Render
-    let requestToCrawler = fetch("/static/data/supportedList.json");
     fetch("/static/data/supportedList.json")
         .then(data => data.json())
         .then(SupportedList => {

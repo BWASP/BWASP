@@ -88,7 +88,7 @@ class pagerTools {
             console.log(splitURIPiece);
             // if(splitURIPiece.length !== 0) return this.directories[URL][URI[0]]
             if(currentURI[0].split("."))
-            this.directories[URL][URI[0]] = Object();
+                this.directories[URL][URI[0]] = Object();
 
             console.log(currentURI);
         })
@@ -98,15 +98,11 @@ class pagerTools {
         console.log(this.directories);
     }
 
-    buildPaginationButton() {
-
-    }
-
     async updateRowCount() {
         await this.getRowCount((rowCount) => {
             let maxPageCount = (Math.round(rowCount / this.paging.rowPerPage)).toLocaleString(),
                 formattedRowCount = rowCount.toLocaleString();
-            console.log(rowCount, maxPageCount, this.data.rowCount);
+            console.log(rowCount, maxPageCount, this.data.rowCount, formattedRowCount);
             document.getElementById("viewPref-modal-allRowCount").innerText = formattedRowCount;
             console.log(maxPageCount);
             document.getElementById("viewPref-input-rowPerPage").max = rowCount;
@@ -399,8 +395,8 @@ class pagerTools {
             "/api/domain/count",
             (err, res) => {
                 console.log(res);
-                this.data.rowCount = res.RowCount;
-                callback(Number(res.RowCount));
+                this.data.rowCount = res.count;
+                callback(Number(res.count));
             });
     }
 
