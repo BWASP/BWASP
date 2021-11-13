@@ -5,9 +5,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 import re,json
 
 from Crawling import analyst
-from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
+from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, csp_evaluator, db, func
 from Crawling.feature.api import *
-from Crawling.attack_vector import attack_header, robots_txt
+from Crawling.attack_vector import attackHeader, robotsTxt
 
 # TODO
 # 사용자가 여러개의 사이트를 동시에 테스트 할 때, 전역 변수의 관리 문제
@@ -84,8 +84,8 @@ def visit(driver, url, depth, options):
         pass
 
     if start_options["check"]:
-        http_method, infor_vector = attack_header(driver.current_url)
-        robots_result = robots_txt(driver.current_url)
+        http_method, infor_vector = attackHeader(driver.current_url)
+        robots_result = robotsTxt(driver.current_url)
         start_options["input_url"] = driver.current_url
         db.postWebInfo(start_options["input_url"])
         start_options["visited_links"].append(start_options["input_url"])
@@ -115,7 +115,6 @@ def visit(driver, url, depth, options):
         cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
         cur_page_links += get_res_links.start(driver.current_url, req_res_packets, driver.page_source)
         cur_page_links = list(set(packet_capture.deleteFragment(cur_page_links)))
-        # domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
     cookie_result = get_cookies.start(driver.current_url, req_res_packets)
 
     req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
@@ -139,7 +138,7 @@ def visit(driver, url, depth, options):
             continue
         if func.isSamePath(visit_url, start_options["visited_links"]):
             continue
-        if func.isExistExtension(visit_url, "image"):
+        if func.isExistExtension(visit_url, ["image"]):
             continue
         if checkCountLink(visit_url, start_options["count_links"]):
             continue

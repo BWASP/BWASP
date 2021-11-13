@@ -62,7 +62,6 @@ class Systeminfo_data_access_object(object):
 
                 return Return_object().return_post_http_status_message(Type=True)
             except:
-                print("except")
                 g.bwasp_db_obj.rollback()
 
         return Return_object().return_post_http_status_message(Type=False)
