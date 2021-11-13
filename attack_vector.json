@@ -20,6 +20,7 @@
     "File Upload": false
   },
   "misc": {
-    "robots.txt": false
+    "robots.txt": false,
+    "error": false
   }
 }

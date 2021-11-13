@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import re
+import base64
 
 
 def attackHeader(target_url):
@@ -10,7 +11,7 @@ def attackHeader(target_url):
     infor_vector = ""
     try:
         http_method = requests.options(target_url).headers['Allow'].replace(",", "").split(" ")
-    except:
+    except KeyError:
         http_method = "private"
 
     try:
@@ -70,8 +71,13 @@ def inputTag(response_body, http_method, infor_vector):
 
     if len(text) != 0:
         for tag in text:
+            try:
+                if tag.attrs['type']:
+                    pass
+            except KeyError:
+                continue
             if tag.attrs['type'] != "submit" and len(text) != 0:
-                tag_list.append(str(tag))  # input tag 값 ex) <input ~
+                tag_list.append(base64.b64encode(str(tag).encode('utf-8')).decode('utf-8'))  # input tag 값 ex) <input ~
                 try:
                     tag_name_list.append(tag.attrs['name'])
                 except:
@@ -169,11 +175,11 @@ def inputTag(response_body, http_method, infor_vector):
     if form:
         for tag in form:
             try:
-                action_page.append(tag.attrs['action'])
+                action_page.append(base64.b64encode(tag.attrs['action'].encode('utf-8')).decode('utf-8'))
             except:
                 pass
             try:
-                action_type.append(tag.attrs['method'])
+                action_type.append(base64.b64encode(tag.attrs['method'].encode('utf-8')).decode('utf-8'))
             except:
                 pass
                 
@@ -254,6 +260,10 @@ def robotsTxt(url):
     url = url.split("/")[0] + "//" + url.split("/")[2] + "/robots.txt"
     return True if "user-agent" not in requests.get(url).text.lower() or 404 == requests.get(url).status_code else False
 
+def errorPage(url):
+    # 주요정보통신기반시설_기술적_취약점_뿐석_평가_방법_상세가이드.pdf [page 678] Error Page not set
+    url = url.split("/")[0] + "//" + url.split("/")[2] + "/BWASP/BWASP.TOP9"
+    return True if 404 == requests.get(url).status_code and "not found" in requests.get(url).text.lower() else False
 
 
 

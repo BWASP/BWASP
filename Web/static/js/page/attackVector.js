@@ -309,7 +309,7 @@ class pagerTools {
                     localSkeleton.target.innerText = dataSet.action.target[rowNum];
 
                     localSkeleton.parent.classList.add("mt-1", "mb-1");
-                    localSkeleton.method.classList.add("badge", coloring[dataSet.action.type[0].toLowerCase()], "text-uppercase", "me-2", "mb-1");
+                    localSkeleton.method.classList.add("badge", coloring[dataSet.action.type[rowNum].toLowerCase()], "text-uppercase", "me-2", "mb-1");
                     localSkeleton.target.classList.add("mb-0");
 
                     localSkeleton.parent.append(
