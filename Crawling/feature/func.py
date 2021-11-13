@@ -48,7 +48,8 @@ def get_dbpath(repo_name="BWASP",prefix="sqlite:///",sub_path="Web\databases\BWA
 def isExistExtension(url, keys):
     extensions_dict = {
         "image" : ["png", "gif", "jpg", "jpeg", "webp", "tiff", "bmp", "svg", "jpe", "jif", "jfif", "jfi", "ico"],
-        "style" : ["css", "scss"]
+        "style" : ["css", "scss"],
+        "font" : ["woff2"]
     }
     
     for key in keys:
