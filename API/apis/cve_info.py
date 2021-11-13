@@ -20,21 +20,28 @@ cve_info = ns.model('CVE information model', {
 class Cve_information_data_access_object(object):
     def __init__(self):
         self.counter = 0
-        self.cveInfo = list()
+        self.selectData = ""
+        self.cve_list = ""
+        self.limitCount = 9
 
     def get_search_cve_list(self, framework=None, version=None):
-        if framework is None or version is None:
+        if framework is None and version is None:
             ns.abort(404, f"cve info doesn't exist; Your framework: {framework}, Version: {version}")
 
-        self.counter = g.cve_db_obj.query(cveModel).filter(cveModel.description.like(f"%{framework}%"), cveModel.description.like(f"%{version}%")).count()
+        self.selectData = g.cve_db_obj.query(cveModel).filter(
+            cveModel.description.like(f"%{framework}%")
+        ) if version == "0" else g.cve_db_obj.query(cveModel).filter(
+            cveModel.description.like(f"%{framework}%"), cveModel.description.like(f"%{version}%")
+        )
+
+        self.counter = self.selectData.count()
 
         if self.counter == 0:
             ns.abort(404, f"cve info doesn't exist; Your framework: {framework}, Version: {version}")
-        else:
-            self.cveInfo = g.cve_db_obj.query(cveModel).filter(cveModel.description.like(f"%{framework}%"), cveModel.description.like(f"%{version}%")).order_by(
-                cveModel.year.desc()).all()
 
-        return self.cveInfo
+        self.cve_list = self.selectData.order_by(cveModel.year.desc()).limit(self.limitCount).all()
+
+        return self.cve_list
 
 
 data_access_object_for_cve_information = Cve_information_data_access_object()
@@ -49,4 +56,4 @@ class Cve_list(Resource):
     @ns.marshal_list_with(cve_info)
     def get(self, framework, version):
         """List a CVE info"""
-        return data_access_object_for_cve_information.get_search_cve_list(framework, version)
+        return data_access_object_for_cve_information.get_search_cve_list(framework=framework, version=version)
