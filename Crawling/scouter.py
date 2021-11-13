@@ -5,7 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import re,json
 
 from Crawling import analyst
-from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, get_domains, csp_evaluator, db, func
+from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, csp_evaluator, db, func
 from Crawling.feature.api import *
 from Crawling.attack_vector import attackHeader, robotsTxt
 
@@ -115,7 +115,6 @@ def visit(driver, url, depth, options):
         cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
         cur_page_links += get_res_links.start(driver.current_url, req_res_packets, driver.page_source)
         cur_page_links = list(set(packet_capture.deleteFragment(cur_page_links)))
-        # domain_result = get_domains.start(dict(), driver.current_url, cur_page_links)
     cookie_result = get_cookies.start(driver.current_url, req_res_packets)
 
     req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
@@ -135,7 +134,7 @@ def visit(driver, url, depth, options):
             continue
         if func.isSamePath(visit_url, start_options["visited_links"]):
             continue
-        if func.isExistExtension(visit_url, "image"):
+        if func.isExistExtension(visit_url, ["image"]):
             continue
         if checkCountLink(visit_url, start_options["count_links"]):
             continue
