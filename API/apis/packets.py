@@ -1,15 +1,17 @@
 from flask import g
-from flask_restx import Resource, fields, Namespace, model
-from .api_returnObj import ReturnObject
+from flask_restx import (
+    Resource, fields, Namespace, model
+)
 import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from models.BWASP import packets as packetsModel
+from .api_returnObj import Return_object
 
 ns = Namespace('api/packet', description='packet operations')
 
-packet = ns.model('PacketData', {
+packet = ns.model('Packet model', {
     'id': fields.Integer(readonly=True, description='packet id for unique identifier'),
     'category': fields.Integer(readonly=True, description='packet classification'),
     'statusCode': fields.Integer(required=True, description='status code'),
@@ -19,20 +21,20 @@ packet = ns.model('PacketData', {
     'responseBody': fields.String(required=True, description='response body')
 })
 
-packet_returnPost = ns.model('job_returnPost', {
+packet_return_post_method = ns.model('Packet Return Post Message', {
     "message": fields.String(readonly=True, description='message of return data')
 })
 
-packetIndex = ns.model('packetIndex', {
+packet_index = ns.model('Packet Index', {
     "id": fields.String(readonly=True, description='packet id list for classification')
 })
 
-packet_RowCount = ns.model('packet_RowCount', {
-    'RowCount': fields.Integer(readonly=True, description='Count of all CspEvaluator id data')
+packet_count = ns.model('Packet Row Count', {
+    'count': fields.Integer(readonly=True, description='Count of all CspEvaluator id data')
 })
 
 
-class PacketDAO(object):
+class Packet_data_access_object(object):
     def __init__(self):
         self.DefineAutomation = 0
         self.DefineManual = 1
@@ -43,56 +45,53 @@ class PacketDAO(object):
         self.selectData = ""
         self.insertData = ""
 
-    def get_RowID_InvalidCheck(self, id=None, Type=None):
+    def get_row_id_invalid_check(self, id=None, Type=None):
         if id is not None and Type is True:
-            self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation, packetsModel.id == id).count()
-            if self.selectData != 0:
-                return True
-            else:
-                return False
+            self.selectData = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation, packetsModel.id == id).count()
 
         if id is not None and Type is False:
-            self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineManual, packetsModel.id == id).count()
-            if self.selectData != 0:
-                return True
-            else:
-                return False
+            self.selectData = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.category == self.DefineManual, packetsModel.id == id).count()
+
+        if self.selectData != 0:
+            return True
+
+        return False
 
     # id count in table of packets
-    def get_retRowCount(self, Type=None):
-        self.Automation_Counter = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation).count()
-        self.Manual_Counter = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineManual).count()
+    def get_return_row_count(self, Type=None):
+        self.Automation_Counter = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation).count()
+        self.Manual_Counter = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.category == self.DefineManual).count()
 
         if Type is True:
-            return {"RowCount": int(self.Automation_Counter)}
+            return {"count": int(self.Automation_Counter)}
 
         if Type is False:
-            return {"RowCount": int(self.Manual_Counter)}
+            return {"count": int(self.Manual_Counter)}
 
     def get_automation(self, id=None, Type=False):
         if Type is False and id is None:
-            self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation).all()
+            self.selectData = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation).all()
             return self.selectData
 
-        if Type is not False and self.get_RowID_InvalidCheck(id, Type=True) and id > 0:
-            self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineAutomation).first()
+        if Type is not False and self.get_row_id_invalid_check(id, Type=True) and id > 0:
+            self.selectData = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineAutomation).first()
             return self.selectData
 
         ns.abort(404, f"packet {id} doesn't exist")
 
     def get_manual(self, id=None, Type=False):
         if Type is False and id is None:
-            self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.category == self.DefineManual).all()
+            self.selectData = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.category == self.DefineManual).all()
             return self.selectData
 
-        if Type is not False and self.get_RowID_InvalidCheck(id, Type=False) and id > 0:
-            self.selectData = g.BWASP_DBObj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineManual).first()
+        if Type is not False and self.get_row_id_invalid_check(id, Type=False) and id > 0:
+            self.selectData = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.id == id, packetsModel.category == self.DefineManual).first()
             return self.selectData
 
         ns.abort(404, f"packet {id} doesn't exist")
 
-    def get_automationIndex(self):
-        self.selectData = g.BWASP_DBObj.query(packetsModel.id).filter(packetsModel.category == self.DefineAutomation).all()
+    def get_automation_index(self):
+        self.selectData = g.bwasp_db_obj.query(packetsModel.id).filter(packetsModel.category == self.DefineAutomation).all()
         retIndex = list()
 
         for idx in range(len(self.selectData)):
@@ -100,8 +99,8 @@ class PacketDAO(object):
 
         return {"id": retIndex}  # automaton id of packet list
 
-    def get_manualIndex(self):
-        self.selectData = g.BWASP_DBObj.query(packetsModel.id).filter(packetsModel.category == self.DefineManual).all()
+    def get_manual_index(self):
+        self.selectData = g.bwasp_db_obj.query(packetsModel.id).filter(packetsModel.category == self.DefineManual).all()
         retIndex = list()
 
         for idx in range(len(self.selectData)):
@@ -114,7 +113,7 @@ class PacketDAO(object):
             try:
                 self.insertData = data
                 for ListOfData in range(len(data)):
-                    g.BWASP_DBObj.add(
+                    g.bwasp_db_obj.add(
                         packetsModel(category=0,
                                      statusCode=int(self.insertData[ListOfData]['statusCode']),
                                      requestType=self.insertData[ListOfData]['requestType'],
@@ -123,19 +122,19 @@ class PacketDAO(object):
                                      responseBody=self.insertData[ListOfData]['responseBody']
                                      )
                     )
-                    g.BWASP_DBObj.commit()
-                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
+                    g.bwasp_db_obj.commit()
+                return Return_object().return_post_http_status_message(Type=True)
             except:
-                g.BWASP_DBObj.rollback()
+                g.bwasp_db_obj.rollback()
 
-        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
+        return Return_object().return_post_http_status_message(Type=False)
 
     def create_manual(self, data):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
                 for ListOfData in range(len(data)):
-                    g.BWASP_DBObj.add(
+                    g.bwasp_db_obj.add(
                         packetsModel(category=1,
                                      statusCode=int(self.insertData[ListOfData]['statusCode']),
                                      requestType=self.insertData[ListOfData]['requestType'],
@@ -144,121 +143,121 @@ class PacketDAO(object):
                                      responseBody=self.insertData[ListOfData]['responseBody']
                                      )
                     )
-                    g.BWASP_DBObj.commit()
-                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
+                    g.bwasp_db_obj.commit()
+                return Return_object().return_post_http_status_message(Type=True)
             except:
-                g.BWASP_DBObj.rollback()
+                g.bwasp_db_obj.rollback()
 
-        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
+        return Return_object().return_post_http_status_message(Type=False)
 
 
-Packet_DAO = PacketDAO()
+data_access_object_for_packet = Packet_data_access_object()
 
 
 # Packets
 @ns.route('/automation')
-class automation_packetList(Resource):
+class Automation_packet_list(Resource):
     """Shows a list of all automation packets, and lets you POST to add new data"""
 
     @ns.doc('List of all automation packets')
     @ns.marshal_list_with(packet)
     def get(self):
         """Shows automation packets"""
-        return Packet_DAO.get_automation()
+        return data_access_object_for_packet.get_automation(id=None, Type=False)
 
     @ns.doc('Create automation packet')
     @ns.expect(packet)
-    @ns.marshal_with(packet_returnPost)
+    @ns.marshal_with(packet_return_post_method)
     def post(self):
         """Create automation packet"""
-        return Packet_DAO.create_automation(ns.payload)
+        return data_access_object_for_packet.create_automation(ns.payload)
 
 
 @ns.route('/manual')
-class manual_packetList(Resource):
+class Manual_packet_list(Resource):
     """Shows a list of all manual packets, and lets you POST to add new data"""
 
     @ns.doc('List of all manual packets')
     @ns.marshal_list_with(packet)
     def get(self):
         """Shows manual packets"""
-        return Packet_DAO.get_manual()
+        return data_access_object_for_packet.get_manual(id=None, Type=False)
 
     @ns.doc('Create manual packet')
     @ns.expect(packet)
-    @ns.marshal_with(packet_returnPost)
+    @ns.marshal_with(packet_return_post_method)
     def post(self):
         """Create manual packet"""
-        return Packet_DAO.create_manual(ns.payload)
+        return data_access_object_for_packet.create_manual(ns.payload)
 
 
 @ns.route('/automation/index')
-class automation_packetIndex(Resource):
+class Automation_packet_index(Resource):
     """Shows a list of all automation packet id"""
 
     @ns.doc('List of all automation packet id')
-    @ns.marshal_with(packetIndex)
+    @ns.marshal_with(packet_index)
     def get(self):
         """Shows automation packets id list"""
-        return Packet_DAO.get_automationIndex()
+        return data_access_object_for_packet.get_automation_index()
 
 
 @ns.route('/manual/index')
-class manual_packetIndex(Resource):
+class Manual_packet_index(Resource):
     """Shows a list of all manual packet id"""
 
     @ns.doc('List of all manual packet id')
-    @ns.marshal_with(packetIndex)
+    @ns.marshal_with(packet_index)
     def get(self):
         """Shows manual packets id list"""
-        return Packet_DAO.get_manualIndex()
+        return data_access_object_for_packet.get_manual_index()
 
 
 @ns.route('/automation/<int:id>')
 @ns.response(404, 'packet not found')
 @ns.param('id', 'Packet id for unique identifier')
-class automation_single_packetList(Resource):
+class Automation_single_packet_list(Resource):
     """Show a single packet data for automation"""
 
     @ns.doc('Get single packet data for automation')
     @ns.marshal_list_with(packet)
     def get(self, id):
         """Fetch a given resource"""
-        return Packet_DAO.get_automation(id, Type=True)
+        return data_access_object_for_packet.get_automation(id=id, Type=True)
 
 
 @ns.route('/manual/<int:id>')
 @ns.response(404, 'packet not found')
 @ns.param('id', 'Packet id for unique identifier')
-class manual_single_packetList(Resource):
+class Manual_single_packet_list(Resource):
     """Show a single packet data for manual"""
 
     @ns.doc('Get single packet data for manual')
     @ns.marshal_list_with(packet)
     def get(self, id):
         """Fetch a given resource"""
-        return Packet_DAO.get_manual(id, Type=True)
+        return data_access_object_for_packet.get_manual(id=id, Type=True)
 
 
 @ns.route('/automation/count')
-class count_automation_packetList(Resource):
+class Count_automation_packet_list(Resource):
     """Show count of all domain data"""
 
     @ns.doc('Get count of all domain data')
-    @ns.marshal_with(packet_RowCount)
+    @ns.marshal_with(packet_count)
     def get(self):
         """Fetch a given resource"""
-        return Packet_DAO.get_retRowCount(Type=True)
+        return data_access_object_for_packet.get_return_row_count(Type=True)
         # TODO: Return Type
 
 
 @ns.route('/manual/count')
-class count_manual_packetList(Resource):
+class Count_manual_packet_list(Resource):
     """Show count of all packet data"""
 
     @ns.doc('Get count of all packet data')
-    @ns.marshal_with(packet_RowCount)
+    @ns.marshal_with(packet_count)
     def get(self):
         """Fetch a given resource"""
-        return Packet_DAO.get_retRowCount(Type=False)
+        return data_access_object_for_packet.get_return_row_count(Type=False)
         # TODO: Return Type

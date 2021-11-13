@@ -1,42 +1,44 @@
 from flask import g
-from flask_restx import Resource, fields, Namespace, model
+from flask_restx import (
+    Resource, fields, Namespace, model
+)
 from sqlalchemy import func
-from .api_returnObj import ReturnObject
 import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from models.BWASP import CSPEvaluator as CSPEvaluatorModel
+from .api_returnObj import Return_object
 
 ns = Namespace('api/cspevaluator', description='csp evaluator operations')
 
-CSPEvaluator = ns.model('CSPEvaluator', {
+csp_evaluator = ns.model('CSP Evaluator model', {
     'id': fields.Integer(readonly=True, description='CspEvaluator id for unique identifier'),
     'header': fields.String(required=True, description='Content-Security Policy in HTTP header')
 })
 
-CSPEvaluator_returnPost = ns.model('CSPEvaluator_returnPost', {
+csp_evaluator_return_post = ns.model('CSP Evaluator Return Post Message', {
     "message": fields.String(readonly=True, description='message of return data')
 })
 
 
-class CSPEvaluatorDAO(object):
+class Csp_evaluator_data_access_object(object):
     def __init__(self):
         self.counter = 0
         self.selectData = ""
         self.insertData = ""
 
-    def get_retRowCount(self):
-        self.counter = g.BWASP_DBObj.query(CSPEvaluatorModel).count()
+    def get_return_row_count(self):
+        self.counter = g.bwasp_db_obj.query(CSPEvaluatorModel).count()
         return self.counter
 
     def get(self, id=None, Type=False):
         if Type is False and id is None:
-            self.selectData = g.BWASP_DBObj.query(CSPEvaluatorModel).all()
+            self.selectData = g.bwasp_db_obj.query(CSPEvaluatorModel).all()
             return self.selectData
 
-        if Type is not False and self.get_retRowCount() >= id > 0:
-            self.selectData = g.BWASP_DBObj.query(CSPEvaluatorModel).filter(CSPEvaluatorModel.id == id).all()
+        if Type is not False and self.get_return_row_count() >= id > 0:
+            self.selectData = g.bwasp_db_obj.query(CSPEvaluatorModel).filter(CSPEvaluatorModel.id == id).all()
             return self.selectData
 
         ns.abort(404, f"CSPEvaluator data {id} doesn't exist")
@@ -47,50 +49,50 @@ class CSPEvaluatorDAO(object):
                 self.insertData = data
 
                 for ListOfData in range(len(data)):
-                    g.BWASP_DBObj.add(
+                    g.bwasp_db_obj.add(
                         CSPEvaluatorModel(
                             header=json.dumps(self.insertData[ListOfData]["header"])
                         )
                     )
-                    g.BWASP_DBObj.commit()
+                    g.bwasp_db_obj.commit()
 
-                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
+                return Return_object().return_post_http_status_message(Type=True)
             except:
-                g.BWASP_DBObj.rollback()
+                g.bwasp_db_obj.rollback()
 
-        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
+        return Return_object().return_post_http_status_message(Type=False)
 
 
-CSPEvaluator_DAO = CSPEvaluatorDAO()
+data_access_object_for_csp_evaluator = Csp_evaluator_data_access_object()
 
 
 # CSP Evaluator
 @ns.route('')
-class CSPEvaluatorList(Resource):
+class Csp_evaluator_list(Resource):
     """Shows a list of all CSPEvaluator data and lets you POST to add new data"""
 
     @ns.doc('List of all CSP data')
-    @ns.marshal_list_with(CSPEvaluator)
+    @ns.marshal_list_with(csp_evaluator)
     def get(self):
         """Shows CSPEvaluator data"""
-        return CSPEvaluator_DAO.get()
+        return data_access_object_for_csp_evaluator.get(id=None, Type=False)
 
     @ns.doc('Create CSP data')
-    @ns.expect(CSPEvaluator)
-    @ns.marshal_with(CSPEvaluator_returnPost)
+    @ns.expect(csp_evaluator)
+    @ns.marshal_with(csp_evaluator_return_post)
     def post(self):
         """Create CSPEvaluator data"""
-        return CSPEvaluator_DAO.create(ns.payload)
+        return data_access_object_for_csp_evaluator.create(ns.payload)
 
 
 @ns.route('/<int:id>')
 @ns.response(404, 'CSPEvaluator not found')
 @ns.param('id', 'CSPEvaluator id for unique identifier')
-class single_CSPEvaluatorList(Resource):
+class Single_csp_evaluator_list(Resource):
     """Show a single CSPEvaluator data"""
 
     @ns.doc('Get single CSPEvaluator data')
-    @ns.marshal_list_with(CSPEvaluator)
+    @ns.marshal_list_with(csp_evaluator)
     def get(self, id):
         """Fetch a given resource"""
-        return CSPEvaluator_DAO.get(id, Type=True)
+        return data_access_object_for_csp_evaluator.get(id=id, Type=True)

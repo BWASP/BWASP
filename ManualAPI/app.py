@@ -9,11 +9,11 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 def create_app(config=None):
     app = Flask(__name__)
 
-    from configs import DevelopmentsConfig, ProductionConfig
+    from configs import Developments_config, Production_config
     if app.config['DEBUG']:
-        config = DevelopmentsConfig()
+        config = Developments_config()
     else:
-        config = ProductionConfig()
+        config = Production_config()
 
     # config type
     app.config.from_object(config)

@@ -1,6 +1,6 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
-from .api_returnObj import ReturnObject
+from .api_returnObj import Return_object
 import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -15,34 +15,34 @@ systeminfo = ns.model('SystemInfo', {
     'data': fields.String(required=True, description='target system information')
 })
 
-systeminfo_returnPost = ns.model('systeminfo_returnPost', {
+systeminfo_return_post_method = ns.model('system information return post message', {
     "message": fields.String(readonly=True, description='message of return data')
 })
 
-Update_SystemInfo = ns.model('Update_SystemInfo', {
+update_systeminfo = ns.model('update in system information data', {
     'id': fields.Integer(required=True, description='system-info id for unique identifier'),
     'data': fields.String(required=True, description='target system information')
 })
 
 
-class SysteminfoDAO(object):
+class Systeminfo_data_access_object(object):
     def __init__(self):
         self.counter = 0
         self.selectData = ""
         self.insertData = ""
         self.updateData = ""
 
-    def get_retRowCount(self):
-        self.counter = g.BWASP_DBObj.query(systeminfoModel).count()
+    def get_return_row_count(self):
+        self.counter = g.bwasp_db_obj.query(systeminfoModel).count()
         return self.counter
 
     def get(self, id=None, Type=False):
         if Type is False and id is None:
-            self.selectData = g.BWASP_DBObj.query(systeminfoModel).all()
+            self.selectData = g.bwasp_db_obj.query(systeminfoModel).all()
             return self.selectData
 
-        if Type is not False and self.get_retRowCount() >= id > 0:
-            self.selectData = g.BWASP_DBObj.query(systeminfoModel).filter(systeminfoModel.id == id).all()
+        if Type is not False and self.get_return_row_count() >= id > 0:
+            self.selectData = g.bwasp_db_obj.query(systeminfoModel).filter(systeminfoModel.id == id).all()
             return self.selectData
 
         ns.abort(404, f"System-info {id} doesn't exist")
@@ -53,18 +53,18 @@ class SysteminfoDAO(object):
                 self.insertData = data
 
                 for ListOfData in range(len(data)):
-                    g.BWASP_DBObj.add(
+                    g.bwasp_db_obj.add(
                         systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
                                         data=json.dumps(self.insertData[ListOfData]["data"])
                                         )
                     )
-                    g.BWASP_DBObj.commit()
+                    g.bwasp_db_obj.commit()
 
-                return ReturnObject().Return_POST_HTTPStatusMessage(Type=True)
+                return Return_object().return_post_http_status_message(Type=True)
             except:
-                g.BWASP_DBObj.rollback()
+                g.bwasp_db_obj.rollback()
 
-        return ReturnObject().Return_POST_HTTPStatusMessage(Type=False)
+        return Return_object().return_post_http_status_message(Type=False)
 
     def update(self, data):
         if str(type(data)) == "<class 'list'>":
@@ -72,44 +72,44 @@ class SysteminfoDAO(object):
                 self.updateData = data
 
                 for ListofData in range(len(data)):
-                    g.BWASP_DBObj.query(systeminfoModel).filter(
+                    g.bwasp_db_obj.query(systeminfoModel).filter(
                         systeminfoModel.id == int(self.updateData[ListofData]["id"])
                     ).update(
                         {'data': json.dumps(self.updateData[ListofData]["data"])}
                     )
-                    g.BWASP_DBObj.commit()
+                    g.bwasp_db_obj.commit()
 
-                return ReturnObject().Return_PATCH_HTTPStatusMessage(Type=True)
+                return Return_object().return_patch_http_status_message(Type=True)
             except:
-                g.BWASP_DBObj.rollback()
+                g.bwasp_db_obj.rollback()
 
-        return ReturnObject().Return_PATCH_HTTPStatusMessage(Type=False)
+        return Return_object().return_patch_http_status_message(Type=False)
 
 
-Systeminfo_DAO = SysteminfoDAO()
+Systeminfo_DAO = Systeminfo_data_access_object()
 
 
 # Systeminfo
 @ns.route('')
-class SystemInfoList(Resource):
+class SystemInfo_list(Resource):
     """Shows a list of all system-info, and lets you POST to add new data"""
 
     @ns.doc('List of all system-info')
     @ns.marshal_list_with(systeminfo)
     def get(self):
         """Shows system-infos"""
-        return Systeminfo_DAO.get()
+        return Systeminfo_DAO.get(id=None, Type=False)
 
     @ns.doc('Create system information')
     @ns.expect(systeminfo)
-    @ns.marshal_with(systeminfo_returnPost)
+    @ns.marshal_with(systeminfo_return_post_method)
     def post(self):
         """Create system information"""
         return Systeminfo_DAO.create(ns.payload)
 
     @ns.doc('Update system information')
-    @ns.expect(Update_SystemInfo)
-    @ns.marshal_with(systeminfo_returnPost)
+    @ns.expect(update_systeminfo)
+    @ns.marshal_with(systeminfo_return_post_method)
     def patch(self):
         """Update a data given its identifier"""
         return Systeminfo_DAO.update(ns.payload)
@@ -118,11 +118,11 @@ class SystemInfoList(Resource):
 @ns.route('/<int:id>')
 @ns.response(404, 'systeminfo not found')
 @ns.param('id', 'system-info id for unique identifier')
-class single_SystemInfoList(Resource):
+class Single_systemInfo_list(Resource):
     """Show a single system-info item"""
 
     @ns.doc('Get single system-info')
     @ns.marshal_list_with(systeminfo)
     def get(self, id):
         """Fetch a given resource"""
-        return Systeminfo_DAO.get(id, Type=True)
+        return Systeminfo_DAO.get(id=id, Type=True)

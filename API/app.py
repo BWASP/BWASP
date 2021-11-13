@@ -3,9 +3,8 @@ from flask import (
 )
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_cors import CORS
-import os
-from models.BWASP import BWASP_DB
-from models.CVE import CVE_DB
+from models.BWASP import bwasp_db
+from models.CVE import cve_db
 
 
 def create_app(config=None):
@@ -15,11 +14,11 @@ def create_app(config=None):
     CORS(app, resource={r'/api/*': {"Access-Control-Allow-Credentials": True}})
 
     # Config initialization
-    from configs import DevelopmentsConfig, ProductionConfig
+    from configs import Developments_config, Production_config
     if app.config['DEBUG']:
-        config = DevelopmentsConfig()
+        config = Developments_config()
     else:
-        config = ProductionConfig()
+        config = Production_config()
 
     app.config.from_object(config)
 
@@ -31,24 +30,27 @@ def create_app(config=None):
     app.app_context().push()
 
     # Database initialization
-    BWASP_DB.init_app(app)
-    CVE_DB.init_app(app)
-    BWASP_DB.app = app
-    CVE_DB.app = app
+    bwasp_db.init_app(app)
+    cve_db.init_app(app)
+    bwasp_db.app = app
+    cve_db.app = app
 
     # Database create
-    BWASP_DB.create_all()
+    bwasp_db.create_all()
 
     @app.before_request
     def before_request():
         # g object session initialization
-        g.BWASP_DBObj = BWASP_DB.session
-        g.CVE_DBObj = CVE_DB.session
+        g.bwasp_db_obj = bwasp_db.session
+        g.cve_db_obj = cve_db.session
 
     @app.teardown_request
     def teardown_request(exception):
-        if hasattr(g, 'database'):
-            g.BWASP_DBObj.close()
+        if hasattr(g, 'bwasp_db_obj'):
+            g.bwasp_db_obj.close()
+
+        if hasattr(g, 'cve_db_obj'):
+            g.cve_db_obj.close()
 
     return app
 

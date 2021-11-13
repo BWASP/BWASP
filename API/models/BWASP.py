@@ -1,20 +1,19 @@
-# from Web.app import BWASP_DB
 from flask_sqlalchemy import SQLAlchemy
 
-BWASP_DB = SQLAlchemy()
+bwasp_db = SQLAlchemy()
 
 
-class packets(BWASP_DB.Model):
+class packets(bwasp_db.Model):
     __tablename__ = 'packets'
     __bind_key__ = 'BWASP'
 
-    id = BWASP_DB.Column(BWASP_DB.Integer, primary_key=True, autoincrement=True)
-    category = BWASP_DB.Column(BWASP_DB.Integer, nullable=False)
-    statusCode = BWASP_DB.Column(BWASP_DB.Integer, nullable=False)
-    requestType = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    requestJson = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    responseHeader = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    responseBody = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
+    id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
+    category = bwasp_db.Column(bwasp_db.Integer, nullable=False)
+    statusCode = bwasp_db.Column(bwasp_db.Integer, nullable=False)
+    requestType = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    requestJson = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    responseHeader = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    responseBody = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
 
     def __init__(self, category, statusCode, requestType, requestJson, responseHeader, responseBody, **kwargs):
         self.category = category
@@ -29,22 +28,22 @@ class packets(BWASP_DB.Model):
                f"'{self.responseHeader}', '{self.responseBody}')>"
 
 
-class domain(BWASP_DB.Model):
+class domain(bwasp_db.Model):
     __tablename__ = 'domain'
     __bind_key__ = 'BWASP'
 
-    id = BWASP_DB.Column(BWASP_DB.Integer, primary_key=True, autoincrement=True)
-    related_Packet = BWASP_DB.Column(BWASP_DB.Integer, nullable=False)
-    URL = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    URI = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    action_URL = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    action_URL_Type = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    params = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    comment = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    attackVector = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    impactRate = BWASP_DB.Column(BWASP_DB.Integer, nullable=False)
-    description = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    Details = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
+    id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
+    related_Packet = bwasp_db.Column(bwasp_db.Integer, nullable=False)
+    URL = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    URI = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    action_URL = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    action_URL_Type = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    params = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    comment = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    attackVector = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    impactRate = bwasp_db.Column(bwasp_db.Integer, nullable=False)
+    description = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    Details = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
 
     def __init__(self, related_Packet, URL, URI, action_URL, action_URL_Type, params, comment, attackVector, impactRate, description, Details, **kwargs):
         self.related_Packet = related_Packet
@@ -64,15 +63,15 @@ class domain(BWASP_DB.Model):
                f"'{self.attackVector}', '{self.impactRate}', '{self.description}', '{self.Details}')>"
 
 
-class job(BWASP_DB.Model):
+class job(bwasp_db.Model):
     __tablename__ = 'job'
     __bind_key__ = 'BWASP'
 
-    id = BWASP_DB.Column(BWASP_DB.Integer, primary_key=True, autoincrement=True)
-    targetURL = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    knownInfo = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    recursiveLevel = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    uriPath = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
+    id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
+    targetURL = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    knownInfo = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    recursiveLevel = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    uriPath = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
 
     def __init__(self, targetURL, knownInfo, recursiveLevel, uriPath, **kwargs):
         self.targetURL = targetURL
@@ -84,14 +83,14 @@ class job(BWASP_DB.Model):
         return f"<job('{self.targetURL}', '{self.knownInfo}', '{self.recursiveLevel}', '{self.uriPath}')>"
 
 
-class ports(BWASP_DB.Model):
+class ports(bwasp_db.Model):
     __tablename__ = 'ports'
     __bind_key__ = 'BWASP'
-    id = BWASP_DB.Column(BWASP_DB.Integer, primary_key=True, autoincrement=True)
-    service = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    target = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    port = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    result = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
+    id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
+    service = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    target = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    port = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    result = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
 
     def __init__(self, service, target, port, result, **kwargs):
         self.service = service
@@ -103,12 +102,12 @@ class ports(BWASP_DB.Model):
         return f"<ports('{self.service}', '{self.target}', '{self.port}, {self.result}')>"
 
 
-class systeminfo(BWASP_DB.Model):
+class systeminfo(bwasp_db.Model):
     __tablename__ = 'systeminfo'
     __bind_key__ = 'BWASP'
-    id = BWASP_DB.Column(BWASP_DB.Integer, primary_key=True, autoincrement=True)
-    url = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
-    data = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
+    id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
+    url = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    data = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
 
     def __init__(self, url, data, **kwargs):
         self.url = url
@@ -118,12 +117,12 @@ class systeminfo(BWASP_DB.Model):
         return f"<systeminfo('{self.url}', '{self.data}')>"
 
 
-class CSPEvaluator(BWASP_DB.Model):
+class CSPEvaluator(bwasp_db.Model):
     __tablename__ = 'CSPEvaluator'
     __bind_key__ = 'BWASP'
 
-    id = BWASP_DB.Column(BWASP_DB.Integer, primary_key=True, autoincrement=True)
-    header = BWASP_DB.Column(BWASP_DB.TEXT, nullable=False)
+    id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
+    header = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
 
     def __init__(self, header, **kwargs):
         self.header = header

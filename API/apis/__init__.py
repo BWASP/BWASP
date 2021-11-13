@@ -1,13 +1,13 @@
 from flask import Blueprint
 from flask_restx import Api
 
-from .packets import ns as packetNamespace
-from .CSPEvaluator import ns as cspEvaluatorNamespace
-from .cve_info import ns as cveInfoNamespace
-from .domain import ns as domainNamespace
-from .job import ns as jobNamespace
-from .port import ns as portNamespace
-from .system_info import ns as systemInfoNamespace
+from .packets import ns as packet_namespace
+from .CSPEvaluator import ns as csp_evaluator_namespace
+from .cve_info import ns as cve_info_namespace
+from .domain import ns as domain_namespace
+from .job import ns as job_namespace
+from .port import ns as port_namespace
+from .system_info import ns as system_info_namespace
 
 blueprint = Blueprint(
     'api',
@@ -22,11 +22,11 @@ api = Api(
     description='The BoB Web Application Security Project API Server'
 )
 
-api.add_namespace(packetNamespace)
-api.add_namespace(cspEvaluatorNamespace)
-api.add_namespace(cveInfoNamespace)
-api.add_namespace(domainNamespace)
-api.add_namespace(jobNamespace)
-api.add_namespace(portNamespace)
-api.add_namespace(systemInfoNamespace)
+api.add_namespace(packet_namespace)
+api.add_namespace(csp_evaluator_namespace)
+api.add_namespace(cve_info_namespace)
+api.add_namespace(domain_namespace)
+api.add_namespace(job_namespace)
+api.add_namespace(port_namespace)
+api.add_namespace(system_info_namespace)
 
