@@ -90,7 +90,7 @@ def start(detect_list, lock, url, cur_page_links, current_url, req_res_packets, 
 
                 if "cookies" in list(data[app].keys()):
                     detectCookies(detect_list, lock, packet, data, i, cats, app)
-
+                    
     # return detect_list
 
 
