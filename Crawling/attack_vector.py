@@ -10,7 +10,7 @@ def attackHeader(target_url):
     infor_vector = ""
     try:
         http_method = requests.options(target_url).headers['Allow'].replace(",", "").split(" ")
-    except:
+    except KeyError:
         http_method = "private"
 
     try:
@@ -70,6 +70,11 @@ def inputTag(response_body, http_method, infor_vector):
 
     if len(text) != 0:
         for tag in text:
+            try:
+                if tag.attrs['type']:
+                    pass
+            except KeyError:
+                continue
             if tag.attrs['type'] != "submit" and len(text) != 0:
                 tag_list.append(str(tag))  # input tag 값 ex) <input ~
                 try:
@@ -254,6 +259,10 @@ def robotsTxt(url):
     url = url.split("/")[0] + "//" + url.split("/")[2] + "/robots.txt"
     return True if "user-agent" not in requests.get(url).text.lower() or 404 == requests.get(url).status_code else False
 
+def errorPage(url):
+    # 주요정보통신기반시설_기술적_취약점_뿐석_평가_방법_상세가이드.pdf [page 678] Error Page not set
+    url = url.split("/")[0] + "//" + url.split("/")[2] + "/BWASP/BWASP.TOP9"
+    return True if 404 == requests.get(url).status_code and "not found" in requests.get(url).text.lower() else False
 
 
 
