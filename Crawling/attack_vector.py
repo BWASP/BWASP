@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import re
+import base64
 
 
 def attackHeader(target_url):
@@ -76,7 +77,7 @@ def inputTag(response_body, http_method, infor_vector):
             except KeyError:
                 continue
             if tag.attrs['type'] != "submit" and len(text) != 0:
-                tag_list.append(str(tag))  # input tag 값 ex) <input ~
+                tag_list.append(base64.b64encode(str(tag)))  # input tag 값 ex) <input ~
                 try:
                     tag_name_list.append(tag.attrs['name'])
                 except:
@@ -174,11 +175,11 @@ def inputTag(response_body, http_method, infor_vector):
     if form:
         for tag in form:
             try:
-                action_page.append(tag.attrs['action'])
+                action_page.append(base64.b64encode(tag.attrs['action']))
             except:
                 pass
             try:
-                action_type.append(tag.attrs['method'])
+                action_type.append(base64.b64encode(tag.attrs['method']))
             except:
                 pass
                 
