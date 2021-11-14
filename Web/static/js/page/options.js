@@ -174,6 +174,52 @@ let renderULElement = (target, dataPackage) => {
     target.appendChild(skeleton);
 }
 
+document.getElementById("modal-start-job").addEventListener("click", () => {
+    document.getElementById("modal-start-job").setAttribute("disabled", "true");
+    jobSubmitVerifyModal.hide();
+    let data = {
+        targetURL: requestData.target.url,
+        knownInfo: requestData.info,
+        recursiveLevel: Number(requestData.tool.analysisLevel),
+        uriPath: requestData.target.path
+    };
+    fetch("/automation/options", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+        },
+        body: new URLSearchParams({
+            reqJsonData: JSON.stringify(requestData)
+        })
+    }).then(()=>console.log("Done"));
+
+    alert("Job has just started!\nRedirecting to dashboard");
+    document.location.replace("/dashboard");
+    /*
+    .then(response => {
+        let setResult = (result) => {
+            if (Boolean(result)) {
+                alert("Job has just requested.\nRedirecting you to Dashboard...");
+                document.location.replace("/dashboard");
+            } else {
+                alert("Failed to create job.")
+            }
+        }
+
+        if (!verifyOutput) setResult(true);
+        else {
+            response.json().then(json => {
+                if (json.success) {
+                    setResult(true);
+                } else {
+                    setResult(false);
+                }
+            });
+        }
+    })
+     */
+})
+
 // Handler for submit check modal
 document.getElementById("submitJobRequest").addEventListener("click", function () {
     let formData = document.getElementsByTagName("input"),
@@ -250,50 +296,4 @@ document.getElementById("submitJobRequest").addEventListener("click", function (
         show: true
     });
     jobSubmitVerifyModal.toggle();
-
-    document.getElementById("modal-start-job").addEventListener("click", () => {
-        document.getElementById("modal-start-job").setAttribute("disabled", "true");
-        jobSubmitVerifyModal.hide();
-        let data = {
-            targetURL: requestData.target.url,
-            knownInfo: requestData.info,
-            recursiveLevel: Number(requestData.tool.analysisLevel),
-            uriPath: requestData.target.path
-        };
-        fetch("/automation/options", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-            },
-            body: new URLSearchParams({
-                reqJsonData: JSON.stringify(requestData)
-            })
-        }).then(()=>console.log("Done"));
-
-        alert("Job has just started!\nRedirecting to dashboard");
-        document.location.replace("/dashboard");
-            /*
-            .then(response => {
-                let setResult = (result) => {
-                    if (Boolean(result)) {
-                        alert("Job has just requested.\nRedirecting you to Dashboard...");
-                        document.location.replace("/dashboard");
-                    } else {
-                        alert("Failed to create job.")
-                    }
-                }
-
-                if (!verifyOutput) setResult(true);
-                else {
-                    response.json().then(json => {
-                        if (json.success) {
-                            setResult(true);
-                        } else {
-                            setResult(false);
-                        }
-                    });
-                }
-            })
-             */
-    })
 })
