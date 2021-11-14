@@ -79,7 +79,7 @@ def inputTag(response_body, http_method, infor_vector):
             if tag.attrs['type'] != "submit" and len(text) != 0:
                 tag_list.append(base64.b64encode(str(tag).encode('utf-8')).decode('utf-8'))  # input tag 값 ex) <input ~
                 try:
-                    tag_name_list.append(tag.attrs['name'])
+                    tag_name_list.append(tag.attrs['name'].replace("'", "").replace("+", "").replace("\"", ""))
                 except:
                     pass
 
