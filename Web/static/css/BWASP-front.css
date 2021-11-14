@@ -126,3 +126,7 @@
     background-color: white !important;
     padding: 1.5rem !important;
 }
+
+.element-clickable{
+    cursor: pointer !important;
+}
