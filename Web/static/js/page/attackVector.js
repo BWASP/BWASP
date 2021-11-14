@@ -10,6 +10,7 @@ let viewEnginePrefModal = new bootstrap.Modal(document.getElementById("viewEngin
 let userHelpModal = new bootstrap.Modal(document.getElementById('helpModal'), {
     show: true
 });
+let detailViewEventHandlers = [];
 
 // Define API Endpoints
 const APIEndpoints = {
@@ -61,13 +62,100 @@ let stateHandler = {
 // define api communicator
 let API = await new api();
 
+const openDetailsModal = (dataSet) => {
+    let detailViewModal = new bootstrap.Modal(document.getElementById("detailViewModal"), {
+            show: true
+        }),
+        dataKind = ["cookie", "queryString", "tag"],
+        modalElements = Object();
+
+    // Initialize table elements
+    dataKind.forEach((currentKind) => {
+        modalElements[currentKind] = {
+            noData: document.getElementById(`detail-${currentKind}`),
+            dataPlace: document.getElementById(`detail-${currentKind}-data`),
+            tablePlace: document.getElementById(`tablePlace-${currentKind}`)
+        }
+        modalElements[currentKind].noData.classList.add("d-none");
+        modalElements[currentKind].dataPlace.classList.add("d-none");
+        modalElements[currentKind].tablePlace.innerHTML = "";
+    })
+    console.log(dataSet.details.queryString);
+
+    // Set current row ID
+    document.getElementById("currentRowID").innerText = dataSet.id;
+
+    // Set each value - impact
+    let modalDataElement = {
+        impact: document.getElementById("detail-impact"),
+        threat: document.getElementById("detail-threat"),
+        url: document.getElementById("detail-url"),
+        actions: document.getElementById("detail-actions")
+    };
+    /*
+    modalDataElement.child.impact.rate.innerText = impactRate[dataSet.impactRate][1];
+    rowElement.child.impact.rate.classList.add("badge", "rounded-pill", `bg-${impactRate[dataSet.impactRate][0]}`, "small");
+    rowElement.child.impact.parent.classList.add("text-center");
+    rowElement.child.impact.parent.appendChild(rowElement.child.impact.rate);
+     */
+
+    // Create cookie view
+    [dataKind[0], dataKind[1]].forEach((currentKind) => {
+        Object.keys(dataSet.details[currentKind]).forEach((currentData) => {
+            let localSkeleton = {
+                parent: document.createElement("tr"),
+                key: document.createElement("th"),
+                value: {
+                    parent: document.createElement("td"),
+                    value: document.createElement("code")
+                }
+            };
+            localSkeleton.key.innerText = currentData;
+            localSkeleton.value.value.innerText = dataSet.details[currentKind][currentData];
+            localSkeleton.value.parent.appendChild(localSkeleton.value.value);
+
+            localSkeleton.key.classList.add("text-break");
+            localSkeleton.value.parent.classList.add("text-break");
+
+            localSkeleton.parent.append(
+                localSkeleton.key,
+                localSkeleton.value.parent
+            );
+            modalElements[currentKind].tablePlace.appendChild(localSkeleton.parent);
+        })
+        if(Object.keys(dataSet.details[currentKind]).length !== 0) modalElements[currentKind].dataPlace.classList.remove("d-none");
+        else modalElements[currentKind].noData.classList.remove("d-none");
+    })
+
+    if(dataSet.details[dataKind[2]].length!==0){
+        dataSet.details[dataKind[2]].forEach((currentTag)=>{
+            let localSkeleton = {
+                pre: document.createElement("pre"),
+                code: document.createElement("code")
+            };
+            localSkeleton.code.classList.add("language-html");
+            localSkeleton.code.innerText = currentTag;
+            localSkeleton.pre.appendChild(localSkeleton.code);
+
+            modalElements[dataKind[2]].tablePlace.appendChild(localSkeleton.pre);
+        })
+        modalElements[dataKind[2]].dataPlace.classList.remove("d-none");
+    }else modalElements[dataKind[2]].noData.classList.remove("d-none");
+
+
+    hljs.highlightAll();
+    detailViewModal.show();
+
+    console.log(dataSet);
+}
+
 class pagerTools {
     constructor() {
         this.className = "pagerTools";
         this.API = new api();
         this.paging = {
             currentPage: 1,
-            rowPerPage: 10
+            rowPerPage: 30
         };
         this.data = {
             rowCount: Number(),
@@ -87,7 +175,7 @@ class pagerTools {
             let splitURIPiece = URI[0].split(".");
             console.log(splitURIPiece);
             // if(splitURIPiece.length !== 0) return this.directories[URL][URI[0]]
-            if(currentURI[0].split("."))
+            if (currentURI[0].split("."))
                 this.directories[URL][URI[0]] = Object();
 
             console.log(currentURI);
@@ -174,10 +262,11 @@ class pagerTools {
 
                 res.forEach(async (domainData) => {
                     let skeleton = {
+                        id: domainData["id"],
                         category: Number(),
                         url: {
-                            url: domainData.URL,
-                            uri: domainData.URI
+                            url: domainData["URL"],
+                            uri: domainData["URI"]
                         },
                         payloads: Array(),
                         action: {
@@ -195,10 +284,25 @@ class pagerTools {
                         details: API.jsonDataHandler(domainData["Details"])
                     };
 
-                    // this.insertURL(skeleton.url.url, skeleton.url.uri);
-
                     // Reengineer details.
                     Object.keys(skeleton.details).forEach((key) => skeleton.details[key] = API.jsonDataHandler(skeleton.details[key]));
+
+                    // Base64 Decryption
+                    Object.keys(skeleton.action).forEach((currentKey) => {
+                        for (let counter = 0; counter <= skeleton.action[currentKey].length - 1; counter++) {
+                            skeleton.action[currentKey][counter] = atob(skeleton.action[currentKey][counter]);
+                        }
+                    })
+
+                    for (let counter = 0; counter <= skeleton.details.tag.length - 1; counter++) {
+                        skeleton.details.tag[counter] = atob(skeleton.details.tag[counter]);
+                    }
+
+
+
+                    console.log("tag: ", skeleton.details.tag);
+
+                    // this.insertURL(skeleton.url.url, skeleton.url.uri);
 
                     // Attack vector data regulation
                     let attackVector = API.jsonDataHandler(domainData["attackVector"]);
@@ -375,6 +479,10 @@ class pagerTools {
 
             // Add current row to main tbody
             table.elements.tbody.append(rowElement.parent);
+
+            // Add event listener for each line
+            rowElement.parent.addEventListener("click", () => openDetailsModal(dataSet));
+
             // console.log(dataSet);
         });
         // Build table element

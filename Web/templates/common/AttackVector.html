@@ -4,6 +4,107 @@
 {% include 'components/head.html' %}
 
 <body>
+<div class="modal fade" id="detailViewModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content border-rounded shadow border-rounded shadow modal-storage p-4">
+            <section class="mb-3">
+                <div class="d-flex">
+                    <h3 class="text-dark fw-bolder mb-0 font-logo">Detail View</h3>
+                    <a class="ms-auto h4 text-muted"><i class="fas fa-expand-alt"></i></a>
+                    <a href="#" data-bs-dismiss="modal" class="ms-3 h4 text-danger text-decoration-none"><i class="fas fa-times"></i></a>
+                </div>
+                <p class="text-capitalize text-muted small">Data of vector No. <span id="currentRowID">0</span></p>
+            </section>
+            <div class="modal-body p-0">
+                <section class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                        <tr>
+                            <th class="w-25">Impact</th>
+                            <td class="w-75" id="detail-impact"><span class="badge rounded-pill bg-success small">Low</span></td>
+                        </tr>
+                        <tr>
+                            <th class="w-25">Threat</th>
+                            <td class="w-75" id="detail-threat">Sample One, Sample Two, Sample Three</td>
+                        </tr>
+                        <tr>
+                            <th class="w-25">URL</th>
+                            <td class="w-75" id="detail-url">
+                                <p class="mb-0">
+                                    <span class="badge bg-success text-uppercase me-2 mb-1">GET</span>
+                                    <span id="detail-URL">https://example.com</span><span class="text-muted" id="detail-URI">/this?is=Sample</span>
+                                </p>
+                            <td>
+                        </tr>
+                        <tr>
+                            <th class="w-25">Actions</th>
+                            <td class="w-75" id="detail-actions">
+                                <p>
+                                    <span class="badge bg-success text-uppercase me-2 mb-1">SAMPLE</span>
+                                    <span>/this/is/sample</span>
+                                </p>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <section>
+                    <section>
+                        <h4>Cookies</h4>
+                        <section class="d-none" id="detail-cookie">
+                            <p class="text-center text-muted text-capitalize p-4">No Data</p>
+                        </section>
+                        <section class="d-none table-responsive" id="detail-cookie-data">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th class="w-25" scope="col">Key</th>
+                                    <th class="w-75" scope="col">Value</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tablePlace-cookie"></tbody>
+                            </table>
+                        </section>
+                    </section>
+                    <section class="mt-2">
+                        <h4>Query Strings</h4>
+                        <section class="d-none" id="detail-queryString">
+                            <p class="text-center text-muted text-capitalize p-4">No Data</p>
+                        </section>
+                        <section class="d-none table-responsive" id="detail-queryString-data">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Key</th>
+                                    <th scope="col">Value</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tablePlace-queryString"></tbody>
+                            </table>
+                        </section>
+                    </section>
+                    <section class="mt-2">
+                        <h4>Tags</h4>
+                        <section class="d-none" id="detail-tag">
+                            <p class="text-center text-muted text-capitalize p-4">No Data</p>
+                        </section>
+                        <section class="d-none table-responsive" id="detail-tag-data">
+                            <div id="tablePlace-tag">
+
+                            </div>
+                        </section>
+                    </section>
+                </section>
+                <section>
+                    <h4>Referred Documents</h4>
+                    <ul>
+                        <li><a class="text-decoration-none" href="#">Google Cheatsheet - BWASP PM</a></li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="viewEnginePrefModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -32,23 +133,31 @@
                     <div>
                         <div class="d-flex">
                             <label for="viewPref-input-rowPerPage" class="form-label">Row per page</label>
-                            <p class="ms-auto mb-0"><span class="text-primary" id="viewPref-modal-rowPerPage">10</span> / <span id="viewPref-modal-allRowCount">1</span></p>
+                            <p class="ms-auto mb-0"><span class="text-primary" id="viewPref-modal-rowPerPage">10</span>
+                                / <span id="viewPref-modal-allRowCount">1</span></p>
                         </div>
-                        <input type="range" class="form-range" id="viewPref-input-rowPerPage" value="5" max="0" min="5" step="5">
+                        <input type="range" class="form-range" id="viewPref-input-rowPerPage" value="5" max="0" min="5"
+                               step="5">
                     </div>
                     <div class="mt-3">
                         <div class="d-flex">
                             <label for="viewPref-input-currentPage" class="form-label">Current page</label>
-                            <p class="ms-auto mb-0"><span class="text-primary" id="viewPref-modal-currentPage">0</span> / <span id="viewPref-modal-pageCount">0</span></p>
+                            <p class="ms-auto mb-0"><span class="text-primary" id="viewPref-modal-currentPage">0</span>
+                                / <span id="viewPref-modal-pageCount">0</span></p>
                         </div>
-                        <input type="range" class="form-range" id="viewPref-input-currentPage" value="0" max="0" min="1" step="1">
+                        <input type="range" class="form-range" id="viewPref-input-currentPage" value="0" max="0" min="1"
+                               step="1">
                     </div>
                 </section>
             </div>
             <div class="mt-3">
                 <div class="sizer">
-                    <button type="button" class="col btn btn-warning border border-rounded border-white shadow m-1" data-bs-dismiss="modal">Back</button>
-                    <button type="button" id="viewPref-button-save" class="col btn btn-success border border-rounded border-white shadow m-1">Update</button>
+                    <button type="button" class="col btn btn-warning border border-rounded border-white shadow m-1"
+                            data-bs-dismiss="modal">Back
+                    </button>
+                    <button type="button" id="viewPref-button-save"
+                            class="col btn btn-success border border-rounded border-white shadow m-1">Update
+                    </button>
                 </div>
             </div>
         </div>
@@ -63,7 +172,9 @@
                 <p class="mb-0">Click <span class="text-primary">Payload Detail</span> to view related packets.</p>
             </div>
             <div class="border-rounded shadow mt-3">
-                <button type="button" class="btn btn-success border border-white w-100" data-bs-dismiss="modal">Dismiss</button>
+                <button type="button" class="btn btn-success border border-white w-100" data-bs-dismiss="modal">
+                    Dismiss
+                </button>
             </div>
         </div>
     </div>
@@ -110,7 +221,8 @@
                     </h3>
                     <h3 class="ms-3 mb-0" id="errMsgTitle">No data.</h3>
                 </div>
-                <p class="pt-3 text-muted text-center" id="errMsgDesc">Refresh it if this screen lasts for a long time</p>
+                <p class="pt-3 text-muted text-center" id="errMsgDesc">Refresh it if this screen lasts for a long
+                    time</p>
             </div>
         </div>
         <div class="w-100 p-4 pt-3 pb-3 d-none" id="tablePlaceHolder">
@@ -131,12 +243,8 @@
     </footer>
 </div>
 
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/page/attackVector.js') }}"></script>
-<script>
-    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='libs/highlight/atom-one-light.min.css') }}">
 </body>
 </html>
