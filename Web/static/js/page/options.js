@@ -1,7 +1,8 @@
 // Get modules
 import {API as api} from '../jHelper.js';
 
-let API = new api();
+let API = new api(),
+    requestData = {tool: Object(), info: Object(), target: Object()};
 
 const MaximumRecursiveLevel = 5000,
     patterns = {
@@ -230,8 +231,10 @@ document.getElementById("submitJobRequest").addEventListener("click", function (
             backend: [],
             renderData: {}
         },
-        requestData = {tool: Object(), info: Object(), target: Object()},
         renderTmpStorage = {};
+
+    // Initialize requestData before use
+    requestData = {tool: Object(), info: Object(), target: Object()};
 
     // Target URL
     requestData.target["url"] = document.getElementById("target-url").value;
