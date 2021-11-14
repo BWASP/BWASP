@@ -5,12 +5,13 @@
 
 <body>
 <div class="modal fade" id="detailViewModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
-        <div class="modal-content border-rounded shadow border-rounded shadow modal-storage p-4">
+    <div id="detailViewModalContainer" class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div id="detailViewModalContentView" class="modal-content p-4 border-rounded shadow">
             <section class="mb-3">
                 <div class="d-flex">
                     <h3 class="text-dark fw-bolder mb-0 font-logo">Detail View</h3>
-                    <a class="ms-auto h4 text-muted"><i class="fas fa-expand-alt"></i></a>
+                    <a class="ms-auto h4 text-muted" id="toggleDetailViewModalSize"><i id="togglerIcon" class="fas fa-expand-alt"></i></a>
+                    <a class="ms-auto h4 text-muted d-none" id="minimizeDetailViewModal"><i class="fas fa-compress-alt"></i></a>
                     <a href="#" data-bs-dismiss="modal" class="ms-3 h4 text-danger text-decoration-none"><i class="fas fa-times"></i></a>
                 </div>
                 <p class="text-capitalize text-muted small">Data of vector No. <span id="currentRowID">0</span></p>
@@ -21,7 +22,7 @@
                         <tbody>
                         <tr>
                             <th class="w-25">Impact</th>
-                            <td class="w-75" id="detail-impact"><span class="badge rounded-pill bg-success small">Low</span></td>
+                            <td class="w-75"><span class="badge rounded-pill bg-success small" id="detail-impact">Low</span></td>
                         </tr>
                         <tr>
                             <th class="w-25">Threat</th>
@@ -49,8 +50,8 @@
                     </table>
                 </section>
                 <section>
-                    <section>
-                        <h4>Cookies</h4>
+                    <section class="mb-2">
+                        <h4 class="mb-3">Cookies</h4>
                         <section class="d-none" id="detail-cookie">
                             <p class="text-center text-muted text-capitalize p-4">No Data</p>
                         </section>
@@ -66,8 +67,8 @@
                             </table>
                         </section>
                     </section>
-                    <section class="mt-2">
-                        <h4>Query Strings</h4>
+                    <section class="mb-2">
+                        <h4 class="mb-3">Query Strings</h4>
                         <section class="d-none" id="detail-queryString">
                             <p class="text-center text-muted text-capitalize p-4">No Data</p>
                         </section>
@@ -83,19 +84,25 @@
                             </table>
                         </section>
                     </section>
-                    <section class="mt-2">
-                        <h4>Tags</h4>
+                    <section class="mb-2">
+                        <h4 class="mb-3">Tags</h4>
                         <section class="d-none" id="detail-tag">
                             <p class="text-center text-muted text-capitalize p-4">No Data</p>
                         </section>
                         <section class="d-none table-responsive" id="detail-tag-data">
-                            <div id="tablePlace-tag">
-
-                            </div>
+                            <div id="tablePlace-tag"></div>
                         </section>
                     </section>
                 </section>
-                <section>
+                <section class="mb-2">
+                    <h4 class="mb-3">Violation</h4>
+                    <p class="mb-1">주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf</p>
+                    <ul>
+                        <li><code>robots.txt</code> Not set</li>
+                        <li><code>Error page</code> Not set</li>
+                    </ul>
+                </section>
+                <section class="mb-2">
                     <h4>Referred Documents</h4>
                     <ul>
                         <li><a class="text-decoration-none" href="#">Google Cheatsheet - BWASP PM</a></li>

@@ -1,37 +1,60 @@
 // Get modules
 import {API as api, createKey, tableBuilder} from '../jHelper.js';
 
-// Define Modals
-let viewEnginePrefModal = new bootstrap.Modal(document.getElementById("viewEnginePrefModal"), {
-    keyboard: false,
-    backdrop: 'static',
-    show: true
-});
-let userHelpModal = new bootstrap.Modal(document.getElementById('helpModal'), {
-    show: true
-});
-let detailViewEventHandlers = [];
+// Specified query selectors
+let places = {
+    detailView: {
+        modal: document.getElementById("detailViewModal"),
+        container: document.getElementById("detailViewModalContainer"),
+        view: document.getElementById("detailViewModalContentView")
+    },
+    help: {
+        modal: document.getElementById('helpModal')
+    },
+    viewEngine: {
+        modal: document.getElementById("viewEnginePrefModal")
+    }
+};
+
+// Modals
+let modals = {
+    viewEngine: new bootstrap.Modal(places.viewEngine.modal, {
+        keyboard: false,
+        backdrop: 'static',
+        show: true
+    }),
+    userHelp: new bootstrap.Modal(places.help.modal, {
+        show: true
+    }),
+    detailView: new bootstrap.Modal(places.detailView.modal, {
+        show: true
+    })
+};
 
 // Define API Endpoints
 const APIEndpoints = {
-        vectors: "/api/domain",
-        packets: {
-            base: "/api/packet",
-            type: {
-                auto: "automation",
-                manual: "manual"
-            }
+    vectors: "/api/domain",
+    packets: {
+        base: "/api/packet",
+        type: {
+            auto: "automation",
+            manual: "manual"
         }
-    },
-    elements = {
+    }
+};
+
+// Other frontend rendering option / values
+const elements = {
         vectors: ["Category", "URL", "Action", "Params", "Threat", "Method", "Impact"],
         packets: []
     },
     coloring = {
         post: "bg-primary",
         get: "bg-success"
-    };
+    },
+    impactRate = [["success", "Low"], ["warning", "Normal"], ["danger", "High"]];
 
+// State Handler
 let stateHandler = {
         isVector: true
     },
@@ -45,29 +68,33 @@ let stateHandler = {
             viewString: "Attack Vectors"
         }
     ],
-    returnError = (errorMessage = ["No data", ""]) => {
-        let condition = (typeof (errorMessage) !== "string");
-        console.log(errorMessage, typeof (errorMessage), condition);
-        document.getElementById("errMsgTitle").innerText = (condition)
-            ? errorMessage[0]
-            : errorMessage;
-        document.getElementById("errMsgDesc").innerText = (condition)
-            ? errorMessage[1]
-            : "";
-        document.getElementById("loadingProgress").classList.add("d-none");
-        document.getElementById("resultNoData").classList.remove("d-none");
-        console.error(`:: ERROR :: `, errorMessage);
-    };
+    isModalFullscreen = false
+
+// Helper functions
+let returnError = (errorMessage = ["No data", ""]) => {
+    let condition = (typeof (errorMessage) !== "string");
+    console.log(errorMessage, typeof (errorMessage), condition);
+    document.getElementById("errMsgTitle").innerText = (condition)
+        ? errorMessage[0]
+        : errorMessage;
+    document.getElementById("errMsgDesc").innerText = (condition)
+        ? errorMessage[1]
+        : "";
+    document.getElementById("loadingProgress").classList.add("d-none");
+    document.getElementById("resultNoData").classList.remove("d-none");
+    console.error(`:: ERROR :: `, errorMessage);
+};
 
 // define api communicator
 let API = await new api();
 
 const openDetailsModal = (dataSet) => {
-    let detailViewModal = new bootstrap.Modal(document.getElementById("detailViewModal"), {
-            show: true
-        }),
-        dataKind = ["cookie", "queryString", "tag"],
+    let dataKind = ["cookie", "queryString", "tag"],
         modalElements = Object();
+
+    places.detailView.view.className = "";
+    places.detailView.view.classList.add("modal-content", "p-4", "border-rounded", "shadow");
+
 
     // Initialize table elements
     dataKind.forEach((currentKind) => {
@@ -80,7 +107,7 @@ const openDetailsModal = (dataSet) => {
         modalElements[currentKind].dataPlace.classList.add("d-none");
         modalElements[currentKind].tablePlace.innerHTML = "";
     })
-    console.log(dataSet.details.queryString);
+    console.log(dataSet.impactRate);
 
     // Set current row ID
     document.getElementById("currentRowID").innerText = dataSet.id;
@@ -92,12 +119,16 @@ const openDetailsModal = (dataSet) => {
         url: document.getElementById("detail-url"),
         actions: document.getElementById("detail-actions")
     };
-    /*
-    modalDataElement.child.impact.rate.innerText = impactRate[dataSet.impactRate][1];
-    rowElement.child.impact.rate.classList.add("badge", "rounded-pill", `bg-${impactRate[dataSet.impactRate][0]}`, "small");
-    rowElement.child.impact.parent.classList.add("text-center");
-    rowElement.child.impact.parent.appendChild(rowElement.child.impact.rate);
-     */
+
+    // Impact rate
+    modalDataElement.impact.className = "";
+    modalDataElement.impact.classList.add("badge", "rounded-pill", "small", `bg-${impactRate[dataSet.impactRate][0]}`);
+    modalDataElement.impact.innerText = impactRate[dataSet.impactRate][1];
+
+    modalDataElement.threat.innerText = "";
+    Object.keys(dataSet.vulnerability.type["doubt"]).forEach((currentThreat) => {
+        modalDataElement.threat.innerText += currentThreat;
+    });
 
     // Create cookie view
     [dataKind[0], dataKind[1]].forEach((currentKind) => {
@@ -123,12 +154,12 @@ const openDetailsModal = (dataSet) => {
             );
             modalElements[currentKind].tablePlace.appendChild(localSkeleton.parent);
         })
-        if(Object.keys(dataSet.details[currentKind]).length !== 0) modalElements[currentKind].dataPlace.classList.remove("d-none");
+        if (Object.keys(dataSet.details[currentKind]).length !== 0) modalElements[currentKind].dataPlace.classList.remove("d-none");
         else modalElements[currentKind].noData.classList.remove("d-none");
     })
 
-    if(dataSet.details[dataKind[2]].length!==0){
-        dataSet.details[dataKind[2]].forEach((currentTag)=>{
+    if (dataSet.details[dataKind[2]].length !== 0) {
+        dataSet.details[dataKind[2]].forEach((currentTag) => {
             let localSkeleton = {
                 pre: document.createElement("pre"),
                 code: document.createElement("code")
@@ -140,11 +171,11 @@ const openDetailsModal = (dataSet) => {
             modalElements[dataKind[2]].tablePlace.appendChild(localSkeleton.pre);
         })
         modalElements[dataKind[2]].dataPlace.classList.remove("d-none");
-    }else modalElements[dataKind[2]].noData.classList.remove("d-none");
+    } else modalElements[dataKind[2]].noData.classList.remove("d-none");
 
 
     hljs.highlightAll();
-    detailViewModal.show();
+    modals.detailView.show();
 
     console.log(dataSet);
 }
@@ -214,7 +245,7 @@ class pagerTools {
 
     async openPagingOption() {
         await this.updateRowCount();
-        viewEnginePrefModal.show();
+        modals.viewEngine.show();
     }
 
 
@@ -243,7 +274,7 @@ class pagerTools {
 
         // Do job
         await this.syncData(this.paging.currentPage, this.paging.rowPerPage, this.buildTable);
-        viewEnginePrefModal.hide();
+        modals.viewEngine.hide();
     }
 
     async syncData(requestPage, rowPerPage, callback) {
@@ -297,12 +328,6 @@ class pagerTools {
                     for (let counter = 0; counter <= skeleton.details.tag.length - 1; counter++) {
                         skeleton.details.tag[counter] = atob(skeleton.details.tag[counter]);
                     }
-
-
-
-                    console.log("tag: ", skeleton.details.tag);
-
-                    // this.insertURL(skeleton.url.url, skeleton.url.uri);
 
                     // Attack vector data regulation
                     let attackVector = API.jsonDataHandler(domainData["attackVector"]);
@@ -365,29 +390,28 @@ class pagerTools {
 
         dataPackage.forEach((dataSet) => {
             let rowElement = {
-                    parent: document.createElement("tr"),
-                    child: {
-                        category: document.createElement("th"),
-                        URL: document.createElement("td"),
-                        action: {
-                            parent: document.createElement("td"),
-                            target: document.createElement("p"),
-                            method: document.createElement("p")
-                        },
-                        params: document.createElement("td"),
-                        doubt: document.createElement("td"),
-                        method: {
-                            parent: document.createElement("td"),
-                            method: document.createElement("span")
-                        },
-                        impact: {
-                            parent: document.createElement("td"),
-                            rate: document.createElement("span")
-                        }
+                parent: document.createElement("tr"),
+                child: {
+                    category: document.createElement("th"),
+                    URL: document.createElement("td"),
+                    action: {
+                        parent: document.createElement("td"),
+                        target: document.createElement("p"),
+                        method: document.createElement("p")
                     },
-                    lineBreak: document.createElement("br")
+                    params: document.createElement("td"),
+                    threat: document.createElement("td"),
+                    method: {
+                        parent: document.createElement("td"),
+                        method: document.createElement("span")
+                    },
+                    impact: {
+                        parent: document.createElement("td"),
+                        rate: document.createElement("span")
+                    }
                 },
-                impactRate = [["success", "Low"], ["warning", "Normal"], ["danger", "High"]];
+                lineBreak: document.createElement("br")
+            };
 
             // Build category
             rowElement.child.category.innerText = (dataSet.category === 0)
@@ -414,7 +438,7 @@ class pagerTools {
 
                     localSkeleton.parent.classList.add("mt-1", "mb-1");
                     localSkeleton.method.classList.add("badge", coloring[dataSet.action.type[rowNum].toLowerCase()], "text-uppercase", "me-2", "mb-1");
-                    localSkeleton.target.classList.add("mb-0");
+                    localSkeleton.target.classList.add("mb-0", "text-break");
 
                     localSkeleton.parent.append(
                         localSkeleton.method,
@@ -451,15 +475,15 @@ class pagerTools {
 
             // Build vulnerability doubt
             paramSet = Object.keys(dataSet.vulnerability.type.doubt);
-            rowElement.child.doubt.classList.add("text-center");
+            rowElement.child.threat.classList.add("text-center");
             paramSet.forEach((param) => {
                 let codeElement = document.createElement("code");
                 codeElement.innerText = param;
-                rowElement.child.doubt.appendChild(codeElement);
-                if (paramSet[paramSet.length - 1] !== param) rowElement.child.doubt.appendChild(builder.commaAsElement());
+                rowElement.child.threat.appendChild(codeElement);
+                if (paramSet[paramSet.length - 1] !== param) rowElement.child.threat.appendChild(builder.commaAsElement());
             })
             rowElement.parent.appendChild((paramSet.length !== 0)
-                ? rowElement.child.doubt
+                ? rowElement.child.threat
                 : builder.dataNotPresent()
             );
 
@@ -527,9 +551,18 @@ document.getElementById("viewPref-input-currentPage").addEventListener("change",
 
 document.getElementById("viewPref-button-save").addEventListener("click", () => pager.buildPage());
 
+document.getElementById("toggleDetailViewModalSize").addEventListener("click", () => {
+    let toggleKeywords = ["remove", "add"];
+    document.getElementById("togglerIcon").className
+        = `fas fa-${(isModalFullscreen)?"expand":"compress"}-alt`;
+    places.detailView.container.classList[toggleKeywords[Number(isModalFullscreen)]]("modal-lg");
+    places.detailView.container.classList[toggleKeywords[Number(!isModalFullscreen)]]("modal-fullscreen");
+    isModalFullscreen = !isModalFullscreen;
+})
+
 window.onload = () => {
     pager.buildPage().then(() => {
-        document.getElementById("openHelpModal").addEventListener("click", () => userHelpModal.toggle());
+        document.getElementById("openHelpModal").addEventListener("click", () => modals.userHelp.toggle());
         // document.getElementById("viewPref-input-rowPerPage").value = 12;
         console.log("rowPerPage", document.getElementById("viewPref-input-rowPerPage").value, pager.paging.rowPerPage);
     })
