@@ -61,17 +61,19 @@ def seleniumCrawling(driver):
 
 def checkURLFormat(origin, target):
     
-    parsed_origin = urlparse(origin)
-    parsed_target = urlparse(target)
+    # parsed_origin = urlparse(origin)
+    # parsed_target = urlparse(target)
 
-    # 상대경로 예외처리
-    if parsed_target.netloc == '':
-        if parsed_target.path == './':
-            return parsed_origin.geturl()
-        parsed_target = urljoin(parsed_origin.geturl(), parsed_target.path)
-    else:
-        parsed_target=parsed_target.geturl() 
-    return parsed_target
+    # # 상대경로 예외처리
+    # if parsed_target.netloc == '':
+    #     if parsed_target.path == './':
+    #         return parsed_origin.geturl()
+    #     parsed_target = urljoin(parsed_origin.geturl(), parsed_target.path)
+    # else:
+    #     parsed_target=parsed_target.geturl() 
+    # return parsed_target
+
+    return urljoin(origin, target)
 
 
 # 2. BeautifulSoup을 이용한 태그 클릭 리스트
