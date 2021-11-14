@@ -14,12 +14,11 @@ const MaximumRecursiveLevel = 5000,
             version: "webAppVersion"
         }
     },
-    /*
-    DO NOT SET THIS VALUE TO FALSE WHEN PRODUCTION!!
-     - Result may not be worked or printed as designated.
-     - Please remove this keywords when code goes on production.
-     */
-    verifyOutput = false;
+    jobSubmitVerifyModal = new bootstrap.Modal(document.getElementById('jobSubmitVerifyModal'), {
+        keyboard: false,
+        backdrop: 'static',
+        show: true
+    });
 
 // Initialize frontend when load
 window.onload = () => {
@@ -191,7 +190,7 @@ document.getElementById("modal-start-job").addEventListener("click", () => {
         body: new URLSearchParams({
             reqJsonData: JSON.stringify(requestData)
         })
-    }).then(()=>console.log("Done"));
+    }).then(() => console.log("Done"));
 
     alert("Job has just started!\nRedirecting to dashboard");
     document.location.replace("/dashboard");
@@ -290,10 +289,5 @@ document.getElementById("submitJobRequest").addEventListener("click", function (
         if (tempStorage.length > 0) renderULElement(document.getElementById(`modal-info-${type.toLowerCase()}`), tempStorage);
     })
 
-    let jobSubmitVerifyModal = new bootstrap.Modal(document.getElementById('jobSubmitVerifyModal'), {
-        keyboard: false,
-        backdrop: 'static',
-        show: true
-    });
     jobSubmitVerifyModal.toggle();
 })
