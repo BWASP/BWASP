@@ -69,8 +69,9 @@ def checkURLFormat(origin, target):
         if parsed_target.path == './':
             return parsed_origin.geturl()
         parsed_target = urljoin(parsed_origin.geturl(), parsed_target.path)
-        
-    return parsed_target.geturl()
+    else:
+        parsed_target=parsed_target.geturl() 
+    return parsed_target
 
 
 # 2. BeautifulSoup을 이용한 태그 클릭 리스트
