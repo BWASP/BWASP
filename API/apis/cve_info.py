@@ -16,6 +16,10 @@ cve_info = ns.model('CVE information model', {
     'description': fields.String(required=True, description='CVE description'),
 })
 
+cve_info_count = ns.model('CVE information model counting', {
+    'count': fields.Integer(readonly=True, description='CVE list count')
+})
+
 
 class Cve_information_data_access_object(object):
     def __init__(self):
@@ -24,7 +28,7 @@ class Cve_information_data_access_object(object):
         self.cve_list = ""
         self.limitCount = 9
 
-    def get_search_cve_list(self, framework=None, version=None):
+    def get_search_cve_list(self, framework=None, version=None, Type=False):
         if framework is None and version is None:
             ns.abort(404, f"cve info doesn't exist; Your framework: {framework}, Version: {version}")
 
@@ -39,9 +43,11 @@ class Cve_information_data_access_object(object):
         if self.counter == 0:
             ns.abort(404, f"cve info doesn't exist; Your framework: {framework}, Version: {version}")
 
-        self.cve_list = self.selectData.order_by(cveModel.year.desc()).limit(self.limitCount).all()
-
-        return self.cve_list
+        if Type is False:
+            self.cve_list = self.selectData.order_by(cveModel.year.desc()).limit(self.limitCount).all()
+            return self.cve_list
+        else:
+            return {"count": self.counter}
 
 
 data_access_object_for_cve_information = Cve_information_data_access_object()
@@ -56,4 +62,15 @@ class Cve_list(Resource):
     @ns.marshal_list_with(cve_info)
     def get(self, framework, version):
         """List a CVE info"""
-        return data_access_object_for_cve_information.get_search_cve_list(framework=framework, version=version)
+        return data_access_object_for_cve_information.get_search_cve_list(framework=framework, version=version, Type=True)
+
+
+@ns.route('/<string:framework>/<string:version>/count')
+class Count_of_cve_list(Resource):
+    """Shows a list of cve"""
+
+    @ns.doc('List of cve info')
+    @ns.marshal_list_with(cve_info)
+    def get(self, framework, version):
+        """List a CVE info"""
+        return data_access_object_for_cve_information.get_search_cve_list(framework=framework, version=version,  Type=False)
