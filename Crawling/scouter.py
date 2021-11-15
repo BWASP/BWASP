@@ -7,7 +7,7 @@ import re,json
 from Crawling import analyst
 from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, csp_evaluator, db, func
 from Crawling.feature.api import *
-from Crawling.attack_vector import attackHeader, robotsTxt, errorPage
+from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing
 
 # TODO
 # 사용자가 여러개의 사이트를 동시에 테스트 할 때, 전역 변수의 관리 문제
@@ -95,6 +95,8 @@ def visit(driver, url, depth, options):
 
         start_options["check"] = False
 
+        directoryIndexing(driver.current_url)
+        
         if "portScan" in options["tool"]["optionalJobs"]:
             target_port = get_ports.getPortsOffline(start_options["input_url"])
             db.insertPorts(target_port, start_options["input_url"])

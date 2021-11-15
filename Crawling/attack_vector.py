@@ -265,7 +265,16 @@ def errorPage(url):
     url = url.split("/")[0] + "//" + url.split("/")[2] + "/BWASP/BWASP.TOP9"
     return True if 404 == requests.get(url).status_code and "not found" in requests.get(url).text.lower() else False
 
+def directoryIndexing(url):
+    try:
+        f = open("./Crawling/config/api.json")
+        data = json.load(f)
+        
+    except FileNotFoundError:
+        print("[!] API 키가 없습니다.")
 
+    #TODO
+    # API 요청
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
 """
