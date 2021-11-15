@@ -45,7 +45,7 @@ const APIEndpoints = {
 
 // Other frontend rendering option / values
 const elements = {
-        vectors: ["Category", "URL", "Action", "Params", "Threat", "Method", "Impact"],
+        vectors: ["Type", "URL", "Action", "Params", "Threat", "Method", "Impact"],
         packets: []
     },
     coloring = {
@@ -116,7 +116,11 @@ const openDetailsModal = (dataSet) => {
     let modalDataElement = {
         impact: document.getElementById("detail-impact"),
         threat: document.getElementById("detail-threat"),
-        url: document.getElementById("detail-url"),
+        url: {
+            method: document.getElementById("detail-method"),
+            url: document.getElementById("detail-URL"),
+            uri: document.getElementById("detail-URI"),
+        },
         actions: document.getElementById("detail-actions")
     };
 
@@ -125,10 +129,54 @@ const openDetailsModal = (dataSet) => {
     modalDataElement.impact.classList.add("badge", "rounded-pill", "small", `bg-${impactRate[dataSet.impactRate][0]}`);
     modalDataElement.impact.innerText = impactRate[dataSet.impactRate][1];
 
+    // Threats
     modalDataElement.threat.innerText = "";
-    Object.keys(dataSet.vulnerability.type["doubt"]).forEach((currentThreat) => {
-        modalDataElement.threat.innerText += currentThreat;
-    });
+    let doubtList = Object.keys(dataSet.vulnerability.type["doubt"]);
+    if (doubtList.length > 0) {
+        doubtList.forEach((currentThreat) => {
+            modalDataElement.threat.innerText +=
+                currentThreat.concat(
+                    (doubtList[doubtList.length - 1] !== currentThreat) ? ", " : ""
+                );
+        });
+    } else {
+        modalDataElement.threat.innerText = "-";
+    }
+
+    // URL
+    modalDataElement.url.url.innerText = dataSet.url.url;
+    modalDataElement.url.uri.innerText = dataSet.url.uri;
+    modalDataElement.url.method.innerText = dataSet.method.toUpperCase();
+
+    // Actions
+    console.log(dataSet.action);
+    if (dataSet.action.target.length > 0) {
+        modalDataElement.actions.innerHTML = "";
+        for (let currentRow = 0; currentRow <= dataSet.action.target.length - 1; currentRow++) {
+            let localSkeleton = {
+                parent: document.createElement("p"),
+                method: document.createElement("span"),
+                target: document.createElement("span")
+            }
+            localSkeleton.method.classList.add("badge", "text-uppercase", "me-2", "mb-1",
+                (typeof(coloring[dataSet.action.type[currentRow].toLowerCase()]) === "undefined")
+                    ? "bg-warning"
+                    : coloring[dataSet.action.type[currentRow].toLowerCase()]);
+            localSkeleton.target.classList.add("text-break");
+
+            localSkeleton.method.innerText = dataSet.action.type[currentRow];
+            localSkeleton.target.innerText = dataSet.action.target[currentRow];
+            localSkeleton.parent.append(
+                localSkeleton.method,
+                localSkeleton.target
+            );
+            modalDataElement.actions.appendChild(localSkeleton.parent);
+            //  console.log("currentRow", currentRow);
+        }
+    } else {
+        dataSet.action.innerHTML = " - ";
+    }
+
 
     // Create cookie view
     [dataKind[0], dataKind[1]].forEach((currentKind) => {
@@ -554,7 +602,7 @@ document.getElementById("viewPref-button-save").addEventListener("click", () => 
 document.getElementById("toggleDetailViewModalSize").addEventListener("click", () => {
     let toggleKeywords = ["remove", "add"];
     document.getElementById("togglerIcon").className
-        = `fas fa-${(isModalFullscreen)?"expand":"compress"}-alt`;
+        = `fas fa-${(isModalFullscreen) ? "expand" : "compress"}-alt`;
     places.detailView.container.classList[toggleKeywords[Number(isModalFullscreen)]]("modal-lg");
     places.detailView.container.classList[toggleKeywords[Number(!isModalFullscreen)]]("modal-fullscreen");
     isModalFullscreen = !isModalFullscreen;
