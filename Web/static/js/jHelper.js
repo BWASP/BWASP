@@ -14,7 +14,7 @@ class API {
      * @param {function} callback
      */
     communicate(endpoint, callback) {
-        if(typeof(this.API)==="undefined") return callback(["API Communication error", "Please wait until it retries."]);
+        if (typeof (this.API) === "undefined") return callback(["API Communication error", "Please wait until it retries."]);
         fetch(this.API.base + endpoint, {
             method: "GET",
             cache: "no-cache",
@@ -23,15 +23,19 @@ class API {
                 "accept": "application/json"
             }
         })
-            .then(blob => blob.json())
-            .then(res => {
-                if (this.debug.mode === true
-                    && this.debug.functions.printAllOutput === true) console.log(`:: DEBUG : RETURN ::\n${res}`);
-                callback(null, res);
-            })
-            .catch(error => {
-                console.log(`:: DEBUG : ERROR ::\n${error}`);
-                callback(error.toString().split(": "))
+            .then(blob => {
+                if (!blob.ok) return callback(blob.status);
+                else blob.json()
+                    .then(res => {
+                        if (this.debug.mode === true
+                            && this.debug["functions"]["printAllOutput"] === true)
+                            console.log(`:: DEBUG : RETURN ::\n${res}`);
+                        callback(null, res);
+                    })
+                    .catch(error => {
+                        console.log(`:: DEBUG : ERROR ::\n${error}`);
+                        callback(error.toString().split(": "))
+                    })
             })
     }
 
@@ -79,7 +83,7 @@ class API {
             .replaceAll("'", "\"")
             .replaceAll(replaceKeyword[0], "'")
             .replaceAll(replaceKeyword[1], "\"");
-        ["True", "False"].forEach((currentKeyword)=>{
+        ["True", "False"].forEach((currentKeyword) => {
             str = str.replaceAll(currentKeyword, currentKeyword.toLowerCase);
         })
         return (parseJSON) ? JSON.parse(str) : str;
