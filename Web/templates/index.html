@@ -17,93 +17,41 @@
                 <h3 class="col-md-12 fw-bold text-capitalize mb-3">Quick view</h3>
                 <div class="col-md-3 p-1 mt-2">
                     <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Received<br>Packets</p>
-                        <p class="fs-2 mb-0">426</p>
+                        <p class="text-muted small mb-1 text-uppercase">Received Packets</p>
+                        <p class="fs-2 mb-0" id="receivedPacketsCount">-</p>
                     </div>
                 </div>
                 <div class="col-md-3 p-1 mt-2">
                     <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Average<br>first response time</p>
-                        <p class="fs-2 mb-0">1 min</p>
+                        <p class="text-muted small mb-1 text-uppercase">Detected Threats</p>
+                        <p class="fs-2 mb-0" id="detectedThreatsCount">-</p>
                     </div>
                 </div>
                 <div class="col-md-3 p-1 mt-2">
                     <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Average<br>Response time</p>
-                        <p class="fs-2 mb-0">3 min</p>
-                    </div>
-                </div>
-                <div class="col-md-3 p-1 mt-2">
-                    <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Resolution<br>within SLA</p>
-                        <p class="fs-2 mb-0">94 %</p>
-                    </div>
-                </div>
-                <div class="col-md-3 p-1 mt-2">
-                    <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Web Information</p>
-                        <p class="fs-2 mb-0">20</p>
-                    </div>
-                </div>
-                <div class="col-md-3 p-1 mt-2">
-                    <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Vulnerability Doubt</p>
-                        <p class="fs-2 mb-0">40</p>
-                    </div>
-                </div>
-                <div class="col-md-3 p-1 mt-2">
-                    <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Attack Vector</p>
-                        <p class="fs-2 mb-0">50</p>
+                        <p class="text-muted small mb-1 text-uppercase">Opened Ports</p>
+                        <p class="fs-2 mb-0" id="openedPortsCount">-</p>
                     </div>
                 </div>
                 <div class="col-md-3 p-1 mt-2">
                     <div class="p-3 border-rounded shadow">
                         <p class="text-muted small mb-1 text-uppercase">Related CVE</p>
-                        <p class="fs-2 mb-0">16</p>
+                        <p class="fs-2 mb-0" id="relatedCVECount">-</p>
                     </div>
                 </div>
                 <p class="col-md-12 mt-2 text-muted small">Calculated numbers may has numerical errors.</p>
             </section>
             <section class="row mt-3 pb-3">
                 <h3 class="col-md-12 fw-bold text-capitalize mb-3">Scan result</h3>
-                <div class="col-md-6 p-1 mt-2">
+                <section class="col-md-6 mb-2 p-1">
                     <div class="p-3 border-rounded shadow">
-                        <div class="sizer">
-                            <p class="mb-1 text-uppercase">Vulnerability Doubt</p>
-                            <a class="text-decoration-none ms-auto small mb-1 text-uppercase" href="/common/attack_vector"><i class="bi bi-zoom-in"></i> Detail</a>
-                        </div>
-                        <table class="table table-borderless mt-3">
-                            <tbody>
-                            <tr>
-                                <td>SQL Injection</td>
-                                <td>1</td>
-                            </tr>
-                            <tr>
-                                <td>Cross Site Scripting (Stored)</td>
-                                <td>2</td>
-                            </tr>
-                            <tr>
-                                <td>Server Side Request Forgery</td>
-                                <td>1</td>
-                            </tr>
-                            <tr>
-                                <td>File Download (LFI/RFI)</td>
-                                <td>4</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-md-6 p-1 mt-2">
-                    <div class="p-3 border-rounded shadow">
-                        <div class="">
+                        <section>
                             <p class="mb-0 text-uppercase">Web Environment Information</p>
                             <p class="mb-1 text-muted small">of <span class="fw-bold" id="webEnvURLPlace">https://example.com/</span></p>
-                        </div>
-                        <div class="row" id="webEnvDataPlace"></div>
+                        </section>
+                        <section class="row" id="webEnvDataPlace"></section>
                     </div>
-                </div>
+                </section>
             </section>
         </div>
     </div>
