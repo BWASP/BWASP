@@ -9,6 +9,42 @@ const APIEndpoints = {
 let API = await new api();
 
 class dashboard {
+    updateView() {
+        this.webEnvironments();
+        this.updatePacketCount();
+        this.updateThreatsCount();
+        this.updatePortsCount();
+    }
+
+    updatePacketCount() {
+        API.communicate("/api/packet/automation/count", (autoErr, automationCount) => {
+            API.communicate("/api/packet/manual/count", (manualErr, manualCount) => {
+                if (autoErr || manualErr) setTimeout(() => {
+                    return this.updatePacketCount();
+                }, 500);
+                else document.getElementById("receivedPacketsCount").innerText = automationCount.count + manualCount.count;
+            })
+        })
+    }
+
+    updateThreatsCount() {
+        API.communicate("/api/domain/count", (err, res) => {
+            if (err) setTimeout(() => {
+                return this.updateThreatsCount();
+            }, 500);
+            else document.getElementById("detectedThreatsCount").innerText = res.count;
+        })
+    }
+
+    updatePortsCount() {
+        API.communicate("/api/ports/count", (err, res) => {
+            if (err) setTimeout(() => {
+                return this.updatePortsCount();
+            }, 500);
+            else document.getElementById("openedPortsCount").innerText = res.count;
+        })
+    }
+
     webEnvironments() {
         API.communicate(
             APIEndpoints.webEnvironments + "/1",
@@ -83,5 +119,8 @@ class dashboard {
 
 window.onload = () => {
     let render = new dashboard();
-    render.webEnvironments();
+    render.updateView();
+    setInterval(() => {
+        render.updateView();
+    }, 2500);
 }

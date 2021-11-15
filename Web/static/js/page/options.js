@@ -1,7 +1,8 @@
 // Get modules
 import {API as api} from '../jHelper.js';
 
-let API = new api();
+let API = new api(),
+    requestData = {tool: Object(), info: Object(), target: Object()};
 
 const MaximumRecursiveLevel = 5000,
     patterns = {
@@ -14,15 +15,31 @@ const MaximumRecursiveLevel = 5000,
             version: "webAppVersion"
         }
     },
-    /*
-    DO NOT SET THIS VALUE TO FALSE WHEN PRODUCTION!!
-     - Result may not be worked or printed as designated.
-     - Please remove this keywords when code goes on production.
-     */
-    verifyOutput = false;
+    jobSubmitVerifyModal = new bootstrap.Modal(document.getElementById('jobSubmitVerifyModal'), {
+        keyboard: false,
+        backdrop: 'static',
+        show: true
+    });
 
 // Initialize frontend when load
-window.onload = () => {
+window.onload = async () => {
+    ["ClearAllData", "submitJobRequest", "job-order"].forEach((currentElement) => {
+        document.getElementById(currentElement).classList.remove("d-none");
+    })
+    /*
+    await API.communicate("/api/job/1", (err, res) => {
+        if(err === 404 || typeof(res)!=="undefined" && res.length <= 0) {
+            // Job start
+            ["ClearAllData", "submitJobRequest", "job-order"].forEach((currentElement) => {
+                document.getElementById(currentElement).classList.remove("d-none");
+            })
+        }else{
+            // Job Can't
+            document.getElementById("job-cant").classList.remove("d-none");
+            document.getElementById("job-order").classList.add("d-none");
+        }
+    })
+     */
     // Add event handler to recursive level handler
     let RecursiveLevelHandler = ["Input", "Slider"];
     for (let i = 0; i < RecursiveLevelHandler.length; i++) {
@@ -174,6 +191,52 @@ let renderULElement = (target, dataPackage) => {
     target.appendChild(skeleton);
 }
 
+document.getElementById("modal-start-job").addEventListener("click", () => {
+    document.getElementById("modal-start-job").setAttribute("disabled", "true");
+    jobSubmitVerifyModal.hide();
+    let data = {
+        targetURL: requestData.target.url,
+        knownInfo: requestData.info,
+        recursiveLevel: Number(requestData.tool.analysisLevel),
+        uriPath: requestData.target.path
+    };
+    fetch("/automation/options", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+        },
+        body: new URLSearchParams({
+            reqJsonData: JSON.stringify(requestData)
+        })
+    }).then(() => console.log("Done"));
+
+    alert("Job has just started!\nRedirecting to dashboard");
+    document.location.replace("/dashboard");
+    /*
+    .then(response => {
+        let setResult = (result) => {
+            if (Boolean(result)) {
+                alert("Job has just requested.\nRedirecting you to Dashboard...");
+                document.location.replace("/dashboard");
+            } else {
+                alert("Failed to create job.")
+            }
+        }
+
+        if (!verifyOutput) setResult(true);
+        else {
+            response.json().then(json => {
+                if (json.success) {
+                    setResult(true);
+                } else {
+                    setResult(false);
+                }
+            });
+        }
+    })
+     */
+})
+
 // Handler for submit check modal
 document.getElementById("submitJobRequest").addEventListener("click", function () {
     let formData = document.getElementsByTagName("input"),
@@ -185,8 +248,10 @@ document.getElementById("submitJobRequest").addEventListener("click", function (
             backend: [],
             renderData: {}
         },
-        requestData = {tool: Object(), info: Object(), target: Object()},
         renderTmpStorage = {};
+
+    // Initialize requestData before use
+    requestData = {tool: Object(), info: Object(), target: Object()};
 
     // Target URL
     requestData.target["url"] = document.getElementById("target-url").value;
@@ -244,56 +309,5 @@ document.getElementById("submitJobRequest").addEventListener("click", function (
         if (tempStorage.length > 0) renderULElement(document.getElementById(`modal-info-${type.toLowerCase()}`), tempStorage);
     })
 
-    let jobSubmitVerifyModal = new bootstrap.Modal(document.getElementById('jobSubmitVerifyModal'), {
-        keyboard: false,
-        backdrop: 'static',
-        show: true
-    });
     jobSubmitVerifyModal.toggle();
-
-    document.getElementById("modal-start-job").addEventListener("click", () => {
-        document.getElementById("modal-start-job").setAttribute("disabled", "true");
-        jobSubmitVerifyModal.hide();
-        let data = {
-            targetURL: requestData.target.url,
-            knownInfo: requestData.info,
-            recursiveLevel: Number(requestData.tool.analysisLevel),
-            uriPath: requestData.target.path
-        };
-        fetch("/automation/options", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-            },
-            body: new URLSearchParams({
-                reqJsonData: JSON.stringify(requestData)
-            })
-        }).then(()=>console.log("Done"));
-
-        alert("Job has just started!\nRedirecting to dashboard");
-        document.location.replace("/dashboard");
-            /*
-            .then(response => {
-                let setResult = (result) => {
-                    if (Boolean(result)) {
-                        alert("Job has just requested.\nRedirecting you to Dashboard...");
-                        document.location.replace("/dashboard");
-                    } else {
-                        alert("Failed to create job.")
-                    }
-                }
-
-                if (!verifyOutput) setResult(true);
-                else {
-                    response.json().then(json => {
-                        if (json.success) {
-                            setResult(true);
-                        } else {
-                            setResult(false);
-                        }
-                    });
-                }
-            })
-             */
-    })
 })
