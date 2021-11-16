@@ -273,7 +273,7 @@ def directoryIndexing(target_url):
     
     if api_key == False:
         print("[!] API 키가 없습니다.")
-        return
+        return return_data
 
     GOOGLE_ENGINE_ID = api_key["google"]["google_search_api"]["engine_id"]
     GOOGLE_SEARCH_API = api_key["google"]["google_search_api"]["api"]
@@ -286,6 +286,10 @@ def directoryIndexing(target_url):
 
     if res.status_code == 200:
         api_result = res.json()
+        if "items" in api_result.keys():
+            print("[*] No search data.")
+            return return_data
+
         search_result = api_result["items"]
         
         for item in search_result:
