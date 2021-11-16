@@ -279,14 +279,14 @@ def directoryIndexing(target_url):
     GOOGLE_SEARCH_API = api_key["google"]["google_search_api"]["api"]
 
     target_domain = urlparse(target_url).netloc
-    query = 'intitle:"Index Of" site:"{target_domain}"'.format(target_domain=target_domain)
+    query = 'intitle:"Index Of" inurl:"{target_domain}"'.format(target_domain=target_domain)
     api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
 
     res = requests.get(api_url)
 
     if res.status_code == 200:
         api_result = res.json()
-        if "items" in api_result.keys():
+        if "items" not in api_result.keys():
             print("[*] No search data.")
             return return_data
 
@@ -306,6 +306,8 @@ def directoryIndexing(target_url):
         # print("Print response: {}".format(res.text))
 
     return return_data
+
+directoryIndexing("http://testphp.vulnweb.com")
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
 """
