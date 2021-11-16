@@ -86,16 +86,15 @@ def visit(driver, url, depth, options):
         pass
 
     if start_options["check"]:
+        directoryIndexing(driver.current_url)
         http_method, infor_vector = attackHeader(driver.current_url)
         robots_result = robotsTxt(driver.current_url)
         error_result = errorPage(driver.current_url)
+        db.postWebInfo(driver.current_url)
+
         start_options["input_url"] = driver.current_url
-        db.postWebInfo(start_options["input_url"])
         start_options["visited_links"].append(start_options["input_url"])
-
         start_options["check"] = False
-
-        directoryIndexing(driver.current_url)
         
         if "portScan" in options["tool"]["optionalJobs"]:
             target_port = get_ports.getPortsOffline(start_options["input_url"])
@@ -173,7 +172,7 @@ def checkCountLink(visit_url, count_links):
     return False
 
 '''
-    String visit_url: 방문한 url
+    String visit_url: 입력한 url
     String current_url: 현재 페이지의 url
     String target_url: 사용자가 입력한 url 
 '''

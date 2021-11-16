@@ -3,6 +3,7 @@ import requests
 import json
 import re
 import base64
+from urllib.parse import urlparse
 
 
 def attackHeader(target_url):
@@ -265,16 +266,43 @@ def errorPage(url):
     url = url.split("/")[0] + "//" + url.split("/")[2] + "/BWASP/BWASP.TOP9"
     return True if 404 == requests.get(url).status_code and "not found" in requests.get(url).text.lower() else False
 
-def directoryIndexing(url):
+def directoryIndexing(target_url):
+    return_data = list()
+
     try:
         f = open("./Crawling/config/api.json")
         data = json.load(f)
+        GOOGLE_SEARCH_API = data["google"]["google_search_api"]["api"]
+        GOOGLE_ENGINE_ID = data["google"]["google_search_api"]["engine_id"]
         
     except FileNotFoundError:
         print("[!] API 키가 없습니다.")
+        return return_data
 
-    #TODO
-    # API 요청
+    target_domain = urlparse(target_url).netloc
+    query = 'intitle:"Index Of" inurl:"{target_domain}"'.format(target_domain=target_domain)
+    api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
+
+    res = requests.get(api_url)
+
+    if res.status_code == 200:
+        api_result = res.json()
+        search_result = api_result["items"]
+        
+        for item in search_result:
+            if item["title"].find("Index") != 0:
+                continue
+
+            return_data.append({
+                "title": item["title"],
+                "link": item["link"]
+            })
+    else:
+        print("[!] API State_code: {}".format(res.status_code))
+        print("[!] Please check API response.")
+        # print("Print response: {}".format(res.text))
+
+    return return_data
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
 """
