@@ -1,5 +1,5 @@
 from urllib.parse import urlparse, urlunparse
-import os
+import os, json
 
 def isSameDomain(target_url, visit_url):
     try:
@@ -77,3 +77,12 @@ def isExistExtension(url, keys):
         #         return True
 
     return False
+
+def apiKeyLoad():
+    try:
+        f = open("./Crawling/config/api.json")
+        data = json.load(f)
+        return data
+        
+    except FileNotFoundError:
+        return False

@@ -1,9 +1,10 @@
 from bs4 import BeautifulSoup
-import requests
-import json
-import re
-import base64
+import requests, json, re, base64
 from urllib.parse import urlparse
+
+from requests import api
+
+from Crawling.feature import func
 
 
 def attackHeader(target_url):
@@ -268,19 +269,17 @@ def errorPage(url):
 
 def directoryIndexing(target_url):
     return_data = list()
-
-    try:
-        f = open("./Crawling/config/api.json")
-        data = json.load(f)
-        GOOGLE_SEARCH_API = data["google"]["google_search_api"]["api"]
-        GOOGLE_ENGINE_ID = data["google"]["google_search_api"]["engine_id"]
-        
-    except FileNotFoundError:
+    api_key = func.apiKeyLoad()
+    
+    if api_key == False:
         print("[!] API 키가 없습니다.")
-        return return_data
+        return
+
+    GOOGLE_ENGINE_ID = api_key["google"]["google_search_api"]["engine_id"]
+    GOOGLE_SEARCH_API = api_key["google"]["google_search_api"]["api"]
 
     target_domain = urlparse(target_url).netloc
-    query = 'intitle:"Index Of" inurl:"{target_domain}"'.format(target_domain=target_domain)
+    query = 'intitle:"Index Of" site:"{target_domain}"'.format(target_domain=target_domain)
     api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
 
     res = requests.get(api_url)
