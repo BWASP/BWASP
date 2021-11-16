@@ -307,7 +307,31 @@ def directoryIndexing(target_url):
 
     return return_data
 
-directoryIndexing("http://testphp.vulnweb.com")
+def adminPage(target_url):
+    api_key = func.apiKeyLoad()
+
+    if api_key == False:
+        print("[!] API 키가 없습니다.")
+        return
+    
+    GOOGLE_ENGINE_ID = api_key["google"]["google_search_api"]["engine_id"]
+    GOOGLE_SEARCH_API = api_key["google"]["google_search_api"]["api"]
+
+    f = open("./Crawling/directory.json")
+    directory_list = json.load(f)
+
+    inurl_list = list()
+    for key in directory_list.keys():
+        if "php" != key:
+            continue
+        for directory in directory_list[key]:
+            inurl_list.append("inurl:{}".format(directory))
+
+    target_domain = urlparse(target_url).netloc
+    query = 'site:{DOMAIN} AND ({INURL_LIST})'.format(DOMAIN=target_domain, INURL_LIST=" | ".join(inurl_list))
+    print(query)
+    # api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
+
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
 """
