@@ -10,10 +10,12 @@
             <section class="mb-3">
                 <div class="d-flex">
                     <h3 class="text-dark fw-bolder mb-0 font-logo">Detail View</h3>
-                    <a class="ms-auto h4 text-muted element-clickable" id="toggleDetailViewModalSize"><i id="togglerIcon" class="fas fa-expand-alt"></i></a>
-                    <a href="#" data-bs-dismiss="modal" class="ms-3 h4 text-danger text-decoration-none"><i class="fas fa-times"></i></a>
+                    <p class="text-capitalize text-muted small ms-2">of vector No. <span id="currentRowID">0</span></p>
+                    <div class="ms-auto d-inline-flex">
+                        <a class="h4 text-muted element-clickable" id="toggleDetailViewModalSize"><i id="togglerIcon" class="fas fa-expand-alt"></i></a>
+                        <a href="#" data-bs-dismiss="modal" class="ms-3 h4 text-danger text-decoration-none"><i class="fas fa-times"></i></a>
+                    </div>
                 </div>
-                <p class="text-capitalize text-muted small">Data of vector No. <span id="currentRowID">0</span></p>
             </section>
             <div class="modal-body p-0">
                 <section class="table-responsive">
@@ -90,17 +92,11 @@
                 </section>
                 <section class="mb-2">
                     <h4 class="mb-3">Violation</h4>
-                    <p class="mb-1">주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf</p>
-                    <ul>
-                        <li><code>robots.txt</code> Not set</li>
-                        <li><code>Error page</code> Not set</li>
-                    </ul>
+                    <div id="violationViewArea"></div>
                 </section>
                 <section class="mb-2">
-                    <h4>Referred Documents</h4>
-                    <ul>
-                        <li><a class="text-decoration-none" href="#">Google Cheatsheet - BWASP PM</a></li>
-                    </ul>
+                    <h4 class="mb-3">Referred Documents</h4>
+                    <ul id="referredDocumentViewArea"></ul>
                 </section>
             </div>
         </div>

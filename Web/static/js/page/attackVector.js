@@ -88,148 +88,8 @@ let returnError = (errorMessage = ["No data", ""]) => {
 // define api communicator
 let API = await new api();
 
-const openDetailsModal = (dataSet) => {
-    let dataKind = ["cookie", "queryString", "tag"],
-        modalElements = Object();
-
-    places.detailView.view.className = "";
-    places.detailView.view.classList.add("modal-content", "p-4", "border-rounded", "shadow");
-
-
-    // Initialize table elements
-    dataKind.forEach((currentKind) => {
-        modalElements[currentKind] = {
-            noData: document.getElementById(`detail-${currentKind}`),
-            dataPlace: document.getElementById(`detail-${currentKind}-data`),
-            tablePlace: document.getElementById(`tablePlace-${currentKind}`)
-        }
-        modalElements[currentKind].noData.classList.add("d-none");
-        modalElements[currentKind].dataPlace.classList.add("d-none");
-        modalElements[currentKind].tablePlace.innerHTML = "";
-    })
-    console.log(dataSet.impactRate);
-
-    // Set current row ID
-    document.getElementById("currentRowID").innerText = dataSet.id;
-
-    // Set each value - impact
-    let modalDataElement = {
-        impact: document.getElementById("detail-impact"),
-        threat: document.getElementById("detail-threat"),
-        url: {
-            method: document.getElementById("detail-method"),
-            url: document.getElementById("detail-URL"),
-            uri: document.getElementById("detail-URI"),
-        },
-        actions: document.getElementById("detail-actions")
-    };
-
-    // Impact rate
-    modalDataElement.impact.className = "";
-    modalDataElement.impact.classList.add("badge", "rounded-pill", "small", `bg-${impactRate[dataSet.impactRate][0]}`);
-    modalDataElement.impact.innerText = impactRate[dataSet.impactRate][1];
-
-    // Threats
-    modalDataElement.threat.innerText = "";
-    let doubtList = Object.keys(dataSet.vulnerability.type["doubt"]);
-    if (doubtList.length > 0) {
-        doubtList.forEach((currentThreat) => {
-            modalDataElement.threat.innerText +=
-                currentThreat.concat(
-                    (doubtList[doubtList.length - 1] !== currentThreat) ? ", " : ""
-                );
-        });
-    } else {
-        modalDataElement.threat.innerText = "-";
-    }
-
-    // URL
-    modalDataElement.url.url.innerText = dataSet.url.url;
-    modalDataElement.url.uri.innerText = dataSet.url.uri;
-    modalDataElement.url.method.innerText = dataSet.method.toUpperCase();
-
-    // Actions
-    console.log(dataSet.action);
-    if (dataSet.action.target.length > 0) {
-        modalDataElement.actions.innerHTML = "";
-        for (let currentRow = 0; currentRow <= dataSet.action.target.length - 1; currentRow++) {
-            let localSkeleton = {
-                parent: document.createElement("p"),
-                method: document.createElement("span"),
-                target: document.createElement("span")
-            }
-            localSkeleton.method.classList.add("badge", "text-uppercase", "me-2", "mb-1",
-                (typeof(coloring[dataSet.action.type[currentRow].toLowerCase()]) === "undefined")
-                    ? "bg-warning"
-                    : coloring[dataSet.action.type[currentRow].toLowerCase()]);
-            localSkeleton.target.classList.add("text-break");
-
-            localSkeleton.method.innerText = dataSet.action.type[currentRow];
-            localSkeleton.target.innerText = dataSet.action.target[currentRow];
-            localSkeleton.parent.append(
-                localSkeleton.method,
-                localSkeleton.target
-            );
-            modalDataElement.actions.appendChild(localSkeleton.parent);
-            //  console.log("currentRow", currentRow);
-        }
-    } else {
-        dataSet.action.innerHTML = " - ";
-    }
-
-
-    // Create cookie view
-    [dataKind[0], dataKind[1]].forEach((currentKind) => {
-        Object.keys(dataSet.details[currentKind]).forEach((currentData) => {
-            let localSkeleton = {
-                parent: document.createElement("tr"),
-                key: document.createElement("th"),
-                value: {
-                    parent: document.createElement("td"),
-                    value: document.createElement("code")
-                }
-            };
-            localSkeleton.key.innerText = currentData;
-            localSkeleton.value.value.innerText = dataSet.details[currentKind][currentData];
-            localSkeleton.value.parent.appendChild(localSkeleton.value.value);
-
-            localSkeleton.key.classList.add("text-break");
-            localSkeleton.value.parent.classList.add("text-break");
-
-            localSkeleton.parent.append(
-                localSkeleton.key,
-                localSkeleton.value.parent
-            );
-            modalElements[currentKind].tablePlace.appendChild(localSkeleton.parent);
-        })
-        if (Object.keys(dataSet.details[currentKind]).length !== 0) modalElements[currentKind].dataPlace.classList.remove("d-none");
-        else modalElements[currentKind].noData.classList.remove("d-none");
-    })
-
-    if (dataSet.details[dataKind[2]].length !== 0) {
-        dataSet.details[dataKind[2]].forEach((currentTag) => {
-            let localSkeleton = {
-                pre: document.createElement("pre"),
-                code: document.createElement("code")
-            };
-            localSkeleton.code.classList.add("language-html");
-            localSkeleton.code.innerText = currentTag;
-            localSkeleton.pre.appendChild(localSkeleton.code);
-
-            modalElements[dataKind[2]].tablePlace.appendChild(localSkeleton.pre);
-        })
-        modalElements[dataKind[2]].dataPlace.classList.remove("d-none");
-    } else modalElements[dataKind[2]].noData.classList.remove("d-none");
-
-
-    hljs.highlightAll();
-    modals.detailView.show();
-
-    console.log(dataSet);
-}
-
 class pagerTools {
-    constructor() {
+    constructor(defaultSet = {hello: String()}) {
         this.className = "pagerTools";
         this.API = new api();
         this.paging = {
@@ -583,6 +443,224 @@ class pagerTools {
 }
 
 let pager = new pagerTools();
+let referredDocuments = Object();
+
+const openDetailsModal = (dataSet) => {
+    /**
+     * Build Violation section for details modal
+     * @param dataPackage
+     */
+    const buildViolationElement = (dataPackage) => {
+        let viewArea = document.getElementById("violationViewArea");
+        if (dataPackage.length > 0) viewArea.innerHTML = "";
+        dataPackage.forEach((currentPackage) => {
+            let skeleton = {
+                parent: document.createElement("section"),
+                docName: document.createElement("p"),
+                listParent: document.createElement("ul")
+            }
+            skeleton.docName.classList.add("mb-3");
+            skeleton.docName.innerText = currentPackage.documentName;
+
+            currentPackage.elements.forEach((currentElement) => {
+                let localSkeleton = {
+                    parent: document.createElement("li"),
+                    target: document.createElement("code")
+                }
+                localSkeleton.target.innerText = currentElement;
+                localSkeleton.parent.append(
+                    localSkeleton.target,
+                    " Not set"
+                );
+                skeleton.listParent.appendChild(localSkeleton.parent);
+            })
+            skeleton.parent.append(
+                skeleton.docName,
+                skeleton.listParent
+            );
+            viewArea.appendChild(skeleton.parent);
+        })
+    };
+
+    const buildReferredDocs = async (target, types = String()) => {
+        let overallDocuments = Array(),
+            viewArea = document.getElementById("referredDocumentViewArea");
+        if (Object.keys(referredDocuments).length === 0) {
+            await fetch("/static/data/referredDocuments.json")
+                .then(blob => blob.json())
+                .then(res => referredDocuments = res);
+        }
+        if (typeof (referredDocuments[target]) === "undefined") return;
+        if (!Array.isArray(referredDocuments[target])) {
+            let typeCategory = Object.keys(referredDocuments[target]);
+            let localDataSet = referredDocuments[target][(types !== String())
+                ? types
+                : "Generic"];
+            localDataSet.forEach((currentValue) => overallDocuments.push(currentValue));
+        } else referredDocuments[target].forEach((currentValue) => overallDocuments.push(currentValue));
+
+        overallDocuments.forEach((currentDocument) => {
+            let localSkeleton = {
+                parent: document.createElement("li"),
+                innerLink: document.createElement("a")
+            };
+            localSkeleton.innerLink.classList.add("text-decoration-none");
+            localSkeleton.innerLink.href = currentDocument.link;
+            localSkeleton.innerLink.innerHTML = `${currentDocument["name"]} - ${currentDocument["author"]}`;
+            localSkeleton.parent.appendChild(localSkeleton.innerLink);
+            viewArea.appendChild(localSkeleton.parent);
+        });
+
+        console.log(overallDocuments);
+
+        //  console.log(Array.isArray(referredDocuments[target]), target, referredDocuments, referredDocuments[target]);
+    }
+
+    let dataKind = ["cookie", "queryString", "tag"],
+        modalElements = Object();
+
+    places.detailView.view.className = "";
+    places.detailView.view.classList.add("modal-content", "p-4", "border-rounded", "shadow");
+
+
+    // Initialize table elements
+    dataKind.forEach((currentKind) => {
+        modalElements[currentKind] = {
+            noData: document.getElementById(`detail-${currentKind}`),
+            dataPlace: document.getElementById(`detail-${currentKind}-data`),
+            tablePlace: document.getElementById(`tablePlace-${currentKind}`)
+        }
+        modalElements[currentKind].noData.classList.add("d-none");
+        modalElements[currentKind].dataPlace.classList.add("d-none");
+        modalElements[currentKind].tablePlace.innerHTML = "";
+    })
+
+    // Set current row ID
+    document.getElementById("currentRowID").innerText = dataSet.id;
+
+    // Set each value - impact
+    let modalDataElement = {
+        impact: document.getElementById("detail-impact"),
+        threat: document.getElementById("detail-threat"),
+        url: {
+            method: document.getElementById("detail-method"),
+            url: document.getElementById("detail-URL"),
+            uri: document.getElementById("detail-URI"),
+        },
+        actions: document.getElementById("detail-actions")
+    };
+
+    // Impact rate
+    modalDataElement.impact.className = "";
+    modalDataElement.impact.classList.add("badge", "rounded-pill", "small", `bg-${impactRate[dataSet.impactRate][0]}`);
+    modalDataElement.impact.innerText = impactRate[dataSet.impactRate][1];
+
+    // Threats
+    modalDataElement.threat.innerText = "";
+    let doubtList = Object.keys(dataSet.vulnerability.type["doubt"]);
+    document.getElementById("referredDocumentViewArea").innerHTML = "";
+    if (doubtList.length > 0) {
+        doubtList.forEach((currentThreat) => {
+            buildReferredDocs(currentThreat);
+            modalDataElement.threat.innerText +=
+                currentThreat.concat(
+                    (doubtList[doubtList.length - 1] !== currentThreat) ? ", " : ""
+                );
+        });
+    } else {
+        modalDataElement.threat.innerText = "-";
+    }
+
+    // URL
+    modalDataElement.url.url.innerText = dataSet.url.url;
+    modalDataElement.url.uri.innerText = dataSet.url.uri;
+    modalDataElement.url.method.innerText = dataSet.method.toUpperCase();
+
+    // Actions
+    modalDataElement.actions.innerHTML = " - ";
+    if (dataSet.action.target.length > 0) {
+        modalDataElement.actions.innerHTML = "";
+        for (let currentRow = 0; currentRow <= dataSet.action.target.length - 1; currentRow++) {
+            let localSkeleton = {
+                parent: document.createElement("p"),
+                method: document.createElement("span"),
+                target: document.createElement("span")
+            }
+            localSkeleton.method.classList.add("badge", "text-uppercase", "me-2", "mb-1",
+                (typeof (coloring[dataSet.action.type[currentRow].toLowerCase()]) === "undefined")
+                    ? "bg-warning"
+                    : coloring[dataSet.action.type[currentRow].toLowerCase()]);
+            localSkeleton.target.classList.add("text-break");
+
+            localSkeleton.method.innerText = dataSet.action.type[currentRow];
+            localSkeleton.target.innerText = dataSet.action.target[currentRow];
+            localSkeleton.parent.append(
+                localSkeleton.method,
+                localSkeleton.target
+            );
+            modalDataElement.actions.appendChild(localSkeleton.parent);
+        }
+    } else {
+        dataSet.action.innerHTML = " - ";
+    }
+
+
+    // Create cookie view
+    [dataKind[0], dataKind[1]].forEach((currentKind) => {
+        Object.keys(dataSet.details[currentKind]).forEach((currentData) => {
+            let localSkeleton = {
+                parent: document.createElement("tr"),
+                key: document.createElement("th"),
+                value: {
+                    parent: document.createElement("td"),
+                    value: document.createElement("code")
+                }
+            };
+            localSkeleton.key.innerText = currentData;
+            localSkeleton.value.value.innerText = dataSet.details[currentKind][currentData];
+            localSkeleton.value.parent.appendChild(localSkeleton.value.value);
+
+            localSkeleton.key.classList.add("text-break");
+            localSkeleton.value.parent.classList.add("text-break");
+
+            localSkeleton.parent.append(
+                localSkeleton.key,
+                localSkeleton.value.parent
+            );
+            modalElements[currentKind].tablePlace.appendChild(localSkeleton.parent);
+        })
+        if (Object.keys(dataSet.details[currentKind]).length !== 0) modalElements[currentKind].dataPlace.classList.remove("d-none");
+        else modalElements[currentKind].noData.classList.remove("d-none");
+    })
+
+    if (dataSet.details[dataKind[2]].length !== 0) {
+        dataSet.details[dataKind[2]].forEach((currentTag) => {
+            let localSkeleton = {
+                pre: document.createElement("pre"),
+                code: document.createElement("code")
+            };
+            localSkeleton.code.classList.add("language-html");
+            localSkeleton.code.innerText = currentTag;
+            localSkeleton.pre.appendChild(localSkeleton.code);
+
+            modalElements[dataKind[2]].tablePlace.appendChild(localSkeleton.pre);
+        })
+        modalElements[dataKind[2]].dataPlace.classList.remove("d-none");
+    } else modalElements[dataKind[2]].noData.classList.remove("d-none");
+
+    let vulnerabilityMisc = Object.keys(dataSet.vulnerability.type["misc"]);
+    if (vulnerabilityMisc.length > 0) {
+        buildViolationElement([{
+            documentName: "주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf",
+            elements: vulnerabilityMisc
+        }]);
+    }
+
+    hljs.highlightAll();
+    modals.detailView.show();
+
+    console.log(dataSet);
+}
 
 document.getElementById("openPrefModal").addEventListener("click", () => pager.openPagingOption());
 
