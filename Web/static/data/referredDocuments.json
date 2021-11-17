@@ -1,0 +1,127 @@
+{
+  "SQL injection": {
+    "Generic": [
+      {
+        "name": "Blind SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/GenericBlind.txt"
+      },
+      {
+        "name": "ErrorBased SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/Generic_ErrorBased.txt"
+      },
+      {
+        "name": "SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/Generic_SQLI.txt"
+      },
+      {
+        "name": "TimeBased SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/Generic_TimeBased.txt"
+      },
+      {
+        "name": "Union SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/Generic_UnionSelect.txt"
+      },
+      {
+        "name": "Auth_Bypass SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/exploit/Auth_Bypass.txt"
+      }
+    ],
+    "MSSQL": [
+      {
+        "name": "MSSQL SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/MSSQL/MSSQL.txt"
+      },
+      {
+        "name": "MSSQL Blind SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/MSSQL/MSSQL_blind.txt"
+      },
+      {
+        "name": "MSSQL enumeration SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/exploit/MSSQL/ms-sql-enumeration.txt"
+      },
+      {
+        "name": "MSSQL Blind SQLi (INSERT) Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/payloads-sql-blind/MSSQL/payloads-sql-blind-MSSQL-INSERT.txt"
+      },
+      {
+        "name": "MSSQL Blind SQLi (WHERE) Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/payloads-sql-blind/MSSQL/payloads-sql-blind-MSSQL-WHERE.txt"
+      }
+    ],
+    "MySQL": [
+      {
+        "name": "MySQL SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/MySQL/MySQL.txt"
+      },
+      {
+        "name": "MySQL Blind SQLi (INSERT) Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/payloads-sql-blind/MySQL/payloads-sql-blind-MySQL-INSERT.txt"
+      },
+      {
+        "name": "MySQL Blind SQLi (ORDER BY) Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/payloads-sql-blind/MySQL/payloads-sql-blind-MySQL-ORDER_BY.txt"
+      },
+      {
+        "name": "MySQL Blind SQLi (WHERE) Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/payloads-sql-blind/MySQL/payloads-sql-blind-MySQL-WHERE.txt"
+      }
+    ],
+    "NoSQL": [
+      {
+        "name": "NoSQL SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/NoSQL/no-sql.txt"
+      }
+    ],
+    "Oracle": [
+      {
+        "name": "Oracle SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/Oracle/oracle.txt"
+      }
+    ],
+    "xPlatform": [
+      {
+        "name": "xPlatform SQLi Cheatshet",
+        "author": "PayloadBox",
+        "link": "https://raw.githubusercontent.com/payloadbox/sql-injection-payload-list/master/Intruder/detect/xPlatform/xplatform.txt"
+      }
+    ],
+    "PostgreSQL": [
+      {
+        "name": "PostgreSQL SQLi Cheatsheet",
+        "author": "PayloadBox",
+        "link": "https://github.com/payloadbox/sql-injection-payload-list/blob/master/Intruder/exploit/PostgresSQL/postgres-enumeration.txt"
+      }
+    ]
+  },
+  "XSS": [
+    {
+      "name": "Cross Site Script(XSS) Cheatsheet",
+      "author": "PayloadBox",
+      "link": "https://raw.githubusercontent.com/payloadbox/xss-payload-list/master/Intruder/xss-payload-list.txt"
+    }
+  ],
+  "Open Redirect": [
+    {
+      "name": "Open Redirect Cheatsheet",
+      "author": "PayloadBox",
+      "link": "https://raw.githubusercontent.com/payloadbox/open-redirect-payload-list/master/README.md"
+    }
+  ]
+}

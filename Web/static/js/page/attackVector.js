@@ -443,6 +443,7 @@ class pagerTools {
 }
 
 let pager = new pagerTools();
+let referredDocuments = Object();
 
 const openDetailsModal = (dataSet) => {
     /**
@@ -450,8 +451,8 @@ const openDetailsModal = (dataSet) => {
      * @param dataPackage
      */
     const buildViolationElement = (dataPackage) => {
-        let violationViewArea = document.getElementById("violationViewArea");
-        if(dataPackage.length > 0) violationViewArea.innerHTML = "";
+        let viewArea = document.getElementById("violationViewArea");
+        if (dataPackage.length > 0) viewArea.innerHTML = "";
         dataPackage.forEach((currentPackage) => {
             let skeleton = {
                 parent: document.createElement("section"),
@@ -477,9 +478,44 @@ const openDetailsModal = (dataSet) => {
                 skeleton.docName,
                 skeleton.listParent
             );
-            violationViewArea.appendChild(skeleton.parent);
+            viewArea.appendChild(skeleton.parent);
         })
+    };
+
+    const buildReferredDocs = async (target, types = String()) => {
+        let overallDocuments = Array(),
+            viewArea = document.getElementById("referredDocumentViewArea");
+        if (Object.keys(referredDocuments).length === 0) {
+            await fetch("/static/data/referredDocuments.json")
+                .then(blob => blob.json())
+                .then(res => referredDocuments = res);
+        }
+        if (typeof (referredDocuments[target]) === "undefined") return;
+        if (!Array.isArray(referredDocuments[target])) {
+            let typeCategory = Object.keys(referredDocuments[target]);
+            let localDataSet = referredDocuments[target][(types !== String())
+                ? types
+                : "Generic"];
+            localDataSet.forEach((currentValue) => overallDocuments.push(currentValue));
+        } else referredDocuments[target].forEach((currentValue) => overallDocuments.push(currentValue));
+
+        overallDocuments.forEach((currentDocument) => {
+            let localSkeleton = {
+                parent: document.createElement("li"),
+                innerLink: document.createElement("a")
+            };
+            localSkeleton.innerLink.classList.add("text-decoration-none");
+            localSkeleton.innerLink.href = currentDocument.link;
+            localSkeleton.innerLink.innerHTML = `${currentDocument["name"]} - ${currentDocument["author"]}`;
+            localSkeleton.parent.appendChild(localSkeleton.innerLink);
+            viewArea.appendChild(localSkeleton.parent);
+        });
+
+        console.log(overallDocuments);
+
+        //  console.log(Array.isArray(referredDocuments[target]), target, referredDocuments, referredDocuments[target]);
     }
+
     let dataKind = ["cookie", "queryString", "tag"],
         modalElements = Object();
 
@@ -522,8 +558,10 @@ const openDetailsModal = (dataSet) => {
     // Threats
     modalDataElement.threat.innerText = "";
     let doubtList = Object.keys(dataSet.vulnerability.type["doubt"]);
+    document.getElementById("referredDocumentViewArea").innerHTML = "";
     if (doubtList.length > 0) {
         doubtList.forEach((currentThreat) => {
+            buildReferredDocs(currentThreat);
             modalDataElement.threat.innerText +=
                 currentThreat.concat(
                     (doubtList[doubtList.length - 1] !== currentThreat) ? ", " : ""
@@ -539,7 +577,6 @@ const openDetailsModal = (dataSet) => {
     modalDataElement.url.method.innerText = dataSet.method.toUpperCase();
 
     // Actions
-    console.log(dataSet.action);
     modalDataElement.actions.innerHTML = " - ";
     if (dataSet.action.target.length > 0) {
         modalDataElement.actions.innerHTML = "";
@@ -562,7 +599,6 @@ const openDetailsModal = (dataSet) => {
                 localSkeleton.target
             );
             modalDataElement.actions.appendChild(localSkeleton.parent);
-            //  console.log("currentRow", currentRow);
         }
     } else {
         dataSet.action.innerHTML = " - ";
@@ -619,9 +655,6 @@ const openDetailsModal = (dataSet) => {
             elements: vulnerabilityMisc
         }]);
     }
-
-    console.log(dataSet.vulnerability.type["misc"]);
-
 
     hljs.highlightAll();
     modals.detailView.show();
