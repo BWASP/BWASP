@@ -1,7 +1,11 @@
 from flask import (
-    Blueprint, g, render_template_string
+    Blueprint, g, render_template_string, request
 )
-from ManualAPI.modules.manual import start
+import sys, os
+
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
+from modules.manual import start
 
 NAME = 'manual'
 bp = Blueprint(NAME, __name__, url_prefix='/')

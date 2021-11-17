@@ -1,5 +1,5 @@
-#=========================== 나중에 다시 참고해야 할 것 ===============================
-'''
+# =========================== 나중에 다시 참고해야 할 것 ===============================
+"""
 def deleteUselessBody(packets):
     content_types = ["text/css", "application/font-woff2"]
 
@@ -32,18 +32,19 @@ open_redirect = openRedirectionCheck(packet)
 
             def getPacketIndex(packet_index, previous_packet_count):
     return previous_packet_count + packet_index + 1
-'''
-
-import os
-import json
-from urllib.parse import urlparse, urlunparse
+"""
 
 """from ManualAPI.modules import func, attack_vector
 from ManualAPI.modules.api import *"""
-import func
-from attack_vector import *
-from api import *
-import requests
+import requests, json, sys, os
+from urllib.parse import urlparse, urlunparse
+
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
+from modules.func import *
+from modules.attack_vector import *
+from modules.api import *
+
 
 # REST API: 종민 Packets
 def deleteUselessBody(packets):
@@ -56,6 +57,7 @@ def deleteUselessBody(packets):
                     packets[index]["response"]["body"] = ""
 
     return packets
+
 
 def insertPackets(req_res_packets):
     api_url = "http://localhost:20102/api/packet/manual"
@@ -74,6 +76,7 @@ def insertPackets(req_res_packets):
 
     Packets().PostManual(json.dumps(data))
     # res = requests.post(api_url, headers=headers, data=json.dumps(data))
+
 
 # REST API: 도훈 Domains
 # TODO
@@ -96,18 +99,17 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             impactRate = 2
         else:
             attack_vector["doubt"].pop("CORS")
-            
+
         url_part = urlparse(packet["request"]["full_url"])
         domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
         domain_uri = urlunparse(url_part._replace(scheme="", netloc=""))
 
-        #if len(domain_params) > 0:
+        # if len(domain_params) > 0:
 
+        tag_name_list.append(url_part.query)  # hello=world&a=b
+        # domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
 
-        tag_name_list.append(url_part.query) # hello=world&a=b
-        #domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
-
-        #Query String 정리
+        # Query String 정리
         domain_params = dict()
         if url_part.query != "":
             try:
@@ -133,20 +135,19 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
                     attack_vector["doubt"]["SQL injection"] = {"type": ["None"]}
                     attack_vector["doubt"]["XSS"] = {"type": ["None"]}
                     impactRate = 1
-            
 
         if not packet["request"]["full_url"] in cookie_result.keys():
             domain_cookie = {}
         else:
             domain_cookie = json.dumps(cookie_result[packet["request"]["full_url"]])
 
-        #robots.txt check
+        # robots.txt check
         if robots_result == True:
             attack_vector["misc"]["robots.txt"] = robots_result
         else:
             attack_vector["misc"].pop("robots.txt")
 
-        #Error Page check
+        # Error Page check
         if error_result == True:
             attack_vector["misc"]["error"] = error_result
         else:
@@ -175,7 +176,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             }  # tag_list + domain_cookie + #domain_params 양식에 맞춰서 포함해야 함
         }
         data.append(query)
-        print("attackvector",attack_vector)
+        print("attackvector", attack_vector)
         attack_vector["current_url"] = packet["request"]["full_url"]
         crx.append(attack_vector)
 
