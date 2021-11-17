@@ -16,9 +16,8 @@ bp = Blueprint(NAME, __name__, url_prefix='/')
 @bp.route('/', methods=['GET', 'POST'])
 def DataReqRes():
     if request.method == 'POST':
-        data = start(request.form["reqdata"])
-
-        return_data = start(json.dumps(data))
+        data = request.get_json()
+        return_data = start(data)
 
         return render_template_string(f"""
             <!Doctype html>
