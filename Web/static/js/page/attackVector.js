@@ -506,6 +506,7 @@ const openDetailsModal = (dataSet) => {
             };
             localSkeleton.innerLink.classList.add("text-decoration-none");
             localSkeleton.innerLink.href = currentDocument.link;
+            localSkeleton.innerLink.target = "_BLANK";
             localSkeleton.innerLink.innerHTML = `${currentDocument["name"]} - ${currentDocument["author"]}`;
             localSkeleton.parent.appendChild(localSkeleton.innerLink);
             viewArea.appendChild(localSkeleton.parent);
