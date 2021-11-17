@@ -42,7 +42,7 @@ def start(receive):
     }
     
     receive = {
-        current_url: [{
+        "https://webhacking.kr/": [{
             'request': {'method': 'GET', 'url': '/s/lato/v20/S6uyw4BMUTPHjx4wXg.woff2',
                         'headers': {'host': 'fonts.gstatic.com', 'sec-ch-ua': '"Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"',
                                     'origin': 'https://webhacking.kr', 'sec-ch-ua-mobile': '?0',
