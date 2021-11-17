@@ -1,6 +1,7 @@
 import json
 from urllib.parse import urlparse
-from ManualAPI.modules import func
+# from ManualAPI.modules import func
+import func
 
 def start(url, req_res_packets):
     cookies_per_packet = dict()
