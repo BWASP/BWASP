@@ -9,11 +9,19 @@ const APIEndpoints = {
 let API = await new api();
 
 class dashboard {
+    constructor() {
+        this.webEnvironment = {
+            target: String(),
+            data: Object()
+        };
+        this.ports = Object();
+    }
+
     updateView() {
         this.webEnvironments();
         this.updatePacketCount();
         this.updateThreatsCount();
-        this.updatePortsCount();
+        this.updatePorts();
     }
 
     updatePacketCount() {
@@ -36,12 +44,70 @@ class dashboard {
         })
     }
 
-    updatePortsCount() {
+    updatePorts() {
+        let localPorts = Object();
+
+        // Port count
         API.communicate("/api/ports/count", (err, res) => {
             if (err) setTimeout(() => {
                 return this.updatePortsCount();
             }, 500);
-            else document.getElementById("openedPortsCount").innerText = res.count;
+            else {
+                document.getElementById("portCountViewPlace").innerText = res.count;
+                document.getElementById("openedPortsCount").innerText = res.count;
+            }
+        })
+
+        // Ports
+        API.communicate("/api/ports", (err, res)=>{
+            if (err) setTimeout(() => {
+                return this.updatePorts();
+            }, 500);
+            else {
+                res.forEach((currentPort) => {
+                    if (currentPort.result === "Open") {
+                        if (!Object.keys(localPorts).includes(currentPort["service"]))
+                            localPorts[currentPort["service"]] = Array();
+                        if (currentPort.port !== "None") localPorts[currentPort["service"]].push(currentPort.port)
+                    }
+                    // currentPort["service"].push()
+                    // if(Object.keys(localPorts))
+                })
+            }
+            if(JSON.stringify(this.ports)!==JSON.stringify(localPorts)){
+                // Save ports data
+                this.ports = localPorts;
+
+                // Initialize opened ports DOM
+                let portView = document.getElementById("portViewPlace");
+                portView.innerHTML = "";
+
+                // Build
+                console.log(localPorts);
+                Object.keys(this.ports).forEach((currentType)=>{
+                    let skeleton = {
+                        parent: document.createElement("section"),
+                        name: document.createElement("p"),
+                        ports: document.createElement("p")
+                    };
+                    skeleton.parent.classList.add("col-md-12", "mt-3");
+                    skeleton.name.classList.add("text-muted","small", "text-capitalize");
+                    skeleton.name.innerText = `${currentType} (${localPorts[currentType].length})`;
+                    localPorts[currentType].forEach(currentPort=>{
+                        skeleton.ports.innerText += currentPort.concat(
+                            (localPorts[currentType][localPorts[currentType].length-1]!==currentPort)
+                                ? ", "
+                                : ""
+                        )
+                    })
+
+                    skeleton.parent.append(
+                        skeleton.name,
+                        skeleton.ports
+                    )
+                    portView.appendChild(skeleton.parent);
+                })
+            }
         })
     }
 
@@ -53,17 +119,23 @@ class dashboard {
                     return window.setTimeout(() => {
                         this.webEnvironments();
                     }, 500);
-                } else res = {
-                    target: res[0].url,
-                    data: JSON.parse(res[0].data)
-                };
+                } else {
+                    let localObject = {
+                        target: res[0].url,
+                        data: JSON.parse(res[0].data)
+                    }
+                    let reGenObject = JSON.stringify(this.webEnvironment) !== JSON.stringify(localObject);
+                    this.webEnvironment.target = localObject.target;
+                    this.webEnvironment.data = localObject.data;
 
-                document.getElementById("webEnvURLPlace").innerText = res.target;
-                document.getElementById("webEnvDataPlace").innerHTML = "";
-                Object.keys(res.data).forEach((key) => {
-                    document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, res.data[key]));
-                });
-
+                    if (reGenObject) {
+                        document.getElementById("webEnvURLPlace").innerText = this.webEnvironment.target;
+                        document.getElementById("webEnvDataPlace").innerHTML = "";
+                        Object.keys(this.webEnvironment.data).forEach((key) => {
+                            document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, this.webEnvironment.data[key]));
+                        });
+                    }
+                }
             })
     }
 
