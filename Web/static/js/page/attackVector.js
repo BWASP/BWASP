@@ -451,36 +451,55 @@ const openDetailsModal = (dataSet) => {
      * Build Violation section for details modal
      * @param dataPackage
      */
-    const buildViolationElement = (dataPackage) => {
-        let viewArea = document.getElementById("violationViewArea");
-        if (dataPackage.length > 0) viewArea.innerHTML = "";
-        dataPackage.forEach((currentPackage) => {
-            let skeleton = {
-                parent: document.createElement("section"),
-                docName: document.createElement("p"),
-                listParent: document.createElement("ul")
-            }
-            skeleton.docName.classList.add("mb-3");
-            skeleton.docName.innerText = currentPackage.documentName;
+    const buildViolationElement = async (dataPackage) => {
+        let guideline = Object(),
+            viewArea = document.getElementById("violationViewArea"),
+            packageKeys = Object.keys(dataPackage);
 
-            currentPackage.elements.forEach((currentElement) => {
-                let localSkeleton = {
-                    parent: document.createElement("li"),
-                    target: document.createElement("code")
+        // Load guideline
+        await fetch("/static/data/documents/kisa.json")
+            .then(blob => blob.json())
+            .then(res => guideline = res);
+
+        // Clear HTML Area
+        if (packageKeys.length > 0) viewArea.innerHTML = "";
+
+        // Create skeleton
+        let skeleton = {
+            parent: document.createElement("section"),
+            documentName: document.createElement("h5")
+        }
+        skeleton.documentName.classList.add("fw-bolder", "mb-3");
+        skeleton.documentName.innerText = `[${guideline.document.fileType.toUpperCase()}, ${guideline.document.released}] ${guideline.document.name}`;
+
+        skeleton.parent.appendChild(skeleton.documentName);
+
+        packageKeys.forEach((currentElement) => {
+            let localSkeleton = {
+                parent: document.createElement("div"),
+                child: {
+                    message: document.createElement("p"),
+                    quote: document.createElement("p")
                 }
-                localSkeleton.target.innerText = currentElement;
-                localSkeleton.parent.append(
-                    localSkeleton.target,
-                    " Not set"
-                );
-                skeleton.listParent.appendChild(localSkeleton.parent);
-            })
-            skeleton.parent.append(
-                skeleton.docName,
-                skeleton.listParent
+            },
+                currentGuideline = guideline.detect[currentElement];
+
+            localSkeleton.parent.classList.add("m-3", "p-3", "rounded-custom", "shadow");
+            localSkeleton.child.message.classList.add("mb-0", "fw-bold");
+            localSkeleton.child.quote.classList.add("small", "text-muted", "mb-0", "ms-2");
+
+            localSkeleton.child.message.innerText = currentGuideline.message;
+            localSkeleton.child.quote.innerText = `[P. ${currentGuideline.relatedPage}] ${currentGuideline.quote}`;
+
+            localSkeleton.parent.append(
+                localSkeleton.child.message,
+                localSkeleton.child.quote
             );
-            viewArea.appendChild(skeleton.parent);
+
+            skeleton.parent.appendChild(localSkeleton.parent);
         })
+
+        viewArea.appendChild(skeleton.parent);
     };
 
     const buildReferredDocs = async (target, types = String()) => {
@@ -646,12 +665,8 @@ const openDetailsModal = (dataSet) => {
         modalElements[dataKind[2]].dataPlace.classList.remove("d-none");
     } else modalElements[dataKind[2]].noData.classList.remove("d-none");
 
-    let vulnerabilityMisc = Object.keys(dataSet.vulnerability.type["misc"]);
-    if (vulnerabilityMisc.length > 0) {
-        buildViolationElement([{
-            documentName: "주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf",
-            elements: vulnerabilityMisc
-        }]);
+    if (Object.keys(dataSet.vulnerability.type["misc"]).length > 0) {
+        buildViolationElement(dataSet.vulnerability.type["misc"]);
     }
 
     hljs.highlightAll();
