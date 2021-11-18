@@ -15,7 +15,7 @@ job = ns.model('job model', {
     'knownInfo': fields.String(required=True, description='Known information'),
     'recursiveLevel': fields.String(required=True, description='recursive level'),
     'uriPath': fields.String(required=True, description='Path on Web Server'),
-    'done': fields.Integer(readonly=True, description='Analysis checking'),
+    'done': fields.Integer(required=True, description='Analysis checking'),
     'maximumProcess': fields.String(required=True, description='Process max count'),
 })
 
@@ -24,8 +24,8 @@ job_return_post_method = ns.model('Job Return Post Message', {
 })
 
 job_update_analysis_check = ns.model('Job Update', {
-    'id': fields.Integer(readonly=True, description='setting initialization(Job) id for unique identifier'),
-    'done': fields.Integer(readonly=True, description='Analysis checking')
+    'id': fields.Integer(required=True, description='setting initialization(Job) id for unique identifier'),
+    'done': fields.Integer(required=True, description='Analysis checking')
 })
 
 
@@ -61,7 +61,9 @@ class Job_data_access_object(object):
                         jobModel(targetURL=str(self.insertData[ListOfData]["targetURL"]),
                                  knownInfo=json.dumps(self.insertData[ListOfData]["knownInfo"]),
                                  recursiveLevel=str(self.insertData[ListOfData]["recursiveLevel"]),
-                                 uriPath=str(self.insertData[ListOfData]["uriPath"])
+                                 uriPath=str(self.insertData[ListOfData]["uriPath"]),
+                                 done=int(self.insertData[ListOfData]["done"]),
+                                 maximumProcess=str(self.insertData[ListOfData]["maximumProcess"])
                                  )
                     )
                     g.bwasp_db_obj.commit()
@@ -78,10 +80,12 @@ class Job_data_access_object(object):
                 self.updateData = data
 
                 for ListofData in range(len(data)):
+                    print(int(self.updateData[ListofData]["done"]))
+
                     g.bwasp_db_obj.query(jobModel).filter(
-                        systeminfoModel.id == int(self.updateData[ListofData]["id"])
+                        jobModel.id == int(self.updateData[ListofData]["id"])
                     ).update(
-                        {'done': json.dumps(self.updateData[ListofData]["done"])}
+                        {'done': int(self.updateData[ListofData]["done"])}
                     )
                     g.bwasp_db_obj.commit()
 
@@ -113,9 +117,9 @@ class Job_list(Resource):
         """Create Job"""
         return data_access_object_for_job.create(ns.payload)
 
-    @ns.doc('Update system information')
+    @ns.doc('Update Job')
     @ns.expect(job_update_analysis_check)
-    @ns.marshal_with(job)
+    @ns.marshal_with(job_return_post_method)
     def patch(self):
         """Update a data given its identifier"""
         return data_access_object_for_job.update(ns.payload)
