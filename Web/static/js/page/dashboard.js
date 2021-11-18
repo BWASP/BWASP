@@ -29,43 +29,55 @@ class dashboard {
     }
 
     async updateView() {
+        await this.getCurrentJob();
         await this.webEnvironments();
         this.updateRelatedCVEs();
         this.updatePacketCount();
         this.updateThreatsCount();
         this.updatePorts();
-        this.updateAnalysisLevel();
     }
 
-    updatePacketCount() {
-        API.communicate("/api/packet/automation/count", (autoErr, automationCount) => {
-            API.communicate("/api/packet/manual/count", (manualErr, manualCount) => {
-                if (!autoErr && !manualErr) document.getElementById("receivedPacketsCount").innerText = automationCount.count + manualCount.count;
-            })
+    getCurrentJob() {
+        API.communicate("/api/job", (jobError, jobResult) => {
+            this.job.allJobs = jobResult;
         })
     }
 
-    updateRelatedCVEs() {
-        if (!this.flip) this.flip = !this.flip;
-        else {
-            this.viewData.CVECount.runCount += 1;
-            Object.keys(this.webEnvironment.data).forEach((currentKey) => {
-                Object.keys(this.webEnvironment.data[currentKey]).forEach(async (currentLib) => {
-                    currentLib = {
-                        name: currentLib,
-                        version: this.webEnvironment.data[currentKey][currentLib]["version"]
-                    };
-                    await API.communicate(`/api/cve/search/${currentLib.name}/${currentLib.version}/count`, (err, res) => this.addCVECount(res.count));
+    updatePacketCount() {
+        let currentDOM = document.getElementById("receivedPacketsCount");
+        if (this.job.allJobs.length > 0) {
+            API.communicate("/api/packet/automation/count", (autoErr, automationCount) => {
+                API.communicate("/api/packet/manual/count", (manualErr, manualCount) => {
+                    if (!autoErr && !manualErr) currentDOM.innerText = automationCount.count + manualCount.count;
                 })
             })
+        } else currentDOM.innerText = " - ";
+    }
 
-            // Save to DOM
-            if (this.viewData.CVECount.runCount >= 3)
-                document.getElementById("relatedCVECount").innerText = (this.viewData.CVECount.count === 0)
-                    ? "-"
-                    : String(this.viewData.CVECount.count);
-            this.addCVECount(0, true);
-        }
+    updateRelatedCVEs() {
+        let currentDOM = document.getElementById("relatedCVECount");
+        if (this.job.allJobs.length > 0) {
+            if (!this.flip) this.flip = !this.flip;
+            else {
+                this.viewData.CVECount.runCount += 1;
+                Object.keys(this.webEnvironment.data).forEach((currentKey) => {
+                    Object.keys(this.webEnvironment.data[currentKey]).forEach(async (currentLib) => {
+                        currentLib = {
+                            name: currentLib,
+                            version: this.webEnvironment.data[currentKey][currentLib]["version"]
+                        };
+                        await API.communicate(`/api/cve/search/${currentLib.name}/${currentLib.version}/count`, (err, res) => this.addCVECount(res.count));
+                    })
+                })
+
+                // Save to DOM
+                if (this.viewData.CVECount.runCount >= 3)
+                    currentDOM.innerText = (this.viewData.CVECount.count === 0)
+                        ? "-"
+                        : String(this.viewData.CVECount.count);
+                this.addCVECount(0, true);
+            }
+        } else currentDOM.innerText = " - ";
     }
 
     addCVECount(count, init = false) {
@@ -75,74 +87,79 @@ class dashboard {
     }
 
     updateThreatsCount() {
-        API.communicate("/api/domain/count", (err, res) => {
-            if (!err) document.getElementById("detectedThreatsCount").innerText = res.count;
-        })
+        let currentDOM = document.getElementById("detectedThreatsCount");
+        if (this.job.allJobs.length > 0) {
+            API.communicate("/api/domain/count", (err, res) => {
+                if (!err) currentDOM.innerText = res.count;
+            })
+        } else currentDOM.innerText = " - ";
     }
 
     updatePorts() {
-        let localPorts = Object();
-
-        // Port count
-        API.communicate("/api/ports/count", (err, res) => {
-            let targets = [
+        let localPorts = Object(),
+            targets = [
                 document.getElementById("portCountViewPlace"),
                 document.getElementById("openedPortsCount")
-            ]
-            if (!err) targets.forEach((currentTarget) => currentTarget.innerText = res.count);
-        })
+            ];
 
-        // Ports
-        API.communicate("/api/ports", (err, res) => {
-            if (err) return;
-            else {
-                if (res.count > 0) {
-                    res.forEach((currentPort) => {
-                        if (currentPort.result === "Open") {
-                            if (!Object.keys(localPorts).includes(currentPort["service"]))
-                                localPorts[currentPort["service"]] = Array();
-                            if (currentPort.port !== "None") localPorts[currentPort["service"]].push(currentPort.port)
-                        }
-                    })
-                    document.getElementById("portViewPlace-detail").classList.remove("d-none");
-                    document.getElementById("portViewPlace-noData").classList.add("d-none");
+        if (this.job.allJobs.length > 0) {
+
+            // Port count
+            API.communicate("/api/ports/count", (err, res) => {
+                if (!err) targets.forEach((currentTarget) => currentTarget.innerText = res.count);
+            })
+
+            // Ports
+            API.communicate("/api/ports", (err, res) => {
+                if (err) return;
+                else {
+                    if (res.count > 0) {
+                        res.forEach((currentPort) => {
+                            if (currentPort.result === "Open") {
+                                if (!Object.keys(localPorts).includes(currentPort["service"]))
+                                    localPorts[currentPort["service"]] = Array();
+                                if (currentPort.port !== "None") localPorts[currentPort["service"]].push(currentPort.port)
+                            }
+                        })
+                        document.getElementById("portViewPlace-detail").classList.remove("d-none");
+                        document.getElementById("portViewPlace-noData").classList.add("d-none");
+                    }
                 }
-            }
-            if (JSON.stringify(this.ports) !== JSON.stringify(localPorts)) {
-                // Save ports data
-                this.ports = localPorts;
+                if (JSON.stringify(this.ports) !== JSON.stringify(localPorts)) {
+                    // Save ports data
+                    this.ports = localPorts;
 
-                // Initialize opened ports DOM
-                let portView = document.getElementById("portViewPlace");
-                portView.innerHTML = "";
+                    // Initialize opened ports DOM
+                    let portView = document.getElementById("portViewPlace");
+                    portView.innerHTML = "";
 
-                // Build
-                console.log(localPorts);
-                Object.keys(this.ports).forEach((currentType) => {
-                    let skeleton = {
-                        parent: document.createElement("section"),
-                        name: document.createElement("p"),
-                        ports: document.createElement("p")
-                    };
-                    skeleton.parent.classList.add("col-md-12", "mt-3");
-                    skeleton.name.classList.add("text-muted", "small", "text-capitalize");
-                    skeleton.name.innerText = `${currentType} (${localPorts[currentType].length})`;
-                    localPorts[currentType].forEach(currentPort => {
-                        skeleton.ports.innerText += currentPort.concat(
-                            (localPorts[currentType][localPorts[currentType].length - 1] !== currentPort)
-                                ? ", "
-                                : ""
+                    // Build
+                    Object.keys(this.ports).forEach((currentType) => {
+                        let skeleton = {
+                            parent: document.createElement("section"),
+                            name: document.createElement("p"),
+                            ports: document.createElement("p")
+                        };
+                        skeleton.parent.classList.add("col-md-12", "mt-3");
+                        skeleton.name.classList.add("text-muted", "small", "text-capitalize");
+                        skeleton.name.innerText = `${currentType} (${localPorts[currentType].length})`;
+                        localPorts[currentType].forEach(currentPort => {
+                            skeleton.ports.innerText += currentPort.concat(
+                                (localPorts[currentType][localPorts[currentType].length - 1] !== currentPort)
+                                    ? ", "
+                                    : ""
+                            )
+                        })
+
+                        skeleton.parent.append(
+                            skeleton.name,
+                            skeleton.ports
                         )
+                        portView.appendChild(skeleton.parent);
                     })
-
-                    skeleton.parent.append(
-                        skeleton.name,
-                        skeleton.ports
-                    )
-                    portView.appendChild(skeleton.parent);
-                })
-            }
-        })
+                }
+            })
+        }else targets[1].innerText = " - ";
     }
 
     updateAnalysisLevel() {
@@ -152,32 +169,38 @@ class dashboard {
     }
 
     webEnvironments() {
-        API.communicate(
-            APIEndpoints.webEnvironments + "/1",
-            (err, res) => {
-                if (err) return;
-                else {
-                    let localObject = {
-                        target: res[0].url,
-                        data: JSON.parse(res[0].data)
+        if (this.job.allJobs.length > 0) {
+            API.communicate(
+                APIEndpoints.webEnvironments + "/1",
+                (err, res) => {
+                    if (err) return;
+                    else {
+                        let localObject = {
+                            target: res[0].url,
+                            data: JSON.parse(res[0].data)
+                        }
+
+                        document.getElementById("webEnvDataPlace-detail").classList.remove("d-none");
+                        document.getElementById("webEnvDataPlace-noData").classList.add("d-none");
+
+                        let reGenObject = JSON.stringify(this.webEnvironment) !== JSON.stringify(localObject);
+                        this.webEnvironment.target = localObject.target;
+                        this.webEnvironment.data = localObject.data;
+
+                        if (reGenObject) {
+                            document.getElementById("webEnvURLPlace").innerText = this.webEnvironment.target;
+                            document.getElementById("webEnvDataPlace").innerHTML = "";
+                            Object.keys(this.webEnvironment.data).forEach((key) => {
+                                document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, this.webEnvironment.data[key]));
+                            });
+                        }
                     }
-
-                    document.getElementById("webEnvDataPlace-detail").classList.remove("d-none");
-                    document.getElementById("webEnvDataPlace-noData").classList.add("d-none");
-
-                    let reGenObject = JSON.stringify(this.webEnvironment) !== JSON.stringify(localObject);
-                    this.webEnvironment.target = localObject.target;
-                    this.webEnvironment.data = localObject.data;
-
-                    if (reGenObject) {
-                        document.getElementById("webEnvURLPlace").innerText = this.webEnvironment.target;
-                        document.getElementById("webEnvDataPlace").innerHTML = "";
-                        Object.keys(this.webEnvironment.data).forEach((key) => {
-                            document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, this.webEnvironment.data[key]));
-                        });
-                    }
-                }
-            })
+                })
+        }else{
+            document.getElementById("webEnvDataPlace").classList.add("d-none");
+            document.getElementById("webEnvDataPlace-detail").classList.add("d-none");
+            document.getElementById("webEnvDataPlace-noData").classList.remove("d-none");
+        }
     }
 
     buildWebEnvCard(type, dataPackage) {
