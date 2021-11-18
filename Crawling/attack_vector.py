@@ -1,8 +1,10 @@
 from bs4 import BeautifulSoup
-import requests
-import json
-import re
-import base64
+import requests, json, re, base64
+from urllib.parse import urlparse
+
+from requests import api
+
+from Crawling.feature import func
 
 
 def attackHeader(target_url):
@@ -265,7 +267,89 @@ def errorPage(url):
     url = url.split("/")[0] + "//" + url.split("/")[2] + "/BWASP/BWASP.TOP9"
     return True if 404 == requests.get(url).status_code and "not found" in requests.get(url).text.lower() else False
 
+def directoryIndexing(target_url):
+    return_data = list()
+    api_key = func.apiKeyLoad()
+    
+    if api_key == False:
+        print("[!] API 키가 없습니다.")
+        return return_data
 
+    GOOGLE_ENGINE_ID = api_key["google"]["google_search_api"]["engine_id"]
+    GOOGLE_SEARCH_API = api_key["google"]["google_search_api"]["api"]
+
+    target_domain = urlparse(target_url).netloc
+    query = 'intitle:"Index Of" inurl:"{target_domain}"'.format(target_domain=target_domain)
+    api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
+
+    res = requests.get(api_url)
+
+    if res.status_code == 200:
+        api_result = res.json()
+        if "items" not in api_result.keys():
+            print("[*] No search data.")
+            return return_data
+
+        search_result = api_result["items"]
+        
+        for item in search_result:
+            if item["title"].find("Index") != 0:
+                continue
+
+            return_data.append({
+                "title": item["title"],
+                "link": item["link"]
+            })
+    else:
+        print("[!] API State_code: {}".format(res.status_code))
+        print("[!] Please check API response.")
+        # print("Print response: {}".format(res.text))
+
+    return return_data
+
+def adminPage(target_url):
+    api_key = func.apiKeyLoad()
+    return_data = list()
+    target_domain = urlparse(target_url).netloc
+
+    if api_key == False:
+        print("[!] API 키가 없습니다.")
+        return return_data
+    
+    GOOGLE_ENGINE_ID = api_key["google"]["google_search_api"]["engine_id"]
+    GOOGLE_SEARCH_API = api_key["google"]["google_search_api"]["api"]
+
+    f = open("./Crawling/directory.json")
+    directory_list = json.load(f)
+
+    for key in directory_list.keys():
+        if "all" != key:
+            continue
+        inurl_list = list()
+        for directory in directory_list[key]:
+            inurl_list.append("inurl:{}".format(directory))
+
+        query = 'site:{DOMAIN} AND ({INURL_LIST})'.format(DOMAIN=target_domain, INURL_LIST=" | ".join(inurl_list))
+        api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
+        # print(api_url)
+        res = requests.get(api_url)
+        if res.status_code == 200:
+            api_result = res.json()
+            if "items" not in api_result.keys():
+                print("[*] No search data.")
+                continue
+            else:
+                search_result = api_result["items"]
+                for item in search_result:
+                    return_data.append({
+                        "title" : item["title"],
+                        "link": item["link"]
+                    })
+        else:
+            print("[!] API server error.")
+            # print(res.json())
+    
+    return return_data
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
 """

@@ -50,7 +50,7 @@ def insertCSP(csp_result):
 # REST API: 도훈 Domains
 # TODO
 # 중복된 url 이 있을 경우, 데이터를 넣어야 하는가?
-def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, http_method, infor_vector, robots_result, error_result):
+def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, http_method, infor_vector, robots_result, error_result, directory_indexing, admin_page):
     # db_connect, db_table = connect("domain")
     '''
     [
@@ -169,6 +169,18 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             attack_vector["misc"]["error"] = error_result
         else:
             attack_vector["misc"].pop("error")
+        
+        # directory indexing check
+        if len(directory_indexing) != 0:
+            attack_vector["misc"]["indexing"] = directory_indexing
+        else:
+            attack_vector["misc"].pop("indexing")
+        
+        # admin page check
+        if len(admin_page) != 0:
+            attack_vector["misc"]["admin page"] = admin_page
+        else:
+            attack_vector["misc"].pop("admin page")
 
         # 패킷 url이 중복된다면 ??
         # json.dumps()
