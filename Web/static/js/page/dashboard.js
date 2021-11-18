@@ -28,9 +28,7 @@ class dashboard {
     updatePacketCount() {
         API.communicate("/api/packet/automation/count", (autoErr, automationCount) => {
             API.communicate("/api/packet/manual/count", (manualErr, manualCount) => {
-                if (autoErr || manualErr) setTimeout(() => {
-                    return this.updatePacketCount();
-                }, 500);
+                if (autoErr || manualErr) document.getElementById("receivedPacketsCount").innerText = automationCount.count + manualCount.count;
                 else document.getElementById("receivedPacketsCount").innerText = automationCount.count + manualCount.count;
             })
         })
@@ -38,9 +36,7 @@ class dashboard {
 
     updateThreatsCount() {
         API.communicate("/api/domain/count", (err, res) => {
-            if (err) setTimeout(() => {
-                return this.updateThreatsCount();
-            }, 500);
+            if (err) return document.getElementById("detectedThreatsCount").innerText = "0";
             else document.getElementById("detectedThreatsCount").innerText = res.count;
         })
     }
@@ -50,16 +46,19 @@ class dashboard {
 
         // Port count
         API.communicate("/api/ports/count", (err, res) => {
-            if (err === 404) return;
+            let targets = [
+                document.getElementById("portCountViewPlace"),
+                document.getElementById("openedPortsCount")
+            ]
+            if (err) return targets.forEach((currentTarget)=>currentTarget.innerText = "0");
             else {
-                document.getElementById("portCountViewPlace").innerText = res.count;
-                document.getElementById("openedPortsCount").innerText = res.count;
+                targets.forEach((currentTarget)=>currentTarget.innerText = res.count);
             }
         })
 
         // Ports
         API.communicate("/api/ports", (err, res) => {
-            if (err === 404) return;
+            if (err) return;
             else {
                 res.forEach((currentPort) => {
                     if (currentPort.result === "Open") {
@@ -67,8 +66,6 @@ class dashboard {
                             localPorts[currentPort["service"]] = Array();
                         if (currentPort.port !== "None") localPorts[currentPort["service"]].push(currentPort.port)
                     }
-                    // currentPort["service"].push()
-                    // if(Object.keys(localPorts))
                 })
             }
             if (JSON.stringify(this.ports) !== JSON.stringify(localPorts)) {
@@ -110,7 +107,7 @@ class dashboard {
 
     updateAnalysisLevel() {
         API.communicate("/api/job/1", (err, res) => {
-            if (err === 404) {
+            if (err) {
                 return document.getElementById("analysisLevelView").innerText = "0";
             }
             else {
@@ -123,7 +120,7 @@ class dashboard {
         API.communicate(
             APIEndpoints.webEnvironments + "/1",
             (err, res) => {
-                if (err === 404) return;
+                if (err) return;
                 else {
                     let localObject = {
                         target: res[0].url,
