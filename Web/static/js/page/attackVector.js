@@ -72,16 +72,31 @@ let stateHandler = {
 
 // Helper functions
 let returnError = (errorMessage = ["No data", ""]) => {
-    let condition = (typeof (errorMessage) !== "string");
-    console.log(errorMessage, typeof (errorMessage), condition);
-    document.getElementById("errMsgTitle").innerText = (condition)
-        ? errorMessage[0]
-        : errorMessage;
-    document.getElementById("errMsgDesc").innerText = (condition)
-        ? errorMessage[1]
-        : "";
+    let condition = {
+        isFromHelper: Array.isArray(errorMessage),
+        isString: (typeof (errorMessage) !== "string")
+    };
+
+    // Flexible data reactor
+    let messages = [
+        (condition.isFromHelper)
+            ? errorMessage.name
+            : (condition.isString)
+                ? errorMessage[0]
+                : errorMessage,
+        (condition.isFromHelper)
+            ? errorMessage.message
+            : (condition.isString)
+                ? errorMessage[1]
+                : "",
+    ];
+
+    document.getElementById("errMsgTitle").innerText = messages[0];
+    document.getElementById("errMsgDesc").innerText = messages[1];
     document.getElementById("loadingProgress").classList.add("d-none");
     document.getElementById("resultNoData").classList.remove("d-none");
+
+    // Will be removed in future commits.
     console.error(`:: ERROR :: `, errorMessage);
 };
 
@@ -89,12 +104,12 @@ let returnError = (errorMessage = ["No data", ""]) => {
 let API = await new api();
 
 class pagerTools {
-    constructor(defaultSet = {hello: String()}) {
+    constructor() {
         this.className = "pagerTools";
         this.API = new api();
         this.paging = {
             currentPage: 1,
-            rowPerPage: 30
+            rowPerPage: 10
         };
         this.data = {
             rowCount: Number(),
@@ -103,39 +118,28 @@ class pagerTools {
         this.directories = Object();
     }
 
-    insertURL(URL, URI) {
-        if (typeof (this.directories[URL]) === "undefined") this.directories[URL] = Object();
-
-        // URI to array
-        URI = URI.split("/");
-        URI.splice(0, 1);
-
-        URI.forEach((currentURI) => {
-            let splitURIPiece = URI[0].split(".");
-            console.log(splitURIPiece);
-            // if(splitURIPiece.length !== 0) return this.directories[URL][URI[0]]
-            if (currentURI[0].split("."))
-                this.directories[URL][URI[0]] = Object();
-
-            console.log(currentURI);
-        })
-
-        // this.directories[URL].
-        console.log(URI);
-        console.log(this.directories);
-    }
-
     async updateRowCount() {
         await this.getRowCount((rowCount) => {
-            let maxPageCount = (Math.round(rowCount / this.paging.rowPerPage)).toLocaleString(),
+            let maxPageCount = (Math.round(rowCount / this.paging.rowPerPage)),
                 formattedRowCount = rowCount.toLocaleString();
-            console.log(rowCount, maxPageCount, this.data.rowCount, formattedRowCount);
-            document.getElementById("viewPref-modal-allRowCount").innerText = formattedRowCount;
-            console.log(maxPageCount);
+
+            console.log(
+                "Row count: ", rowCount,
+                "\nMax page: ", maxPageCount,
+                "\nRow count: ", this.data.rowCount,
+                "\nCurrent page: ", this.paging.currentPage
+            );
+
+            // Set current rowPerPage value
+            document.getElementById("viewPref-modal-rowPerPage").innerText = (this.paging.rowPerPage > rowCount)
+                ? rowCount
+                : this.paging.rowPerPage;
             document.getElementById("viewPref-input-rowPerPage").max = rowCount;
             document.getElementById("viewPref-input-rowPerPage").value = this.paging.rowPerPage;
+
+
+            document.getElementById("viewPref-modal-allRowCount").innerText = formattedRowCount;
             document.getElementById("viewPref-input-currentPage").value = this.paging.currentPage;
-            console.log("Current page: ", this.paging.currentPage);
             this.updateMaxPage();
         });
         return true;
@@ -151,9 +155,10 @@ class pagerTools {
         document.getElementById("viewPref-modal-currentPage").innerText = this.paging.currentPage;
     }
 
-    async openPagingOption() {
-        await this.updateRowCount();
-        modals.viewEngine.show();
+    openPagingOption() {
+        this.updateRowCount().then(() => {
+            modals.viewEngine.show();
+        });
     }
 
 
@@ -196,7 +201,7 @@ class pagerTools {
         await API.communicate(
             APIEndpoints.vectors + `/${pages.from}/${pages.count}`,
             (err, res) => {
-                if(err) return returnError(err);
+                if (err) return returnError(err);
                 if (res.length === 0) return returnError("No data");
 
                 res.forEach(async (domainData) => {
@@ -435,7 +440,6 @@ class pagerTools {
         await API.communicate(
             "/api/domain/count",
             (err, res) => {
-                console.log(res);
                 this.data.rowCount = res.count;
                 callback(Number(res.count));
             });
