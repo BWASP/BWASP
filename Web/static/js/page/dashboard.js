@@ -180,6 +180,7 @@ class dashboard {
                             data: JSON.parse(res[0].data)
                         }
 
+                        document.getElementById("webEnvDataPlace").classList.remove("d-none");
                         document.getElementById("webEnvDataPlace-detail").classList.remove("d-none");
                         document.getElementById("webEnvDataPlace-noData").classList.add("d-none");
 
