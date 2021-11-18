@@ -1,12 +1,25 @@
+function APICommunicationError(name, message) {
+    this.message = message;
+    this.name = name;
+}
+
 class API {
     constructor() {
         this.API = String();
         this.debug = Object();
+        this.requestOptions = {
+            method: "GET",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json",
+                "accept": "application/json"
+            }
+        };
         this.getFrontConfig();
     }
 
     async getFrontConfig() {
-        if(this.API !== String() && this.debug !== Object()) return;
+        if (this.API !== String() && this.debug !== Object()) return;
         await fetch("/static/data/frontConfig.json")
             .then(blob => blob.json())
             .then(res => {
@@ -15,21 +28,9 @@ class API {
             })
     }
 
-    /**
-     * Communicate with API
-     * @param {string} endpoint
-     * @param {function} callback
-     */
     async communicate(endpoint, callback) {
         await this.getFrontConfig();
-        await fetch(this.API.base + endpoint, {
-            method: "GET",
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "application/json",
-                "accept": "application/json"
-            }
-        })
+        await fetch(this.API.base + endpoint, this.requestOptions)
             .then(blob => {
                 if (!blob.ok) return callback(blob.status);
                 else blob.json()
@@ -47,32 +48,20 @@ class API {
     }
 
     /**
-     * Send data to API
+     * Communicate with API
      * @param {string} endpoint
-     * @param {string} type POST
-     * @param {object} data null
      * @param {function} callback
      */
-    relativeCommunication(endpoint, type = "POST", data = null, callback) {
-        fetch(this.API.base + endpoint, {
-            method: type,
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "application/json",
-                "accept": "application/json"
-            },
-            body: JSON.stringify(data)
-        })
-            .then(blob => blob.json())
-            .then(res => {
-                if (this.debug.mode === true
-                    && this.debug.functions.printAllOutput === true) console.log(`:: DEBUG : RETURN ::\n${res}`);
-                callback(null, res);
-            })
+    async communicateRAW(endpoint, callback) {
+        await this.getFrontConfig();
+        const communication = await fetch(this.API.base + endpoint, this.requestOptions)
             .catch(error => {
-                console.log(`:: DEBUG : ERROR ::\n${error}`);
-                callback(error)
-            })
+                error = error.toString().split(": ");
+                throw new APICommunicationError(error[0], error[1]);
+            });
+        const dataset = await communication.json();
+        if (communication.ok) return dataset;
+        if (!communication.ok) throw new APICommunicationError("Error", communication.statusText);
     }
 
     /**
