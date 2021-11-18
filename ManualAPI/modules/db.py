@@ -177,7 +177,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         }
         data.append(query)
         print("attackvector", attack_vector)
-        attack_vector["current_url"] = packet["request"]["full_url"]
+        attack_vector["url"] = packet["request"]["full_url"]
         crx.append(attack_vector)
 
     Domain().PostDomain(json.dumps(data))
