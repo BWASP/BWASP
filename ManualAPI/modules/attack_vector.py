@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests, json, re, base64, sys, os
 
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 
 def attackHeader(target_url):

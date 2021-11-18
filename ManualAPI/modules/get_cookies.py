@@ -1,9 +1,9 @@
 import json, sys, os
 from urllib.parse import urlparse
 
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
-from modules.func import *
+from modules import func
 
 
 def start(url, req_res_packets):

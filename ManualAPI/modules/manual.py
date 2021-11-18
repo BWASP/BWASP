@@ -16,10 +16,11 @@ recent_packet_count =  len(req_res_packets) + previous_packet_count
 
 import re, json, sys, os
 
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
-from modules.db import *
-from modules.get_cookies import *
+
+from modules import db
+from modules import get_cookies
 from modules.attack_vector import *
 from modules.api import *
 
@@ -84,4 +85,4 @@ def start(receive):
     result = db.insertDomains(req_res_packets, cookie_result, packet_indexes, list(receive.keys())[0], http_method, infor_vector,
                               robots_result, error_result)
 
-    return result
+    return json.dumps(result)

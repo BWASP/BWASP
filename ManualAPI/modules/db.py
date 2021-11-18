@@ -39,9 +39,9 @@ from ManualAPI.modules.api import *"""
 import requests, json, sys, os
 from urllib.parse import urlparse, urlunparse
 
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
-from modules.func import *
+from modules import func
 from modules.attack_vector import *
 from modules.api import *
 
