@@ -14,11 +14,23 @@ class dashboard {
             target: String(),
             data: Object()
         };
+        this.viewData = {
+            CVECount: {
+                count: Number(),
+                runCount: Number()
+            }
+        }
+        this.job = {
+            allJobs: Array(),
+            currentJob: Object()
+        };
         this.ports = Object();
+        this.flip = true;
     }
 
-    updateView() {
-        this.webEnvironments();
+    async updateView() {
+        await this.webEnvironments();
+        this.updateRelatedCVEs();
         this.updatePacketCount();
         this.updateThreatsCount();
         this.updatePorts();
@@ -31,6 +43,35 @@ class dashboard {
                 if (!autoErr && !manualErr) document.getElementById("receivedPacketsCount").innerText = automationCount.count + manualCount.count;
             })
         })
+    }
+
+    updateRelatedCVEs() {
+        if (!this.flip) this.flip = !this.flip;
+        else {
+            this.viewData.CVECount.runCount += 1;
+            Object.keys(this.webEnvironment.data).forEach((currentKey) => {
+                Object.keys(this.webEnvironment.data[currentKey]).forEach(async (currentLib) => {
+                    currentLib = {
+                        name: currentLib,
+                        version: this.webEnvironment.data[currentKey][currentLib]["version"]
+                    };
+                    await API.communicate(`/api/cve/search/${currentLib.name}/${currentLib.version}/count`, (err, res) => this.addCVECount(res.count));
+                })
+            })
+
+            // Save to DOM
+            if (this.viewData.CVECount.runCount >= 3)
+                document.getElementById("relatedCVECount").innerText = (this.viewData.CVECount.count === 0)
+                    ? "-"
+                    : String(this.viewData.CVECount.count);
+            this.addCVECount(0, true);
+        }
+    }
+
+    addCVECount(count, init = false) {
+        if (init) return this.viewData.CVECount.count = Number();
+        console.log("Submitted! ", count);
+        this.viewData.CVECount.count += count;
     }
 
     updateThreatsCount() {
@@ -55,15 +96,17 @@ class dashboard {
         API.communicate("/api/ports", (err, res) => {
             if (err) return;
             else {
-                res.forEach((currentPort) => {
-                    if (currentPort.result === "Open") {
-                        if (!Object.keys(localPorts).includes(currentPort["service"]))
-                            localPorts[currentPort["service"]] = Array();
-                        if (currentPort.port !== "None") localPorts[currentPort["service"]].push(currentPort.port)
-                    }
-                })
-                document.getElementById("portViewPlace-detail").classList.remove("d-none");
-                document.getElementById("portViewPlace-noData").classList.add("d-none");
+                if (res.count > 0) {
+                    res.forEach((currentPort) => {
+                        if (currentPort.result === "Open") {
+                            if (!Object.keys(localPorts).includes(currentPort["service"]))
+                                localPorts[currentPort["service"]] = Array();
+                            if (currentPort.port !== "None") localPorts[currentPort["service"]].push(currentPort.port)
+                        }
+                    })
+                    document.getElementById("portViewPlace-detail").classList.remove("d-none");
+                    document.getElementById("portViewPlace-noData").classList.add("d-none");
+                }
             }
             if (JSON.stringify(this.ports) !== JSON.stringify(localPorts)) {
                 // Save ports data
@@ -104,7 +147,7 @@ class dashboard {
 
     updateAnalysisLevel() {
         API.communicate("/api/job/1", (err, res) => {
-            if (!err) document.getElementById("analysisLevelView").innerText = res[0].recursiveLevel;
+            document.getElementById("analysisLevelView").innerText = (!err) ? res[0].recursiveLevel : "0";
         })
     }
 
@@ -190,7 +233,7 @@ class dashboard {
 window.onload = () => {
     let render = new dashboard();
     render.updateView();
-    setInterval(() => {
-        render.updateView();
-    }, 2500);
+    setInterval(async () => {
+        await render.updateView();
+    }, 3000);
 }
