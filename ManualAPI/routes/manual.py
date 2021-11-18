@@ -18,7 +18,7 @@ def DataReqRes():
     if request.method == 'POST':
         data = request.get_json()
         return_data = start(data)
-        return json.dumps(return_data)
+        return return_data
 
 '''
         return render_template_string(f"""
