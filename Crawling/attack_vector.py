@@ -262,7 +262,7 @@ def robotsTxt(url):
 
 def errorPage(url):
     # 주요정보통신기반시설_기술적_취약점_뿐석_평가_방법_상세가이드.pdf [page 678] Error Page not set
-    url = url.split("/")[0] + "//" + url.split("/")[2] + "/BWASP/BWASP.TOP9"
+    url = url.split("/")[0] + "//" + url.split("/")[2] + "/weasxczxcqh/weasxczxcqh.html"
     return True if 404 == requests.get(url).status_code and "not found" in requests.get(url).text.lower() else False
 
 
