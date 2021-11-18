@@ -80,7 +80,7 @@ def start(receive):
     #
 
     prior_packetcount = Packets().GetManualCount()["retData"]["count"]
-    packet_indexes = list(range(prior_packetcount + 1, len(req_res_packets) + 1))
+    packet_indexes = list(range(prior_packetcount + 1, prior_packetcount + len(req_res_packets) + 1))
     db.insertPackets(req_res_packets)
     result = db.insertDomains(req_res_packets, cookie_result, packet_indexes, list(receive.keys())[0], http_method, infor_vector,
                               robots_result, error_result)
