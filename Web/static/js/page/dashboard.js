@@ -82,7 +82,6 @@ class dashboard {
 
     addCVECount(count, init = false) {
         if (init) return this.viewData.CVECount.count = Number();
-        console.log("Submitted! ", count);
         this.viewData.CVECount.count += count;
     }
 
@@ -113,7 +112,7 @@ class dashboard {
             API.communicate("/api/ports", (err, res) => {
                 if (err) return;
                 else {
-                    if (res.count > 0) {
+                    if (res.length > 0) {
                         res.forEach((currentPort) => {
                             if (currentPort.result === "Open") {
                                 if (!Object.keys(localPorts).includes(currentPort["service"]))
