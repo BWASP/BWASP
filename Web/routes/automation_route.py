@@ -16,7 +16,9 @@ def automation_options():
         data = [{"targetURL": reqJsonData['target']['url'],
                  "knownInfo": json.dumps(reqJsonData['info']),
                  "recursiveLevel": reqJsonData['tool']['analysisLevel'],
-                 "uriPath": reqJsonData['target']['path']
+                 "uriPath": reqJsonData['target']['path'],
+                 "done": 0,
+                 "maximumProcess": "None"
                  }]
 
         try:
