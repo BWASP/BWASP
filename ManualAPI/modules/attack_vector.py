@@ -58,8 +58,7 @@ def inputTag(response_body, http_method, infor_vector):
 
     text = soup.find_all('input')
     form = soup.find_all('form')
-
-    with open("./attack_vector.json", 'r', encoding='UTF8') as f:
+    with open("./modules/attack_vector.json", 'r', encoding='UTF8') as f:
         data = json.load(f)
 
     # ~~~~~~~~~~~~Allow Method
