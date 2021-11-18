@@ -28,16 +28,14 @@ class dashboard {
     updatePacketCount() {
         API.communicate("/api/packet/automation/count", (autoErr, automationCount) => {
             API.communicate("/api/packet/manual/count", (manualErr, manualCount) => {
-                if (autoErr || manualErr) document.getElementById("receivedPacketsCount").innerText = automationCount.count + manualCount.count;
-                else document.getElementById("receivedPacketsCount").innerText = automationCount.count + manualCount.count;
+                if (!autoErr && !manualErr) document.getElementById("receivedPacketsCount").innerText = automationCount.count + manualCount.count;
             })
         })
     }
 
     updateThreatsCount() {
         API.communicate("/api/domain/count", (err, res) => {
-            if (err) return document.getElementById("detectedThreatsCount").innerText = "0";
-            else document.getElementById("detectedThreatsCount").innerText = res.count;
+            if (!err) document.getElementById("detectedThreatsCount").innerText = res.count;
         })
     }
 
@@ -50,10 +48,7 @@ class dashboard {
                 document.getElementById("portCountViewPlace"),
                 document.getElementById("openedPortsCount")
             ]
-            if (err) return targets.forEach((currentTarget)=>currentTarget.innerText = "0");
-            else {
-                targets.forEach((currentTarget)=>currentTarget.innerText = res.count);
-            }
+            if (!err) targets.forEach((currentTarget) => currentTarget.innerText = res.count);
         })
 
         // Ports
@@ -67,6 +62,8 @@ class dashboard {
                         if (currentPort.port !== "None") localPorts[currentPort["service"]].push(currentPort.port)
                     }
                 })
+                document.getElementById("portViewPlace-detail").classList.remove("d-none");
+                document.getElementById("portViewPlace-noData").classList.add("d-none");
             }
             if (JSON.stringify(this.ports) !== JSON.stringify(localPorts)) {
                 // Save ports data
@@ -107,12 +104,7 @@ class dashboard {
 
     updateAnalysisLevel() {
         API.communicate("/api/job/1", (err, res) => {
-            if (err) {
-                return document.getElementById("analysisLevelView").innerText = "0";
-            }
-            else {
-                document.getElementById("analysisLevelView").innerText = res[0].recursiveLevel;
-            }
+            if (!err) document.getElementById("analysisLevelView").innerText = res[0].recursiveLevel;
         })
     }
 
@@ -126,6 +118,10 @@ class dashboard {
                         target: res[0].url,
                         data: JSON.parse(res[0].data)
                     }
+
+                    document.getElementById("webEnvDataPlace-detail").classList.remove("d-none");
+                    document.getElementById("webEnvDataPlace-noData").classList.add("d-none");
+
                     let reGenObject = JSON.stringify(this.webEnvironment) !== JSON.stringify(localObject);
                     this.webEnvironment.target = localObject.target;
                     this.webEnvironment.data = localObject.data;

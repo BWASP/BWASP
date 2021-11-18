@@ -18,25 +18,41 @@
                 <div class="col-md-3 p-1 mt-2">
                     <div class="p-3 border-rounded shadow">
                         <p class="text-muted small mb-1 text-uppercase">Received Packets</p>
-                        <p class="fs-2 mb-0" id="receivedPacketsCount">-</p>
+                        <p class="fs-2 mb-0" id="receivedPacketsCount">
+                            <span class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-3 p-1 mt-2">
                     <div class="p-3 border-rounded shadow">
                         <p class="text-muted small mb-1 text-uppercase">Detected Threats</p>
-                        <p class="fs-2 mb-0" id="detectedThreatsCount">-</p>
+                        <p class="fs-2 mb-0" id="detectedThreatsCount">
+                            <span class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-3 p-1 mt-2">
                     <div class="p-3 border-rounded shadow">
                         <p class="text-muted small mb-1 text-uppercase">Opened Ports</p>
-                        <p class="fs-2 mb-0" id="openedPortsCount">-</p>
+                        <p class="fs-2 mb-0" id="openedPortsCount">
+                            <span class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-3 p-1 mt-2">
                     <div class="p-3 border-rounded shadow">
                         <p class="text-muted small mb-1 text-uppercase">Analysis Level</p>
-                        <p class="fs-2 mb-0" id="analysisLevelView">-</p>
+                        <p class="fs-2 mb-0" id="analysisLevelView">
+                            <span class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </p>
                     </div>
                 </div>
                 <p class="col-md-12 mt-2 text-muted small">Calculated numbers may has numerical errors.</p>
@@ -47,18 +63,24 @@
                     <div class="p-3 border-rounded shadow">
                         <section>
                             <p class="mb-0 text-uppercase">Web Environment Information</p>
-                            <p class="mb-1 text-muted small"><span>of</span> <span class="fw-bold hide" id="webEnvURLPlace">Unknown</span></p>
+                            <p id="webEnvDataPlace-detail" class="mb-1 text-muted small d-none"><span>of</span> <span class="fw-bold" id="webEnvURLPlace">Unknown</span></p>
                         </section>
                         <section class="row" id="webEnvDataPlace"></section>
+                        <section class="mt-3" id="webEnvDataPlace-noData">
+                            <p class="text-center text-muted text-capitalize p-4">No Data</p>
+                        </section>
                     </div>
                 </section>
                 <section class="col-md-6 mb-2 p-1">
                     <div class="p-3 border-rounded shadow">
                         <section>
                             <p class="mb-0 text-uppercase">Opened Ports</p>
-                            <p class="mb-1 text-muted small"><span class="fw-bold" id="portCountViewPlace">0</span> ports opened.</p>
+                            <p id="portViewPlace-detail" class="mb-1 text-muted small d-none"><span class="fw-bold" id="portCountViewPlace">0</span> ports opened.</p>
                         </section>
                         <section class="row" id="portViewPlace"></section>
+                        <section class="mt-3" id="portViewPlace-noData">
+                            <p class="text-center text-muted text-capitalize p-4">No Data</p>
+                        </section>
                     </div>
                 </section>
             </section>
