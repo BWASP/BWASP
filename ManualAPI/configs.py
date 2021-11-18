@@ -14,14 +14,14 @@ class Config(object):
         pass
 
 
-class DevelopmentsConfig(Config):
+class Developments_config(Config):
     """
         Flask Config for Development
     """
     DEBUG = True
 
 
-class ProductionConfig(Config):
+class Production_config(Config):
     """
         Flask Config for Production
     """

@@ -14,11 +14,18 @@ job = ns.model('job model', {
     'targetURL': fields.String(required=True, description='target URL'),
     'knownInfo': fields.String(required=True, description='Known information'),
     'recursiveLevel': fields.String(required=True, description='recursive level'),
-    'uriPath': fields.String(required=True, description='Path on Web Server')
+    'uriPath': fields.String(required=True, description='Path on Web Server'),
+    'done': fields.Integer(readonly=True, description='Analysis checking'),
+    'maximumProcess': fields.String(required=True, description='Process max count'),
 })
 
 job_return_post_method = ns.model('Job Return Post Message', {
     "message": fields.String(readonly=True, description='message of return data')
+})
+
+job_update_analysis_check = ns.model('Job Update', {
+    'id': fields.Integer(readonly=True, description='setting initialization(Job) id for unique identifier'),
+    'done': fields.Integer(readonly=True, description='Analysis checking')
 })
 
 
@@ -27,6 +34,7 @@ class Job_data_access_object(object):
         self.counter = 0
         self.selectData = ""
         self.insertData = ""
+        self.updateData = ""
 
     def get_return_row_count(self):
         self.counter = g.bwasp_db_obj.query(jobModel).count()
@@ -64,6 +72,25 @@ class Job_data_access_object(object):
 
         return Return_object().return_post_http_status_message(Type=False)
 
+    def update(self, data):
+        if str(type(data)) == "<class 'list'>":
+            try:
+                self.updateData = data
+
+                for ListofData in range(len(data)):
+                    g.bwasp_db_obj.query(jobModel).filter(
+                        systeminfoModel.id == int(self.updateData[ListofData]["id"])
+                    ).update(
+                        {'done': json.dumps(self.updateData[ListofData]["done"])}
+                    )
+                    g.bwasp_db_obj.commit()
+
+                return Return_object().return_patch_http_status_message(Type=True)
+            except:
+                g.bwasp_db_obj.rollback()
+
+        return Return_object().return_patch_http_status_message(Type=False)
+
 
 data_access_object_for_job = Job_data_access_object()
 
@@ -85,6 +112,13 @@ class Job_list(Resource):
     def post(self):
         """Create Job"""
         return data_access_object_for_job.create(ns.payload)
+
+    @ns.doc('Update system information')
+    @ns.expect(job_update_analysis_check)
+    @ns.marshal_with(job)
+    def patch(self):
+        """Update a data given its identifier"""
+        return data_access_object_for_job.update(ns.payload)
 
 
 @ns.route('/<int:id>')

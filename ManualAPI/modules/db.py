@@ -38,13 +38,27 @@ import os
 import json
 from urllib.parse import urlparse, urlunparse
 
-from ManualAPI.modules import func, attack_vector
-from ManualAPI.modules.api import *
+"""from ManualAPI.modules import func, attack_vector
+from ManualAPI.modules.api import *"""
+import func
+from attack_vector import *
+from api import *
 import requests
 
 # REST API: 종민 Packets
+def deleteUselessBody(packets):
+    content_types = ["text/css", "application/font-woff2"]
+
+    for index in range(len(packets)):
+        if "content-type" in list(packets[index]["response"]["headers"].keys()):
+            for type in content_types:
+                if packets[index]["response"]["headers"]["content-type"].find(type) != -1:
+                    packets[index]["response"]["body"] = ""
+
+    return packets
+
 def insertPackets(req_res_packets):
-    api_url = "http://localhost:20102/api/packets/automation"
+    api_url = "http://localhost:20102/api/packet/manual"
     headers = {"Content-Type": "application/json; charset=utf-8"}
     data = []
 
@@ -58,7 +72,7 @@ def insertPackets(req_res_packets):
         }
         data.append(params)
 
-    Packets().PostAutomation(json.dumps(data))
+    Packets().PostManual(json.dumps(data))
     # res = requests.post(api_url, headers=headers, data=json.dumps(data))
 
 # REST API: 도훈 Domains
@@ -67,7 +81,6 @@ def insertPackets(req_res_packets):
 def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, http_method, infor_vector, robots_result, error_result):
     data = list()
     crx = list()
-
     for i, packet in enumerate(req_res_packets):
         if not func.isSameDomain(target_url, packet["request"]["full_url"]):
             continue
@@ -162,8 +175,9 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             }  # tag_list + domain_cookie + #domain_params 양식에 맞춰서 포함해야 함
         }
         data.append(query)
+        print("attackvector",attack_vector)
         attack_vector["current_url"] = packet["request"]["full_url"]
         crx.append(attack_vector)
 
     Domain().PostDomain(json.dumps(data))
-return crx
+    return crx

@@ -330,6 +330,7 @@ class pagerTools {
 
             // Build URL
             rowElement.child.URL.innerText = dataSet.url.url + dataSet.url.uri;
+            rowElement.child.URL.classList.add("text-break");
             // rowElement.child.URL.classList.add("text-break");
             rowElement.parent.appendChild(rowElement.child.URL);
 
@@ -511,10 +512,6 @@ const openDetailsModal = (dataSet) => {
             localSkeleton.parent.appendChild(localSkeleton.innerLink);
             viewArea.appendChild(localSkeleton.parent);
         });
-
-        console.log(overallDocuments);
-
-        //  console.log(Array.isArray(referredDocuments[target]), target, referredDocuments, referredDocuments[target]);
     }
 
     let dataKind = ["cookie", "queryString", "tag"],

@@ -22,6 +22,7 @@ class dashboard {
         this.updatePacketCount();
         this.updateThreatsCount();
         this.updatePorts();
+        this.updateAnalysisLevel();
     }
 
     updatePacketCount() {
@@ -49,9 +50,7 @@ class dashboard {
 
         // Port count
         API.communicate("/api/ports/count", (err, res) => {
-            if (err) setTimeout(() => {
-                return this.updatePortsCount();
-            }, 500);
+            if (err === 404) return;
             else {
                 document.getElementById("portCountViewPlace").innerText = res.count;
                 document.getElementById("openedPortsCount").innerText = res.count;
@@ -59,10 +58,8 @@ class dashboard {
         })
 
         // Ports
-        API.communicate("/api/ports", (err, res)=>{
-            if (err) setTimeout(() => {
-                return this.updatePorts();
-            }, 500);
+        API.communicate("/api/ports", (err, res) => {
+            if (err === 404) return;
             else {
                 res.forEach((currentPort) => {
                     if (currentPort.result === "Open") {
@@ -74,7 +71,7 @@ class dashboard {
                     // if(Object.keys(localPorts))
                 })
             }
-            if(JSON.stringify(this.ports)!==JSON.stringify(localPorts)){
+            if (JSON.stringify(this.ports) !== JSON.stringify(localPorts)) {
                 // Save ports data
                 this.ports = localPorts;
 
@@ -84,18 +81,18 @@ class dashboard {
 
                 // Build
                 console.log(localPorts);
-                Object.keys(this.ports).forEach((currentType)=>{
+                Object.keys(this.ports).forEach((currentType) => {
                     let skeleton = {
                         parent: document.createElement("section"),
                         name: document.createElement("p"),
                         ports: document.createElement("p")
                     };
                     skeleton.parent.classList.add("col-md-12", "mt-3");
-                    skeleton.name.classList.add("text-muted","small", "text-capitalize");
+                    skeleton.name.classList.add("text-muted", "small", "text-capitalize");
                     skeleton.name.innerText = `${currentType} (${localPorts[currentType].length})`;
-                    localPorts[currentType].forEach(currentPort=>{
+                    localPorts[currentType].forEach(currentPort => {
                         skeleton.ports.innerText += currentPort.concat(
-                            (localPorts[currentType][localPorts[currentType].length-1]!==currentPort)
+                            (localPorts[currentType][localPorts[currentType].length - 1] !== currentPort)
                                 ? ", "
                                 : ""
                         )
@@ -111,15 +108,23 @@ class dashboard {
         })
     }
 
+    updateAnalysisLevel() {
+        API.communicate("/api/job/1", (err, res) => {
+            if (err === 404) {
+                return document.getElementById("analysisLevelView").innerText = "0";
+            }
+            else {
+                document.getElementById("analysisLevelView").innerText = res[0].recursiveLevel;
+            }
+        })
+    }
+
     webEnvironments() {
         API.communicate(
             APIEndpoints.webEnvironments + "/1",
             (err, res) => {
-                if (err) {
-                    return window.setTimeout(() => {
-                        this.webEnvironments();
-                    }, 500);
-                } else {
+                if (err === 404) return;
+                else {
                     let localObject = {
                         target: res[0].url,
                         data: JSON.parse(res[0].data)
