@@ -7,7 +7,7 @@ import re,json
 from Crawling import analyst
 from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, csp_evaluator, db, func
 from Crawling.feature.api import *
-from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing
+from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing, adminPage
 
 # TODO
 # 사용자가 여러개의 사이트를 동시에 테스트 할 때, 전역 변수의 관리 문제
@@ -25,6 +25,8 @@ http_method = "None"
 infor_vector = "None"
 robots_result = False
 error_result = False
+directory_indexing = list()
+admin_page = list()
 
 def start(url, depth, options):
     global start_options
@@ -47,7 +49,7 @@ def start(url, depth, options):
     start_options["visited_links"] = []
     start_options["count_links"] = {}
 
-def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,current_url,previous_packet_count,http_method, infor_vector, robots_result, error_result):
+def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,current_url,previous_packet_count,http_method, infor_vector, robots_result, error_result, directory_indexing, admin_page):
     global start_options
     global loadpacket_indexes
 
@@ -63,7 +65,7 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
 
-    db.insertDomains(req_res_packets, cookie_result,packet_indexes , input_url, http_method, infor_vector, robots_result, error_result) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
+    db.insertDomains(req_res_packets, cookie_result,packet_indexes , input_url, http_method, infor_vector, robots_result, error_result, directory_indexing, admin_page) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
     db.updateWebInfo(detect_list[0])
     
     return 1
@@ -77,6 +79,8 @@ def visit(driver, url, depth, options):
     global infor_vector
     global robots_result
     global error_result
+    global directory_indexing
+    global admin_page
 
     try:
         driver.get(url)
@@ -86,7 +90,8 @@ def visit(driver, url, depth, options):
         pass
 
     if start_options["check"]:
-        directoryIndexing(driver.current_url)
+        directory_indexing = directoryIndexing(driver.current_url)
+        admin_page = adminPage(driver.current_url)
         http_method, infor_vector = attackHeader(driver.current_url)
         robots_result = robotsTxt(driver.current_url)
         error_result = errorPage(driver.current_url)
@@ -123,7 +128,7 @@ def visit(driver, url, depth, options):
 
     req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
     db.insertPackets(req_res_packets)
-    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,driver.current_url,start_options["previous_packet_count"],http_method, infor_vector, robots_result, error_result)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,driver.current_url,start_options["previous_packet_count"],http_method, infor_vector, robots_result, error_result, directory_indexing, admin_page)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
     start_options["previous_packet_count"] += len(req_res_packets)
     p.start()
     process_list.append(p)

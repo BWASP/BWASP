@@ -268,7 +268,6 @@ def errorPage(url):
     return True if 404 == requests.get(url).status_code and "not found" in requests.get(url).text.lower() else False
 
 def directoryIndexing(target_url):
-    # 주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf [page 663] Directory Indexing 위반
     return_data = list()
     api_key = func.apiKeyLoad()
     
@@ -309,7 +308,6 @@ def directoryIndexing(target_url):
     return return_data
 
 def adminPage(target_url):
-    # 주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf [page 712] 관리자 페이지 노출
     api_key = func.apiKeyLoad()
     return_data = list()
     target_domain = urlparse(target_url).netloc
