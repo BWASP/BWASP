@@ -72,15 +72,19 @@ class job(bwasp_db.Model):
     knownInfo = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
     recursiveLevel = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
     uriPath = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    done = bwasp_db.Column(bwasp_db.BOOLEAN, default=False)
+    maximumProcess = bwasp_db.Column(bwasp_db.TEXT, nullable=0)
 
-    def __init__(self, targetURL, knownInfo, recursiveLevel, uriPath, **kwargs):
+    def __init__(self, targetURL, knownInfo, recursiveLevel, uriPath, done, maximumProcess, **kwargs):
         self.targetURL = targetURL
         self.knownInfo = knownInfo
         self.recursiveLevel = recursiveLevel
         self.uriPath = uriPath
+        self.done = done
+        self.maximumProcess = maximumProcess
 
     def __repr__(self):
-        return f"<job('{self.targetURL}', '{self.knownInfo}', '{self.recursiveLevel}', '{self.uriPath}')>"
+        return f"<job('{self.targetURL}', '{self.knownInfo}', '{self.recursiveLevel}', '{self.uriPath}', '{self.done}', '{self.maximumProcess}')>"
 
 
 class ports(bwasp_db.Model):
