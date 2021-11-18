@@ -1,8 +1,7 @@
 from bs4 import BeautifulSoup
-import requests
-import json
-import re
-import base64
+import requests, json, re, base64, sys, os
+
+#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 
 def attackHeader(target_url):
@@ -53,14 +52,13 @@ def inputTag(response_body, http_method, infor_vector):
     tag_name_list = list()
     action_page = list()
     action_type = list()
-    attack_vector = dict() #list()
+    attack_vector = dict()  # list()
     data = dict()
     impactRate = 0
 
     text = soup.find_all('input')
     form = soup.find_all('form')
-
-    with open("./attack_vector.json", 'r', encoding='UTF8') as f:
+    with open("./modules/attack_vector.json", 'r', encoding='UTF8') as f:
         data = json.load(f)
 
     # ~~~~~~~~~~~~Allow Method
@@ -83,7 +81,7 @@ def inputTag(response_body, http_method, infor_vector):
                 except:
                     pass
 
-                #~~~~~~~~~~~~SQL Injection and XSS
+                # ~~~~~~~~~~~~SQL Injection and XSS
 
                 # th tag check (board) and type="password" check (login)
                 if "<th" in response_body:
@@ -144,7 +142,7 @@ def inputTag(response_body, http_method, infor_vector):
                         impactRate = 1
 
                 try:
-                    #~~~~~~~~~~~~File Upload
+                    # ~~~~~~~~~~~~File Upload
                     if tag.attrs['type'] == "file":
                         data["doubt"]["File Upload"] = True
 
@@ -182,7 +180,7 @@ def inputTag(response_body, http_method, infor_vector):
                 action_type.append(base64.b64encode(tag.attrs['method'].encode('utf-8')).decode('utf-8'))
             except:
                 pass
-                
+
     return tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate
 
 
@@ -199,6 +197,7 @@ def corsCheck(packet):
 
     return cors_check
 
+
 def openRedirectionCheck(packet):
     try:
         if packet["open_redirect"]:
@@ -206,21 +205,21 @@ def openRedirectionCheck(packet):
     except:
         return ""
 
+
 def s3BucketCheck(packet):
     return_s3_url = []
-    patterns = [    "s3\.[a-zA-Z0-9.-]+\.com",
-                    "[a-zA-Z0-9.-]+\.s3\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9.-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*"
-                    "[a-zA-Z0-9.-]+\.s3-[a-zA-Z0-9-]\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9.-]+\.s3-website[.-](?: eu|ap|us|ca|sa|cn)",
-                    "[\/\/]?s3\.amazonaws\.com\/[a-zA-Z0-9\-\/]*",
-                    "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{3,63}\.s3[\.-](?: eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{3,63}\.s3-website[\.-](?: eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*"]
-    
+    patterns = ["s3\.[a-zA-Z0-9.-]+\.com",
+                "[a-zA-Z0-9.-]+\.s3\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9.-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*"
+                "[a-zA-Z0-9.-]+\.s3-[a-zA-Z0-9-]\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9.-]+\.s3-website[.-](?: eu|ap|us|ca|sa|cn)",
+                "[\/\/]?s3\.amazonaws\.com\/[a-zA-Z0-9\-\/]*",
+                "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9\.\-]{3,63}\.s3[\.-](?: eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9\.\-]{3,63}\.s3-website[\.-](?: eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*"]
 
     for pattern in patterns:
         regex = re.compile(pattern)
@@ -233,6 +232,7 @@ def s3BucketCheck(packet):
             return_s3_url += req_body
 
     return list(set(return_s3_url))
+
 
 def jwtCheck(packet):
     return_jwt = []
@@ -255,14 +255,15 @@ def jwtCheck(packet):
         return_jwt += req_header + req_body + res_header + res_body
     return list(set(return_jwt))
 
+
 def robotsTxt(current_url):
     # 주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf [page 726] robots.txt not set
     return True if "user-agent" not in requests.get(current_url).text.lower() or 404 == requests.get(current_url).status_code else False
 
+
 def errorPage(current_url):
     # 주요정보통신기반시설_기술적_취약점_뿐석_평가_방법_상세가이드.pdf [page 678] Error Page not set
     return True if 404 == requests.get(current_url).status_code and "not found" in requests.get(current_url).text.lower() else False
-
 
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
