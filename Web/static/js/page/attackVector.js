@@ -187,16 +187,16 @@ class pagerTools {
 
     async syncData(requestPage, rowPerPage, callback) {
         let localDataPack = [],
-            counter = Number();
+            counter = Number(),
+            pages = {
+                from: ((requestPage - 1) * rowPerPage) + 1,
+                count: rowPerPage
+            };
+
         await API.communicate(
-            APIEndpoints.vectors + `/${((requestPage - 1) * rowPerPage) + 1}/${rowPerPage}`,
+            APIEndpoints.vectors + `/${pages.from}/${pages.count}`,
             (err, res) => {
-                if (err) {
-                    let redoJob = window.setTimeout(() => {
-                        this.syncData(requestPage, rowPerPage, callback);
-                    }, 500);
-                    return returnError(err);
-                }
+                if(err) return returnError(err);
                 if (res.length === 0) return returnError("No data");
 
                 res.forEach(async (domainData) => {
@@ -476,14 +476,14 @@ const openDetailsModal = (dataSet) => {
 
         packageKeys.forEach((currentElement) => {
             let localSkeleton = {
-                parent: document.createElement("div"),
-                flex: document.createElement("div"),
-                child: {
-                    message: document.createElement("p"),
-                    page: document.createElement("p"),
-                    quote: document.createElement("p")
-                }
-            },
+                    parent: document.createElement("div"),
+                    flex: document.createElement("div"),
+                    child: {
+                        message: document.createElement("p"),
+                        page: document.createElement("p"),
+                        quote: document.createElement("p")
+                    }
+                },
                 currentGuideline = guideline.detect[currentElement];
 
             localSkeleton.parent.classList.add("m-3", "p-3", "rounded-custom", "shadow");
