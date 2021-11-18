@@ -1,5 +1,8 @@
 from urllib.parse import urlparse, urlunparse
-import os
+import os, sys, os
+
+#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
 
 def isSameDomain(target_url, visit_url):
     try:
@@ -14,6 +17,7 @@ def isSameDomain(target_url, visit_url):
             return False
     except:
         return False
+
 
 def isSamePath(visit_url, previous_urls):
     try:
@@ -33,11 +37,13 @@ def isSamePath(visit_url, previous_urls):
     except:
         return False
 
-def get_dbpath(repo_name="BWASP",prefix="sqlite:///",sub_path="Web\databases\BWASP.db"):
+
+def get_dbpath(repo_name="BWASP", prefix="sqlite:///", sub_path="Web\databases\BWASP.db"):
     repopath = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
     index = repopath.find(repo_name)
-    repopath = repopath[:index+len(repo_name)]
-    return (prefix+repopath+"\\"+sub_path).replace("\\","\\\\")
+    repopath = repopath[:index + len(repo_name)]
+    return (prefix + repopath + "\\" + sub_path).replace("\\", "\\\\")
+
 
 """
     This function check the extension of url.
@@ -45,17 +51,19 @@ def get_dbpath(repo_name="BWASP",prefix="sqlite:///",sub_path="Web\databases\BWA
         - key: String
         - return: boolean
 """
+
+
 def isExistExtension(url, keys):
     extensions_dict = {
-        "image" : ["png", "gif", "jpg", "jpeg", "webp", "tiff", "bmp", "svg", "jpe", "jif", "jfif", "jfi", "ico"],
-        "style" : ["css", "scss"],
-        "font" : ["woff2"]
+        "image": ["png", "gif", "jpg", "jpeg", "webp", "tiff", "bmp", "svg", "jpe", "jif", "jfif", "jfi", "ico"],
+        "style": ["css", "scss"],
+        "font": ["woff2"]
     }
-    
+
     for key in keys:
         if not key in list(extensions_dict.keys()):
             return False
-        
+
         extension_list = extensions_dict[key]
         parse_url = urlparse(url)
 
@@ -63,7 +71,7 @@ def isExistExtension(url, keys):
         url_path_extension = parse_url.path.split(".")[::-1][0]
         if url_path_extension in extension_list:
             return True
-        
+
         # Check only query
         # url_query = parse_url.query.split("&")
         # for query in url_query:
