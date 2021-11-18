@@ -1,6 +1,13 @@
 class API {
     constructor() {
-        fetch("/static/data/frontConfig.json")
+        this.API = String();
+        this.debug = Object();
+        this.getFrontConfig();
+    }
+
+    async getFrontConfig() {
+        if(this.API !== String() && this.debug !== Object()) return;
+        await fetch("/static/data/frontConfig.json")
             .then(blob => blob.json())
             .then(res => {
                 this.API = res.API
@@ -13,9 +20,9 @@ class API {
      * @param {string} endpoint
      * @param {function} callback
      */
-    communicate(endpoint, callback) {
-        if (typeof (this.API) === "undefined") return callback(["API Communication error", "Please wait until it retries."]);
-        fetch(this.API.base + endpoint, {
+    async communicate(endpoint, callback) {
+        await this.getFrontConfig();
+        await fetch(this.API.base + endpoint, {
             method: "GET",
             cache: "no-cache",
             headers: {
