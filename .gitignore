@@ -10,3 +10,4 @@ Include/
 Scripts/
 Lib/
 pyvenv.cfg
+Crawling/config/api.json
