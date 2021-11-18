@@ -220,6 +220,7 @@ def insertPorts(port_list, target_url):
             "result": "Open"
         }
         data.append(value)
+        '''
     else:
         value = {
             "service": "None",
@@ -228,6 +229,7 @@ def insertPorts(port_list, target_url):
             "result": "None"
         }
         data.append(value)
+        '''
     Ports().PostPorts(json.dumps(data))
 
 
