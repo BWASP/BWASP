@@ -21,6 +21,8 @@
   },
   "misc": {
     "robots.txt": false,
-    "error": false
+    "error": false,
+    "indexing": [],
+    "admin page": []
   }
 }
