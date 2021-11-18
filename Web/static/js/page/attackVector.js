@@ -477,22 +477,32 @@ const openDetailsModal = (dataSet) => {
         packageKeys.forEach((currentElement) => {
             let localSkeleton = {
                 parent: document.createElement("div"),
+                flex: document.createElement("div"),
                 child: {
                     message: document.createElement("p"),
+                    page: document.createElement("p"),
                     quote: document.createElement("p")
                 }
             },
                 currentGuideline = guideline.detect[currentElement];
 
             localSkeleton.parent.classList.add("m-3", "p-3", "rounded-custom", "shadow");
+            localSkeleton.flex.classList.add("d-flex");
             localSkeleton.child.message.classList.add("mb-0", "fw-bold");
-            localSkeleton.child.quote.classList.add("small", "text-muted", "mb-0", "ms-2");
+            localSkeleton.child.page.classList.add("mb-0", "text-muted", "ms-auto", "small");
+            localSkeleton.child.quote.classList.add("small", "text-muted", "mb-0");
 
             localSkeleton.child.message.innerText = currentGuideline.message;
-            localSkeleton.child.quote.innerText = `[P. ${currentGuideline.relatedPage}] ${currentGuideline.quote}`;
+            localSkeleton.child.page.innerText = `P. ${currentGuideline.relatedPage}`;
+            localSkeleton.child.quote.innerText = currentGuideline.quote;
+
+            localSkeleton.flex.append(
+                localSkeleton.child.message,
+                localSkeleton.child.page
+            );
 
             localSkeleton.parent.append(
-                localSkeleton.child.message,
+                localSkeleton.flex,
                 localSkeleton.child.quote
             );
 
