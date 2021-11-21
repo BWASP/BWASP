@@ -9,7 +9,8 @@ from Crawling.feature.packet_capture import PacketCapture
 from Crawling.feature.get_res_links import GetReslinks
 from Crawling.feature.csp_evaluator import cspAnalysis
 from Crawling.feature.get_ports import GetPort
-from Crawling.feature import get_page_links, get_cookies, db, func
+from Crawling.feature.get_page_links import GetPageLinks
+from Crawling.feature import get_cookies, db, func
 from Crawling.feature.api import *
 from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing, adminPage
 
@@ -122,7 +123,7 @@ def visit(driver, url, depth, options):
         packet_obj.packets[0]["open_redirect"] = True
         cur_page_links = list()
     else:
-        cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
+        cur_page_links = GetPageLinks.start(driver.current_url, driver.page_source)
         cur_page_links += GetReslinks(driver.current_url, packet_obj.packets, driver.page_source).start()
         cur_page_links = list(set(packet_obj.deleteFragment(cur_page_links)))
     cookie_result = get_cookies.start(driver.current_url, packet_obj.packets)
