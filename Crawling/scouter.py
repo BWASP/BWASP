@@ -8,7 +8,8 @@ from Crawling import analyst
 from Crawling.feature.packet_capture import PacketCapture
 from Crawling.feature.get_res_links import GetReslinks
 from Crawling.feature.csp_evaluator import cspAnalysis
-from Crawling.feature import get_page_links, get_ports, get_cookies, db, func
+from Crawling.feature.get_ports import GetPort
+from Crawling.feature import get_page_links, get_cookies, db, func
 from Crawling.feature.api import *
 from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing, adminPage
 
@@ -102,10 +103,10 @@ def visit(driver, url, depth, options):
         START_OPTIONS["check"] = False
         
         if "portScan" in options["tool"]["optionalJobs"]:
-            target_port = get_ports.getPortsOffline(START_OPTIONS["input_url"])
+            target_port = GetPort().getPortsOffline(START_OPTIONS["input_url"])
             db.insertPorts(target_port, START_OPTIONS["input_url"])
         else:
-            target_port = get_ports.getPortsOnline(START_OPTIONS["input_url"])
+            target_port = GetPort().getPortsOnline(START_OPTIONS["input_url"])
             db.insertPorts(target_port, START_OPTIONS["input_url"])
 
         if "CSPEvaluate" in options["tool"]["optionalJobs"]:
