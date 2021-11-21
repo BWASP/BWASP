@@ -1,0 +1,29 @@
+
+version: '3'
+
+services:
+    core:
+        build:
+            context: ./core/
+            dockerfile: ./Dockerfile
+        ports:
+            - "20202:20202"
+            - "20302:20302"
+    database:
+        build:
+            context: ./database/
+            dockerfile: ./Dockerfile
+        ports:
+            - "3306:3306"
+    frontend:
+        build:
+            context: ./frontend/
+            dockerfile: ./Dockerfile
+        ports:
+             - "8000:3000"
+    api:
+        build:
+            context: ./api/
+            dockerfile: ./Dockerfile
+        ports:
+            - "20102:20102"
