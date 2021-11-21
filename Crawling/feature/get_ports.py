@@ -11,7 +11,7 @@ class GetPort:
                                 156, 220]
         self.service_of_port = {'3306': 'mysql', '1521': 'oracle', '8080': 'tomcat', '8443': 'https', '8090': 'tomcat', '220': 'imap3'}
 
-        self.port_pattern = re.compile('''^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\:(\d)+)?$''')
+        self.port_pattern = '''^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\:(\d)+)?$'''
         self.port_scan = {
             "online": {
                 "Get_port_information_url": "https://search.censys.io/hosts/",
@@ -26,7 +26,9 @@ class GetPort:
         }
 
     def getPortsOnline(self, target_ip):
-        if self.port_pattern.match(target_ip) is None:
+        port_pattern = re.compile(self.port_pattern)
+
+        if port_pattern.match(target_ip) is None:
             try:
                 target_ip = gethostbyname(urlparse(target_ip).netloc)
             except:
@@ -46,7 +48,9 @@ class GetPort:
         return self.ports_list
 
     def getPortsOffline(self, target_ip):
-        if re.search(self.port_pattern, target_ip):
+        port_pattern = re.compile(self.port_pattern)
+
+        if re.search(port_pattern, target_ip):
             try:
                 print(urlparse(target_ip).netloc)
                 target_ip = gethostbyname(urlparse(target_ip).netloc)
