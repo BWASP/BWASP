@@ -5,7 +5,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 import re,json
 
 from Crawling import analyst
-from Crawling.feature import get_page_links, packet_capture, get_res_links, get_ports, get_cookies, csp_evaluator, db, func
+from Crawling.feature.packet_capture import PacketCapture
+from Crawling.feature import get_page_links, get_res_links, get_ports, get_cookies, csp_evaluator, db, func
 from Crawling.feature.api import *
 from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing, adminPage
 
@@ -112,24 +113,24 @@ def visit(driver, url, depth, options):
         csp_result = csp_evaluator.start(driver.current_url)
         db.insertCSP(csp_result)
 
-    req_res_packets = packet_capture.start(driver)
+    packet_obj = PacketCapture()
+    packet_obj.start(driver)
 
     # 다른 사이트로 Redirect 되었는지 검증.
     if isOpenRedirection(url, driver.current_url, start_options["input_url"]):
-        # print("Open Redirect Detect: {}".format(url))
-        req_res_packets = packet_capture.filterPath(req_res_packets, url)
-        req_res_packets[0]["open_redirect"] = True
+        packet_obj.filterPath(url)
+        packet_obj.packets[0]["open_redirect"] = True
         cur_page_links = list()
     else:
         cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
-        cur_page_links += get_res_links.start(driver.current_url, req_res_packets, driver.page_source)
-        cur_page_links = list(set(packet_capture.deleteFragment(cur_page_links)))
-    cookie_result = get_cookies.start(driver.current_url, req_res_packets)
+        cur_page_links += get_res_links.start(driver.current_url, packet_obj.packets, driver.page_source)
+        cur_page_links = list(set(packet_obj.deleteFragment(cur_page_links)))
+    cookie_result = get_cookies.start(driver.current_url, packet_obj.packets)
 
-    req_res_packets = packet_capture.deleteUselessBody(req_res_packets)
-    db.insertPackets(req_res_packets)
-    p = Process(target=analysis, args=(start_options['input_url'], req_res_packets, cur_page_links, options, cookie_result,detect_list,lock,driver.current_url,start_options["previous_packet_count"],http_method, infor_vector, robots_result, error_result, directory_indexing, admin_page)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
-    start_options["previous_packet_count"] += len(req_res_packets)
+    packet_obj.deleteUselessBody()
+    db.insertPackets(packet_obj.packets)
+    p = Process(target=analysis, args=(start_options['input_url'], packet_obj.packets, cur_page_links, options, cookie_result,detect_list,lock,driver.current_url,start_options["previous_packet_count"],http_method, infor_vector, robots_result, error_result, directory_indexing, admin_page)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    start_options["previous_packet_count"] += len(packet_obj.packets)
     p.start()
     process_list.append(p)
 
@@ -217,54 +218,3 @@ def initSelenium():
     driver = webdriver.Chrome(ChromeDriverManager().install(), seleniumwire_options=options, chrome_options=chrome_options)
 
     return driver
-
-if __name__ == "__main__":
-    options = {
-        "tool": {
-            "analysisLevel": "771",
-            "optionalJobs": [
-                "portScan",
-                "CSPEvaluate"
-            ]
-        },
-        "info": {
-            "server": [
-                {
-                    "name": "apache",
-                    "version": "22"
-                },
-                {
-                    "name": "nginx",
-                    "version": "44"
-                }
-            ],
-            "framework": [
-                {
-                    "name": "react",
-                    "version": "22"
-                },
-                {
-                    "name": "angularjs",
-                    "version": "44"
-                }
-            ],
-            "backend": [
-                {
-                    "name": "flask",
-                    "version": "22"
-                },
-                {
-                    "name": "django",
-                    "version": "44"
-                }
-            ]
-        },
-        "target": {
-            "url": "http://testphp.vulnweb.com/",
-            "path": [
-                "/apply, /login", "/admin"
-            ]
-        }
-    }
-
-    start(options["target"]["url"], int(options["tool"]["analysisLevel"]), options["info"])

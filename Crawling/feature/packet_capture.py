@@ -1,155 +1,145 @@
-from seleniumwire import webdriver
 from seleniumwire.utils import decode
 from urllib.parse import urlparse, urlunparse
 import json
 
-content_image_type = ["image/bmp", "image/cis-cod", "image/gif", "image/ief", "image/jpeg", "image/pipeg", "image/svg+xml", "image/tiff", "image/tiff", "image/png", "font/woff2"]
+class PacketCapture:
 
-def webdriverSetting():
-    # [*] If you want to get decoded response body, you have to add below option.
-    options = {
-        'disable_encoding': True,
-        "detach" : True
-    }
-    driver = webdriver.Chrome("./config/chromedriver.exe", seleniumwire_options = options)
-    return driver
+    def __init__(self):
+        self.packets = list()
+    
+    def start(self, driver):
+        for data in driver.requests:
+            if data.response:
+                if data.url == "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard":
+                    continue
 
-def start(driver):
-    network_packet = []
-    for data in driver.requests:
-        if data.response:
-            if data.url == "https://accounts.google.com/ListAccounts?gpsia=1&source=ChromiumBrowser&json=standard":
-                continue
+                self.packets.append({
+                    "request" : self.getRequestPacket(data), 
+                    "response" : self.getResponsePacket(data.response)
+                })
+            else:
+                print("[!] Response is empty.")
 
-            network_packet.append({
-                "request" : getRequestPacket(data), 
-                "response" : getResponsePacket(data.response)
-            })
+        del driver.requests
+    
+
+    def getRequestPacket(self, request):
+        parsed_url = urlparse(request.url)
+
+        req_uri = parsed_url.path
+        if parsed_url.query:
+            req_uri += "?" + parsed_url.query
+        if parsed_url.fragment:
+            req_uri += "#" + parsed_url.fragment
+
+        # Host 헤더 존재 여부 확인
+        req_headers = ""
+        if request.headers["host"] is None:
+            req_headers = "host: {}\n{}".format(parsed_url.netloc, str(request.headers))
         else:
-            print("[!] Response is empty.")
-    del driver.requests
-    return network_packet
+            req_headers = str(request.headers)
 
-def getRequestPacket(data):
-    parsed_url = urlparse(data.url)
+        # TODO
+        # request body 넣기 https://pypi.org/project/selenium-wire/#example-update-json-in-a-post-request-body
+        return_data = { 
+            "method" : request.method, 
+            "url" : req_uri, 
+            "headers" : {},
+            "body" : "",
+            "full_url" : request.url 
+        }
 
-    req_uri = parsed_url.path
-    if parsed_url.query:
-        req_uri += "?" + parsed_url.query
-    if parsed_url.fragment:
-        req_uri += "#" + parsed_url.fragment
+        # header key를 소문자로 바꾸기
+        return_data["headers"] = self.headerKeyToLower(req_headers)
+        
+        # request body 디코딩
+        try:
+            body = decode(request.body, request.headers.get('Content-Encoding', 'identity'))
+            return_data["body"] = body.decode('utf-8')
 
-    req_headers = ""
-    if data.headers["host"] is None:
-        req_headers = "host: {}\n{}".format(parsed_url.netloc, str(data.headers))
-    else:
-        req_headers = str(data.headers)
+        except UnicodeDecodeError as e:
+            # [*] Do not save image data...etc..
+            print("UnicodeDecodeError: " + str(e))
 
-    # TODO
-    # request body 넣기
-    # https://pypi.org/project/selenium-wire/#example-update-json-in-a-post-request-body
-    return_data = { 
-        "method" : data.method, 
-        "url" : req_uri, 
-        "headers" : {},
-        "body" : "",
-        "full_url" : data.url 
-    }
-
-    for x in req_headers.splitlines():
-        header = x.split(": ")
-        try: return_data["headers"][header[0].lower()] = header[1]
-        except: pass
+        return return_data
     
-    try:
-        body = decode(data.body, data.headers.get('Content-Encoding', 'identity'))
-        return_data["body"] = body.decode('utf-8')
 
-    except UnicodeDecodeError as e:
-        # [*] Do not save image data...etc..
-        print("UnicodeDecodeError: " + str(e))
+    def getResponsePacket(self, response):
+        filter_content_type_list = ["image/bmp", "image/cis-cod", "image/gif", "image/ief", "image/jpeg", "image/pipeg", "image/svg+xml", "image/tiff", "image/tiff", "image/png", "font/woff2"]
+        return_data = {
+            "headers" : {}, 
+            "body" : "",
+            "status_code" : response.status_code
+        }
+        
+        # header key를 소문자로 바꾸기
+        return_data["headers"] = self.headerKeyToLower(str(response.headers))
 
-    return return_data
+        try:
+            body = decode(response.body, response.headers.get('Content-Encoding', 'identity'))
+            return_data["body"] = body.decode('utf-8')
 
-def getResponsePacket(data):
-    return_data = {
-        "headers" : {}, 
-        "body" : "",
-        "status_code" : data.status_code
-    }
+        except UnicodeDecodeError as e:        
+            if "content-type" in return_data["headers"].keys():
+                if return_data["headers"]["content-type"] in filter_content_type_list:
+                    return return_data
+
+            body = decode(response.body, response.headers.get('Content-Encoding', 'identity'))
+            return_data["body"] = body.decode("ISO-8859-1")
+
+        except UnicodeDecodeError as e:
+            # [*] Do not save image data...etc..
+            print("UnicodeDecodeError: " + str(e))
+        
+        return return_data
     
-    for x in str(data.headers).splitlines():
-        header = x.split(": ")
-        try: return_data["headers"][header[0].lower()] = header[1]
-        except: pass
 
-    try:
-        body = decode(data.body, data.headers.get('Content-Encoding', 'identity'))
-        return_data["body"] = body.decode('utf-8')
+    def deleteUselessBody(self):
+        content_types = ["text/css", "application/font-woff2"]
 
-    except UnicodeDecodeError as e:        
-        if "content-type" in return_data["headers"].keys():
-            if return_data["headers"]["content-type"] in content_image_type:
-                return return_data
-
-        body = decode(data.body, data.headers.get('Content-Encoding', 'identity'))
-        return_data["body"] = body.decode("ISO-8859-1")
-
-    except UnicodeDecodeError as e:
-        # [*] Do not save image data...etc..
-        print("UnicodeDecodeError: " + str(e))
+        for index in range(len(self.packets)):
+            if "content-type" in list(self.packets[index]["response"]["headers"].keys()):
+                for type in content_types:
+                    if self.packets[index]["response"]["headers"]["content-type"].find(type) != -1:
+                        self.packets[index]["response"]["body"] = ""
     
-    return return_data
 
-"""
+    def deleteFragment(self, links):
+        for index in range(len(links)):
+            parse = urlparse(links[index])
+            parse = parse._replace(fragment="")
+            links[index] = urlunparse(parse)
+
+        return links
+    
+
+    """
     This function filter only same domain when browser was redirected other site.
         - packets:      list (req, res packet)
-        - target_url:   String
+        - visited_url:   String
 
         - return:       list (req, res packet)
-"""
-def filterPath(packets, target_url):
-    result_packet = []
-
-    for packet in packets:
-        if packet["request"]["full_url"] == target_url:
-            result_packet.append(packet)
+    """
+    def filterPath(self, visited_url):
+        for packet in self.packets:
+            if packet["request"]["full_url"] == visited_url:
+                self.packets = list()
+                self.packets.append(packet)
+                break
     
-    return result_packet
 
-def deleteFragment(links):
-    for i in range(len(links)):
-        parse = urlparse(links[i])
-        parse = parse._replace(fragment="")
-        links[i] = urlunparse(parse)
+    def headerKeyToLower(self, headers):
+        return_data = {}
 
-    return links
+        for header in headers.splitlines():
+            header_info = header.split(": ")
+            try: return_data["headers"][header_info[0].lower()] = header_info[1]
+            except: pass
+        
+        return return_data
 
-def deleteUselessBody(packets):
-    content_types = ["text/css", "application/font-woff2"]
 
-    for index in range(len(packets)):
-        if "content-type" in list(packets[index]["response"]["headers"].keys()):
-            for type in content_types:
-                if packets[index]["response"]["headers"]["content-type"].find(type) != -1:
-                    packets[index]["response"]["body"] = ""
-
-    return packets
-
-def writeFile(data):
-    f = open("test.json", "w")
-    json.dump(data, f, indent=4)
-    f.close()
-
-if __name__ == "__main__":
-    # [!] You need to install the seleniumwire's root certificate. Visit below link.
-    #     SSL Error: https://github.com/wkeeling/selenium-wire#certificates
-
-    driver = webdriverSetting()
-    url = "https://kitribob.kr"
-    # driver.scopes = [
-    #     '.*youtube.*'
-    # ]
-
-    driver.get(url)
-    writeFile(start(driver))
+    def packetsToFile(self):
+        f = open("test.json", "w")
+        json.dump(self.packets, f, indent=4)
+        f.close()
