@@ -7,7 +7,8 @@ import re,json
 from Crawling import analyst
 from Crawling.feature.packet_capture import PacketCapture
 from Crawling.feature.get_res_links import GetReslinks
-from Crawling.feature import get_page_links, get_ports, get_cookies, csp_evaluator, db, func
+from Crawling.feature.csp_evaluator import cspAnalysis
+from Crawling.feature import get_page_links, get_ports, get_cookies, db, func
 from Crawling.feature.api import *
 from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing, adminPage
 
@@ -107,9 +108,9 @@ def visit(driver, url, depth, options):
             target_port = get_ports.getPortsOnline(START_OPTIONS["input_url"])
             db.insertPorts(target_port, START_OPTIONS["input_url"])
 
-    if "CSPEvaluate" in options["tool"]["optionalJobs"]:
-        csp_result = csp_evaluator.start(driver.current_url)
-        db.insertCSP(csp_result)
+        if "CSPEvaluate" in options["tool"]["optionalJobs"]:
+            csp_result = cspAnalysis().start(driver.current_url)
+            db.insertCSP(csp_result)
 
     packet_obj = PacketCapture()
     packet_obj.start(driver)
