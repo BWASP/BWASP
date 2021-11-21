@@ -135,7 +135,7 @@ def visit(driver, url, depth, options):
         packet_obj.packets[0]["open_redirect"] = True
         cur_page_links = list()
     else:
-        cur_page_links = GetPageLinks.start(driver.current_url, driver.page_source)
+        cur_page_links = GetPageLinks(driver.current_url, driver.page_source).start()
         cur_page_links += GetReslinks(driver.current_url, packet_obj.packets, driver.page_source).start()
         cur_page_links = list(set(packet_obj.deleteFragment(cur_page_links)))
     cookie_result = get_cookies.start(driver.current_url, packet_obj.packets)
