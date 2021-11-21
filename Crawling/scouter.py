@@ -6,7 +6,8 @@ import re,json
 
 from Crawling import analyst
 from Crawling.feature.packet_capture import PacketCapture
-from Crawling.feature import get_page_links, get_res_links, get_ports, get_cookies, csp_evaluator, db, func
+from Crawling.feature.get_res_links import GetReslinks
+from Crawling.feature import get_page_links, get_ports, get_cookies, csp_evaluator, db, func
 from Crawling.feature.api import *
 from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing, adminPage
 
@@ -120,7 +121,7 @@ def visit(driver, url, depth, options):
         cur_page_links = list()
     else:
         cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
-        cur_page_links += get_res_links.start(driver.current_url, packet_obj.packets, driver.page_source)
+        cur_page_links += GetReslinks(driver.current_url, packet_obj.packets, driver.page_source).start()
         cur_page_links = list(set(packet_obj.deleteFragment(cur_page_links)))
     cookie_result = get_cookies.start(driver.current_url, packet_obj.packets)
 
