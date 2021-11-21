@@ -27,7 +27,10 @@ class GetPort:
 
     def getPortsOnline(self, target_ip):
         if self.port_pattern.match(target_ip) is None:
-            target_ip = gethostbyname(urlparse(target_ip).netloc)
+            try:
+                target_ip = gethostbyname(urlparse(target_ip).netloc)
+            except:
+                return self.ports_list
 
         parse_html = BeautifulSoup(
             requests.get(self.port_scan["online"]["Get_port_information_url"] + target_ip).text,
