@@ -132,4 +132,4 @@ class CSPEvaluator(bwasp_db.Model):
         self.header = header
 
     def __repr__(self):
-        return f"<CSPEvaluator('{self.UUID}', '{self.header}')>"
+        return f"<CSPEvaluator('{self.header}')>"

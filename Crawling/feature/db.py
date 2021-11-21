@@ -15,7 +15,7 @@ def connect(table_name):
     db_engine = db.create_engine(db_path)
     db_connect = db_engine.connect()
     db_metadata = db.MetaData()
-    db_table = db.Table(table_name, db_metadata, autoload=True, autoload_with=db_engine)
+    db_table = db.Table(table_name, db_metadata, autoloadk=True, autoload_with=db_engine)
 
     return db_connect, db_table
 
@@ -44,7 +44,12 @@ def insertPackets(req_res_packets):
 def insertCSP(csp_result):
     ### REST API Code
     # url = "http://localhost:20102/api/csp_evaluator"
-    CSPEvaluator().PostCSPEvaluator(csp_result)
+    data_format = dict()
+    csp_data = list()
+    data_format["header"] = csp_result
+    csp_data.append(data_format)
+    csp_data = json.dumps(csp_data)
+    CSPEvaluator().PostCSPEvaluator(csp_data)
 
 
 # REST API: 도훈 Domains
