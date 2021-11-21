@@ -50,7 +50,7 @@ def insertCSP(csp_result):
 # REST API: 도훈 Domains
 # TODO
 # 중복된 url 이 있을 경우, 데이터를 넣어야 하는가?
-def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, http_method, infor_vector, robots_result, error_result, directory_indexing, admin_page):
+def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, analysis_data):
     # db_connect, db_table = connect("domain")
     '''
     [
@@ -91,7 +91,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             continue
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
         response_body = packet["response"]["body"]
-        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = inputTag(response_body, http_method, infor_vector)
+        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = inputTag(response_body, analysis_data["http_method"], analysis_data["infor_vector"])
 
         cors_check = corsCheck(packet)
         if cors_check != "None":
@@ -159,26 +159,26 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
             attack_vector["doubt"].pop("s3", None)
 
         #robots.txt check
-        if robots_result == True:
-            attack_vector["misc"]["robots.txt"] = robots_result
+        if analysis_data["robots_result"] == True:
+            attack_vector["misc"]["robots.txt"] = analysis_data["robots_result"]
         else:
             attack_vector["misc"].pop("robots.txt")
 
         #Error Page check
-        if error_result == True:
-            attack_vector["misc"]["error"] = error_result
+        if analysis_data["error_result"] == True:
+            attack_vector["misc"]["error"] = analysis_data["error_result"]
         else:
             attack_vector["misc"].pop("error")
         
         # directory indexing check
-        if len(directory_indexing) != 0:
-            attack_vector["misc"]["indexing"] = directory_indexing
+        if len(analysis_data["directory_indexing"]) != 0:
+            attack_vector["misc"]["indexing"] = analysis_data["directory_indexing"]
         else:
             attack_vector["misc"].pop("indexing")
         
         # admin page check
-        if len(admin_page) != 0:
-            attack_vector["misc"]["admin page"] = admin_page
+        if len(analysis_data["admin_page"]) != 0:
+            attack_vector["misc"]["admin page"] = analysis_data["admin_page"]
         else:
             attack_vector["misc"].pop("admin page")
 
