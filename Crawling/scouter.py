@@ -14,49 +14,61 @@ from Crawling.feature import get_cookies, db, func
 from Crawling.feature.api import *
 from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing, adminPage
 
-# TODO
-# 사용자가 여러개의 사이트를 동시에 테스트 할 때, 전역 변수의 관리 문제
-START_OPTIONS = {
-    "check" : True,
-    "input_url" : "",
-    "visited_links" : [],
-    "count_links" : {},
-    "previous_packet_count" : 0 #누적 패킷 개수
-}
-ANALYSIS_DATA = {
-    "http_method": None,
-    "infor_vector": None,
-    "robots_result": False,
-    "error_result": False,
-    "directory_indexing": list(),
-    "admin_page": list()
-}
-LOAD_PACKET_INDEXES = list() # automation packet indexes 
-process_list = list()
+
+def initGlobal():
+    global START_OPTIONS
+    global ANALYSIS_DATA 
+    global LOAD_PACKET_INDEXES
+    global PROCESS_LIST
+    global DETECT_LIST
+    global LOCK
+
+    START_OPTIONS = {
+        "check" : True,
+        "input_url" : "",
+        "visited_links" : [],
+        "count_links" : {},
+        "previous_packet_count" : 0 #누적 패킷 개수
+    }
+
+    ANALYSIS_DATA = {
+        "http_method": None,
+        "infor_vector": None,
+        "robots_result": False,
+        "error_result": False,
+        "directory_indexing": list(),
+        "admin_page": list()
+    }
+
+    LOAD_PACKET_INDEXES = list() # automation packet indexes 
+    PROCESS_LIST = list()
+    DETECT_LIST = list()
+    LOCK = None
+    
+
+initGlobal()
 
 def start(url, depth, options):
     global START_OPTIONS
-    global process_list
-    global detect_list
-    global lock
+    global PROCESS_LIST
+    global DETECT_LIST
+    global LOCK
 
     manager = Manager()
-    detect_list = manager.list()
-    detect_list.append({})
-    lock = manager.Lock()
+    DETECT_LIST = manager.list()
+    DETECT_LIST.append({})
+    LOCK = manager.Lock()
+
     driver = initSelenium()
     visit(driver, url, depth, options)
 
-    for each_process in process_list:
+    for each_process in PROCESS_LIST:
         each_process.join()
-    driver.quit()
-    
-    START_OPTIONS["check"] = True
-    START_OPTIONS["input_url"] = ""
-    START_OPTIONS["visited_links"] = []
-    START_OPTIONS["count_links"] = {}
 
-def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, detect_list, lock, current_url, previous_packet_count, ANALYSIS_DATA):
+    driver.quit()
+    initGlobal()
+
+def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, DETECT_LIST, LOCK, current_url, previous_packet_count, ANALYSIS_DATA):
     global START_OPTIONS
     global LOAD_PACKET_INDEXES
 
@@ -68,21 +80,21 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
 
     packet_indexes = LOAD_PACKET_INDEXES[previous_packet_count : recent_packet_count]
     #analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
-    analyst.start(detect_list, lock, input_url, req_res_packets, cur_page_links, current_url, packet_indexes, options['info'])
+    analyst.start(DETECT_LIST, LOCK, input_url, req_res_packets, cur_page_links, current_url, packet_indexes, options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
 
     db.insertDomains(req_res_packets, cookie_result, packet_indexes , input_url, ANALYSIS_DATA) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
-    db.updateWebInfo(detect_list[0])
+    db.updateWebInfo(DETECT_LIST[0])
     
     return 1
 
 def visit(driver, url, depth, options):
     global START_OPTIONS
     global ANALYSIS_DATA
-    global process_list
-    global detect_list
-    global lock
+    global PROCESS_LIST
+    global DETECT_LIST
+    global LOCK
 
     try:
         driver.get(url)
@@ -123,22 +135,22 @@ def visit(driver, url, depth, options):
         packet_obj.packets[0]["open_redirect"] = True
         cur_page_links = list()
     else:
-        cur_page_links = GetPageLinks.start(driver.current_url, driver.page_source)
+        cur_page_links = get_page_links.start(driver.current_url, driver.page_source)
         cur_page_links += GetReslinks(driver.current_url, packet_obj.packets, driver.page_source).start()
         cur_page_links = list(set(packet_obj.deleteFragment(cur_page_links)))
     cookie_result = get_cookies.start(driver.current_url, packet_obj.packets)
 
     packet_obj.deleteUselessBody()
     db.insertPackets(packet_obj.packets)
-    p = Process(target=analysis, args=(START_OPTIONS['input_url'], packet_obj.packets, cur_page_links, options, cookie_result, detect_list, lock, driver.current_url, START_OPTIONS["previous_packet_count"], ANALYSIS_DATA)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p = Process(target=analysis, args=(START_OPTIONS['input_url'], packet_obj.packets, cur_page_links, options, cookie_result, DETECT_LIST, LOCK, driver.current_url, START_OPTIONS["previous_packet_count"], ANALYSIS_DATA)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
     START_OPTIONS["previous_packet_count"] += len(packet_obj.packets)
     p.start()
-    process_list.append(p)
+    PROCESS_LIST.append(p)
 
-    if len(process_list) > 3:
-        for process in process_list:
+    if len(PROCESS_LIST) > 3:
+        for process in PROCESS_LIST:
             process.join()
-        process_list = list()
+        PROCESS_LIST = list()
 
     if depth == 0:
         return
