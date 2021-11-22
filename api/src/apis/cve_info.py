@@ -53,7 +53,7 @@ class Cve_information_data_access_object(object):
             cveModel.description.like(f"%{framework}%"), cveModel.description.like(f"%{version}%")
         )
 
-        self.counter = self.selectData.order_by(cveModel.year.desc()).limit(self.limitCount).count()
+        self.counter = self.selectData.order_by(cveModel.year.desc()).count()
         return {"count": int(self.counter)}
 
 
