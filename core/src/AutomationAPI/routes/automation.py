@@ -15,7 +15,6 @@ bp = Blueprint(NAME, __name__, url_prefix='/')
 def DataReqRes():
     if request.method == 'POST':
         reqJsonData = request.get_json()
-        print("@@@@@@@@@@@@@@@@@@@", reqJsonData)
 
         data = [{"targetURL": reqJsonData['target']['url'],
                  "knownInfo": json.dumps(reqJsonData['info']),
@@ -27,7 +26,7 @@ def DataReqRes():
 
         try:
             requests.post(
-                url="http://localhost:20102/api/job",
+                url="http://172.21.0.4:20102/api/job",
                 headers={"accept": "application/json", "Content-Type": "application/json"},
                 data=json.dumps(data)
             )
