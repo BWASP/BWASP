@@ -14,7 +14,7 @@ bp = Blueprint(NAME, __name__, url_prefix='/')
 @bp.route('/', methods=['GET', 'POST'])
 def DataReqRes():
     if request.method == 'POST':
-        reqJsonData = request.form.get_json()
+        reqJsonData = request.get_json()
 
         data = [{"targetURL": reqJsonData['target']['url'],
                  "knownInfo": json.dumps(reqJsonData['info']),
