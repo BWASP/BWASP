@@ -52,10 +52,7 @@ class Packet_data_access_object(object):
         if id is not None and Type is False:
             self.selectData = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.category == self.DefineManual, packetsModel.id == id).count()
 
-        if self.selectData != 0:
-            return True
-
-        return False
+        return True if self.selectData != 0 else False
 
     # id count in table of packets
     def get_return_row_count(self, Type=None):
@@ -165,6 +162,7 @@ data_access_object_for_packet = Packet_data_access_object()
 @ns.route('')
 class All_packets_list(Resource):
     """Shows a list of all packets"""
+
     @ns.doc("List of all packets")
     @ns.marshal_list_with(packet)
     def get(self):
