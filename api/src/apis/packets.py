@@ -160,7 +160,7 @@ data_access_object_for_packet = Packet_data_access_object()
 
 
 # Packets
-@ns.route('/{id}')
+@ns.route('/<int:id>')
 @ns.response(404, 'packet not found')
 @ns.param('id', 'Packet id for unique identifier')
 class All_packets_list(Resource):
