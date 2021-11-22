@@ -68,6 +68,13 @@ class Packet_data_access_object(object):
         if Type is False:
             return {"count": int(self.Manual_Counter)}
 
+    def get_all_packets(self):
+        if self.get_return_row_count(Type=True)["count"] < 1 and self.get_return_row_count(Type=False)["count"] < 1:
+            ns.abort(404, f"packet doesn't exist")
+
+        self.selectData = g.bwasp_db_obj.query(packetsModel).all()
+        return self.selectData
+
     def get_automation(self, id=None, Type=False):
         if Type is False and id is None:
             self.selectData = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.category == self.DefineAutomation).all()
@@ -155,6 +162,15 @@ data_access_object_for_packet = Packet_data_access_object()
 
 
 # Packets
+@ns.route('')
+class All_packets_list(Resource):
+    """Shows a list of all packets"""
+    @ns.doc("List of all packets")
+    @ns.marshal_list_with(packet)
+    def get(self):
+        return data_access_object_for_packet.get_all_packets()
+
+
 @ns.route('/automation')
 class Automation_packet_list(Resource):
     """Shows a list of all automation packets, and lets you POST to add new data"""
