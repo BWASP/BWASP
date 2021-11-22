@@ -200,41 +200,21 @@ document.getElementById("modal-start-job").addEventListener("click", () => {
         recursiveLevel: Number(requestData.tool.analysisLevel),
         uriPath: requestData.target.path
     };
-    fetch("/automation/options", {
+    fetch("/api/job/enroll", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
         },
         body: new URLSearchParams({
-            reqJsonData: JSON.stringify(requestData)
+            analysisOption: JSON.stringify(requestData)
         })
-    }).then(() => console.log("Done"));
-
-    alert("Job has just started!\nRedirecting to dashboard");
-    document.location.replace("/dashboard");
-    /*
-    .then(response => {
-        let setResult = (result) => {
-            if (Boolean(result)) {
-                alert("Job has just requested.\nRedirecting you to Dashboard...");
-                document.location.replace("/dashboard");
-            } else {
-                alert("Failed to create job.")
-            }
-        }
-
-        if (!verifyOutput) setResult(true);
-        else {
-            response.json().then(json => {
-                if (json.success) {
-                    setResult(true);
-                } else {
-                    setResult(false);
-                }
-            });
-        }
-    })
-     */
+    }).then(blob => blob.json())
+        .then((res)=>{
+            console.log(res);
+        });
+    if(confirm("[개발용 메시지] 요청이 제출되었습니다.\n페이지를 다시 로드하시겠습니까?")) location.reload();
+    // alert("Job has just started!\nRedirecting to dashboard");
+    // document.location.replace("/dashboard");
 })
 
 // Handler for submit check modal
