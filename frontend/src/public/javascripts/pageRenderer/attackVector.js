@@ -80,14 +80,14 @@ let returnError = (errorMessage = ["No data", ""]) => {
     // Flexible data reactor
     let messages = [
         (condition.isFromHelper)
-            ? errorMessage.name
+            ? errorMessage[0]
             : (condition.isString)
-                ? errorMessage[0]
+                ? errorMessage.name
                 : errorMessage,
         (condition.isFromHelper)
-            ? errorMessage.message
+            ? errorMessage[1]
             : (condition.isString)
-                ? errorMessage[1]
+                ? errorMessage.message
                 : "",
     ];
 
