@@ -8,6 +8,7 @@ RUN ["pip", "install", "-r", "/tmp/requirements.txt"]
 # App directory
 WORKDIR /usr/src/app
 COPY src/. .
+COPY dataset/attack_vector.json ./Crawling
 
 # RUN Python
 CMD ["python3", "app.py"]

@@ -1,0 +1,28 @@
+{
+  "info": {
+    "allowMethod": []
+  },
+  "doubt": {
+    "SQL injection": {
+      "type": [
+        "None"
+      ]
+    },
+    "XSS": {
+      "type": [
+        "None"
+      ],
+      "required": []
+    },
+    "CORS": false,
+    "Open Redirect": "url",
+    "s3": [],
+    "File Upload": false
+  },
+  "misc": {
+    "robots.txt": false,
+    "error": false,
+    "indexing": [],
+    "admin page": []
+  }
+}
