@@ -11,3 +11,4 @@ Scripts/
 Lib/
 pyvenv.cfg
 Crawling/config/api.json
+/frontend/src/public/datasets/
