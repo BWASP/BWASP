@@ -15,24 +15,6 @@ bp = Blueprint(NAME, __name__, url_prefix='/')
 def DataReqRes():
     if request.method == 'POST':
         reqJsonData = request.get_json()
-
-        data = [{"targetURL": reqJsonData['target']['url'],
-                 "knownInfo": json.dumps(reqJsonData['info']),
-                 "recursiveLevel": reqJsonData['tool']['analysisLevel'],
-                 "uriPath": reqJsonData['target']['path'],
-                 "done": 0,
-                 "maximumProcess": "None"
-                 }]
-
-        try:
-            requests.post(
-                url="http://172.21.0.4:20102/api/job",
-                headers={"accept": "application/json", "Content-Type": "application/json"},
-                data=json.dumps(data)
-            )
-        except:
-            abort(500, "Automation option setting data request error")
-
         start(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
 
     return render_template_string("The BoB Web Application Security Project")
