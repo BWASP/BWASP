@@ -13,12 +13,6 @@ router.post('/job/enroll', function (req, res, next) {
     // Send error if analysis option not presented
     if (typeof (req.body.analysisOption) === "undefined") return sendErrorToUser(res, 400, "Bad request");
     let analysisOption = JSON.parse(req.body.analysisOption);
-    console.log(analysisOption);
-
-    // Submit analysis option to job API
-    axios.get("http://bwasp-api-1:20102/api/job")
-        .then(res=>console.log("0 Success!", res))
-        .catch(fail=>console.log("1 Failed!", fail));
 
     axios.post("http://bwasp-api-1:20102/api/job", [{
         targetURL: analysisOption.target.url,
@@ -30,12 +24,14 @@ router.post('/job/enroll', function (req, res, next) {
     }])
         .then(jobDataSubmitRes => {
             console.log("\n[ SUCCESS ] Job data submission \n");
-            axios.post("bwasp-core-1:20302", analysisOption)
-                .then(jobSubmitRes => console.log("\n[ SUCCESS ] Final job order \n"))
+            axios.post("http://bwasp-core-1:20302", analysisOption)
+                .then(jobSubmitRes => {
+                    console.log("\n[ SUCCESS ] Final job order \n")
+                    res.send("Submitted!");
+                })
                 .catch(jobSubmitError => {
-                    console.log("\n[ FAIL ] Final job order \n================\n\n", jobSubmitError.response.data, "\n\n================")
+                    console.log("\n[ FAIL ] Final job order \n================\n\n", jobSubmitError, "\n\n================")
                 });
-            res.send("Submitted!");
         })
         .catch(jobDataSubmitError => {
             console.log("\n[ FAIL ] Job data submission \n================\n\n", jobDataSubmitError, "\n\n================")
