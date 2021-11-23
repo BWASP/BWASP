@@ -1,5 +1,6 @@
 import requests
 
+
 class cspAnalysis:
     def __init__(self):
         self.third_data = dict()
@@ -26,7 +27,7 @@ class cspAnalysis:
                 length = len(r.headers['content-security-policy'].split(';'))
                 for i in range(0, length):
                     self.second_data = first_data[i].split(' ')
-                    if len(self.second_data) > 2: #value가 2개 이상인 경우 파악
+                    if len(self.second_data) > 2:  # value가 2개 이상인 경우 파악
                         self.cspAnalyst()
                     elif len(self.second_data) == 3:
                         self.third_data[self.second_data[1]] = self.second_data[2]
@@ -36,6 +37,7 @@ class cspAnalysis:
             pass
 
         return self.third_data
+
 
 '''
 if __name__ == "__main__":
