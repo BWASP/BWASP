@@ -14,7 +14,7 @@ router.post('/job/enroll', function (req, res, next) {
     if (typeof (req.body.analysisOption) === "undefined") return sendErrorToUser(res, 400, "Bad request");
     let analysisOption = JSON.parse(req.body.analysisOption);
 
-    axios.post("http://bwasp-api-1:20102/api/job", [{
+    axios.post(res.locals.API.api + "/api/job", [{
         targetURL: analysisOption.target.url,
         knownInfo: analysisOption.info,
         recursiveLevel: analysisOption.tool.analysisLevel,
@@ -24,7 +24,8 @@ router.post('/job/enroll', function (req, res, next) {
     }])
         .then(jobDataSubmitRes => {
             console.log("\n[ SUCCESS ] Job data submission \n");
-            axios.post("http://bwasp-core-1:20302", analysisOption)
+
+            axios.post(res.locals.API.core.auto, analysisOption)
                 .then(jobSubmitRes => {
                     console.log("\n[ SUCCESS ] Final job order \n")
                     res.send("Submitted!");

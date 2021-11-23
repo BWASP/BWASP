@@ -1,0 +1,16 @@
+{
+  "api": {
+    "url": "http://bwasp-api-1",
+    "port": 20102
+  },
+  "core": {
+    "auto": {
+      "url": "http://bwasp-core-1",
+      "port": 20302
+    },
+    "manual": {
+      "url": "http://bwasp-core-1",
+      "port": 20202
+    }
+  }
+}
