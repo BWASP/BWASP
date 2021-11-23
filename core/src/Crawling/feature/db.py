@@ -1,9 +1,9 @@
 import os, json, requests
 from urllib.parse import urlparse, urlunparse
 
-from feature import func
-from attack_vector import *
-from api import (
+from .func import *
+from Crawling.attack_vector import *
+from .api import (
     Packets as APIofPackets,
     Domain as APIofDomain,
     CSPEvaluator as APIofCSPEvaluator,
@@ -94,9 +94,9 @@ class Domains:
         data = []
 
         for i, packet in enumerate(req_res_packets):
-            if not func.isSameDomain(target_url, packet["request"]["full_url"]):
+            if not isSameDomain(target_url, packet["request"]["full_url"]):
                 continue
-            if func.isExistExtension(packet["request"]["full_url"], ["image", "style", "font"]):
+            if isExistExtension(packet["request"]["full_url"], ["image", "style", "font"]):
                 continue
             # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
             response_body = packet["response"]["body"]
