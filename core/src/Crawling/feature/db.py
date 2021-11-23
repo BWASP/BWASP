@@ -241,12 +241,12 @@ class SystemInformation:
         self.reqData = list()
         self.portsFormat = {
             "POST": {
-                "url": input_url,
+                "url": "",
                 "data": "None"  # prefixed
             },
             "UPDATE": {
                 "id": 1,  # prefixed
-                "data": analyst_result
+                "data": ""
             }
         }
 
