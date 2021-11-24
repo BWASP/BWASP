@@ -133,7 +133,7 @@ class PacketCapture:
 
         for header in headers.splitlines():
             header_info = header.split(": ")
-            try: return_data["headers"][header_info[0].lower()] = header_info[1]
+            try: return_data[header_info[0].lower()] = header_info[1]
             except: pass
         
         return return_data
