@@ -3,7 +3,7 @@ import os, requests, datetime
 
 class Config(object):
     def __init__(self):
-        self.API_URL_PREFIX = "http://localhost:20102"
+        self.API_URL_PREFIX = "http://bwasp-api-1:20102"
 
     def ret_API_URL_PREFIX(self):
         return self.API_URL_PREFIX

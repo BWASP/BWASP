@@ -3,8 +3,14 @@ from flask import (
 )
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_cors import CORS
-from models.BWASP import bwasp_db
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+
+# from models.BWASP import bwasp_db
 from models.CVE import cve_db
+
+db = SQLAlchemy()
+migrate = Migrate()
 
 
 def create_app(config=None):
@@ -26,22 +32,35 @@ def create_app(config=None):
     from apis import blueprint as api
     app.register_blueprint(api)
 
-    # App context initialization
-    app.app_context().push()
-
     # Database initialization
-    bwasp_db.init_app(app)
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    from models.BWASP import (
+        packets,
+        domain,
+        job,
+        ports,
+        systeminfo,
+        CSPEvaluator
+    )
+
+    # bwasp_db.init_app(app)
     cve_db.init_app(app)
-    bwasp_db.app = app
+    # bwasp_db.app = app
     cve_db.app = app
 
     # Database create
-    bwasp_db.create_all()
+    # bwasp_db.create_all()
+    # db.create_all()
+
+    # App context initialization
+    app.app_context().push()
 
     @app.before_request
     def before_request():
         # g object session initialization
-        g.bwasp_db_obj = bwasp_db.session
+        g.bwasp_db_obj = db.session
         g.cve_db_obj = cve_db.session
 
     @app.teardown_request
