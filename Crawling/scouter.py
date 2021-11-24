@@ -37,7 +37,8 @@ def initGlobal():
         "robots_result": False,
         "error_result": False,
         "directory_indexing": list(),
-        "admin_page": list()
+        "admin_page": list(),
+        "attack_option": True
     }
 
     LOAD_PACKET_INDEXES = list() # automation packet indexes 
@@ -125,6 +126,9 @@ def visit(driver, url, depth, options):
         if "CSPEvaluate" in options["tool"]["optionalJobs"]:
             csp_result = cspAnalysis().start(driver.current_url)
             db.insertCSP(csp_result)
+
+        #if "attackoption" in options["tool"]["optionalJobs"]:
+        #    ANALYSIS_DATA["attack_option"] = True
 
     packet_obj = PacketCapture()
     packet_obj.start(driver)

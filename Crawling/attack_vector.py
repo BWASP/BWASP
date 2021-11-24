@@ -44,7 +44,7 @@ def attackHeader(target_url):
     return http_method, infor_vector
 
 
-def inputTag(response_body, http_method, infor_vector):
+def inputTag(response_body, http_method, infor_vector, attack_option, target_url, current_url):
     # form tag action and input tag and input name parse
     try:
         soup = BeautifulSoup(response_body, 'html.parser')
@@ -157,6 +157,46 @@ def inputTag(response_body, http_method, infor_vector):
                     if "File Upload" in data["doubt"]:
                         data["doubt"].pop("File Upload")
 
+                #~~~~~~~~~~~~~attack option
+                if attack_option == True:
+                    cheat_sheet = "'1"
+                    for tag in form:
+                        try:
+                            if "" in tag.attrs['action']:
+                                attack_url = current_url
+                            else:
+                                attack_url = target_url + tag.attrs['action']
+                            attack_tag = tag.find_all('input')
+                            param = dict()
+                            for i in range(len(attack_tag)):
+                                try:
+                                    param[attack_tag[i].attrs['name']] = cheat_sheet
+                                except: #input tag not name except
+                                    pass
+
+                            s = requests.Session().post(attack_url, data=param)
+
+                            if s.status_code != 200:
+                                if "detect" in data["doubt"]["SQL injection"]["type"]:
+                                    pass
+                                else:
+                                    data["doubt"]["SQL injection"]["type"].append("detect")
+                                    impactRate = 2
+
+                            elif "error in your sql" in s.text.lower() or "server error in" in s.text.lower()\
+                                    or "fatal error" in s.text.lower() or "database engine error" in s.text.lower()\
+                                    or "not properly" in s.text.lower() or "db provider" in s.text.lower()\
+                                    or "psqlexception" in s.text.lower() or "query failed" in s.text.lower()\
+                                    or "microsoft sql native" in s.text.lower():
+                                if "detect" in data["doubt"]["SQL injection"]["type"]:
+                                    pass
+                                else:
+                                    data["doubt"]["SQL injection"]["type"].append("detect")
+                                    impactRate = 2
+                        except:
+                            pass
+
+
         attack_vector = data
 
     else:
@@ -184,6 +224,7 @@ def inputTag(response_body, http_method, infor_vector):
                 action_type.append(base64.b64encode(tag.attrs['method'].encode('utf-8')).decode('utf-8'))
             except:
                 pass
+
                 
     return tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate
 
