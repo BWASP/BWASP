@@ -18,4 +18,4 @@ COPY src/. .
 # CMD ["python3", "app.py"]
 
 RUN ["chmod", "+x", "/tmp/docker-entrypoint.sh"]
-ENTRYPOINT ["/tmp/docker-entrypoint.sh"]
+ENTRYPOINT ["sh","/tmp/docker-entrypoint.sh"]

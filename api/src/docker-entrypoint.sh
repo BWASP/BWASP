@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 dockerize -wait tcp://bwasp-database-1:3306 -timeout 20s
 
