@@ -16,7 +16,7 @@ from .api import (
 class Packets:
     def __init__(self):
         self.reqData = list()
-
+        self.packetsFormat = dict()
 
     def insertPackets(self, req_res_packets):
         for packetData in req_res_packets:
@@ -26,7 +26,7 @@ class Packets:
                 "requestJson": packetData["request"],
                 "responseHeader": packetData["response"]["headers"],
                 "responseBody": packetData["response"]["body"]
-                }
+            }
             self.reqData.append(self.packetsFormat)
 
         APIofPackets().PostAutomation(json.dumps(self.reqData))
@@ -213,20 +213,17 @@ class Domains:
 class Ports:
     def __init__(self):
         self.reqData = list()
-        self.portsFormat = {
-            "service": "",
-            "target": "",
-            "port": "",
-            "result": "Open"  # prefixed
-        }
+        self.portsFormat = dict()
 
     def insertPorts(self, port_list, target_url):
         for services in port_list.keys():
-            self.portsFormat["service"] = port_list[services]
-            self.portsFormat["target"] = target_url
-            self.portsFormat["port"] = services
-
-        self.reqData.append(self.portsFormat)
+            self.portsFormat = {
+                "service": port_list[services],
+                "target": target_url,
+                "port": services,
+                "result": "Open"  # prefixed
+            }
+            self.reqData.append(self.portsFormat)
 
         APIofPorts().PostPorts(json.dumps(self.reqData))
 
