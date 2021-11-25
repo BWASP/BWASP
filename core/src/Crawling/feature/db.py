@@ -16,23 +16,18 @@ from .api import (
 class Packets:
     def __init__(self):
         self.reqData = list()
-        self.packetsFormat = {
-            "statusCode": 0,
-            "requestType": "",
-            "requestJson": "",
-            "responseHeader": "",
-            "responseBody": ""
-        }
+
 
     def insertPackets(self, req_res_packets):
         for packetData in req_res_packets:
-            self.packetsFormat["statusCode"] = packetData["response"]["status_code"]
-            self.packetsFormat["requestType"] = packetData["request"]["method"]
-            self.packetsFormat["requestJson"] = packetData["request"]
-            self.packetsFormat["responseHeader"] = packetData["response"]["headers"]
-            self.packetsFormat["responseBody"] = packetData["response"]["body"]
-
-        self.reqData.append(self.packetsFormat)
+            self.packetsFormat = {
+                "statusCode": packetData["response"]["status_code"],
+                "requestType": packetData["request"]["method"],
+                "requestJson": packetData["request"],
+                "responseHeader": packetData["response"]["headers"],
+                "responseBody": packetData["response"]["body"]
+                }
+            self.reqData.append(self.packetsFormat)
 
         APIofPackets().PostAutomation(json.dumps(self.reqData))
 
