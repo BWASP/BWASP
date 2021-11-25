@@ -6,7 +6,8 @@
     "SQL injection": {
       "type": [
         "None"
-      ]
+      ],
+      "detect": []
     },
     "XSS": {
       "type": [

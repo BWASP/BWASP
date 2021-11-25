@@ -6,7 +6,6 @@ from requests import api
 
 from Crawling.feature import func
 
-
 def attackHeader(target_url):
     dict_data = requests.get(target_url, verify=False).headers
     infor_data = ""
@@ -85,7 +84,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                 except:
                     pass
 
-                #~~~~~~~~~~~~SQL Injection and XSS
+                # ~~~~~~~~~~~~SQL Injection and XSS
 
                 # th tag check (board) and type="password" check (login)
                 if "<th" in response_body:
@@ -111,7 +110,8 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                             del (data["doubt"]["SQL injection"]["type"][index_sql])
                             del (data["doubt"]["XSS"]["type"][index_xss])
 
-                        if "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"]["type"]:
+                        if "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"][
+                            "type"]:
                             pass
                         else:
                             data["doubt"]["SQL injection"]["type"].append("account")
@@ -122,7 +122,8 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                     pass
 
                 if "board" in data["doubt"]["SQL injection"]["type"] or "board" in data["doubt"]["XSS"]["type"] \
-                        or "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"]["type"] \
+                        or "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"][
+                    "type"] \
                         or "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
                     pass
                 else:
@@ -146,7 +147,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                         impactRate = 1
 
                 try:
-                    #~~~~~~~~~~~~File Upload
+                    # ~~~~~~~~~~~~File Upload
                     if tag.attrs['type'] == "file":
                         data["doubt"]["File Upload"] = True
 
@@ -157,9 +158,53 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                     if "File Upload" in data["doubt"]:
                         data["doubt"].pop("File Upload")
 
-                #~~~~~~~~~~~~~attack option
-                if attack_option == True:
-                    cheat_sheet = "'1"
+                # ~~~~~~~~~~~~~attack option
+        if attack_option == True:
+            # cheat sheet open
+            with open("./cheat_sheet.txt", 'r', encoding='UTF-8') as f:
+                while True:
+                    cheat_sheet = f.readline()
+                    cheat_sheet = cheat_sheet.replace("\n", "")
+
+                    # current page attack
+                    url_part = urlparse(current_url)
+                    domain_params = dict()
+                    if url_part.query != "":
+                        try:
+                            if "&" in url_part.query:
+                                param_list = url_part.query.split("&")
+                                for param_data in param_list:
+                                    domain_params[param_data.split('=')[0]] = param_data.split('=')[1]
+                            else:
+                                param_data = url_part.query
+                                domain_params[param_data.split('=')[0]] = param_data.split('=')[1]
+                        except:
+                            domain_params[param_data.split('=')[0]] = "None"
+
+                    for keys in list(domain_params.keys()):
+                        param = dict()
+                        param[keys] = cheat_sheet
+                        attack_url = target_url+url_part.path+"?"+keys+"="+cheat_sheet
+                        s = requests.Session().post(attack_url)
+                        if s.status_code == 500 or s.status_code == 501 or s.status_code == 502 or s.status_code == 503 \
+                                or s.status_code == 504 or s.status_code == 505 or s.status_code == 506 or s.status_code == 507 \
+                                or s.status_code == 508 or s.status_code == 509 or s.status_code == 510:
+                            data["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
+                            data["doubt"]["SQL injection"]["detect"].append({"param": param})
+                            data["doubt"]["SQL injection"]["detect"].append({"type": "status 500~510"})
+                            impactRate = 2
+
+                        elif "error in your sql" in s.text.lower() or "server error in" in s.text.lower() \
+                                or "fatal error" in s.text.lower() or "database engine error" in s.text.lower() \
+                                or "not properly" in s.text.lower() or "db provider" in s.text.lower() \
+                                or "psqlexception" in s.text.lower() or "query failed" in s.text.lower() \
+                                or "microsoft sql native" in s.text.lower():
+                            data["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
+                            data["doubt"]["SQL injection"]["detect"].append({"param": param})
+                            data["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
+                            impactRate = 2
+
+                    # action page attack
                     for tag in form:
                         try:
                             if "" in tag.attrs['action']:
@@ -171,31 +216,31 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                             for i in range(len(attack_tag)):
                                 try:
                                     param[attack_tag[i].attrs['name']] = cheat_sheet
-                                except: #input tag not name except
+                                except:  # input tag not name except
                                     pass
 
                             s = requests.Session().post(attack_url, data=param)
 
-                            if s.status_code != 200:
-                                if "detect" in data["doubt"]["SQL injection"]["type"]:
-                                    pass
-                                else:
-                                    data["doubt"]["SQL injection"]["type"].append("detect")
-                                    impactRate = 2
+                            if s.status_code == 500 or s.status_code == 501 or s.status_code == 502 or s.status_code == 503 \
+                                    or s.status_code == 504 or s.status_code == 505 or s.status_code == 506 or s.status_code == 507 \
+                                    or s.status_code == 508 or s.status_code == 509 or s.status_code == 510:
+                                data["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
+                                data["doubt"]["SQL injection"]["detect"].append({"param": param})
+                                data["doubt"]["SQL injection"]["detect"].append({"type": "status 500~510"})
+                                impactRate = 2
 
-                            elif "error in your sql" in s.text.lower() or "server error in" in s.text.lower()\
-                                    or "fatal error" in s.text.lower() or "database engine error" in s.text.lower()\
-                                    or "not properly" in s.text.lower() or "db provider" in s.text.lower()\
-                                    or "psqlexception" in s.text.lower() or "query failed" in s.text.lower()\
+                            elif "error in your sql" in s.text.lower() or "server error in" in s.text.lower() \
+                                    or "fatal error" in s.text.lower() or "database engine error" in s.text.lower() \
+                                    or "not properly" in s.text.lower() or "db provider" in s.text.lower() \
+                                    or "psqlexception" in s.text.lower() or "query failed" in s.text.lower() \
                                     or "microsoft sql native" in s.text.lower():
-                                if "detect" in data["doubt"]["SQL injection"]["type"]:
-                                    pass
-                                else:
-                                    data["doubt"]["SQL injection"]["type"].append("detect")
-                                    impactRate = 2
+                                data["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
+                                data["doubt"]["SQL injection"]["detect"].append({"param": param})
+                                data["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
+                                impactRate = 2
                         except:
                             pass
-
+                    if not cheat_sheet: break
 
         attack_vector = data
 
