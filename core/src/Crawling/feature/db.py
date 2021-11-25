@@ -254,7 +254,7 @@ class SystemInformation:
         self.portsFormat["POST"]["url"] = input_url
         self.reqData.append(self.portsFormat["POST"])
 
-        SystemInfo().PostSystemInfo(json.dumps(self.reqData))
+        APIofSystemInfo().PostSystemInfo(json.dumps(self.reqData))
 
     def updateWebInfo(self, analyst_result):
         self.portsFormat["UPDATE"]["data"] = analyst_result
