@@ -6,7 +6,6 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
-# from models.BWASP import bwasp_db
 from models.CVE import cve_db
 
 db = SQLAlchemy()
@@ -28,31 +27,13 @@ def create_app(config=None):
 
     app.config.from_object(config)
 
-    # API route initialization.
-    from apis import blueprint as api
+    # DATABASE API route initialization.
+    from apis import bp as api
     app.register_blueprint(api)
 
-    # Database initialization
-    db.init_app(app)
-    migrate.init_app(app, db)
-
-    from models.BWASP import (
-        packets,
-        domain,
-        job,
-        ports,
-        systeminfo,
-        CSPEvaluator
-    )
-
-    # bwasp_db.init_app(app)
-    cve_db.init_app(app)
-    # bwasp_db.app = app
-    cve_db.app = app
-
-    # Database create
-    # bwasp_db.create_all()
-    # db.create_all()
+    # DATABASE MANAGE API route initialization.
+    from task_managements import manage
+    app.register_blueprint(manage.bp)
 
     # App context initialization
     app.app_context().push()
@@ -72,6 +53,25 @@ def create_app(config=None):
             g.cve_db_obj.close()
 
     return app
+
+
+def CreateDB(app):
+    # Database initialization
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    from models.BWASP import (
+        packets,
+        domain,
+        job,
+        ports,
+        systeminfo,
+        CSPEvaluator
+    )
+
+    cve_db.init_app(app)
+    cve_db.app = app
+
 
 
 if __name__ == '__main__':

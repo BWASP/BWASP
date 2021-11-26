@@ -3,6 +3,7 @@ import json
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
 from .api_returnObj import Return_object
+from .api_custom_fields import StringToJSON
 import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -16,14 +17,14 @@ domain = ns.model('domain model', {
     'related_Packet': fields.Integer(required=True, description='The unique identifier based on packet id'),
     'URL': fields.String(required=True, description='target URL'),
     'URI': fields.String(required=True, description='target URI'),
-    'action_URL': fields.String(required=True, description='target action URL'),
-    'action_URL_Type': fields.String(required=True, description='target action URL'),
-    'params': fields.String(required=True, description='target URL parameter'),
+    'action_URL': StringToJSON(required=True, description='target action URL'),
+    'action_URL_Type': StringToJSON(required=True, description='target action URL'),
+    'params': StringToJSON(required=True, description='target URL parameter'),
     'comment': fields.String(required=True, description='target Web page HTML comment'),
-    'attackVector': fields.String(required=True, description='Attack vector about CVE, Analysis data'),
+    'attackVector': StringToJSON(required=True, description='Attack vector about CVE, Analysis data'),
     'impactRate': fields.Integer(required=True, description='target attack vector Typical Serverity'),
     'description': fields.String(required=True, description='attack vector description'),
-    'Details': fields.String(required=True, description='attack vector details')
+    'Details': StringToJSON(required=True, description='attack vector details')
 })
 
 domain_return_post_method = ns.model('domain return post method', {
@@ -61,7 +62,7 @@ class Domain_data_access_object(object):
         return self.selectData
 
     def create(self, data):
-        if str(type(data)) == "<class 'list'>":
+        if str(type(data)) == "<class 'list '>":
             try:
                 self.insertData = data
 
@@ -70,14 +71,14 @@ class Domain_data_access_object(object):
                         domainModel(related_Packet=int(self.insertData[ListOfData]["related_Packet"]),
                                     URL=str(self.insertData[ListOfData]["URL"]),
                                     URI=str(self.insertData[ListOfData]["URI"]),
-                                    action_URL=str(self.insertData[ListOfData]["action_URL"]),
-                                    action_URL_Type=str(self.insertData[ListOfData]["action_URL_Type"]),
-                                    params=str(self.insertData[ListOfData]["params"]),
+                                    action_URL=self.insertData[ListOfData]["action_URL"],
+                                    action_URL_Type=self.insertData[ListOfData]["action_URL_Type"],
+                                    params=self.insertData[ListOfData]["params"],
                                     comment=str(self.insertData[ListOfData]["comment"]),
-                                    attackVector=json.dumps(self.insertData[ListOfData]["attackVector"]),
+                                    attackVector=self.insertData[ListOfData]["attackVector"],
                                     impactRate=int(self.insertData[ListOfData]["impactRate"]),
                                     description=str(self.insertData[ListOfData]["description"]),
-                                    Details=json.dumps(self.insertData[ListOfData]["Details"])
+                                    Details=self.insertData[ListOfData]["Details"]
                                     )
                     )
                     g.bwasp_db_obj.commit()

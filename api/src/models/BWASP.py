@@ -13,8 +13,8 @@ class packets(db.Model):
     category = db.Column(db.Integer, nullable=False)
     statusCode = db.Column(db.Integer, nullable=False)
     requestType = db.Column(db.TEXT, nullable=False)
-    requestJson = db.Column(db.TEXT, nullable=False)
-    responseHeader = db.Column(db.TEXT, nullable=False)
+    requestJson = db.Column(db.JSON, nullable=False)
+    responseHeader = db.Column(db.JSON, nullable=False)
     responseBody = db.Column(db.TEXT, nullable=False)
 
     def __init__(self, category, statusCode, requestType, requestJson, responseHeader, responseBody, **kwargs):
@@ -38,14 +38,14 @@ class domain(db.Model):
     related_Packet = db.Column(db.Integer, nullable=False)
     URL = db.Column(db.TEXT, nullable=False)
     URI = db.Column(db.TEXT, nullable=False)
-    action_URL = db.Column(db.TEXT, nullable=False)
-    action_URL_Type = db.Column(db.TEXT, nullable=False)
-    params = db.Column(db.TEXT, nullable=False)
+    action_URL = db.Column(db.JSON, nullable=False)  # TEXT
+    action_URL_Type = db.Column(db.JSON, nullable=False)  # TEX T
+    params = db.Column(db.JSON, nullable=False)  # TEXT
     comment = db.Column(db.TEXT, nullable=False)
-    attackVector = db.Column(db.TEXT, nullable=False)
+    attackVector = db.Column(db.JSON, nullable=False)
     impactRate = db.Column(db.Integer, nullable=False)
     description = db.Column(db.TEXT, nullable=False)
-    Details = db.Column(db.TEXT, nullable=False)
+    Details = db.Column(db.JSON, nullable=False)
 
     def __init__(self, related_Packet, URL, URI, action_URL, action_URL_Type, params, comment, attackVector, impactRate, description, Details, **kwargs):
         self.related_Packet = related_Packet
@@ -71,9 +71,9 @@ class job(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     targetURL = db.Column(db.TEXT, nullable=False)
-    knownInfo = db.Column(db.TEXT, nullable=False)
+    knownInfo = db.Column(db.JSON, nullable=False)
     recursiveLevel = db.Column(db.TEXT, nullable=False)
-    uriPath = db.Column(db.TEXT, nullable=False)
+    uriPath = db.Column(db.JSON, nullable=False)  # TEXT
     done = db.Column(db.BOOLEAN, default=False)
     maximumProcess = db.Column(db.TEXT, nullable=0)
 
@@ -113,7 +113,7 @@ class systeminfo(db.Model):
     __bind_key__ = 'BWASP'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     url = db.Column(db.TEXT, nullable=False)
-    data = db.Column(db.TEXT, nullable=False)
+    data = db.Column(db.JSON, nullable=False)
 
     def __init__(self, url, data, **kwargs):
         self.url = url
@@ -128,7 +128,7 @@ class CSPEvaluator(db.Model):
     __bind_key__ = 'BWASP'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    header = db.Column(db.TEXT, nullable=False)
+    header = db.Column(db.JSON, nullable=False)
 
     def __init__(self, header, **kwargs):
         self.header = header

@@ -11,7 +11,6 @@ class Config(object):
     SESSION_COOKIE_NAME = 'BWASP'
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:BWASPENGINE1234@bwasp-database-1/BWASP?charset=utf8"
     SQLALCHEMY_BINDS = {
-        # "BWASP": f'sqlite:///{os.path.join(BASE_PATH, "databases/BWASP.db")}',
         "BWASP": "mysql+pymysql://root:BWASPENGINE1234@bwasp-database-1/BWASP?charset=utf8",
         "JOB": f'sqlite:///{os.path.join(BASE_PATH, "databases/JOB.db")}',
         "CVE": f'sqlite:///{os.path.join(BASE_PATH, "databases/CVE.db")}'
