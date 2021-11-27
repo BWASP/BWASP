@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'components/head.html' %}
+
+<body>
+{% include 'components/sidebar.html' %}
+<div class="commonPadding w-100">
+    <div class="d-inline-flex sizer element-top">
+        <div class="bg-white h-100 text-dark p-4 pt-3 pb-3 w-100 sizer center-horizontal border-rounded shadow">
+            <h4 class="text-decoration-none mb-0 font-logo">Dashboard</h4>
+        </div>
+    </div>
+    <div class="bg-white shadow text-dark sizer element-objects border-rounded separatedTab">
+        <div class="p-4 w-100">
+            <section class="row">
+                <h3 class="col-md-12 fw-bold text-capitalize mb-3">Quick view</h3>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Received Packets</p>
+                        <p class="fs-2 mb-0" id="receivedPacketsCount">
+                            <span class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Detected Threats</p>
+                        <p class="fs-2 mb-0" id="detectedThreatsCount">
+                            <span class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Opened Ports</p>
+                        <p class="fs-2 mb-0" id="openedPortsCount">
+                            <span class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Related CVE</p>
+                        <p class="fs-2 mb-0" id="relatedCVECount">
+                            <span class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3 p-1 mt-2 d-none">
+                    <div class="p-3 border-rounded shadow">
+                        <p class="text-muted small mb-1 text-uppercase">Analysis Level</p>
+                        <p class="fs-2 mb-0" id="analysisLevelView">
+                            <span class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <p class="col-md-12 mt-2 text-muted small">Calculated numbers may has numerical errors.</p>
+            </section>
+            <section class="row mt-3 pb-3">
+                <h3 class="col-md-12 fw-bold text-capitalize mb-3">Scan result</h3>
+                <section class="col-md-6 mb-2 p-1">
+                    <div class="p-3 border-rounded shadow">
+                        <section>
+                            <p class="mb-0 text-uppercase">Web Environment Information</p>
+                            <p id="webEnvDataPlace-detail" class="mb-1 text-muted small d-none"><span>of</span> <span class="fw-bold" id="webEnvURLPlace">Unknown</span></p>
+                        </section>
+                        <section class="row" id="webEnvDataPlace"></section>
+                        <section class="mt-3" id="webEnvDataPlace-noData">
+                            <p class="text-center text-muted text-capitalize p-4">No Data</p>
+                        </section>
+                    </div>
+                </section>
+                <section class="col-md-6 mb-2 p-1">
+                    <div class="p-3 border-rounded shadow">
+                        <section>
+                            <p class="mb-0 text-uppercase">Opened Ports</p>
+                            <p id="portViewPlace-detail" class="mb-1 text-muted small d-none"><span class="fw-bold" id="portCountViewPlace">0</span> ports opened.</p>
+                        </section>
+                        <section class="row" id="portViewPlace"></section>
+                        <section class="mt-3" id="portViewPlace-noData">
+                            <p class="text-center text-muted text-capitalize p-4">No Data</p>
+                        </section>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="{{ url_for('static', filename='js/page/dashboard.js') }}"></script>
+
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
+</body>
+</html>
