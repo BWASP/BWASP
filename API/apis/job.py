@@ -1,7 +1,6 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
 from .api_returnObj import Return_object
-from .api_custom_fields import StringToJSON
 import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -13,9 +12,9 @@ ns = Namespace('api/job', description='job operations')
 job = ns.model('job model', {
     'id': fields.Integer(readonly=True, description='setting initialization(Job) id for unique identifier'),
     'targetURL': fields.String(required=True, description='target URL'),
-    'knownInfo': StringToJSON(required=True, description='Known information'),
+    'knownInfo': fields.String(required=True, description='Known information'),
     'recursiveLevel': fields.String(required=True, description='recursive level'),
-    'uriPath': StringToJSON(required=True, description='Path on Web Server'),
+    'uriPath': fields.String(required=True, description='Path on Web Server'),
     'done': fields.Integer(required=True, description='Analysis checking'),
     'maximumProcess': fields.String(required=True, description='Process max count'),
 })
@@ -60,9 +59,9 @@ class Job_data_access_object(object):
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
                         jobModel(targetURL=str(self.insertData[ListOfData]["targetURL"]),
-                                 knownInfo=self.insertData[ListOfData]["knownInfo"],
+                                 knownInfo=json.dumps(self.insertData[ListOfData]["knownInfo"]),
                                  recursiveLevel=str(self.insertData[ListOfData]["recursiveLevel"]),
-                                 uriPath=self.insertData[ListOfData]["uriPath"],
+                                 uriPath=str(self.insertData[ListOfData]["uriPath"]),
                                  done=int(self.insertData[ListOfData]["done"]),
                                  maximumProcess=str(self.insertData[ListOfData]["maximumProcess"])
                                  )
@@ -81,6 +80,8 @@ class Job_data_access_object(object):
                 self.updateData = data
 
                 for ListofData in range(len(data)):
+                    print(int(self.updateData[ListofData]["done"]))
+
                     g.bwasp_db_obj.query(jobModel).filter(
                         jobModel.id == int(self.updateData[ListofData]["id"])
                     ).update(

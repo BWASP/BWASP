@@ -3,11 +3,8 @@ from flask import (
 )
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_cors import CORS
-from flask_migrate import Migrate, migrate
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-migrate = Migrate()
+from models.BWASP import bwasp_db
+from models.CVE import cve_db
 
 
 def create_app(config=None):
@@ -25,48 +22,35 @@ def create_app(config=None):
 
     app.config.from_object(config)
 
-    # DATABASE API route initialization.
-    from apis import bp as api
+    # API route initialization.
+    from apis import blueprint as api
     app.register_blueprint(api)
-
-    # DATABASE MANAGE API route initialization.
-    from task_managements import manage
-    app.register_blueprint(manage.bp)
 
     # App context initialization
     app.app_context().push()
 
     # Database initialization
-    """
+    bwasp_db.init_app(app)
     cve_db.init_app(app)
+    bwasp_db.app = app
     cve_db.app = app
 
-    task_db.init_app(app)
-    task_db.app = app
-    """
-
-    db.init_app(app)
-    migrate.init_app(app, db)
+    # Database create
+    bwasp_db.create_all()
 
     @app.before_request
     def before_request():
         # g object session initialization
-        g.bwasp_db_obj = db.session
-        g.cve_db_obj = db.session
-        g.task_db_obj = db.session
+        g.bwasp_db_obj = bwasp_db.session
+        g.cve_db_obj = cve_db.session
 
     @app.teardown_request
     def teardown_request(exception):
         if hasattr(g, 'bwasp_db_obj'):
             g.bwasp_db_obj.close()
 
-        """
         if hasattr(g, 'cve_db_obj'):
             g.cve_db_obj.close()
-
-        if hasattr(g, 'task_db_obj'):
-            g.task_db_obj.close()
-        """
 
     return app
 
