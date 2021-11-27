@@ -21,7 +21,7 @@ def create_app(config=None):
     app.config.from_object(config)
 
     # route initialization
-    from routes import manual
+    from ManualAPI.routes import manual
     app.register_blueprint(manual.bp)
 
     return app

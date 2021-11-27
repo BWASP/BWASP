@@ -60,7 +60,7 @@ def deleteUselessBody(packets):
 
 
 def insertPackets(req_res_packets):
-    api_url = "http://localhost:20102/api/packet/manual"
+    api_url = "http://bwasp-api-1:20102/api/packet/manual"
     headers = {"Content-Type": "application/json; charset=utf-8"}
     data = []
 
@@ -84,6 +84,7 @@ def insertPackets(req_res_packets):
 def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, http_method, infor_vector, robots_result, error_result):
     data = list()
     crx = list()
+    crx_index = 0
     for i, packet in enumerate(req_res_packets):
         if not func.isSameDomain(target_url, packet["request"]["full_url"]):
             continue
@@ -177,8 +178,10 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, ht
         }
         data.append(query)
         print("attackvector", attack_vector)
-        attack_vector["url"] = packet["request"]["full_url"]
         crx.append(attack_vector)
-
+        crx[crx_index]["url"] = packet["request"]["full_url"]
+        if tag_name_list != [""]:
+            crx[crx_index]["param"] = tag_name_list
+        crx_index +=1
     Domain().PostDomain(json.dumps(data))
     return crx
