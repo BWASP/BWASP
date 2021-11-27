@@ -9,14 +9,15 @@ from .job import ns as job_namespace
 from .port import ns as port_namespace
 from .system_info import ns as system_info_namespace
 
-blueprint = Blueprint(
-    'api',
+NAME = 'api'
+bp = Blueprint(
+    NAME,
     __name__,
     url_prefix='/'
 )
 
 api = Api(
-    blueprint,
+    bp,
     version='2021.10.1',
     title='BWASP API',
     description='The BoB Web Application Security Project API Server'

@@ -1,6 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 
-bwasp_db = SQLAlchemy()
+import sys, os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from app import db as bwasp_db
 
 
 class packets(bwasp_db.Model):
@@ -11,8 +14,8 @@ class packets(bwasp_db.Model):
     category = bwasp_db.Column(bwasp_db.Integer, nullable=False)
     statusCode = bwasp_db.Column(bwasp_db.Integer, nullable=False)
     requestType = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
-    requestJson = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
-    responseHeader = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    requestJson = bwasp_db.Column(bwasp_db.JSON, nullable=False)
+    responseHeader = bwasp_db.Column(bwasp_db.JSON, nullable=False)
     responseBody = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
 
     def __init__(self, category, statusCode, requestType, requestJson, responseHeader, responseBody, **kwargs):
@@ -36,14 +39,14 @@ class domain(bwasp_db.Model):
     related_Packet = bwasp_db.Column(bwasp_db.Integer, nullable=False)
     URL = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
     URI = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
-    action_URL = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
-    action_URL_Type = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
-    params = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    action_URL = bwasp_db.Column(bwasp_db.JSON, nullable=False)  # TEXT
+    action_URL_Type = bwasp_db.Column(bwasp_db.JSON, nullable=False)  # TEX T
+    params = bwasp_db.Column(bwasp_db.JSON, nullable=False)  # TEXT
     comment = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
-    attackVector = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    attackVector = bwasp_db.Column(bwasp_db.JSON, nullable=False)
     impactRate = bwasp_db.Column(bwasp_db.Integer, nullable=False)
     description = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
-    Details = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    Details = bwasp_db.Column(bwasp_db.JSON, nullable=False)
 
     def __init__(self, related_Packet, URL, URI, action_URL, action_URL_Type, params, comment, attackVector, impactRate, description, Details, **kwargs):
         self.related_Packet = related_Packet
@@ -69,9 +72,9 @@ class job(bwasp_db.Model):
 
     id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
     targetURL = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
-    knownInfo = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    knownInfo = bwasp_db.Column(bwasp_db.JSON, nullable=False)
     recursiveLevel = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
-    uriPath = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    uriPath = bwasp_db.Column(bwasp_db.JSON, nullable=False)  # TEXT
     done = bwasp_db.Column(bwasp_db.BOOLEAN, default=False)
     maximumProcess = bwasp_db.Column(bwasp_db.TEXT, nullable=0)
 
@@ -111,7 +114,7 @@ class systeminfo(bwasp_db.Model):
     __bind_key__ = 'BWASP'
     id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
     url = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
-    data = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    data = bwasp_db.Column(bwasp_db.JSON, nullable=False)
 
     def __init__(self, url, data, **kwargs):
         self.url = url
@@ -126,7 +129,7 @@ class CSPEvaluator(bwasp_db.Model):
     __bind_key__ = 'BWASP'
 
     id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
-    header = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+    header = bwasp_db.Column(bwasp_db.JSON, nullable=False)
 
     def __init__(self, header, **kwargs):
         self.header = header
