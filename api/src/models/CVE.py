@@ -1,6 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
 
-cve_db = SQLAlchemy()
+import sys, os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from app import db as cve_db
+
+
+# cve_db = SQLAlchemy()
 
 
 class cve(cve_db.Model):

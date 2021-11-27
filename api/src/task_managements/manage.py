@@ -3,9 +3,9 @@ from flask import (
     abort,
     request,
     g,
-    flash
+    current_app as app
 )
-
+from app import db
 from sqlalchemy import create_engine
 
 NAME = 'task'
@@ -18,16 +18,20 @@ bp = Blueprint(
 
 class DatabaseOBJ:
     def __init__(self):
-        self.engine = ""
+        pass
 
-    def engine(self):
-        self.engine = create_engine('mysql+pymysql://scott:tiger@localhost/foo')
+    def engine(self, database_name):
+        app.config["SQLALCHEMY_BINDS"][database_name] = f"mysql+pymysql://root:BWASPENGINE1234@bwasp-database-1/{database_name}?charset=utf8"
+        return app.config["SQLALCHEMY_BINDS"]
+
+
+data_access_object_of_db = DatabaseOBJ()
 
 
 @bp.route('/manage', methods=['GET', 'POST'])
 def manage():
     if request.method == "POST":
-        return request.get_json()
+        return data_access_object_of_db.engine(request.get_json()["time"])
 
     return "BWASP TASK MANAGER"
 
