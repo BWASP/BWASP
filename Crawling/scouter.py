@@ -38,7 +38,7 @@ def initGlobal():
         "error_result": False,
         "directory_indexing": list(),
         "admin_page": list(),
-        "attack_option": True
+        "attack_option": False
     }
 
     LOAD_PACKET_INDEXES = list() # automation packet indexes 
