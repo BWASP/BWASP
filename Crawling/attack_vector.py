@@ -166,6 +166,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                     cheat_sheet = f.readline()
                     cheat_sheet = cheat_sheet.replace("\n", "")
 
+                    '''
                     # current page attack
                     url_part = urlparse(current_url)
                     domain_params = dict()
@@ -203,6 +204,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                             data["doubt"]["SQL injection"]["detect"].append({"param": param})
                             data["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
                             impactRate = 2
+                    '''
 
                     # action page attack
                     for tag in form:
@@ -238,6 +240,8 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                                 data["doubt"]["SQL injection"]["detect"].append({"param": param})
                                 data["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
                                 impactRate = 2
+                            #else:
+                            #    data["doubt"]["SQL injection"].pop("detect")
                         except:
                             pass
                     if not cheat_sheet: break
