@@ -6,7 +6,6 @@ import requests
 
 from Crawling.feature import func
 from Crawling.attack_vector import *
-import requests
 from Crawling.feature.api import *
 
 
@@ -134,13 +133,62 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                 pass
             else:
                 if "<th" in response_body:
+                    '''
                     attack_vector["doubt"]["SQL injection"] = {"type": ["board"]}
                     attack_vector["doubt"]["XSS"] = {"type": ["board"]}
                     impactRate = 2
+                    '''
+
+                    attack_vector["doubt"]["SQL injection"] = {"type": ["board"], "detect": []}
+                    attack_vector["doubt"]["XSS"] = {"type": ["board"]}
+                    impactRate = 2
                 else:
+                    '''
                     attack_vector["doubt"]["SQL injection"] = {"type": ["None"]}
                     attack_vector["doubt"]["XSS"] = {"type": ["None"]}
                     impactRate = 1
+                    '''
+                    attack_vector["doubt"]["SQL injection"] = {"type": ["None"], "detect": []}
+                    attack_vector["doubt"]["XSS"] = {"type": ["None"]}
+                    impactRate = 2
+
+                # ~~~~~~~~~~~~~attack option
+                if analysis_data["attack_option"] == True:
+                    # cheat sheet open
+                    with open("./cheat_sheet.txt", 'r', encoding='UTF-8') as f:
+                        while True:
+                            cheat_sheet = f.readline()
+                            cheat_sheet = cheat_sheet.replace("\n", "")
+
+                            # current page attack
+                            for keys in list(domain_params.keys()):
+                                attack_param = dict()
+                                attack_param[keys] = cheat_sheet
+                                attack_url = domain_url + url_part.path + "?" + keys + "=" + cheat_sheet
+                                print("@#@#@#@#@#$@%$!#@$!#@$@$@$%")
+                                print(attack_url)
+                                s = requests.Session().post(attack_url)
+                                if s.status_code == 500 or s.status_code == 501 or s.status_code == 502 or s.status_code == 503 \
+                                        or s.status_code == 504 or s.status_code == 505 or s.status_code == 506 or s.status_code == 507 \
+                                        or s.status_code == 508 or s.status_code == 509 or s.status_code == 510:
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"param": attack_param})
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"type": "status 500~510"})
+                                    impactRate = 2
+
+                                elif "error in your sql" in s.text.lower() or "server error in" in s.text.lower() \
+                                        or "fatal error" in s.text.lower() or "database engine error" in s.text.lower() \
+                                        or "not properly" in s.text.lower() or "db provider" in s.text.lower() \
+                                        or "psqlexception" in s.text.lower() or "query failed" in s.text.lower() \
+                                        or "microsoft sql native" in s.text.lower():
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"param": attack_param})
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
+                                    impactRate = 2
+                                #else:
+                                #    attack_vector["doubt"]["SQL injection"].pop("detect")
+
+                            if not cheat_sheet: break
             
 
         if not packet["request"]["full_url"] in cookie_result.keys():
