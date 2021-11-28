@@ -165,8 +165,6 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                 attack_param = dict()
                                 attack_param[keys] = cheat_sheet
                                 attack_url = domain_url + url_part.path + "?" + keys + "=" + cheat_sheet
-                                print("@#@#@#@#@#$@%$!#@$!#@$@$@$%")
-                                print(attack_url)
                                 s = requests.Session().post(attack_url)
                                 if s.status_code == 500 or s.status_code == 501 or s.status_code == 502 or s.status_code == 503 \
                                         or s.status_code == 504 or s.status_code == 505 or s.status_code == 506 or s.status_code == 507 \
