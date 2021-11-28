@@ -437,6 +437,30 @@ def adminPage(target_url):
     
     return return_data
 
+def ReflectedXSSCheck(packet):
+    queries = urlparse(packet["request"]["full_url"]).query
+
+    if queries:
+        queries = queries.split("&")
+        try:
+            soup = BeautifulSoup(packet["response"]["body"], "html.parser")
+        except:
+            return 0
+        
+        for query in queries:
+            datas = query.split("=")
+
+            if len(datas) != 2:
+                break
+        
+            if datas[1] == soup.find("input", {"name" : datas[0]}).get("value"):
+                print("[*] ReflectedXss Detect")
+                return 1
+    return 0
+
+# def SSRFCheck(packet):
+    
+
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
 """
 {
