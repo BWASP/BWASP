@@ -50,9 +50,8 @@ class API {
     /**
      * Communicate with API
      * @param {string} endpoint
-     * @param {function} callback
      */
-    async communicateRAW(endpoint, callback) {
+    async communicateRAW(endpoint) {
         await this.getFrontConfig();
         const communication = await fetch(this.API.base + endpoint, this.requestOptions)
             .catch(error => {
@@ -137,6 +136,102 @@ let createKey = (level = 2, keyPrefix = "anonID") => {
     return createdKey;
 }
 
+let setMultipleAttributes = (el, attrs) => {
+    Object.keys(attrs).forEach(key => el.setAttribute(key, attrs[key]));
+}
+
+const createToast = (title, content="", color = "light", inline = true, duration = 5) => {
+    let prefix = "jFront-Toast";
+    let toastAreaID = `${prefix}-Area`;
+    let currentToastID = createKey(3, "jFrontToast");
+    let colorMatching = {
+        danger: "light"
+    }[color];
+    // Check toast area exists
+    if(document.querySelectorAll(toastAreaID).length === 0){
+        let localArea = document.createElement("section");
+        localArea.id = toastAreaID;
+        localArea.classList.add("toast-container", "position-absolute", "top-0", "end-0", "p-3");
+        document.getElementsByTagName("body")[0].appendChild(localArea);
+    }
+    let toastArea = document.getElementById(toastAreaID);
+    let toastSkeleton = {
+        parent: document.createElement("div"),
+        header: {
+            parent: document.createElement("div"),
+            title: document.createElement("strong"),
+            closeButton: document.createElement("button")
+        },
+        body: document.createElement("div")
+    };
+
+    // Build parent
+    toastSkeleton.parent.classList.add("toast", "rounded-custom", "border", `border-${color}`);
+    if(inline) toastSkeleton.parent.classList.add("align-items-center");
+    toastSkeleton.parent.id = currentToastID;
+    setMultipleAttributes(toastSkeleton.parent, {
+        "role": "alert",
+        "aria-live": "assertive",
+        "aria-atomic": "true"
+    })
+
+    // Build toast head and elements
+    toastSkeleton.header.parent.classList.add((inline)
+        ? "d-flex"
+        : "toast-header",
+    "rounded", `bg-${color}`);
+    toastSkeleton.header.parent.classList.add(`bg-${color}`);
+    toastSkeleton.header.title.classList.add("me-auto");
+    toastSkeleton.header.closeButton.classList.add("btn-close");
+    if(inline) toastSkeleton.header.closeButton.classList.add("me-2", "m-auto", `text-${colorMatching}`);
+    setMultipleAttributes(toastSkeleton.header.closeButton, {
+        "type": "button",
+        "data-bs-dismiss": "toast",
+        "aria-label": "Close"
+    })
+
+    // Build toast body
+    toastSkeleton.body.classList.add("toast-body");
+    if(inline) toastSkeleton.body.classList.add(`text-${colorMatching}`);
+    else toastSkeleton.header.title.classList.add(`text-${colorMatching}`);
+
+    // Set values
+    toastSkeleton.header.title.innerText = title;
+    toastSkeleton.body.innerText = (inline) ? title : content;
+
+    // Mix elements
+    if(inline){
+        toastSkeleton.header.parent.append(
+            toastSkeleton.body,
+            toastSkeleton.header.closeButton
+        );
+        toastSkeleton.parent.appendChild(toastSkeleton.header.parent);
+    }else{
+        toastSkeleton.header.parent.append(
+            toastSkeleton.header.title,
+            toastSkeleton.header.closeButton
+        );
+        toastSkeleton.parent.append(
+            toastSkeleton.header.parent,
+            toastSkeleton.body
+        );
+    }
+
+    toastArea.appendChild(toastSkeleton.parent);
+
+    // Get instance
+    let toastBlob = document.getElementById(currentToastID);
+    let currentToast = bootstrap.Toast.getOrCreateInstance(toastBlob, {
+        delay: duration * 1000
+    });
+
+    // Show toast to user
+    currentToast.show();
+
+    // Delete toast after duration + 1 sec
+    setTimeout(()=>toastBlob.remove(), (duration + 1) * 1000)
+}
+
 String.prototype.format = function () {
     let outputText = this;
     for (let arg in arguments) {
@@ -145,4 +240,4 @@ String.prototype.format = function () {
     return outputText;
 };
 
-export {API, createKey, tableBuilder};
+export {API, createKey, createToast, tableBuilder};
