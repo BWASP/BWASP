@@ -441,7 +441,10 @@ def adminPage(target_url):
     
     return return_data
 
-def ReflectedXSSCheck(packet):
+def ReflectedXSSCheck(packet: dict, target_url: str) -> bool:
+    if not func.isSameDomain(packet["request"]["full_url"], target_url):
+        return False
+
     queries = urlparse(packet["request"]["full_url"]).query
 
     if queries:
@@ -449,7 +452,7 @@ def ReflectedXSSCheck(packet):
         try:
             soup = BeautifulSoup(packet["response"]["body"], "html.parser")
         except:
-            return 0
+            return False
         
         for query in queries:
             datas = query.split("=")
@@ -458,12 +461,30 @@ def ReflectedXSSCheck(packet):
                 break
         
             if datas[1] == soup.find("input", {"name" : datas[0]}).get("value"):
-                print("[*] ReflectedXss Detect")
-                return 1
-    return 0
+                return True
+    return False
 
-# def SSRFCheck(packet):
+def SSRFCheck(packet: dict) -> bool:
+    if "open_redirect" in packet.keys():
+        return False
     
+    if packet["request"]["method"] == "GET":
+        body = urlparse(packet["request"]["full_url"]).query.split("&")
+
+    elif packet["request"]["method"] == "POST":
+        body = packet["response"]["body"].split("&")
+
+    for data in body:
+        datas = data.split("=")
+
+        if len(datas) != 2:
+            continue
+
+        if func.isStringAnUrl(datas[1]):
+            return True
+        
+    return False
+
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
 """
