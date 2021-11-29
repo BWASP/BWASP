@@ -469,20 +469,24 @@ def SSRFCheck(packet: dict) -> bool:
         return False
     
     if packet["request"]["method"] == "GET":
-        body = urlparse(packet["request"]["full_url"]).query.split("&")
+        queries = urlparse(packet["request"]["full_url"]).query.split("&")
+        for data in queries:
+            datas = data.split("=")
+
+            if len(datas) != 2:
+                continue
+
+            if func.isStringAnUrl(datas[1]):
+                return True
 
     elif packet["request"]["method"] == "POST":
-        body = packet["response"]["body"].split("&")
-
-    for data in body:
-        datas = data.split("=")
-
-        if len(datas) != 2:
-            continue
-
-        if func.isStringAnUrl(datas[1]):
-            return True
+        body = packet["request"]["body"]
+        pattern = "((?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)"
+        result = re.findall(pattern, body)
         
+        if len(result) != 0:
+            return True
+            
     return False
 
 
