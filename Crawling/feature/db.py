@@ -2,11 +2,22 @@ import sqlalchemy as db
 import os
 import json
 from urllib.parse import urlparse, urlunparse
+from html.parser import HTMLParser
 import requests
 
 from Crawling.feature import func
 from Crawling.attack_vector import *
 from Crawling.feature.api import *
+
+
+
+
+comment = ""
+
+class MyHTMLParser(HTMLParser):
+    def handle_comment(self, data):
+        global comment
+        comment += data
 
 
 def connect(table_name):
@@ -244,6 +255,10 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
             attack_vector["misc"]["admin page"] = analysis_data["admin_page"]
         else:
             attack_vector["misc"].pop("admin page")
+
+        #comment 주석
+        parser = MyHTMLParser()
+        parser.feed(response_body)
         
 
         # 패킷 url이 중복된다면 ??
@@ -258,7 +273,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
             "action_URL": action_page,
             "action_URL_Type": action_type,
             "params": tag_name_list,
-            "comment": "None",
+            "comment": comment,
             "attackVector": attack_vector,
             "impactRate": impactRate,
             "description": "string",
