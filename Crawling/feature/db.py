@@ -17,7 +17,7 @@ comment = ""
 class MyHTMLParser(HTMLParser):
     def handle_comment(self, data):
         global comment
-        comment += data
+        comment += data+"\n"
 
 
 def connect(table_name):
