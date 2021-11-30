@@ -133,15 +133,29 @@ def visit(driver, url, depth, options):
     packet_obj = PacketCapture()
     packet_obj.start(driver)
 
+    cur_page_links = list()
     # 다른 사이트로 Redirect 되었는지 검증.
     if isOpenRedirection(url, driver.current_url, START_OPTIONS["input_url"]):
         packet_obj.filterPath(url)
         packet_obj.packets[0]["open_redirect"] = True
-        cur_page_links = list()
     else:
-        cur_page_links = GetPageLinks(driver.current_url, driver.page_source).start()
-        cur_page_links += GetReslinks(driver.current_url, packet_obj.packets, driver.page_source).start()
+        # page_source는 iframe 안에 있는 html을 가져오지 못함.
+        # 따라서, 각각의 iframe에 접근하여 page_source 를 추출해야 함.
+        count = 0
+        iframes = driver.find_elements_by_tag_name("iframe")
+        while True:
+            cur_page_links += GetPageLinks(driver.current_url, driver.page_source).start()
+            cur_page_links += GetReslinks(driver.current_url, packet_obj.packets, driver.page_source).start()
+
+            if count == len(iframes):
+                break
+
+            driver.switch_to_default_content()
+            driver.switch_to_frame(iframes[count])
+            count += 1
+
         cur_page_links = list(set(packet_obj.deleteFragment(cur_page_links)))
+
     cookie_result = get_cookies.start(driver.current_url, packet_obj.packets)
 
     packet_obj.deleteUselessBody()
@@ -195,7 +209,7 @@ def checkCountLink(visit_url, count_links):
     return False
 
 '''
-    String visit_url: 입력한 url
+    String visit_url: 방문한 url
     String current_url: 현재 페이지의 url
     String target_url: 사용자가 입력한 url 
 '''
