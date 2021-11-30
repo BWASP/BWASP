@@ -196,6 +196,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
 
         open_redirect = openRedirectionCheck(packet)
         s3_bucket = s3BucketCheck(packet)
+        SSRF = SSRFCheck(packet)
+        Reflected_XSS = ReflectedXSSCheck(packet, target_url)
         # jwt_token = jwtCheck(packet)
         if len(open_redirect) != 0:
             attack_vector["doubt"]["Open Redirect"] = open_redirect
@@ -208,6 +210,16 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
             impactRate = 2
         else:
             attack_vector["doubt"].pop("s3", None)
+
+        if SSRF:
+            attack_vector["doubt"]["SSRF"] = True
+        else:
+            attack_vector["doubt"].pop("SSRF", None)
+
+        if Reflected_XSS:
+            attack_vector["doubt"]["Reflected XSS"] = True
+        else:
+            attack_vector["doubt"].pop("Reflected XSS", None)
 
         #robots.txt check
         if analysis_data["robots_result"] == True:
@@ -232,6 +244,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
             attack_vector["misc"]["admin page"] = analysis_data["admin_page"]
         else:
             attack_vector["misc"].pop("admin page")
+        
 
         # 패킷 url이 중복된다면 ??
         # json.dumps()

@@ -459,9 +459,11 @@ def ReflectedXSSCheck(packet: dict, target_url: str) -> bool:
 
             if len(datas) != 2:
                 break
-        
-            if datas[1] == soup.find("input", {"name" : datas[0]}).get("value"):
+            
+            input_tag = soup.find("input", {"name" : datas[0]})
+            if input_tag and datas[1] == input_tag.get("value"):
                 return True
+                
     return False
 
 def SSRFCheck(packet: dict) -> bool:
