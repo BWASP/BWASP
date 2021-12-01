@@ -140,15 +140,16 @@ let setMultipleAttributes = (el, attrs) => {
     Object.keys(attrs).forEach(key => el.setAttribute(key, attrs[key]));
 }
 
-const createToast = (title, content="", color = "light", inline = true, duration = 5) => {
+const createToast = (title, content="", color = "primary", inline = false, duration = 5) => {
     let prefix = "jFront-Toast";
     let toastAreaID = `${prefix}-Area`;
     let currentToastID = createKey(3, "jFrontToast");
     let colorMatching = {
-        danger: "light"
+        danger: "light",
+        primary: "light"
     }[color];
     // Check toast area exists
-    if(document.querySelectorAll(toastAreaID).length === 0){
+    if(document.querySelectorAll(`#${toastAreaID}`).length === 0){
         let localArea = document.createElement("section");
         localArea.id = toastAreaID;
         localArea.classList.add("toast-container", "position-absolute", "top-0", "end-0", "p-3");
