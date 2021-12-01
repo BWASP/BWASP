@@ -4,7 +4,7 @@ from flask import (
 import sys, os
 from flask_cors import CORS
 
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 
 def create_app(config=None):
@@ -21,7 +21,7 @@ def create_app(config=None):
     app.config.from_object(config)
 
     # route initialization
-    from ManualAPI.routes import manual
+    from routes import manual
     app.register_blueprint(manual.bp)
 
     return app
