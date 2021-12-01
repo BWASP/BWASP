@@ -19,7 +19,8 @@ def DataReqRes():
         data = request.get_json()
         return_data = start(data)
         return return_data
-
+    else:
+        return "Success"
 '''
         return render_template_string(f"""
             <!Doctype html>
