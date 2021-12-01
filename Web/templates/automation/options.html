@@ -4,166 +4,147 @@
 {% include 'components/head.html' %}
 
 <body>
-<div class="modal fade" id="jobSubmitVerifyModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content bg-transparent">
-            <div class="border-rounded shadow modal-storage">
-                <h3 class="text-dark fw-bolder mb-3">Requested Info</h3>
-                <table class="table table-borderless mb-0">
-                    <tbody>
-                    <tr>
-                        <th scope="row" style="width: 25%;">Analysis level</th>
-                        <td><code id="modal-tool-analysisLevel">NaN</code></td>
-                    </tr>
-                    <tr>
-                        <th scope="row" style="width: 30%;">Target URL</th>
-                        <td><code id="modal-tool-targetURL">No data.</code></td>
-                    </tr>
-                    <tr>
-                        <th scope="row" style="width: 25%;">URL Path</th>
-                        <td id="modal-tool-URLPath"> - </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Web Server</th>
-                        <td id="modal-info-server"> - </td>
-                    </tr>
-                    <tr>
-                        <th scope="row" style="width: 25%;">Framework</th>
-                        <td id="modal-info-framework"> - </td>
-                    </tr>
-                    <tr>
-                        <th scope="row" style="width: 25%;">Backend</th>
-                        <td id="modal-info-backend"> - </td>
-                    </tr>
-                    <tr>
-                        <th scope="row" style="width: 25%;">Options</th>
-                        <td id="modal-tool-options">Not selected.</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="mt-3">
-                <div class="sizer">
-                    <button type="button" class="col btn btn-warning border border-rounded border-white shadow m-1" data-bs-dismiss="modal">Back</button>
-                    <button type="button" id="modal-start-job" class="col btn btn-success border border-rounded border-white shadow m-1">Start</button>
+<div class="modal fade" id="disableRiskLock">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border border-danger rounded-custom">
+            <div class="modal-body border border-danger rounded-custom">
+                <h5 class="fw-bold text-danger text-center">Important Precautions</h5>
+                <hr>
+                <p>By unlocking this protection option, you will be able to access few more features.</p>
+                <p>
+                    But, these options can <span class="text-danger"><u>undermine the availability</u></span> of the target service
+                    and you will agree that all parties including you are responsible for this not BWASP.
+                </p>
+                <p>Click "Unlock" if you are agree of responsibility policy above.</p>
+                <div class="d-flex">
+                    <button type="button" class="btn btn-secondary rounded-custom ms-auto" data-bs-dismiss="modal">Keep it Locked</button>
+                    <button type="button" class="btn btn-danger rounded-custom ms-2" id="unlockRiskLock">Unlock</button>
                 </div>
+                <hr>
+                <p class="mt-2 mb-0 text-muted small text-center">
+                    You will not be able to revert this change before reload the page
+                    <span class="text-danger text-uppercase">Do at your own risk</span>
+                </p>
             </div>
         </div>
     </div>
 </div>
-<!--
-<button type="button" class="btn btn-danger" data-dismiss="modal">Back</button>
-                    <button type="button" class="btn btn-success ms-2" id="modal-start-job">Start</button>
--->
+
 {% include 'components/sidebar.html' %}
 <div class="commonPadding w-100">
     <div class="d-inline-flex sizer element-top">
         <div class="bg-white h-100 text-dark p-4 pt-3 pb-3 w-100 sizer center-horizontal border-rounded shadow">
             <h4 class="text-decoration-none mb-0 font-logo">Analysis Option</h4>
         </div>
-        <button type="button" id="ClearAllData"
-                class="d-none bg-white p-4 pt-3 pb-3 ms-2 btn btn-link border-rounded shadow"
-                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Clear all input">
-            <h4 class="mb-0"><i class="fas fa-redo-alt text-danger"></i></h4>
-        </button>
-        <button type="button" id="submitJobRequest"
-                class="d-none bg-white p-4 pt-3 pb-3 ms-2 btn btn-link border-rounded shadow"
-                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Start analysis">
-            <h4 class="mb-0"><i class="fas fa-play text-success"></i></h4>
-        </button>
     </div>
     <div class="bg-white shadow text-dark sizer element-objects border-rounded separatedTab">
-        <div class="d-none d-flex align-items-center justify-content-center w-100" id="job-cant">
-            <div class="text-center">
-                <h3>Job has already submitted</h3>
-                <p class="text-muted small mt-3 mb-0">You can't submit new job request for now</p>
-            </div>
-        </div>
-        <div class="p-4 w-100 d-none" id="job-order">
-            <div class="mb-3">
-                <p class="badge bg-success mb-1">Required</p>
-                <h3 class="text-dark fw-bold">Analysis target</h3>
-            </div>
-            <div class="row" id="section-targetURL">
-                <div class="col-md-12">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="target-url"
-                               placeholder="Analysis target URL" aria-describedby="regexViolence-targetURL" value="http://suninatas.com/">
-                        <label for="floatingInput">Target URL</label>
-                        <small id="regexViolence-targetURL" class="form-text text-muted d-none">Regex violence : <span class="text-danger">Target URL must be starts with protocol (http, https)</span></small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-3 mb-3">
-                <p class="badge bg-success mb-1">Required</p>
-                <h3 class="text-dark fw-bold">Tool Setting</h3>
-            </div>
-            <div class="row" id="section-ToolSetting">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="ToolRecursiveLevelInput">Analysis recursive level</label>
-                        <div class="d-flex align-items-center mt-2">
-                            <input class="border border-white" type="number" min="1" max="5000" value="1" id="ToolRecursiveLevelInput">
-                            <input type="range" class="form-range" min="1" max="5000" value="1" id="ToolRecursiveLevelSlider">
+        <div class="p-4 w-100" id="job-order">
+            <section class="h-100">
+                <section class="h-10">
+                    <section class="d-flex align-items-start animate__animated animate__fadeInDown d-none" id="document-top">
+                        <div class="d-flex align-items-center w-100">
+                            <div class="me-auto">
+                                <h3 class="mb-1 fw-bold" id="stepName">Analysis Target</h3>
+                                <p class="mb-0 text-muted small" id="stepDescription"></p>
+                            </div>
+                            <nav class="p-3 rounded-custom border shadow-sm" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                                <ol class="breadcrumb mb-0" id="stepsView">
+                                </ol>
+                            </nav>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mt-1 mb-3">
-                        <input type="text" class="form-control" id="target-urlPath"
-                               placeholder="Path here" aria-describedby="toolURLPath-Help">
-                        <label for="floatingInput">Define URL Path</label>
-                        <small id="toolURLPath-Help" class="form-text text-muted">Multiple paths can be input separated with comma(<code>,</code>)</small>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <div class="card mb-4" id="AdditionalFunctions">
-                            <a href="#additionalFuncs" class="d-block card-header text-decoration-none py-3" data-bs-toggle="collapse"
-                               role="button" aria-expanded="false" aria-controls="additionalFuncs">
-                                <h6 class="m-0 fw-bold text-primary">Additional Options</h6>
-                            </a>
-                            <div class="collapse" id="additionalFuncs" style="">
-                                <div class="card-body">
-                                    <div class="form-group mb-0">
-                                        <div class="custom-control custom-checkbox small">
-                                            <input type="checkbox" class="custom-control-input" id="optFnc-portScan" value="portScan" option_name="Port scan(Known ports)">
-                                            <label id="optFnc-portScan-label" class="custom-control-label pt-1" for="optFnc-portScan">Port scan (Known ports)</label>
-                                        </div>
+                    </section>
+                </section>
+                <section class="h-80">
+                    <section class="d-flex align-items-center h-100 w-100 animate__animated animate__backInUp d-none" id="tab-availabilityCheck-fail">
+                        <div class="w-100 d-flex align-items-center justify-content-center p-4 text-danger">
+                            <h3 class="mb-1"><i class="bi bi-exclamation-circle"></i></h3>
+                            <h3 class="mb-1 ms-4 text-uppercase">Job already in progress.</h3>
+                        </div>
+                    </section>
+                    <section class="d-flex align-items-center h-100 w-100" id="tab-availabilityCheck">
+                        <div class="w-100 d-flex align-items-center p-4">
+                            <div class="spinner-border text-dark" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <h3 class="mb-1 ms-4">Checking availability...</h3>
+                        </div>
+                    </section>
+                    <section class="d-flex align-items-center h-100 w-100 animate__fadeIn animate__animated separatedTab d-none" id="tab-0">
+                        <section class="w-100">
+                            <p class="text-muted mb-3">Input target URL to start analysis.</p>
+                            <div class="form-floating w-100">
+                                <input type="text" class="form-control" id="input-targetURL"
+                                       placeholder="Analysis target URL" aria-describedby="regexViolence-targetURL" value="http://suninatas.com/">
+                                <label for="input-targetURL">Target URL</label>
+                            </div>
+                        </section>
+                    </section>
+                    <section class="d-flex h-100 w-100 separatedTab d-none" id="tab-1">
+                        <section class="w-100">
+                            <section class="row" id="sampleHere"></section>
+                        </section>
+                    </section>
+                    <section class="h-100 w-100 separatedTab d-none" id="tab-2">
+                        <section class="w-100 row">
+                            <h3 class="col-md-12 mt-3 mb-3 text-success fw-bold">Essential</h3>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="d-flex">
+                                        <label for="input-recursiveLevel">Analysis recursive level</label>
+                                        <p class="mb-0 ms-auto small text-muted">Max: <span id="maximumRecursiveLevel">NaN</span></p>
                                     </div>
-                                    <div class="form-group mb-0">
-                                        <div class="custom-control custom-checkbox small">
-                                            <input type="checkbox" class="custom-control-input"
-                                                   id="optFnc-CSPEvaluate" value="CSPEvaluate">
-                                            <label class="custom-control-label pt-1" for="optFnc-CSPEvaluate" id="optFnc-CSPEvaluate-label">CSP Evaluate</label>
-                                        </div>
+                                    <div class="d-flex align-items-center mt-2">
+                                        <input class="border border-white" type="number" id="input-recursiveLevel">
+                                        <input type="range" class="form-range" id="slider-recursiveLevel">
                                     </div>
                                 </div>
+                                <div class="d-flex mt-2">
+                                    <p class="mb-0 text-muted small">Set link recursive level of BWASP auto analysis.</p>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                            <div class="col-md-12 mt-3">
+                                <div class="form-group">
+                                    <div class="d-flex">
+                                        <label for="input-maximumProcesses">Maximum Processes</label>
+                                        <p class="mb-0 ms-auto small text-muted">Max: <span id="maximumProcessesView">NaN</span></p>
+                                    </div>
+                                    <div class="d-flex align-items-center mt-2">
+                                        <input class="border border-white" type="number" id="input-maximumProcesses">
+                                        <input type="range" class="form-range" id="slider-maximumProcesses">
+                                    </div>
+                                </div>
+                                <div class="d-flex mt-2">
+                                    <p class="mb-0 text-muted small">Limit maximum processes of BWASP analysis.</p>
+                                    <p class="mb-0 ms-auto text-muted small">0 : Infinite</p>
+                                </div>
+                            </div>
+                            <hr class="col-md-12 mt-4 mb-4">
+                        </section>
+                        <section class="row">
+                            <div class="col-md-12 mt-3 d-flex align-items-center" id="optionsHead">
+                                <h3 class="text-primary fw-bold mb-0">Optional</h3>
+                                <button type="button" class="btn rounded-custom btn-danger ms-auto" id="call-disableRiskLock">
+                                    Disable Risk Lock
+                                </button>
+                            </div>
+                            <h5 class="col-md-12 mt-3 fw-bold">Options</h5>
+                            <section class="row" id="optionsViewPlace"></section>
+                            <h5 class="col-md-12 mt-3 fw-bold">Google API</h5>
+                        </section>
+                    </section>
+                    <section class="d-flex align-items-center h-100 w-100 separatedTab d-none" id="tab-3">
+                        <section class="w-100">
 
-            <div class="mb-3">
-                <p class="badge bg-secondary mb-1">Optional</p>
-                <h3 class="text-dark fw-bold">WebApp Information</h3>
-            </div>
-            <div class="row" id="section-webAppInfo"></div>
-
-            <div class="mb-3">
-                <p class="badge bg-secondary mb-1">Optional</p>
-                <h3 class="text-dark fw-bold">Experimental Options</h3>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-check small">
-                        <input type="checkbox" class="form-check-input" value="UmVhY3Q=" id="toolOption-full-automated">
-                        <label class="form-check-label text-danger fw-bold d-inline-flex ms-2" for="toolOption-full-automated" id="toolOption-full-automated-label">Fully Automated Analysis</label>
+                        </section>
+                    </section>
+                </section>
+                <section class="h-10">
+                    <div class="d-flex align-items-end animate__animated animate__fadeInUp h-100 d-none" id="document-bottom">
+                        <a class="p-2 ps-3 pe-3 text-danger text-decoration-none rounded-custom d-none" id="document-bottom-back" href="#"><i class="bi bi-arrow-left"></i> Back</a>
+                        <a class="p-2 ps-3 pe-3 ms-auto btn-primary text-decoration-none animate__animated animate__fadeInUp rounded-custom" id="document-bottom-next" href="#"><span id="document-bottom-next-text">Proceed</span> <i class="bi bi-arrow-right"></i></a>
                     </div>
-                </div>
-            </div>
+                </section>
+            </section>
         </div>
     </div>
 </div>

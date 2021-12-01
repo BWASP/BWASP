@@ -40,5 +40,19 @@
       "initial": 1,
       "minimum": 0
     }
+  },
+  "options": {
+    "portScan": {
+      "display": "Port scan (Known ports)",
+      "issue": false
+    },
+    "CSPEvaluate": {
+      "display": "Port scan (Known ports)",
+      "issue": false
+    },
+    "testPayloads": {
+      "display": "Test payloads",
+      "issue": true
+    }
   }
 }
