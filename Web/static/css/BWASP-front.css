@@ -2,10 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;500;700&display=swap');
 
-.text-title {
-    font-family: 'Montserrat', sans-serif;
-}
-
 :root {
     /* Color variables */
     --material-grey-200: #B0BEC5;
@@ -30,6 +26,14 @@
     font-style: normal;
     font-weight: normal;
     src: local('Vice City Sans Regular'), url('/static/fonts/ViceCitySans.woff') format('woff');
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.text-title {
+    font-family: 'Montserrat', sans-serif;
 }
 
 .font-logo {
