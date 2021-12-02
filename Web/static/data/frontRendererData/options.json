@@ -47,7 +47,7 @@
       "issue": false
     },
     "CSPEvaluate": {
-      "display": "Port scan (Known ports)",
+      "display": "Evaluate CSP",
       "issue": false
     },
     "testPayloads": {
