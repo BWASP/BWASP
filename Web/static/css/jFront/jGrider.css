@@ -15,7 +15,6 @@ html, body {
 body{
     display: flex;
     align-items: stretch;
-    font-family: 'Open Sans', sans-serif;
 }
 
 .rounded-custom{
@@ -62,4 +61,12 @@ footer>div>p{
 
 .separatedTab{
     overflow: auto !important;
+}
+
+.h-10{
+    height: 10% !important;
+}
+
+.h-80{
+    height: 80% !important;
 }
