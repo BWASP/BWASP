@@ -1,14 +1,26 @@
+# -*- coding: utf-8 -*-
+
+"""
+    package.module
+    ~~~~~~~~~~~~~~
+
+    A brief description goes here.
+
+    :copyright: (c) YEAR by AUTHOR.
+    :license: LICENSE_NAME, see LICENSE_FILE for more details.
+"""
+
 from flask_sqlalchemy import SQLAlchemy
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from app import db as task_db
+task_db = SQLAlchemy()
 
 
 class task(task_db.Model):
-    __tablename__ = 'task'
-    __bind_key__ = 'TASK'
+    __tablename__ = 'task_manager'
+    __bind_key__ = 'TASK_MANAGER'
 
     id = task_db.Column(task_db.Integer, primary_key=True, autoincrement=True)
     targetURL = task_db.Column(task_db.TEXT, nullable=False)
