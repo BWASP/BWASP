@@ -146,7 +146,8 @@ const createToast = (title, content="", color = "primary", inline = false, durat
     let currentToastID = createKey(3, "jFrontToast");
     let colorMatching = {
         danger: "light",
-        primary: "light"
+        primary: "light",
+        success: "light"
     }[color];
     // Check toast area exists
     if(document.querySelectorAll(`#${toastAreaID}`).length === 0){
