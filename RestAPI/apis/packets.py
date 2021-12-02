@@ -1,14 +1,16 @@
-from flask import g
+from flask import g, current_app as app
 from flask_restx import (
     Resource, fields, Namespace, model
 )
-from .api_custom_fields import StringToJSON
+# from .api_custom_fields import StringToJSON
 import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from models.BWASP import packets as packetsModel
 from .api_returnObj import Return_object
+
+from models.BWASP import packet as packetsModel
+# from models.PACKET import packet as packetModel
 
 ns = Namespace('api/packet', description='packet operations')
 
@@ -17,8 +19,8 @@ packet = ns.model('Packet model', {
     'category': fields.Integer(readonly=True, description='packet classification'),
     'statusCode': fields.Integer(required=True, description='status code'),
     'requestType': fields.String(required=True, description='request type'),
-    'requestJson': StringToJSON(required=True, description='request data'),
-    'responseHeader': StringToJSON(required=True, description='response header'),
+    'requestJson': fields.Raw(required=True, description='request data'),
+    'responseHeader': fields.Raw(required=True, description='response header'),
     'responseBody': fields.String(required=True, description='response body')
 })
 
@@ -118,6 +120,7 @@ class Packet_data_access_object(object):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
+
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
                         packetsModel(category=0,
@@ -139,6 +142,7 @@ class Packet_data_access_object(object):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
+
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
                         packetsModel(category=1,

@@ -6,7 +6,7 @@ import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from models.CVE import cve as cveModel
+from models.CVELIST import cve as cveModel
 
 ns = Namespace('api/cve/search', description='cve info operations')
 

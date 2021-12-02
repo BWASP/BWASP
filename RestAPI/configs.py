@@ -9,10 +9,10 @@ class Config(object):
     """
     SECRET_KEY = os.urandom(16)
     SESSION_COOKIE_NAME = 'BWASP'
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:BWASPENGINE1234@bwasp-database-1/BWASP?charset=utf8"
+    SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(BASE_PATH, "databases/TEMP.db")}'
     SQLALCHEMY_BINDS = {
-        "TASK": f'sqlite:///{os.path.join(BASE_PATH, "databases/TASK.db")}',
-        "CVE": f'sqlite:///{os.path.join(BASE_PATH, "databases/CVE.db")}'
+        "CVELIST": f'sqlite:///{os.path.join(BASE_PATH, "databases/CVE.db")}',
+        "TASK_MANAGER": f'sqlite:///{os.path.join(BASE_PATH, "databases/TASK_MANAGER.db")}'
     }
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False

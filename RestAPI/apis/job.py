@@ -1,21 +1,23 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
-from .api_returnObj import Return_object
-from .api_custom_fields import StringToJSON
 import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+from .api_returnObj import Return_object
+from .api_custom_fields import StringToJSON
+
 from models.BWASP import job as jobModel
+# from models.JOB import job as jobModel
 
 ns = Namespace('api/job', description='job operations')
 
 job = ns.model('job model', {
     'id': fields.Integer(readonly=True, description='setting initialization(Job) id for unique identifier'),
     'targetURL': fields.String(required=True, description='target URL'),
-    'knownInfo': StringToJSON(required=True, description='Known information'),
+    'knownInfo': fields.Raw(required=True, description='Known information'),
     'recursiveLevel': fields.String(required=True, description='recursive level'),
-    'uriPath': StringToJSON(required=True, description='Path on Web Server'),
+    'uriPath': fields.Raw(required=True, description='Path on Web Server'),
     'done': fields.Integer(required=True, description='Analysis checking'),
     'maximumProcess': fields.String(required=True, description='Process max count'),
 })

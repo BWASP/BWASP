@@ -7,15 +7,17 @@ import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from models.BWASP import CSPEvaluator as CSPEvaluatorModel
 from .api_returnObj import Return_object
 from .api_custom_fields import StringToJSON
+
+from models.BWASP import CSPEvaluator as CSPEvaluatorModel
+# from models.CSPEVALUATOR import CSPEvaluator as CSPEvaluatorModel
 
 ns = Namespace('api/cspevaluator', description='csp evaluator operations')
 
 csp_evaluator = ns.model('CSP Evaluator model', {
     'id': fields.Integer(readonly=True, description='CspEvaluator id for unique identifier'),
-    'header': StringToJSON(required=True, description='Content-Security Policy in HTTP header')
+    'header': fields.Raw(required=True, description='Content-Security Policy in HTTP header')
 })
 
 csp_evaluator_return_post = ns.model('CSP Evaluator Return Post Message', {

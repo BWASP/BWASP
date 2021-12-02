@@ -5,8 +5,11 @@ from flask import (
     g,
     current_app as app
 )
-from app import db
-from sqlalchemy import create_engine
+from models.BWASP import bwasp_db
+import os
+from configs import BASE_PATH
+
+# BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 NAME = 'task'
 bp = Blueprint(
@@ -16,29 +19,24 @@ bp = Blueprint(
 )
 
 
-class DatabaseOBJ:
-    def __init__(self):
-        pass
-
-    def engine(self, database_name):
-        app.config["SQLALCHEMY_BINDS"][database_name] = f"mysql+pymysql://root:BWASPENGINE1234@bwasp-database-1/{database_name}?charset=utf8"
-        return app.config["SQLALCHEMY_BINDS"]
-
-
-data_access_object_of_db = DatabaseOBJ()
-
-
-@bp.route('/manage', methods=['GET', 'POST'])
-def manage():
-    if request.method == "POST":
-        return data_access_object_of_db.engine(request.get_json()["time"])
-
-    return "BWASP TASK MANAGER"
+def database_init():
+    # Database create
+    bwasp_db.create_all(bind='BWASP')
 
 
 @bp.route('/create', methods=['GET', 'POST'])
-def create():
+def manage():
     if request.method == "POST":
-        return "POST"
+        values_idx_list = list()
 
-    return "BWASP TASK MANAGER"
+        for values_idx in request.get_json().values():
+            values_idx_list.append(values_idx)
+
+        app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[0] + ".db")}'
+        app.config["SQLALCHEMY_BINDS"]['BWASP'] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[0] + ".db")}'
+
+        database_init()
+
+        return f'{app.config["SQLALCHEMY_BINDS"] }'
+
+    return app.config["SQLALCHEMY_DATABASE_URI"]

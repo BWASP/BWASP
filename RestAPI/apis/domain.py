@@ -9,6 +9,7 @@ import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from models.BWASP import domain as domainModel
+# from models.DOMAIN import domain as domainModel
 
 ns = Namespace('api/domain', description='domain operations')
 
@@ -17,14 +18,14 @@ domain = ns.model('domain model', {
     'related_Packet': fields.Integer(required=True, description='The unique identifier based on packet id'),
     'URL': fields.String(required=True, description='target URL'),
     'URI': fields.String(required=True, description='target URI'),
-    'action_URL': StringToJSON(required=True, description='target action URL'),
-    'action_URL_Type': StringToJSON(required=True, description='target action URL'),
-    'params': StringToJSON(required=True, description='target URL parameter'),
+    'action_URL': fields.Raw(required=True, description='target action URL'),
+    'action_URL_Type': fields.Raw(required=True, description='target action URL'),
+    'params': fields.Raw(required=True, description='target URL parameter'),
     'comment': fields.String(required=True, description='target Web page HTML comment'),
-    'attackVector': StringToJSON(required=True, description='Attack vector about CVE, Analysis data'),
+    'attackVector': fields.Raw(required=True, description='Attack vector about CVE, Analysis data'),
     'impactRate': fields.Integer(required=True, description='target attack vector Typical Serverity'),
     'description': fields.String(required=True, description='attack vector description'),
-    'Details': StringToJSON(required=True, description='attack vector details')
+    'Details': fields.Raw(required=True, description='attack vector details')
 })
 
 domain_return_post_method = ns.model('domain return post method', {

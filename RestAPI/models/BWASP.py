@@ -126,3 +126,18 @@ class ports(bwasp_db.Model):
 
     def __repr__(self):
         return f"<ports('{self.service}', '{self.target}', '{self.port}, {self.result}')>"
+
+
+
+class CSPEvaluator(bwasp_db.Model):
+    __tablename__ = 'CSPEvaluator'
+    __bind_key__ = 'BWASP'
+
+    id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
+    header = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
+
+    def __init__(self, header, **kwargs):
+        self.header = header
+
+    def __repr__(self):
+        return f"<CSPEvaluator('{self.header}')>"

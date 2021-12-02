@@ -1,19 +1,21 @@
 from flask import g
 from flask_restx import Resource, fields, Namespace, model
-from .api_returnObj import Return_object
-from .api_custom_fields import StringToJSON
 import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+from .api_returnObj import Return_object
+from .api_custom_fields import StringToJSON
+
 from models.BWASP import systeminfo as systeminfoModel
+# from models.SYSTEMINFO import systeminfo as systeminfoModel
 
 ns = Namespace('api/systeminfo', description='system info operations')
 
 systeminfo = ns.model('SystemInfo', {
     'id': fields.Integer(readonly=True, description='system-info id for unique identifier'),
     'url': fields.String(required=True, description='target URL'),
-    'data': StringToJSON(required=True, attributes="data", description='target system information')
+    'data': fields.Raw(required=True, attributes="data", description='target system information')
 })
 
 systeminfo_return_post_method = ns.model('system information return post message', {
@@ -22,7 +24,7 @@ systeminfo_return_post_method = ns.model('system information return post message
 
 update_systeminfo = ns.model('update in system information data', {
     'id': fields.Integer(required=True, description='system-info id for unique identifier'),
-    'data': StringToJSON(required=True, description='target system information')
+    'data': fields.Raw(required=True, description='target system information')
 })
 
 
