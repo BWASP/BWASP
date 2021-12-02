@@ -41,11 +41,10 @@ class inputHandler {
 
     receiveData(dataPackage) {
         Object.keys(dataPackage).forEach(key => this[key] = dataPackage[key]);
-        console.log(this);
     }
 
     pagingHandler(page) {
-        createToast("JSON Data", JSON.stringify(this.formData), "primary", false);
+        console.info(JSON.stringify(this.formData));
         switch (page) {
             case 0:
                 return this.validateURL({
@@ -55,12 +54,10 @@ class inputHandler {
                 this.inputHandling();
                 return true;
             case 2:
-                return this.validateOptions({
-                    analysisLevel: Number(document.getElementById("input-recursiveLevel").value),
-                    maximumProcesses: Number(document.getElementById("input-maximumProcesses").value),
-                    options: []
-                });
+                return this.validateOptions();
             case 3:
+                this.inputHandling();
+                this.validateOptions();
                 return true;
             default:
                 return false;
@@ -74,25 +71,66 @@ class inputHandler {
             name: libName,
             version: this.infoTempStorage[libName]
         }))
+
+        // Render in job submission overview page
+        let renderSpace = document.getElementById("overview-environment");
+        renderSpace.innerHTML = "";
+        this.formData.info.forEach((currentLib) => {
+            let skeleton = {
+                parent: document.createElement("h5"),
+                info: document.createElement("span"),
+                version: document.createElement("span")
+            }
+
+            skeleton.parent.classList.add("mb-0", "me-2");
+            skeleton.info.classList.add("badge", "border", "border-primary", "text-dark");
+            skeleton.version.classList.add("small", "text-muted", "ms-2");
+
+            skeleton.version.innerText = currentLib.version;
+
+            skeleton.info.append(
+                currentLib.name,
+                skeleton.version
+            );
+            skeleton.parent.appendChild(skeleton.info);
+
+            renderSpace.appendChild(skeleton.parent);
+        })
     }
 
     validateURL(objects) {
         let condition = patterns.targetURL.test(objects.targetURL.value);
         if (condition) {
             this.formData.target = objects.targetURL.value;
+            document.getElementById("overview-targetURL").innerText = this.formData.target;
         }
         return condition;
     }
 
-    validateOptions(objects) {
-        console.log(objects);
+    validateOptions() {
+        let objects = {
+            analysisLevel: Number(document.getElementById("input-recursiveLevel").value),
+            maximumProcesses: Number(document.getElementById("input-maximumProcesses").value),
+            API: {
+                google: {
+                    key: document.getElementById("googleSearchAPI-APIKey").value,
+                    engineId: document.getElementById("googleSearchAPI-engineID").value
+                }
+            }
+        };
         let condition =
             (objects.analysisLevel <= this.maximum.recursiveLevel) &&
             (objects.maximumProcesses <= this.maximum.maximumProcesses);
         if (condition) {
             this.formData.tool.analysisLevel = objects.analysisLevel;
+            document.getElementById("overview-recursiveLevel").innerText = this.formData.tool.analysisLevel;
             this.formData.maximumProcess = objects.maximumProcesses;
+            document.getElementById("overview-maximumProcess").innerText = this.formData.maximumProcess;
         }
+        this.formData.API.google.key = objects.API.google.key;
+        document.getElementById("overview-googleSearchAPI-APIKey").innerText = objects.API.google.key;
+        this.formData.API.google.engineId = objects.API.google.engineId;
+        document.getElementById("overview-googleSearchAPI-engineID").innerText = objects.API.google.engineId;
         return condition;
     }
 }
@@ -331,7 +369,7 @@ class optionFrontHandler {
                 let condition = localSkeleton.child.checkbox.checked;
                 if(dataPackage.issue && this.riskLock) {
                     localSkeleton.child.checkbox.checked = false;
-                    return createToast("Option restricted", "You must disable Risk Lock before select this option", "danger", false);
+                    return createToast("Option restricted", `You must disable Risk Lock before select this option (${dataPackage.display})`, "danger", false);
                 }
                 if(condition) this.inputHandler.formData.tool.optionalJobs.push(dataPackage.optionID);
                 else {
@@ -490,29 +528,32 @@ class optionFrontHandler {
             next: this.currentStep + ((forward) ? 1 : -1)
         };
 
-        // Double check validation
-        if (page.next !== this.steps.length - 1 && this.doubleCheck) this.doubleCheck = false;
-        else if (forward && page.current === this.steps.length - 1) {
-            createToast("Submission trigger", "Review data and click proceed button again to submit request", "primary", false);
-            this.doubleCheck = true;
-        }
-
-        // Double check triggers
-        if (this.doubleCheck) return this.submitForm();
-
         if ((page.next > this.steps.length - 1)) return createToast("optionFrontHandler.movePage()", "Request page index out of range", "danger");
 
         // Swap page if not triggered.
         this.swapPage(page.current, page.next);
     }
 
-    swapPage(from, to, force = false) {
+    swapPage(from, to, force = false, isFromBreadCrumb = false) {
+        let buttons = {
+            submit: document.getElementById("document-bottom-submit"),
+            proceed: document.getElementById("document-bottom-next")
+        };
         // If target step(page) is out of range (of JSON file index)
         if (to > this.steps.length - 1 && !force) return createToast("Error", "Request page index out of range", "danger");
         // If input values in current page got an error
         else if (!this.inputHandler.pagingHandler(from) && !force) return createToast("Error", "Value error occurred in current page", "danger");
         // If requested same page as currently presented.
         else if (this.currentStep === to && !force) return createToast("Notice", "Requested same page (Current view)", "primary");
+
+        if(to === this.steps.length - 1) {
+            this.inputHandler.pagingHandler(to);
+            buttons.submit.classList.remove("d-none");
+            buttons.proceed.classList.add("d-none");
+        }else{
+            buttons.submit.classList.add("d-none");
+            buttons.proceed.classList.remove("d-none");
+        }
 
         // Show back button
         this.toggleButton(document.getElementById("document-bottom-back"), (to > 0) ? "show" : "hide");
@@ -541,10 +582,20 @@ class optionFrontHandler {
     }
 
     submitForm() {
+        fetch("/automation/options", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+            },
+            body: new URLSearchParams({
+                reqJsonData: JSON.stringify(this.inputHandler.formData)
+            })
+        }).then(() => console.log("Done"));
 
-        console.log(this.inputHandler.formData);
-
-        createToast("Double check triggered", "submitForm() has just called");
+        createToast("Job submitted", "Redirecting you to dashboard", "success", false, 3);
+        setTimeout(() => {
+            document.location.replace("/dashboard");
+        }, 3000);
     }
 
     sendConfigToHandler(dataPackage) {
@@ -566,6 +617,9 @@ window.onload = async () => {
     document.getElementById("document-bottom-next").addEventListener("click", () => {
         handler.movePage();
     })
+    document.getElementById("document-bottom-submit").addEventListener("click", () => {
+        handler.submitForm();
+    })
     document.getElementById("document-bottom-back").addEventListener("click", () => {
         handler.movePage(false);
     })
@@ -586,106 +640,6 @@ window.onload = async () => {
         )
         await handler.buildSupportedList();
         await handler.buildOptions();
-        handler.swapPage(0, 2);
+        handler.swapPage(0, 3);
     })
 }
-
-/*
-document.getElementById("modal-start-job").addEventListener("click", () => {
-    document.getElementById("modal-start-job").setAttribute("disabled", "true");
-    jobSubmitVerifyModal.hide();
-    let data = {
-        targetURL: requestData.target.url,
-        knownInfo: requestData.info,
-        recursiveLevel: Number(requestData.tool.analysisLevel),
-        uriPath: requestData.target.path
-    };
-    fetch("/automation/options", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-        },
-        body: new URLSearchParams({
-            reqJsonData: JSON.stringify(requestData)
-        })
-    }).then(() => console.log("Done"));
-
-    alert("Job has just started!\nRedirecting to dashboard");
-    document.location.replace("/dashboard");
-})
-
-// Handler for submit check modal
-document.getElementById("submitJobRequest").addEventListener("click", function () {
-    let formData = document.getElementsByTagName("input"),
-        optionalJobs = [],
-        webAppInfo = {
-            types: ["Server", "Framework", "Backend"],
-            server: [],
-            framework: [],
-            backend: [],
-            renderData: {}
-        },
-        renderTmpStorage = {};
-
-    // Initialize requestData before use
-    requestData = {tool: Object(), info: Object(), target: Object()};
-
-    // Target URL
-    requestData.target["url"] = document.getElementById("target-url").value;
-    if (patterns.targetURL.test(requestData.target.url) === false) {
-        return document.getElementById("regexViolence-targetURL").classList.remove("d-none");
-    } else {
-        document.getElementById("regexViolence-targetURL").classList.add("d-none");
-        document.getElementById("modal-tool-targetURL").innerHTML = requestData.target.url;
-    }
-
-    // Pre-defined URL Path
-    requestData.target["path"] = document.getElementById("target-urlPath").value.replaceAll(" ", "").split(",");
-    if (requestData.target.path.length > 0) {
-        renderULElement(document.getElementById("modal-tool-URLPath"), requestData.target.path);
-    }
-
-    // Analysis recursive level
-    requestData.tool["analysisLevel"] = document.getElementById("ToolRecursiveLevelSlider").value;
-    if (isNaN(requestData["tool"]["analysisLevel"])) {
-        return alert("Error!");
-    } else {
-        document.getElementById("modal-tool-analysisLevel").innerHTML = requestData.tool.analysisLevel;
-    }
-
-    // Optional functions
-    requestData.tool["optionalJobs"] = [];
-    Object.keys(formData).forEach((index) => {
-        if (formData[index].id.split("-")[0] === identifier.optionalFunctions && formData[index].checked) {
-            optionalJobs.push([formData[index].value, document.getElementById(formData[index].id + "-label").innerHTML]);
-        }
-    })
-    if (optionalJobs.length > 0) {
-        let tmp = [];
-        optionalJobs.forEach((data) => {
-            requestData.tool.optionalJobs.push(data[0]);
-            tmp.push(data[1]);
-        });
-        renderULElement(document.getElementById("modal-tool-options"), tmp);
-    }
-
-    webAppInfo.types.forEach((type) => {
-        requestData.info[type.toLowerCase()] = Array();
-        let tempStorage = [];
-        Object.keys(formData).forEach((index) => {
-            let keySet = formData[index].id.split("-");
-            if (keySet[0] === identifier.webAppInfo.name && keySet[1] === type && formData[index].checked) {
-                let localDataset = {
-                    name: atob(formData[index].value),
-                    version: document.getElementById(`${identifier.webAppInfo.version}-${type}-${formData[index].value}`).value
-                }
-                requestData.info[type.toLowerCase()].push(localDataset)
-                tempStorage.push(document.getElementById(formData[index].id + "-label").innerText.concat((localDataset.version.length > 0) ? ` (Version: ${localDataset.version})` : ""));
-            }
-        })
-        if (tempStorage.length > 0) renderULElement(document.getElementById(`modal-info-${type.toLowerCase()}`), tempStorage);
-    })
-
-    jobSubmitVerifyModal.toggle();
-})
- */
