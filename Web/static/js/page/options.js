@@ -58,6 +58,7 @@ class inputHandler {
             case 3:
                 this.inputHandling();
                 this.validateOptions();
+                this.buildSelectedOptions();
                 return true;
             default:
                 return false;
@@ -133,6 +134,27 @@ class inputHandler {
         document.getElementById("overview-googleSearchAPI-engineID").innerText = objects.API.google.engineId;
         return condition;
     }
+
+    buildSelectedOptions() {
+        let renderSpace = document.getElementById("overview-options");
+        renderSpace.innerHTML = "";
+        this.formData.tool.optionalJobs.forEach((optionID) => {
+            let currentOption = this.options[optionID];
+
+            let skeleton = {
+                parent: document.createElement("h5"),
+                info: document.createElement("span")
+            }
+
+            skeleton.parent.classList.add("mb-0", "me-2");
+            skeleton.info.classList.add("badge", "border", `border-${(currentOption.issue)?"danger":"primary"}`, "text-dark");
+
+            skeleton.info.append(currentOption.display);
+            skeleton.parent.appendChild(skeleton.info);
+
+            renderSpace.appendChild(skeleton.parent);
+        })
+    }
 }
 
 class optionFrontHandler {
@@ -143,6 +165,7 @@ class optionFrontHandler {
         this.sliderObjects = Object();
         this.maximum = Object();
         this.supportedList = Object();
+        this.options = Object();
 
         // Risk Lock
         this.riskLock = true;
