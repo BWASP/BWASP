@@ -640,6 +640,5 @@ window.onload = async () => {
         )
         await handler.buildSupportedList();
         await handler.buildOptions();
-        handler.swapPage(0, 3);
     })
 }
