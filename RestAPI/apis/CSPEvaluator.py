@@ -13,7 +13,7 @@ ns = Namespace('api/cspevaluator', description='csp evaluator operations')
 
 csp_evaluator = ns.model('CSP Evaluator model', {
     'id': fields.Integer(readonly=True, description='CspEvaluator id for unique identifier'),
-    'header': fields.Raw(required=True, description='Content-Security Policy in HTTP header')
+    'header': fields.String(required=True, description='Content-Security Policy in HTTP header')
 })
 
 csp_evaluator_return_post = ns.model('CSP Evaluator Return Post Message', {
@@ -50,7 +50,7 @@ class Csp_evaluator_data_access_object(object):
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
                         CSPEvaluatorModel(
-                            header=self.insertData[ListOfData]["header"]
+                            header=json.dumps(self.insertData[ListOfData]["header"])
                         )
                     )
                     g.bwasp_db_obj.commit()

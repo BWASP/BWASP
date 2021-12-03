@@ -35,7 +35,6 @@ class Packets:
         )
 
         if self.responseObj.status_code == 200:
-            json = self.responseObj.json()
             return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}

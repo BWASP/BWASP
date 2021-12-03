@@ -1,3 +1,5 @@
+import json
+
 from flask import g
 from flask_restx import (
     Resource, fields, Namespace
@@ -16,14 +18,14 @@ domain = ns.model('domain model', {
     'related_Packet': fields.Integer(required=True, description='The unique identifier based on packet id'),
     'URL': fields.String(required=True, description='target URL'),
     'URI': fields.String(required=True, description='target URI'),
-    'action_URL': fields.Raw(required=True, description='target action URL'),
-    'action_URL_Type': fields.Raw(required=True, description='target action URL'),
-    'params': fields.Raw(required=True, description='target URL parameter'),
+    'action_URL': fields.String(required=True, description='target action URL'),
+    'action_URL_Type': fields.String(required=True, description='target action URL'),
+    'params': fields.String(required=True, description='target URL parameter'),
     'comment': fields.String(required=True, description='target Web page HTML comment'),
-    'attackVector': fields.Raw(required=True, description='Attack vector about CVE, Analysis data'),
+    'attackVector': fields.String(required=True, description='Attack vector about CVE, Analysis data'),
     'impactRate': fields.Integer(required=True, description='target attack vector Typical Serverity'),
     'description': fields.String(required=True, description='attack vector description'),
-    'Details': fields.Raw(required=True, description='attack vector details')
+    'Details': fields.String(required=True, description='attack vector details')
 })
 
 domain_return_post_method = ns.model('domain return post method', {
@@ -70,14 +72,14 @@ class Domain_data_access_object(object):
                         domainModel(related_Packet=int(self.insertData[ListOfData]["related_Packet"]),
                                     URL=str(self.insertData[ListOfData]["URL"]),
                                     URI=str(self.insertData[ListOfData]["URI"]),
-                                    action_URL=self.insertData[ListOfData]["action_URL"],
-                                    action_URL_Type=self.insertData[ListOfData]["action_URL_Type"],
-                                    params=self.insertData[ListOfData]["params"],
+                                    action_URL=str(self.insertData[ListOfData]["action_URL"]),
+                                    action_URL_Type=str(self.insertData[ListOfData]["action_URL_Type"]),
+                                    params=str(self.insertData[ListOfData]["params"]),
                                     comment=str(self.insertData[ListOfData]["comment"]),
-                                    attackVector=self.insertData[ListOfData]["attackVector"],
+                                    attackVector=json.dumps(self.insertData[ListOfData]["attackVector"]),
                                     impactRate=int(self.insertData[ListOfData]["impactRate"]),
                                     description=str(self.insertData[ListOfData]["description"]),
-                                    Details=self.insertData[ListOfData]["Details"]
+                                    Details=json.dumps(self.insertData[ListOfData]["Details"])
                                     )
                     )
                     g.bwasp_db_obj.commit()

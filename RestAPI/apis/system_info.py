@@ -14,7 +14,7 @@ ns = Namespace('api/systeminfo', description='system info operations')
 systeminfo = ns.model('SystemInfo', {
     'id': fields.Integer(readonly=True, description='system-info id for unique identifier'),
     'url': fields.String(required=True, description='target URL'),
-    'data': fields.Raw(required=True, attributes="data", description='target system information')
+    'data': fields.String(required=True, attributes="data", description='target system information')
 })
 
 systeminfo_return_post_method = ns.model('system information return post message', {
@@ -57,7 +57,7 @@ class Systeminfo_data_access_object(object):
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
                         systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
-                                        data=self.insertData[ListOfData]["data"]
+                                        data=json.dumps(self.insertData[ListOfData]["data"])
                                         )
                     )
                     g.bwasp_db_obj.commit()
@@ -77,7 +77,7 @@ class Systeminfo_data_access_object(object):
                     g.bwasp_db_obj.query(systeminfoModel).filter(
                         systeminfoModel.id == int(self.updateData[ListofData]["id"])
                     ).update(
-                        {'data': self.updateData[ListofData]["data"]}
+                        {'data': json.dumps(self.updateData[ListofData]["data"])}
                     )
                     g.bwasp_db_obj.commit()
 

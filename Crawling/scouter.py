@@ -2,7 +2,7 @@ from seleniumwire import webdriver
 from multiprocessing import Process, Manager
 from urllib.parse import urlparse, urljoin
 from webdriver_manager.chrome import ChromeDriverManager
-import re,json
+import re, json
 
 from Crawling import analyst
 from Crawling.feature.packet_capture import PacketCapture
@@ -17,18 +17,18 @@ from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directory
 
 def initGlobal():
     global START_OPTIONS
-    global ANALYSIS_DATA 
+    global ANALYSIS_DATA
     global LOAD_PACKET_INDEXES
     global PROCESS_LIST
     global DETECT_LIST
     global LOCK
 
     START_OPTIONS = {
-        "check" : True,
-        "input_url" : "",
-        "visited_links" : [],
-        "count_links" : {},
-        "previous_packet_count" : 0 #누적 패킷 개수
+        "check": True,
+        "input_url": "",
+        "visited_links": [],
+        "count_links": {},
+        "previous_packet_count": 0  # 누적 패킷 개수
     }
 
     ANALYSIS_DATA = {
@@ -40,13 +40,14 @@ def initGlobal():
         "admin_page": list()
     }
 
-    LOAD_PACKET_INDEXES = list() # automation packet indexes 
+    LOAD_PACKET_INDEXES = list()  # automation packet indexes
     PROCESS_LIST = list()
     DETECT_LIST = list()
     LOCK = None
-    
+
 
 initGlobal()
+
 
 def start(url, depth, options):
     global START_OPTIONS
@@ -68,26 +69,27 @@ def start(url, depth, options):
     driver.quit()
     initGlobal()
 
+
 def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, DETECT_LIST, LOCK, current_url, previous_packet_count, ANALYSIS_DATA):
     global START_OPTIONS
     global LOAD_PACKET_INDEXES
 
-    recent_packet_count =  len(req_res_packets) + previous_packet_count
+    recent_packet_count = len(req_res_packets) + previous_packet_count
     # {"id": "[1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]"}     
     if len(LOAD_PACKET_INDEXES) < recent_packet_count:
-        #수정 후 LOAD_PACKET_INDEXES = json.loads(Packets().GetAutomationIndex()["retData"])["id"]
+        # 수정 후 LOAD_PACKET_INDEXES = json.loads(Packets().GetAutomationIndex()["retData"])["id"]
         LOAD_PACKET_INDEXES = json.loads(Packets().GetAutomationIndex()["retData"]["id"])
 
-    packet_indexes = LOAD_PACKET_INDEXES[previous_packet_count : recent_packet_count]
-    #analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
+    packet_indexes = LOAD_PACKET_INDEXES[previous_packet_count: recent_packet_count]
+    # analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
     analyst.start(DETECT_LIST, LOCK, input_url, req_res_packets, cur_page_links, current_url, packet_indexes, options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
-
-    db.insertDomains(req_res_packets, cookie_result, packet_indexes , input_url, ANALYSIS_DATA) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
+    db.insertDomains(req_res_packets, cookie_result, packet_indexes, input_url, ANALYSIS_DATA)  # current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
     db.updateWebInfo(DETECT_LIST[0])
-    
+
     return 1
+
 
 def visit(driver, url, depth, options):
     global START_OPTIONS
@@ -114,7 +116,7 @@ def visit(driver, url, depth, options):
         START_OPTIONS["input_url"] = driver.current_url
         START_OPTIONS["visited_links"].append(START_OPTIONS["input_url"])
         START_OPTIONS["check"] = False
-        
+
         if "portScan" in options["tool"]["optionalJobs"]:
             target_port = GetPort().getPortsOffline(START_OPTIONS["input_url"])
             db.insertPorts(target_port, START_OPTIONS["input_url"])
@@ -142,7 +144,9 @@ def visit(driver, url, depth, options):
 
     packet_obj.deleteUselessBody()
     db.insertPackets(packet_obj.packets)
-    p = Process(target=analysis, args=(START_OPTIONS['input_url'], packet_obj.packets, cur_page_links, options, cookie_result, DETECT_LIST, LOCK, driver.current_url, START_OPTIONS["previous_packet_count"], ANALYSIS_DATA)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p = Process(target=analysis, args=(
+    START_OPTIONS['input_url'], packet_obj.packets, cur_page_links, options, cookie_result, DETECT_LIST, LOCK, driver.current_url, START_OPTIONS["previous_packet_count"],
+    ANALYSIS_DATA))  # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
     START_OPTIONS["previous_packet_count"] += len(packet_obj.packets)
     p.start()
     PROCESS_LIST.append(p)
@@ -166,9 +170,10 @@ def visit(driver, url, depth, options):
             continue
         if checkCountLink(visit_url, START_OPTIONS["count_links"]):
             continue
-        
+
         START_OPTIONS["visited_links"].append(visit_url)
         visit(driver, visit_url, depth - 1, options)
+
 
 def checkCountLink(visit_url, count_links):
     visit_path = urlparse(visit_url).path
@@ -186,15 +191,18 @@ def checkCountLink(visit_url, count_links):
 
         count_links[visit_path]["count"] += 1
     except:
-        START_OPTIONS["count_links"][visit_path] = {"count" : 1}
+        START_OPTIONS["count_links"][visit_path] = {"count": 1}
 
     return False
+
 
 '''
     String visit_url: 입력한 url
     String current_url: 현재 페이지의 url
     String target_url: 사용자가 입력한 url 
 '''
+
+
 def isOpenRedirection(visit_url, current_url, target_url):
     url = urlparse(visit_url)
     if url.query:
@@ -202,12 +210,12 @@ def isOpenRedirection(visit_url, current_url, target_url):
 
         if not func.isSameDomain(current_url, target_url) or not func.isSamePath(visit_url, current_url):
             pattern_url = re.compile("((?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)")
-            
+
             for query in url_query:
                 value = query.split("=")
                 if len(value) == 1:
                     continue
-                
+
                 value = value[1]
                 if pattern_url.findall(value):
                     return True
@@ -215,6 +223,7 @@ def isOpenRedirection(visit_url, current_url, target_url):
                     return True
             return False
     return False
+
 
 def initSelenium():
     chrome_options = webdriver.ChromeOptions()

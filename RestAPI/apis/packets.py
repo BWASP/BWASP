@@ -16,8 +16,8 @@ packet = ns.model('Packet model', {
     'category': fields.Integer(readonly=True, description='packet classification'),
     'statusCode': fields.Integer(required=True, description='status code'),
     'requestType': fields.String(required=True, description='request type'),
-    'requestJson': fields.Raw(required=True, description='request data'),
-    'responseHeader': fields.Raw(required=True, description='response header'),
+    'requestJson': fields.String(required=True, description='request data'),
+    'responseHeader': fields.String(required=True, description='response header'),
     'responseBody': fields.String(required=True, description='response body')
 })
 
@@ -122,10 +122,10 @@ class Packet_data_access_object(object):
                     g.bwasp_db_obj.add(
                         packetsModel(category=0,
                                      statusCode=int(self.insertData[ListOfData]['statusCode']),
-                                     requestType=self.insertData[ListOfData]['requestType'],
-                                     requestJson=self.insertData[ListOfData]['requestJson'],
-                                     responseHeader=self.insertData[ListOfData]['responseHeader'],
-                                     responseBody=self.insertData[ListOfData]['responseBody']
+                                     requestType=str(self.insertData[ListOfData]['requestType']),
+                                     requestJson=json.dumps(self.insertData[ListOfData]['requestJson']),
+                                     responseHeader=json.dumps(self.insertData[ListOfData]['responseHeader']),
+                                     responseBody=str(self.insertData[ListOfData]['responseBody'])
                                      )
                     )
                     g.bwasp_db_obj.commit()
@@ -144,10 +144,10 @@ class Packet_data_access_object(object):
                     g.bwasp_db_obj.add(
                         packetsModel(category=1,
                                      statusCode=int(self.insertData[ListOfData]['statusCode']),
-                                     requestType=self.insertData[ListOfData]['requestType'],
-                                     requestJson=self.insertData[ListOfData]['requestJson'],
-                                     responseHeader=self.insertData[ListOfData]['responseHeader'],
-                                     responseBody=self.insertData[ListOfData]['responseBody']
+                                     requestType=str(self.insertData[ListOfData]['requestType']),
+                                     requestJson=json.dumps(self.insertData[ListOfData]['requestJson']),
+                                     responseHeader=json.dumps(self.insertData[ListOfData]['responseHeader']),
+                                     responseBody=str(self.insertData[ListOfData]['responseBody'])
                                      )
                     )
                     g.bwasp_db_obj.commit()

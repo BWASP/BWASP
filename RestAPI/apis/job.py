@@ -14,7 +14,7 @@ ns = Namespace('api/job', description='job operations')
 job = ns.model('job model', {
     'id': fields.Integer(readonly=True, description='setting initialization(Job) id for unique identifier'),
     'targetURL': fields.String(required=True, description='target URL'),
-    'knownInfo': fields.Raw(required=True, description='Known information'),
+    'knownInfo': fields.String(required=True, description='Known information'),
     'recursiveLevel': fields.String(required=True, description='recursive level'),
     'done': fields.Integer(required=True, description='Analysis checking'),
     'maximumProcess': fields.String(required=True, description='Process max count'),
@@ -60,7 +60,7 @@ class Job_data_access_object(object):
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
                         jobModel(targetURL=str(self.insertData[ListOfData]["target"]),
-                                 knownInfo=str(self.insertData[ListOfData]["info"]),
+                                 knownInfo=json.dumps(self.insertData[ListOfData]["info"]),
                                  recursiveLevel=str(self.insertData[ListOfData]["tool"]["analysisLevel"]),
                                  done=0,
                                  maximumProcess=str(self.insertData[ListOfData]["maximumProcess"])
