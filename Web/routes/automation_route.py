@@ -20,6 +20,6 @@ def automation_options():
     if request.method == 'POST':
         reqJsonData = request.get_json()
 
-        AutomatedAnalysis(reqJsonData["target"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
+        AutomatedAnalysis(reqJsonData["target"], str(reqJsonData["tool"]["analysisLevel"]), reqJsonData)
 
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")
