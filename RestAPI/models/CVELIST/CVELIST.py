@@ -12,7 +12,7 @@
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from models.model_returnObj import cve_db as CVELIST_DB
+from models.BWASP.model_returnObj import cve_db as CVELIST_DB
 
 
 class cve(CVELIST_DB.Model):

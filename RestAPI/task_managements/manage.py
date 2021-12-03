@@ -1,11 +1,9 @@
 from flask import (
     Blueprint,
-    abort,
     request,
-    g,
     current_app as app
 )
-from models.model_returnObj import bwasp_db
+from models.BWASP.model_returnObj import bwasp_db
 import os
 from configs import BASE_PATH
 
@@ -19,12 +17,6 @@ bp = Blueprint(
 
 def database_init():
     # Database create
-    from models.CSPEVALUATOR import CSPEVALUATOR_DB
-    from models.PORTS import ports
-    from models.PACKET import packet
-    from models.SYSTEMINFO import systeminfo
-    from models.JOB import job
-    from models.DOMAIN import domain
 
     bwasp_db.create_all(bind='BWASP')
 

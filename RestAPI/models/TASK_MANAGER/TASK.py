@@ -10,9 +10,10 @@
     :license: LICENSE_NAME, see LICENSE_FILE for more details.
 """
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from models.model_returnObj import task_db as TASK_MANAGER_DB
+from models.BWASP.model_returnObj import task_db as TASK_MANAGER_DB
 
 
 class task(TASK_MANAGER_DB.Model):
@@ -29,6 +30,7 @@ class task(TASK_MANAGER_DB.Model):
 
     def __repr__(self):
         return f"<task('{self.targetURL}', '{self.task_id}', '{self.done}')>"
+
 
 """
 {
