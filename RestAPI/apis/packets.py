@@ -1,13 +1,16 @@
-from flask import g
+from flask import g, current_app as app
 from flask_restx import (
     Resource, fields, Namespace, model
 )
+# from .api_custom_fields import StringToJSON
 import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from models.BWASP import packets as packetsModel
 from .api_returnObj import Return_object
+
+from models.BWASP import packet as packetsModel
+# from models.PACKET import packet as packetModel
 
 ns = Namespace('api/packet', description='packet operations')
 
@@ -16,8 +19,8 @@ packet = ns.model('Packet model', {
     'category': fields.Integer(readonly=True, description='packet classification'),
     'statusCode': fields.Integer(required=True, description='status code'),
     'requestType': fields.String(required=True, description='request type'),
-    'requestJson': fields.String(required=True, description='request data'),
-    'responseHeader': fields.String(required=True, description='response header'),
+    'requestJson': fields.Raw(required=True, description='request data'),
+    'responseHeader': fields.Raw(required=True, description='response header'),
     'responseBody': fields.String(required=True, description='response body')
 })
 
@@ -30,7 +33,7 @@ packet_index = ns.model('Packet Index', {
 })
 
 packet_count = ns.model('Packet Row Count', {
-    'count': fields.Integer(readonly=True, description='Count of all CspEvaluator id data')
+    'count': fields.Integer(readonly=True, description='Count of all packets id data')
 })
 
 
@@ -52,10 +55,7 @@ class Packet_data_access_object(object):
         if id is not None and Type is False:
             self.selectData = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.category == self.DefineManual, packetsModel.id == id).count()
 
-        if self.selectData != 0:
-            return True
-
-        return False
+        return True if self.selectData != 0 else False
 
     # id count in table of packets
     def get_return_row_count(self, Type=None):
@@ -67,6 +67,14 @@ class Packet_data_access_object(object):
 
         if Type is False:
             return {"count": int(self.Manual_Counter)}
+
+    def get_all_packets(self, id):
+        self.selectData = g.bwasp_db_obj.query(packetsModel).filter(packetsModel.id == id).all()
+
+        if self.selectData == "":
+            ns.abort(404, f"packet {id} doesn't exist")
+
+        return self.selectData
 
     def get_automation(self, id=None, Type=False):
         if Type is False and id is None:
@@ -112,13 +120,14 @@ class Packet_data_access_object(object):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
+
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
                         packetsModel(category=0,
                                      statusCode=int(self.insertData[ListOfData]['statusCode']),
                                      requestType=self.insertData[ListOfData]['requestType'],
-                                     requestJson=json.dumps(self.insertData[ListOfData]['requestJson']),
-                                     responseHeader=json.dumps(self.insertData[ListOfData]['responseHeader']),
+                                     requestJson=self.insertData[ListOfData]['requestJson'],
+                                     responseHeader=self.insertData[ListOfData]['responseHeader'],
                                      responseBody=self.insertData[ListOfData]['responseBody']
                                      )
                     )
@@ -133,13 +142,14 @@ class Packet_data_access_object(object):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
+
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
                         packetsModel(category=1,
                                      statusCode=int(self.insertData[ListOfData]['statusCode']),
                                      requestType=self.insertData[ListOfData]['requestType'],
-                                     requestJson=json.dumps(self.insertData[ListOfData]['requestJson']),
-                                     responseHeader=json.dumps(self.insertData[ListOfData]['responseHeader']),
+                                     requestJson=self.insertData[ListOfData]['requestJson'],
+                                     responseHeader=self.insertData[ListOfData]['responseHeader'],
                                      responseBody=self.insertData[ListOfData]['responseBody']
                                      )
                     )
@@ -155,6 +165,18 @@ data_access_object_for_packet = Packet_data_access_object()
 
 
 # Packets
+@ns.route('/<int:id>')
+@ns.response(404, 'packet not found')
+@ns.param('id', 'Packet id for unique identifier')
+class All_packets_list(Resource):
+    """Shows a list of all packets"""
+
+    @ns.doc("List of all packets")
+    @ns.marshal_list_with(packet)
+    def get(self, id):
+        return data_access_object_for_packet.get_all_packets(id=id)
+
+
 @ns.route('/automation')
 class Automation_packet_list(Resource):
     """Shows a list of all automation packets, and lets you POST to add new data"""

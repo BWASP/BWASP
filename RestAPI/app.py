@@ -3,13 +3,20 @@ from flask import (
 )
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_cors import CORS
-from models.BWASP import bwasp_db
-from models.CVE import cve_db
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+
+from models.model_returnObj import bwasp_db
+from models.model_returnObj import cve_db
+from models.model_returnObj import task_db
+
+print(bwasp_db)
 
 
 def create_app(config=None):
     app = Flask(__name__)
     app.wsgi_app = ProxyFix(app.wsgi_app)
+
     CORS(app, resource={r'/api/*': {"Access-Control-Allow-Origin": "*"}})
     CORS(app, resource={r'/api/*': {"Access-Control-Allow-Credentials": True}})
 
@@ -22,27 +29,34 @@ def create_app(config=None):
 
     app.config.from_object(config)
 
-    # API route initialization.
-    from apis import blueprint as api
+    # Register routing for blueprint
+    from apis import bp as api
+    # from task_managements import manage
     app.register_blueprint(api)
+    # app.register_blueprint(manage.bp)
 
     # App context initialization
     app.app_context().push()
 
-    # Database initialization
-    bwasp_db.init_app(app)
+    # DB initialize and migrate
     cve_db.init_app(app)
-    bwasp_db.app = app
     cve_db.app = app
 
-    # Database create
-    bwasp_db.create_all()
+    task_db.init_app(app)
+    task_db.app = app
+
+    bwasp_db.init_app(app)
+    bwasp_db.app = app
+
+    print(bwasp_db)
+
+    task_db.create_all(bind='TASK_MANAGER')
 
     @app.before_request
     def before_request():
-        # g object session initialization
         g.bwasp_db_obj = bwasp_db.session
         g.cve_db_obj = cve_db.session
+        g.task_db_obj = task_db.session
 
     @app.teardown_request
     def teardown_request(exception):
@@ -51,6 +65,9 @@ def create_app(config=None):
 
         if hasattr(g, 'cve_db_obj'):
             g.cve_db_obj.close()
+
+        if hasattr(g, 'task_db_obj'):
+            g.task_db_obj.close()
 
     return app
 
