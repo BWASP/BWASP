@@ -16,7 +16,6 @@ job = ns.model('job model', {
     'targetURL': fields.String(required=True, description='target URL'),
     'knownInfo': fields.Raw(required=True, description='Known information'),
     'recursiveLevel': fields.String(required=True, description='recursive level'),
-    'uriPath': fields.Raw(required=True, description='Path on Web Server'),
     'done': fields.Integer(required=True, description='Analysis checking'),
     'maximumProcess': fields.String(required=True, description='Process max count'),
 })
@@ -63,7 +62,6 @@ class Job_data_access_object(object):
                         jobModel(targetURL=str(self.insertData[ListOfData]["targetURL"]),
                                  knownInfo=self.insertData[ListOfData]["knownInfo"],
                                  recursiveLevel=str(self.insertData[ListOfData]["recursiveLevel"]),
-                                 uriPath=self.insertData[ListOfData]["uriPath"],
                                  done=int(self.insertData[ListOfData]["done"]),
                                  maximumProcess=str(self.insertData[ListOfData]["maximumProcess"])
                                  )
