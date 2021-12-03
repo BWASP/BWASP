@@ -25,17 +25,15 @@ class job(JOB_DB.Model):
     targetURL = JOB_DB.Column(JOB_DB.TEXT, nullable=False)
     knownInfo = JOB_DB.Column(JOB_DB.TEXT, nullable=False)
     recursiveLevel = JOB_DB.Column(JOB_DB.TEXT, nullable=False)
-    uriPath = JOB_DB.Column(JOB_DB.TEXT, nullable=False)
     done = JOB_DB.Column(JOB_DB.BOOLEAN, default=False)
     maximumProcess = JOB_DB.Column(JOB_DB.TEXT, nullable=0)
 
-    def __init__(self, targetURL, knownInfo, recursiveLevel, uriPath, done, maximumProcess, **kwargs):
+    def __init__(self, targetURL, knownInfo, recursiveLevel, done, maximumProcess, **kwargs):
         self.targetURL = targetURL
         self.knownInfo = knownInfo
         self.recursiveLevel = recursiveLevel
-        self.uriPath = uriPath
         self.done = done
         self.maximumProcess = maximumProcess
 
     def __repr__(self):
-        return f"<job('{self.targetURL}', '{self.knownInfo}', '{self.recursiveLevel}', '{self.uriPath}', '{self.done}', '{self.maximumProcess}')>"
+        return f"<job('{self.targetURL}', '{self.knownInfo}', '{self.recursiveLevel}', '{self.done}', '{self.maximumProcess}')>"
