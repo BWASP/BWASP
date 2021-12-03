@@ -219,10 +219,15 @@ class optionFrontHandler {
     }
 
     async checkAvailability() {
-        let data = await API.communicateRAW("/api/job");
+        let data = Object();
+        try{
+            data = await API.communicateRAW("/api/job");
 
-        // True if available
-        return data.length <= 0;
+            // True if available
+            return data.length <= 0;
+        }catch{
+            return true
+        }
     }
 
     changePageView(from, to) {
@@ -604,20 +609,44 @@ class optionFrontHandler {
         this.currentStep = to;
     }
 
-    submitForm() {
-        fetch("/automation/options", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-            },
-            body: new URLSearchParams({
-                reqJsonData: JSON.stringify(this.inputHandler.formData)
-            })
-        }).then(() => console.log("Done"));
+    async submitForm() {
+        let res = Object();
+
+        // Create Task ID
+        let taskID = new Date().toJSON().substring(0,19);
+        ["T", ":", "-"].forEach((char) => taskID = taskID.replaceAll(char, ""));
+
+        // Submit task
+        try{
+            res["CreateTask"] = await API.communicateRAW("/api/task", "POST", [{
+                targetURL: this.inputHandler.formData.target,
+                task_id: taskID,
+                "done": 0
+            }]);
+        }catch{
+            return createToast("Error occurred", "Cannot create task", "danger", false);
+        }
+
+        // Create DB
+        try{
+            res["CreateDB"] = await API.communicateRAW("/api/task/database/create", "POST", {
+                targetURL: this.inputHandler.formData.target.replace(/(^\w+:|^)\/\//, '').replaceAll("/", ""),
+                taskID: taskID
+            });
+        }catch{
+            return createToast("Error occurred", "Cannot create DB", "danger", false);
+        }
+
+        // Get task count
+        res["taskCount"] = await API.communicateRAW("/api/task/count");
+        res["taskCount"] = res["taskCount"].count;
+
+        // Send Task
+        await API.communicateRAW("/automation/options", "POST", this.inputHandler.formData, true);
 
         createToast("Job submitted", "Redirecting you to dashboard", "success", false, 3);
         setTimeout(() => {
-            document.location.replace("/dashboard");
+            //document.location.replace("/dashboard");
         }, 3000);
     }
 
