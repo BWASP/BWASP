@@ -219,6 +219,7 @@ class optionFrontHandler {
     }
 
     async checkAvailability() {
+        return true;
         let data = Object();
         try{
             data = await API.communicateRAW("/api/job");
