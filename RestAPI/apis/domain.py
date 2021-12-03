@@ -63,18 +63,19 @@ class Domain_data_access_object(object):
         return self.selectData
 
     def create(self, data):
-        if str(type(data)) == "<class 'list '>":
+        if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
 
                 for ListOfData in range(len(data)):
+                    print(f'domain post {json.dumps(self.insertData[ListOfData]["Details"])}')
                     g.bwasp_db_obj.add(
                         domainModel(related_Packet=int(self.insertData[ListOfData]["related_Packet"]),
                                     URL=str(self.insertData[ListOfData]["URL"]),
                                     URI=str(self.insertData[ListOfData]["URI"]),
-                                    action_URL=str(self.insertData[ListOfData]["action_URL"]),
-                                    action_URL_Type=str(self.insertData[ListOfData]["action_URL_Type"]),
-                                    params=str(self.insertData[ListOfData]["params"]),
+                                    action_URL=json.dumps(self.insertData[ListOfData]["action_URL"]),
+                                    action_URL_Type=json.dumps(self.insertData[ListOfData]["action_URL_Type"]),
+                                    params=json.dumps(self.insertData[ListOfData]["params"]),
                                     comment=str(self.insertData[ListOfData]["comment"]),
                                     attackVector=json.dumps(self.insertData[ListOfData]["attackVector"]),
                                     impactRate=int(self.insertData[ListOfData]["impactRate"]),
