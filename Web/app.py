@@ -5,8 +5,6 @@ import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
-from Crawling.scouter import start
-
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -34,15 +32,6 @@ def create_app(config=None):
     return app
 
 
-def AutomatedAnalysis(url, depth, options):
-    start(url, int(depth), options)
-
-
-def ManualAnalysis(url, depth, options):
-    pass
-
-
 if __name__ == '__main__':
     application = create_app()
     application.run(host="0.0.0.0", port=20002, debug=True)
-
