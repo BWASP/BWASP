@@ -50,10 +50,21 @@ class API {
     /**
      * Communicate with API
      * @param {string} endpoint
+     * @param {string} requestType
+     * @param {object} dataPackage
+     * @param {boolean} isLocalhost
      */
-    async communicateRAW(endpoint) {
+    async communicateRAW(endpoint, requestType = "GET", dataPackage = null, isLocalhost = false) {
         await this.getFrontConfig();
-        const communication = await fetch(this.API.base + endpoint, this.requestOptions)
+        let requestOptions = {
+            method: requestType,
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        };
+        if(dataPackage !== null) requestOptions["body"] = JSON.stringify(dataPackage);
+        const communication = await fetch(`${(isLocalhost)?"":this.API.base}${endpoint}`, requestOptions)
             .catch(error => {
                 error = error.toString().split(": ");
                 throw new APICommunicationError(error[0], error[1]);
