@@ -1,0 +1,58 @@
+{
+  "maximum": {
+    "recursiveLevel": 5000,
+    "maximumProcesses": 10,
+    "steps": 4
+  },
+  "identifier": {
+    "optionalFunctions": "optFnc",
+    "webAppInfo": {
+      "name": "webAppName",
+      "version": "webAppVersion"
+    }
+  },
+  "steps": [
+    {
+      "title": "Analysis Target",
+      "subtitle": "Target"
+    },
+    {
+      "title": "Known Information",
+      "subtitle": "Info"
+    },
+    {
+      "title": "Tool Options",
+      "subtitle": "Options"
+    },
+    {
+      "title": "Job submission",
+      "subtitle": "Start"
+    }
+  ],
+  "sliderObjects": {
+    "recursiveLevel": {
+      "message": "Analysis recursive level cannot exceed",
+      "initial": 1,
+      "minimum": 1
+    },
+    "maximumProcesses": {
+      "message": "Maximum process cannot exceed",
+      "initial": 1,
+      "minimum": 0
+    }
+  },
+  "options": {
+    "portScan": {
+      "display": "Port scan (Known ports)",
+      "issue": false
+    },
+    "CSPEvaluate": {
+      "display": "Evaluate CSP",
+      "issue": false
+    },
+    "testPayloads": {
+      "display": "Test payloads",
+      "issue": true
+    }
+  }
+}

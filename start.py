@@ -12,3 +12,4 @@ if __name__ == '__main__':
         subprocess.call(["python", "RestAPI/app.py"])
     except KeyboardInterrupt:
         app.terminate()
+        app2.terminate()

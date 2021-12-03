@@ -78,10 +78,13 @@ def start(receive):
     # req_res_packets = #자동쪽의 패킷 값 가져오게
     # cookie_result = #자동쪽의 쿠키 값 가져오게
     #
+    
+    
 
-    prior_packetcount = Packets().GetManualCount()["retData"]["count"]
-    packet_indexes = list(range(prior_packetcount + 1, prior_packetcount + len(req_res_packets) + 1))
+    previous_packet_count = Packets().GetManualCount()["retData"]["count"]
     db.insertPackets(req_res_packets)
+    recent_packet_count =  len(req_res_packets) + previous_packet_count
+    packet_indexes = json.loads(Packets().GetManualIndex()["retData"]["id"])[previous_packet_count:recent_packet_count]
     result = db.insertDomains(req_res_packets, cookie_result, packet_indexes, list(receive.keys())[0], http_method, infor_vector,
                               robots_result, error_result)
 

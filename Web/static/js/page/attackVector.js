@@ -107,6 +107,7 @@ class pagerTools {
     constructor() {
         this.className = "pagerTools";
         this.API = new api();
+        this.dataSet = Array();
         this.paging = {
             currentPage: 1,
             rowPerPage: 10
@@ -186,95 +187,73 @@ class pagerTools {
         document.getElementById("rowPerPage").innerText = this.paging.rowPerPage;
 
         // Do job
-        await this.syncData(this.paging.currentPage, this.paging.rowPerPage, this.buildTable);
+        await this.syncData(this.paging.currentPage, this.paging.rowPerPage);
+        this.buildTable();
+
         modals.viewEngine.hide();
     }
 
-    async syncData(requestPage, rowPerPage, callback) {
-        let localDataPack = [],
-            counter = Number(),
-            pages = {
-                from: ((requestPage - 1) * rowPerPage) + 1,
-                count: rowPerPage
+    async syncData(requestPage, rowPerPage) {
+        this.dataSet = Array();
+        let vectors = await API.communicateRAW(`${APIEndpoints.vectors}/${((requestPage - 1) * rowPerPage) + 1}/${rowPerPage}`),
+            malformedID = {
+                vector: ["Details/", "action_URL", "action_URL_Type", "params", "Details"],
+                packet: ["requestJson", "responseHeader"]
             };
 
-        await API.communicate(
-            APIEndpoints.vectors + `/${pages.from}/${pages.count}`,
-            (err, res) => {
-                if (err) return returnError(err);
-                if (res.length === 0) return returnError("No data");
+        // If no data present
+        if (vectors.length === 0) return returnError("No data");
+        else for (const vector of vectors) {
+            let packet = Object();
+            try {
+                packet = await API.communicateRAW(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.auto}/${vector["related_Packet"]}`)
+            } catch {
+                packet = await API.communicateRAW(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.manual}/${vector["related_Packet"]}`)
+            }
 
-                res.forEach(async (domainData) => {
-                    let skeleton = {
-                        id: domainData["id"],
-                        category: Number(),
-                        url: {
-                            url: domainData["URL"],
-                            uri: domainData["URI"]
-                        },
-                        payloads: Array(),
-                        action: {
-                            target: API.jsonDataHandler(domainData["action_URL"]),
-                            type: API.jsonDataHandler(domainData["action_URL_Type"])
-                        },
-                        params: API.jsonDataHandler(domainData["params"]),
-                        allowMethod: Array(),
-                        vulnerability: {
-                            type: Object(),
-                            cve: Array()
-                        },
-                        method: String(),
-                        impactRate: domainData["impactRate"],
-                        details: API.jsonDataHandler(domainData["Details"])
-                    };
+            vector.attackVector = JSON.parse(vector.attackVector);
 
-                    // Reengineer details.
-                    Object.keys(skeleton.details).forEach((key) => skeleton.details[key] = API.jsonDataHandler(skeleton.details[key]));
+            // Fix malformed JSON
+            malformedID.vector.forEach((id) => {
+                // Check if scans recursively
+                let recursive = id.includes("/");
+                if (recursive) id = id.replaceAll("/", "");
 
-                    // Base64 Decryption
-                    Object.keys(skeleton.action).forEach((currentKey) => {
-                        for (let counter = 0; counter <= skeleton.action[currentKey].length - 1; counter++) {
-                            skeleton.action[currentKey][counter] = atob(skeleton.action[currentKey][counter]);
+                // Handle data to jsonDataHandler
+                vector[id] = API.jsonDataHandler(vector[id]);
+
+                // Recursive Handler
+                if (recursive) {
+                    Object.keys(vector[id]).forEach((key) => {
+                        if (typeof (vector[id][key]) === "string") {
+                            vector[id][key] = API.jsonDataHandler(vector[id][key]);
                         }
                     })
+                }
+            });
+            malformedID.packet.forEach((id) => packet[id] = API.jsonDataHandler(packet[id]));
 
-                    for (let counter = 0; counter <= skeleton.details.tag.length - 1; counter++) {
-                        skeleton.details.tag[counter] = atob(skeleton.details.tag[counter]);
-                    }
-
-                    // Attack vector data regulation
-                    let attackVector = API.jsonDataHandler(domainData["attackVector"]);
-                    if (typeof (attackVector["Allow Method"]) !== "undefined") skeleton.allowMethod = attackVector["Allow Method"];
-                    delete attackVector["Allow Method"];
-                    skeleton.vulnerability.type = attackVector;
-
-                    // Receive data from API
-                    await API.communicate(
-                        `${APIEndpoints.packets.base}/${APIEndpoints.packets.type.auto}/${domainData["related_Packet"]}`,
-                        (err, localRes) => {
-                            let packetData = Array();
-                            if (!err) packetData = localRes;
-                            else API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.manual}/${domainData["related_Packet"]}`, (err, res) => {
-                                if (!err) packetData = res;
-                            });
-                            skeleton.category = packetData["category"];
-                            skeleton.method = packetData["requestType"];
-
-                            // Push data(s) to localDataPack
-                            localDataPack.push(skeleton);
-
-                            // Push data to callback when job done.
-                            if (counter++ + 1 === res.length) {
-                                console.info(`${this.className}.syncData() : Loaded ${localDataPack.length} rows.`);
-                                callback(localDataPack);
-                            }
-                        });
-                });
+            // Base64 Decode
+            ["action_URL_Type"].forEach((target) => {
+                for(let count = 0; count <= vector[target].length - 1; count++) {
+                    vector[target][count] = atob(vector[target][count])
+                }
+            })
+            for(let count = 0; count <= vector.Details.tag.length - 1; count++) {
+                vector.Details.tag[count] = atob(vector.Details.tag[count])
             }
-        )
+            // vector.action_URL_Type.forEach((id) => console.log(vector.action_URL_Type));
+
+            this.dataSet.push({
+                vector: vector,
+                packet: packet
+            })
+        }
+
+        return this.dataSet;
     }
 
-    buildTable(dataPackage) {
+    buildTable() {
         let builder = new tableBuilder(),
             table = {
                 ID: createKey(),
@@ -301,7 +280,7 @@ class pagerTools {
         // Set default table classes
         table.elements.table.classList.add("table", "table-hover");
 
-        dataPackage.forEach((dataSet) => {
+        this.dataSet.forEach((dataSet) => {
             let rowElement = {
                 parent: document.createElement("tr"),
                 child: {
@@ -334,31 +313,35 @@ class pagerTools {
             rowElement.parent.appendChild(rowElement.child.category);
 
             // Build URL
-            rowElement.child.URL.innerText = dataSet.url.url + dataSet.url.uri;
+            rowElement.child.URL.innerText = dataSet.vector.URL + dataSet.vector.URI;
             rowElement.child.URL.classList.add("text-break");
             // rowElement.child.URL.classList.add("text-break");
             rowElement.parent.appendChild(rowElement.child.URL);
 
             // Build action if present
-            if (dataSet.action.target.length !== 0) {
-                for (let rowNum = 0; rowNum <= dataSet.action.target.length - 1; rowNum++) {
-                    let localSkeleton = {
-                        parent: document.createElement("div"),
-                        target: document.createElement("p"),
-                        method: document.createElement("p")
+            if (dataSet.vector.action_URL.length !== 0) {
+                for (let rowNum = 0; rowNum <= dataSet.vector.action_URL.length - 1; rowNum++) {
+                    if(dataSet.vector.action_URL[rowNum] !== ""){
+                        let localSkeleton = {
+                            parent: document.createElement("div"),
+                            target: document.createElement("p"),
+                            method: document.createElement("p")
+                        }
+
+                        localSkeleton.method.innerText = dataSet.vector.action_URL[rowNum];
+                        localSkeleton.target.innerText = dataSet.vector.action_URL_Type[rowNum];
+
+                        localSkeleton.parent.classList.add("mt-1", "mb-1");
+                        console.log(dataSet.vector.action_URL_Type[rowNum].toLowerCase());
+                        localSkeleton.method.classList.add("badge", coloring[dataSet.vector.action_URL_Type[rowNum].toLowerCase()], "text-uppercase", "me-2", "mb-1");
+                        localSkeleton.target.classList.add("mb-0", "text-break");
+
+                        localSkeleton.parent.append(
+                            localSkeleton.method,
+                            localSkeleton.target
+                        )
+                        rowElement.child.action.parent.appendChild(localSkeleton.parent);
                     }
-                    localSkeleton.method.innerText = dataSet.action.type[rowNum];
-                    localSkeleton.target.innerText = dataSet.action.target[rowNum];
-
-                    localSkeleton.parent.classList.add("mt-1", "mb-1");
-                    localSkeleton.method.classList.add("badge", coloring[dataSet.action.type[rowNum].toLowerCase()], "text-uppercase", "me-2", "mb-1");
-                    localSkeleton.target.classList.add("mb-0", "text-break");
-
-                    localSkeleton.parent.append(
-                        localSkeleton.method,
-                        localSkeleton.target
-                    )
-                    rowElement.child.action.parent.appendChild(localSkeleton.parent);
                 }
                 rowElement.parent.appendChild(rowElement.child.action.parent);
             } else {
@@ -368,7 +351,7 @@ class pagerTools {
             // Build params if present
             let paramSet = Array();
             rowElement.child.params.classList.add("text-center");
-            dataSet.params.forEach((param) => {
+            dataSet.vector.params.forEach((param) => {
                 if (param !== "") {
                     if (param.includes("=")) param = param.split("=")[0];
                     paramSet.push(param);
@@ -388,7 +371,7 @@ class pagerTools {
             }
 
             // Build vulnerability doubt
-            paramSet = Object.keys(dataSet.vulnerability.type.doubt);
+            paramSet = Object.keys(dataSet.vector.attackVector.doubt);
             rowElement.child.threat.classList.add("text-center");
             paramSet.forEach((param) => {
                 let codeElement = document.createElement("code");
@@ -402,15 +385,15 @@ class pagerTools {
             );
 
             // Build Method
-            rowElement.child.method.method.innerText = dataSet.method;
+            rowElement.child.method.method.innerText = dataSet.packet.requestType;
             rowElement.child.method.method.classList.add("badge", "bg-success");
             rowElement.child.method.parent.classList.add("text-center");
             rowElement.child.method.parent.appendChild(rowElement.child.method.method);
             rowElement.parent.appendChild(rowElement.child.method.parent);
 
             // Build Impact
-            rowElement.child.impact.rate.innerText = impactRate[dataSet.impactRate][1];
-            rowElement.child.impact.rate.classList.add("badge", "rounded-pill", `bg-${impactRate[dataSet.impactRate][0]}`, "small");
+            rowElement.child.impact.rate.innerText = impactRate[dataSet.vector.impactRate][1];
+            rowElement.child.impact.rate.classList.add("badge", "rounded-pill", `bg-${impactRate[dataSet.vector.impactRate][0]}`, "small");
             rowElement.child.impact.parent.classList.add("text-center");
             rowElement.child.impact.parent.appendChild(rowElement.child.impact.rate);
             rowElement.parent.appendChild(rowElement.child.impact.parent);
@@ -451,6 +434,7 @@ let pager = new pagerTools();
 let referredDocuments = Object();
 
 const openDetailsModal = (dataSet) => {
+    console.log(dataSet);
     /**
      * Build Violation section for details modal
      * @param dataPackage
@@ -567,7 +551,7 @@ const openDetailsModal = (dataSet) => {
     })
 
     // Set current row ID
-    document.getElementById("currentRowID").innerText = dataSet.id;
+    document.getElementById("currentRowID").innerText = dataSet.vector.id;
 
     // Set each value - impact
     let modalDataElement = {
@@ -583,12 +567,12 @@ const openDetailsModal = (dataSet) => {
 
     // Impact rate
     modalDataElement.impact.className = "";
-    modalDataElement.impact.classList.add("badge", "rounded-pill", "small", `bg-${impactRate[dataSet.impactRate][0]}`);
-    modalDataElement.impact.innerText = impactRate[dataSet.impactRate][1];
+    modalDataElement.impact.classList.add("badge", "rounded-pill", "small", `bg-${impactRate[dataSet.vector.impactRate][0]}`);
+    modalDataElement.impact.innerText = impactRate[dataSet.vector.impactRate][1];
 
     // Threats
     modalDataElement.threat.innerText = "";
-    let doubtList = Object.keys(dataSet.vulnerability.type["doubt"]);
+    let doubtList = Object.keys(dataSet.vector.attackVector["doubt"]);
     document.getElementById("referredDocumentViewArea").innerHTML = "";
     if (doubtList.length > 0) {
         doubtList.forEach((currentThreat) => {
@@ -603,28 +587,28 @@ const openDetailsModal = (dataSet) => {
     }
 
     // URL
-    modalDataElement.url.url.innerText = dataSet.url.url;
-    modalDataElement.url.uri.innerText = dataSet.url.uri;
-    modalDataElement.url.method.innerText = dataSet.method.toUpperCase();
+    modalDataElement.url.url.innerText = dataSet.vector.URL;
+    modalDataElement.url.uri.innerText = dataSet.vector.URI;
+    modalDataElement.url.method.innerText = dataSet.packet.requestType.toUpperCase();
 
     // Actions
     modalDataElement.actions.innerHTML = " - ";
-    if (dataSet.action.target.length > 0) {
+    if (dataSet.vector.action_URL_Type.length > 0) {
         modalDataElement.actions.innerHTML = "";
-        for (let currentRow = 0; currentRow <= dataSet.action.target.length - 1; currentRow++) {
+        for (let currentRow = 0; currentRow <= dataSet.vector.action_URL.length - 1; currentRow++) {
             let localSkeleton = {
                 parent: document.createElement("p"),
                 method: document.createElement("span"),
                 target: document.createElement("span")
             }
             localSkeleton.method.classList.add("badge", "text-uppercase", "me-2", "mb-1",
-                (typeof (coloring[dataSet.action.type[currentRow].toLowerCase()]) === "undefined")
+                (typeof (coloring[dataSet.vector.action_URL_Type[currentRow].toLowerCase()]) === "undefined")
                     ? "bg-warning"
-                    : coloring[dataSet.action.type[currentRow].toLowerCase()]);
+                    : coloring[dataSet.vector.action_URL_Type[currentRow].toLowerCase()]);
             localSkeleton.target.classList.add("text-break");
 
-            localSkeleton.method.innerText = dataSet.action.type[currentRow];
-            localSkeleton.target.innerText = dataSet.action.target[currentRow];
+            localSkeleton.method.innerText = dataSet.vector.action_URL_Type[currentRow];
+            localSkeleton.target.innerText = dataSet.vector.action_URL[currentRow];
             localSkeleton.parent.append(
                 localSkeleton.method,
                 localSkeleton.target
@@ -632,13 +616,13 @@ const openDetailsModal = (dataSet) => {
             modalDataElement.actions.appendChild(localSkeleton.parent);
         }
     } else {
-        dataSet.action.innerHTML = " - ";
+        // dataSet.action.innerHTML = " - ";
     }
 
 
     // Create cookie view
     [dataKind[0], dataKind[1]].forEach((currentKind) => {
-        Object.keys(dataSet.details[currentKind]).forEach((currentData) => {
+        Object.keys(dataSet.vector.Details[currentKind]).forEach((currentData) => {
             let localSkeleton = {
                 parent: document.createElement("tr"),
                 key: document.createElement("th"),
@@ -648,7 +632,7 @@ const openDetailsModal = (dataSet) => {
                 }
             };
             localSkeleton.key.innerText = currentData;
-            localSkeleton.value.value.innerText = dataSet.details[currentKind][currentData];
+            localSkeleton.value.value.innerText = dataSet.vector.Details[currentKind][currentData];
             localSkeleton.value.parent.appendChild(localSkeleton.value.value);
 
             localSkeleton.key.classList.add("text-break");
@@ -660,12 +644,12 @@ const openDetailsModal = (dataSet) => {
             );
             modalElements[currentKind].tablePlace.appendChild(localSkeleton.parent);
         })
-        if (Object.keys(dataSet.details[currentKind]).length !== 0) modalElements[currentKind].dataPlace.classList.remove("d-none");
+        if (Object.keys(dataSet.vector.Details[currentKind]).length !== 0) modalElements[currentKind].dataPlace.classList.remove("d-none");
         else modalElements[currentKind].noData.classList.remove("d-none");
     })
 
-    if (dataSet.details[dataKind[2]].length !== 0) {
-        dataSet.details[dataKind[2]].forEach((currentTag) => {
+    if (dataSet.vector.Details[dataKind[2]].length !== 0) {
+        dataSet.vector.Details[dataKind[2]].forEach((currentTag) => {
             let localSkeleton = {
                 pre: document.createElement("pre"),
                 code: document.createElement("code")
@@ -679,8 +663,8 @@ const openDetailsModal = (dataSet) => {
         modalElements[dataKind[2]].dataPlace.classList.remove("d-none");
     } else modalElements[dataKind[2]].noData.classList.remove("d-none");
 
-    if (Object.keys(dataSet.vulnerability.type["misc"]).length > 0) {
-        buildViolationElement(dataSet.vulnerability.type["misc"]);
+    if (Object.keys(dataSet.vector.attackVector["misc"]).length > 0) {
+        buildViolationElement(dataSet.vector.attackVector["misc"]);
     }
 
     hljs.highlightAll();
