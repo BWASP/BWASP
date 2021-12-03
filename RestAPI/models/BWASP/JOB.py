@@ -23,8 +23,8 @@ class job(JOB_DB.Model):
     targetURL = JOB_DB.Column(JOB_DB.TEXT, nullable=False)
     knownInfo = JOB_DB.Column(JOB_DB.TEXT, nullable=False)
     recursiveLevel = JOB_DB.Column(JOB_DB.TEXT, nullable=False)
-    done = JOB_DB.Column(JOB_DB.BOOLEAN, default=False)
-    maximumProcess = JOB_DB.Column(JOB_DB.TEXT, nullable=0)
+    done = JOB_DB.Column(JOB_DB.BOOLEAN, default=0, nullabl=False)
+    maximumProcess = JOB_DB.Column(JOB_DB.TEXT, nullable=False)
 
     def __init__(self, targetURL, knownInfo, recursiveLevel, done, maximumProcess, **kwargs):
         self.targetURL = targetURL
