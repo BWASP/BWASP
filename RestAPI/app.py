@@ -8,8 +8,6 @@ from models.BWASP.model_returnObj import bwasp_db
 from models.BWASP.model_returnObj import cve_db
 from models.BWASP.model_returnObj import task_db
 
-print(bwasp_db)
-
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -45,8 +43,6 @@ def create_app(config=None):
 
     bwasp_db.init_app(app)
     bwasp_db.app = app
-
-    print(bwasp_db)
 
     task_db.create_all(bind='TASK_MANAGER')
 

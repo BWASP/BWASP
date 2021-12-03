@@ -115,8 +115,6 @@ class task_data_access_object(object):
 
                 app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[0] + "-" + values_idx_list[1] + ".db")}'
                 app.config["SQLALCHEMY_BINDS"]['BWASP'] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[0] + "-" + values_idx_list[1] + ".db")}'
-                print(f'SQLALCHEMY_DATABASE_URI: {app.config["SQLALCHEMY_DATABASE_URI"]}')
-                print(f'SQLALCHEMY_BINDS: {app.config["SQLALCHEMY_BINDS"]}')
 
                 # Database create
                 from models.BWASP.CSPEVALUATOR import CSPEVALUATOR_DB
