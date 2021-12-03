@@ -1,7 +1,6 @@
 .idea/*
 Web/__pycache__/*
 Web/BWASP/*
-BWASP
 .DS_store
 *.pyc
 Web/databases/CVE.db
