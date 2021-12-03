@@ -57,7 +57,6 @@ class Systeminfo_data_access_object(object):
                 self.insertData = data
 
                 for ListOfData in range(len(data)):
-                    print(f'systeminfo post {json.dumps(self.insertData[ListOfData]["data"])}')
                     g.bwasp_db_obj.add(
                         systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
                                         data=json.dumps(self.insertData[ListOfData]["data"])
@@ -75,7 +74,6 @@ class Systeminfo_data_access_object(object):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.updateData = data
-                print(f'systeminfo patch {self.updateData}')
 
                 for ListofData in range(len(data)):
                     g.bwasp_db_obj.query(systeminfoModel).filter(

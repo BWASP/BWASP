@@ -68,7 +68,6 @@ class Domain_data_access_object(object):
                 self.insertData = data
 
                 for ListOfData in range(len(data)):
-                    print(f'domain post {json.dumps(self.insertData[ListOfData]["Details"])}')
                     g.bwasp_db_obj.add(
                         domainModel(related_Packet=int(self.insertData[ListOfData]["related_Packet"]),
                                     URL=str(self.insertData[ListOfData]["URL"]),
