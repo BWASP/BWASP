@@ -1,13 +1,13 @@
 from flask import g
-from flask_restx import Resource, fields, Namespace
+from flask_restx import (
+    Resource, fields, Namespace
+)
 import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from .api_returnObj import Return_object
-
-from models.BWASP.BWASP import systeminfo as systeminfoModel
-# from models.SYSTEMINFO import systeminfo as systeminfoModel
+from models.BWASP.SYSTEMINFO import systeminfo as systeminfoModel
 
 ns = Namespace('api/systeminfo', description='system info operations')
 

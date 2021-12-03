@@ -10,8 +10,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from .api_returnObj import Return_object
 
 from models.TASK_MANAGER.TASK import task as taskModel
-
-from models.BWASP.BWASP import bwasp_db
+from models.BWASP.model_returnObj import bwasp_db
 from configs import BASE_PATH
 
 ns = Namespace('api/task', description='task operations')

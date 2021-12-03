@@ -1,12 +1,13 @@
 from flask import g
-from flask_restx import Resource, fields, Namespace
-from .api_returnObj import Return_object
+from flask_restx import (
+    Resource, fields, Namespace
+)
 import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from models.BWASP.BWASP import domain as domainModel
-# from models.DOMAIN import domain as domainModel
+from .api_returnObj import Return_object
+from models.BWASP.DOMAIN import domain as domainModel
 
 ns = Namespace('api/domain', description='domain operations')
 

@@ -7,9 +7,7 @@ import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from .api_returnObj import Return_object
-
-from models.BWASP.BWASP import CSPEvaluator as CSPEvaluatorModel
-# from models.CSPEVALUATOR import CSPEvaluator as CSPEvaluatorModel
+from models.BWASP.CSPEVALUATOR import CSPEvaluator as CSPEvaluatorModel
 
 ns = Namespace('api/cspevaluator', description='csp evaluator operations')
 

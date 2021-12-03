@@ -2,15 +2,12 @@ from flask import g
 from flask_restx import (
     Resource, fields, Namespace
 )
-# from .api_custom_fields import StringToJSON
 import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from .api_returnObj import Return_object
-
-from models.BWASP.BWASP import packet as packetsModel
-# from models.PACKET import packet as packetModel
+from models.BWASP.PACKET import packet as packetsModel
 
 ns = Namespace('api/packet', description='packet operations')
 
