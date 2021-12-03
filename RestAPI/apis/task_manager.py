@@ -7,7 +7,7 @@ import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from .api_returnObj import Return_object
+from api_returnObj import Return_object
 
 from models.TASK_MANAGER.TASK import task as taskModel
 from models.BWASP.model_returnObj import bwasp_db
@@ -112,8 +112,8 @@ class task_data_access_object(object):
                 for values_idx in self.insertData.values():
                     values_idx_list.append(values_idx)
 
-                app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[0] + "-" + values_idx_list[1] + ".db")}'
-                app.config["SQLALCHEMY_BINDS"]['BWASP'] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[0] + "-" + values_idx_list[1] + ".db")}'
+                app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[1] + "-" + values_idx_list[0] + ".db")}'
+                app.config["SQLALCHEMY_BINDS"]['BWASP'] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[1] + "-" + values_idx_list[0] + ".db")}'
 
                 # Database create
                 from models.BWASP.CSPEVALUATOR import CSPEVALUATOR_DB
@@ -125,11 +125,11 @@ class task_data_access_object(object):
 
                 bwasp_db.create_all(bind='BWASP')
 
-                return Return_object().return_patch_http_status_message(Type=True)
+                return Return_object().return_post_http_status_message(Type=True)
             except:
                 pass
 
-        return Return_object().return_patch_http_status_message(Type=False)
+        return Return_object().return_post_http_status_message(Type=False)
 
 
 data_access_object_for_task = task_data_access_object()

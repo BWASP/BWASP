@@ -14,7 +14,7 @@ import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from model_returnObj import bwasp_db as PORTS_DB
+from .model_returnObj import bwasp_db as PORTS_DB
 
 
 class ports(PORTS_DB.Model):

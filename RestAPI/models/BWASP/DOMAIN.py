@@ -14,7 +14,7 @@ import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from model_returnObj import bwasp_db as DOMAIN_DB
+from .model_returnObj import bwasp_db as DOMAIN_DB
 
 
 class domain(DOMAIN_DB.Model):

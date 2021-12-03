@@ -14,7 +14,7 @@ import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from model_returnObj import bwasp_db as SYSTEMINFO_DB
+from .model_returnObj import bwasp_db as SYSTEMINFO_DB
 
 
 class systeminfo(SYSTEMINFO_DB.Model):

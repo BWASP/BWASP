@@ -14,7 +14,7 @@ import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from model_returnObj import bwasp_db as CSPEVALUATOR_DB
+from .model_returnObj import bwasp_db as CSPEVALUATOR_DB
 
 
 class CSPEvaluator(CSPEVALUATOR_DB.Model):

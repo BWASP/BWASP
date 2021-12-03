@@ -27,9 +27,7 @@ def create_app(config=None):
 
     # Register routing for blueprint
     from apis import bp as api
-    # from task_managements import manage
     app.register_blueprint(api)
-    # app.register_blueprint(manage.bp)
 
     # App context initialization
     app.app_context().push()
