@@ -1,19 +1,17 @@
 from flask import (
     g,
-    request,
     current_app as app
 )
-from flask_restx import Resource, fields, Namespace, model
-import sys, os, json
+from flask_restx import Resource, fields, Namespace
+import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from .api_returnObj import Return_object
-from .api_custom_fields import StringToJSON
 
-from models.TASK import task as taskModel
+from models.TASK_MANAGER.TASK import task as taskModel
 
-from models.BWASP import bwasp_db
+from models.BWASP.BWASP import bwasp_db
 from configs import BASE_PATH
 
 ns = Namespace('api/task', description='task operations')
@@ -117,16 +115,14 @@ class task_data_access_object(object):
 
                 app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[0] + "-" + values_idx_list[1] + ".db")}'
                 app.config["SQLALCHEMY_BINDS"]['BWASP'] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[0] + "-" + values_idx_list[1] + ".db")}'
-                print(f'SQLALCHEMY_DATABASE_URI: {app.config["SQLALCHEMY_DATABASE_URI"]}')
-                print(f'SQLALCHEMY_BINDS: {app.config["SQLALCHEMY_BINDS"]}')
 
                 # Database create
-                from models.CSPEVALUATOR import CSPEVALUATOR_DB
-                from models.PORTS import ports
-                from models.PACKET import packet
-                from models.SYSTEMINFO import systeminfo
-                from models.JOB import job
-                from models.DOMAIN import domain
+                from models.BWASP.CSPEVALUATOR import CSPEVALUATOR_DB
+                from models.BWASP.PORTS import ports
+                from models.BWASP.PACKET import packet
+                from models.BWASP.SYSTEMINFO import systeminfo
+                from models.BWASP.JOB import job
+                from models.BWASP.DOMAIN import domain
 
                 bwasp_db.create_all(bind='BWASP')
 

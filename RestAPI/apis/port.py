@@ -6,7 +6,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from .api_returnObj import Return_object
 
-from models.BWASP import ports as portsModel
+from models.BWASP.BWASP import ports as portsModel
 # from models.PORTS import ports as portsModel
 
 

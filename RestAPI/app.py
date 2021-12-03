@@ -3,14 +3,10 @@ from flask import (
 )
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_cors import CORS
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
 
-from models.model_returnObj import bwasp_db
-from models.model_returnObj import cve_db
-from models.model_returnObj import task_db
-
-print(bwasp_db)
+from models.BWASP.model_returnObj import bwasp_db
+from models.BWASP.model_returnObj import cve_db
+from models.BWASP.model_returnObj import task_db
 
 
 def create_app(config=None):
@@ -47,8 +43,6 @@ def create_app(config=None):
 
     bwasp_db.init_app(app)
     bwasp_db.app = app
-
-    print(bwasp_db)
 
     task_db.create_all(bind='TASK_MANAGER')
 
