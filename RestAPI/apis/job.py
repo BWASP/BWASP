@@ -57,7 +57,6 @@ class Job_data_access_object(object):
         if str(type(data)) == "<class 'list'>":
             try:
                 self.insertData = data
-                print(self.insertData)
 
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
