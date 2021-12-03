@@ -5,11 +5,9 @@ from flask import (
     g,
     current_app as app
 )
-from models.BWASP import bwasp_db
+from models.model_returnObj import bwasp_db
 import os
 from configs import BASE_PATH
-
-# BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 NAME = 'task'
 bp = Blueprint(
@@ -21,6 +19,13 @@ bp = Blueprint(
 
 def database_init():
     # Database create
+    from models.CSPEVALUATOR import CSPEVALUATOR_DB
+    from models.PORTS import ports
+    from models.PACKET import packet
+    from models.SYSTEMINFO import systeminfo
+    from models.JOB import job
+    from models.DOMAIN import domain
+
     bwasp_db.create_all(bind='BWASP')
 
 
@@ -37,6 +42,6 @@ def manage():
 
         database_init()
 
-        return f'{app.config["SQLALCHEMY_BINDS"] }'
+        return f'{app.config["SQLALCHEMY_BINDS"], bwasp_db}'
 
     return app.config["SQLALCHEMY_DATABASE_URI"]

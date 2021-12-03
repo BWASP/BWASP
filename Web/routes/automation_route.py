@@ -36,6 +36,6 @@ def automation_options():
         except:
             abort(500, "Automation option setting data request error")
 
-        AutomatedAnalysis(reqJsonData["target"]["url"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
+        AutomatedAnalysis(reqJsonData["target"], reqJsonData["tool"]["analysisLevel"], reqJsonData)
 
     return render_template('automation/options.html', Title="Option for Automated analysis - BWASP")

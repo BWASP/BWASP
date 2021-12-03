@@ -10,6 +10,8 @@ from models.model_returnObj import bwasp_db
 from models.model_returnObj import cve_db
 from models.model_returnObj import task_db
 
+print(bwasp_db)
+
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -29,9 +31,9 @@ def create_app(config=None):
 
     # Register routing for blueprint
     from apis import bp as api
-    from task_managements import manage
+    # from task_managements import manage
     app.register_blueprint(api)
-    app.register_blueprint(manage.bp)
+    # app.register_blueprint(manage.bp)
 
     # App context initialization
     app.app_context().push()
@@ -45,6 +47,8 @@ def create_app(config=None):
 
     bwasp_db.init_app(app)
     bwasp_db.app = app
+
+    print(bwasp_db)
 
     task_db.create_all(bind='TASK_MANAGER')
 
