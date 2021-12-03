@@ -18,7 +18,7 @@ ns = Namespace('api/task', description='task operations')
 task = ns.model('task model', {
     'id': fields.Integer(readonly=True, description='Task initialization(task) id for unique identifier'),
     'targetURL': fields.String(required=True, description='target URL'),
-    'task_id': fields.Integer(required=True, description='task id')
+    'task_id': fields.String(required=True, description='task id')
 })
 
 task_count = ns.model('Task Row Count', {
@@ -66,8 +66,7 @@ class task_data_access_object(object):
                 for ListOfData in range(len(data)):
                     g.task_db_obj.add(
                         taskModel(targetURL=self.insertData[ListOfData]["targetURL"],
-                                  task_id=int(self.insertData[ListOfData]["task_id"]),
-                                  done=int(self.insertData[ListOfData]["done"])
+                                  task_id=self.insertData[ListOfData]["task_id"]
                                   )
                     )
                     g.task_db_obj.commit()
@@ -132,7 +131,7 @@ data_access_object_for_task = task_data_access_object()
 # task
 @ns.route('')
 class task_list(Resource):
-    """Update a list of all task data, and lets you POST to add new data"""
+    """POST to add new data"""
 
     @ns.doc('Create task')
     @ns.expect(task)

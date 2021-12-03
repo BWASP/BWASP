@@ -59,10 +59,10 @@ class Job_data_access_object(object):
 
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
-                        jobModel(targetURL=str(self.insertData[ListOfData]["targetURL"]),
-                                 knownInfo=self.insertData[ListOfData]["knownInfo"],
-                                 recursiveLevel=str(self.insertData[ListOfData]["recursiveLevel"]),
-                                 done=int(self.insertData[ListOfData]["done"]),
+                        jobModel(targetURL=str(self.insertData[ListOfData]["target"]),
+                                 knownInfo=str(self.insertData[ListOfData]["info"]),
+                                 recursiveLevel=str(self.insertData[ListOfData]["tool"]["analysisLevel"]),
+                                 done=0,
                                  maximumProcess=str(self.insertData[ListOfData]["maximumProcess"])
                                  )
                     )
@@ -71,6 +71,7 @@ class Job_data_access_object(object):
                 return Return_object().return_post_http_status_message(Type=True)
             except:
                 g.bwasp_db_obj.rollback()
+
 
         return Return_object().return_post_http_status_message(Type=False)
 
