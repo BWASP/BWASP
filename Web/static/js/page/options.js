@@ -640,26 +640,28 @@ class optionFrontHandler {
         res["taskCount"] = await API.communicateRAW("/api/task/count");
         res["taskCount"] = res["taskCount"].count;
 
-        // Save Task
-        try{
-            await API.communicateRAW("/api/job", "POST", {
-                targetURL: this.inputHandler.formData.target,
-                knownInfo: this.inputHandler.formData.info,
-                recursiveLevel: this.inputHandler.formData.tool.analysisLevel,
-                done: 0,
-                maximumProcess: this.inputHandler.formData.maximumProcess
-            })
-        }catch{
-            return createToast("Error occurred", "Cannot save task", "danger", false);
-        }
+        // Wait for 1 Sec
+        setTimeout(async () => {
+            // Save Task
+            try{
+                await API.communicateRAW("/api/job", "POST", [{
+                    targetURL: this.inputHandler.formData.target,
+                    knownInfo: JSON.stringify(this.inputHandler.formData.info),
+                    recursiveLevel: String(this.inputHandler.formData.tool.analysisLevel),
+                    maximumProcess: String(this.inputHandler.formData.maximumProcess)
+                }])
+            }catch{
+                return createToast("Error occurred", "Cannot save task", "danger", false);
+            }
 
-        // Send Task
-        API.communicateRAW("/automation/options", "POST", this.inputHandler.formData, true);
+            // Send Task
+            API.communicateRAW("/automation/options", "POST", this.inputHandler.formData, true);
 
-        createToast("Job submitted", "Redirecting you to dashboard", "success", false, 3);
-        setTimeout(() => {
-            //document.location.replace("/dashboard");
-        }, 3000);
+            createToast("Job submitted", "Redirecting you to dashboard", "success", false, 3);
+            setTimeout(() => {
+                document.location.replace("/dashboard");
+            }, 3000);
+        }, 1000);
     }
 
     sendConfigToHandler(dataPackage) {
