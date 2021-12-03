@@ -640,8 +640,21 @@ class optionFrontHandler {
         res["taskCount"] = await API.communicateRAW("/api/task/count");
         res["taskCount"] = res["taskCount"].count;
 
+        // Save Task
+        try{
+            await API.communicateRAW("/api/job", "POST", {
+                targetURL: this.inputHandler.formData.target,
+                knownInfo: this.inputHandler.formData.info,
+                recursiveLevel: this.inputHandler.formData.tool.analysisLevel,
+                done: 0,
+                maximumProcess: this.inputHandler.formData.maximumProcess
+            })
+        }catch{
+            return createToast("Error occurred", "Cannot save task", "danger", false);
+        }
+
         // Send Task
-        await API.communicateRAW("/automation/options", "POST", this.inputHandler.formData, true);
+        API.communicateRAW("/automation/options", "POST", this.inputHandler.formData, true);
 
         createToast("Job submitted", "Redirecting you to dashboard", "success", false, 3);
         setTimeout(() => {
