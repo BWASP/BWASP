@@ -1,3 +1,5 @@
+import json
+
 from flask import g
 from flask_restx import (
     Resource, fields, Namespace
@@ -16,8 +18,7 @@ job = ns.model('job model', {
     'targetURL': fields.String(required=True, description='target URL'),
     'knownInfo': fields.String(required=True, description='Known information'),
     'recursiveLevel': fields.String(required=True, description='recursive level'),
-    'done': fields.Integer(required=True, description='Analysis checking'),
-    'maximumProcess': fields.String(required=True, description='Process max count'),
+    'maximumProcess': fields.String(required=True, description='Process max count')
 })
 
 job_return_post_method = ns.model('Job Return Post Message', {
@@ -59,9 +60,9 @@ class Job_data_access_object(object):
 
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
-                        jobModel(targetURL=str(self.insertData[ListOfData]["target"]),
-                                 knownInfo=json.dumps(self.insertData[ListOfData]["info"]),
-                                 recursiveLevel=str(self.insertData[ListOfData]["tool"]["analysisLevel"]),
+                        jobModel(targetURL=str(self.insertData[ListOfData]["targetURL"]),
+                                 knownInfo=json.dumps(self.insertData[ListOfData]["knownInfo"]),
+                                 recursiveLevel=str(self.insertData[ListOfData]["recursiveLevel"]),
                                  done=0,
                                  maximumProcess=str(self.insertData[ListOfData]["maximumProcess"])
                                  )
@@ -71,7 +72,6 @@ class Job_data_access_object(object):
                 return Return_object().return_post_http_status_message(Type=True)
             except:
                 g.bwasp_db_obj.rollback()
-
 
         return Return_object().return_post_http_status_message(Type=False)
 
