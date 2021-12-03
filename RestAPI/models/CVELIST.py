@@ -9,19 +9,16 @@
     :copyright: (c) YEAR by AUTHOR.
     :license: LICENSE_NAME, see LICENSE_FILE for more details.
 """
-
-from flask_sqlalchemy import SQLAlchemy
-
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-cve_db = SQLAlchemy()
+from models.model_returnObj import cve_db as CVELIST_DB
 
 
-class cve(cve_db.Model):
+class cve(CVELIST_DB.Model):
     __tablename__ = 'cvelist'
     __bind_key__ = 'CVELIST'
 
-    id = cve_db.Column(cve_db.Integer, primary_key=True, autoincrement=True)
-    year = cve_db.Column(cve_db.TEXT, nullable=False)
-    description = cve_db.Column(cve_db.TEXT, nullable=False)
+    id = CVELIST_DB.Column(CVELIST_DB.Integer, primary_key=True, autoincrement=True)
+    year = CVELIST_DB.Column(CVELIST_DB.TEXT, nullable=False)
+    description = CVELIST_DB.Column(CVELIST_DB.TEXT, nullable=False)

@@ -17,7 +17,7 @@ class domain(bwasp_db.Model):
     URL = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
     URI = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
     action_URL = bwasp_db.Column(bwasp_db.TEXT, nullable=False)  # TEXT
-    action_URL_Type = bwasp_db.Column(bwasp_db.TEXT, nullable=False)  # TEX T
+    action_URL_Type = bwasp_db.Column(bwasp_db.TEXT, nullable=False)  # TEXT
     params = bwasp_db.Column(bwasp_db.TEXT, nullable=False)  # TEXT
     comment = bwasp_db.Column(bwasp_db.TEXT, nullable=False)
     attackVector = bwasp_db.Column(bwasp_db.TEXT, nullable=False)

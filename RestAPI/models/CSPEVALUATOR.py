@@ -14,13 +14,12 @@ import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# from RestAPI.app import db as CSPEVALUATOR_DB
 from models.model_returnObj import bwasp_db as CSPEVALUATOR_DB
 
 
 class CSPEvaluator(CSPEVALUATOR_DB.Model):
     __tablename__ = 'CSPEvaluator'
-    # __bind_key__ = 'BWASP'
+    __bind_key__ = 'BWASP'
 
     id = CSPEVALUATOR_DB.Column(CSPEVALUATOR_DB.Integer, primary_key=True, autoincrement=True)
     header = CSPEVALUATOR_DB.Column(CSPEVALUATOR_DB.TEXT, nullable=False)
@@ -30,19 +29,3 @@ class CSPEvaluator(CSPEVALUATOR_DB.Model):
 
     def __repr__(self):
         return f"<CSPEvaluator('{self.header}')>"
-
-
-"""
-class CSPEvaluator(bwasp_db.Model):
-    __tablename__ = 'CSPEvaluator'
-    # __bind_key__ = 'BWASP'
-
-    id = bwasp_db.Column(bwasp_db.Integer, primary_key=True, autoincrement=True)
-    header = bwasp_db.Column(bwasp_db.JSON, nullable=False)
-
-    def __init__(self, header, **kwargs):
-        self.header = header
-
-    def __repr__(self):
-        return f"<CSPEvaluator('{self.header}')>"
-"""
