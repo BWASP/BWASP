@@ -33,7 +33,7 @@ packet_index = ns.model('Packet Index', {
 })
 
 packet_count = ns.model('Packet Row Count', {
-    'count': fields.Integer(readonly=True, description='Count of all CspEvaluator id data')
+    'count': fields.Integer(readonly=True, description='Count of all packets id data')
 })
 
 

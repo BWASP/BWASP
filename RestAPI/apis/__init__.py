@@ -9,6 +9,8 @@ from .job import ns as job_namespace
 from .port import ns as port_namespace
 from .system_info import ns as system_info_namespace
 
+from .task_manager import ns as task_manager_namespace
+
 NAME = 'api'
 bp = Blueprint(
     NAME,
@@ -30,4 +32,6 @@ api.add_namespace(domain_namespace)
 api.add_namespace(job_namespace)
 api.add_namespace(port_namespace)
 api.add_namespace(system_info_namespace)
+
+api.add_namespace(task_manager_namespace)
 

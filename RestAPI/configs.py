@@ -11,7 +11,7 @@ class Config(object):
     SESSION_COOKIE_NAME = 'BWASP'
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(BASE_PATH, "databases/TEMP.db")}'
     SQLALCHEMY_BINDS = {
-        "CVELIST": f'sqlite:///{os.path.join(BASE_PATH, "databases/CVE.db")}',
+        "CVELIST": f'sqlite:///{os.path.join(BASE_PATH, "databases/CVELIST.db")}',
         "TASK_MANAGER": f'sqlite:///{os.path.join(BASE_PATH, "databases/TASK_MANAGER.db")}'
     }
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
