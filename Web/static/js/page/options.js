@@ -620,8 +620,7 @@ class optionFrontHandler {
         try{
             res["CreateTask"] = await API.communicateRAW("/api/task", "POST", [{
                 targetURL: this.inputHandler.formData.target,
-                task_id: taskID,
-                "done": 0
+                task_id: taskID
             }]);
         }catch{
             return createToast("Error occurred", "Cannot create task", "danger", false);
