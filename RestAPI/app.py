@@ -6,9 +6,9 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
-from models.BWASP import bwasp_db
-from models.CVELIST import cve_db
-from models.TASK import task_db
+from models.model_returnObj import bwasp_db
+from models.model_returnObj import cve_db
+from models.model_returnObj import task_db
 
 
 def create_app(config=None):
@@ -42,10 +42,11 @@ def create_app(config=None):
 
     task_db.init_app(app)
     task_db.app = app
-    task_db.create_all(bind='TASK_MANAGER')
 
     bwasp_db.init_app(app)
     bwasp_db.app = app
+
+    task_db.create_all(bind='TASK_MANAGER')
 
     @app.before_request
     def before_request():
