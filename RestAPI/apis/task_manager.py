@@ -18,8 +18,7 @@ ns = Namespace('api/task', description='task operations')
 task = ns.model('task model', {
     'id': fields.Integer(readonly=True, description='Task initialization(task) id for unique identifier'),
     'targetURL': fields.String(required=True, description='target URL'),
-    'task_id': fields.Integer(required=True, description='task id'),
-    'done': fields.Integer(required=True, description='Analysis checking')
+    'task_id': fields.Integer(required=True, description='task id')
 })
 
 task_count = ns.model('Task Row Count', {
@@ -28,11 +27,6 @@ task_count = ns.model('Task Row Count', {
 
 task_return_post_method = ns.model('task Return Post Message', {
     "message": fields.String(readonly=True, description='message of return data')
-})
-
-task_update_analysis_check = ns.model('task Update', {
-    'id': fields.Integer(required=True, description='setting initialization(task) id for unique identifier'),
-    'done': fields.Integer(required=True, description='Analysis checking')
 })
 
 task_create_and_db = ns.model('New task db create', {
@@ -139,13 +133,6 @@ data_access_object_for_task = task_data_access_object()
 @ns.route('')
 class task_list(Resource):
     """Update a list of all task data, and lets you POST to add new data"""
-
-    @ns.doc('Update task')
-    @ns.expect(task_update_analysis_check)
-    @ns.marshal_with(task_return_post_method)
-    def patch(self):
-        """Update a data given its identifier"""
-        return data_access_object_for_task.update(ns.payload)
 
     @ns.doc('Create task')
     @ns.expect(task)
