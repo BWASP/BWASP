@@ -123,6 +123,20 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
 
 
         tag_name_list.append(url_part.query) # hello=world&a=b
+
+        #tag_name, action_page, action_type [ '' ] 값 정리
+        for x in range(len(tag_name_list)):
+            if "" == tag_name_list[x]:
+                tag_name_list.pop(x)
+
+        for x in range(len(action_page)):
+            if "" == action_page[x]:
+                action_page.pop(x)
+
+        for x in range(len(action_type)):
+            if "" == action_type[x]:
+                action_page.pop(x)
+
         #domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
 
         #Query String 정리
