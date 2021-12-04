@@ -7,7 +7,7 @@
     "detect": {
         "robots.txt": {
             "needs": true,
-            "message": "<robots.txt> not set",
+            "message": "{{robots.txt}} not set",
             "quote": "robots.txt 파일 작성을 통해 검색 차단할 디렉터리, 확장자, 페이지 등을 지정할 수 있으며 HTML의 HEAD 태그 내에 META 태그를 추가하여 검색엔진의 인덱싱을 차단",
             "relatedPage": "726"
         },
