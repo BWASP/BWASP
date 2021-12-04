@@ -6,6 +6,9 @@ from requests import api
 
 from Crawling.feature import func
 
+error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
+             "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]
+
 def attackHeader(target_url):
     dict_data = requests.get(target_url, verify=False).headers
     infor_data = ""
@@ -44,6 +47,7 @@ def attackHeader(target_url):
 
 
 def inputTag(response_body, http_method, infor_vector, attack_option, target_url, current_url):
+    global error_msg
     # form tag action and input tag and input name parse
     try:
         soup = BeautifulSoup(response_body, 'html.parser')
@@ -223,23 +227,20 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
 
                             s = requests.Session().post(attack_url, data=param)
 
-                            if s.status_code == 500 or s.status_code == 501 or s.status_code == 502 or s.status_code == 503 \
-                                    or s.status_code == 504 or s.status_code == 505 or s.status_code == 506 or s.status_code == 507 \
-                                    or s.status_code == 508 or s.status_code == 509 or s.status_code == 510:
+                            if s.status_code >= 500 and s.status_code <= 510:
                                 data["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
                                 data["doubt"]["SQL injection"]["detect"].append({"param": param})
                                 data["doubt"]["SQL injection"]["detect"].append({"type": "status 500~510"})
                                 impactRate = 2
 
-                            elif "error in your sql" in s.text.lower() or "server error in" in s.text.lower() \
-                                    or "fatal error" in s.text.lower() or "database engine error" in s.text.lower() \
-                                    or "not properly" in s.text.lower() or "db provider" in s.text.lower() \
-                                    or "psqlexception" in s.text.lower() or "query failed" in s.text.lower() \
-                                    or "microsoft sql native" in s.text.lower():
-                                data["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
-                                data["doubt"]["SQL injection"]["detect"].append({"param": param})
-                                data["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
-                                impactRate = 2
+
+                            else:
+                                for check in error_msg:
+                                    if check in s.text.lower():
+                                        data["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
+                                        data["doubt"]["SQL injection"]["detect"].append({"param": param})
+                                        data["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
+                                        impactRate = 2
                             #else:
                             #    data["doubt"]["SQL injection"].pop("detect")
                         except:

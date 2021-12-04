@@ -9,10 +9,18 @@ from Crawling.feature import func
 from Crawling.attack_vector import *
 from Crawling.feature.api import *
 
-
+'''
+elif "error in your sql" in s.text.lower() or "server error in" in s.text.lower() \
+                                        or "fatal error" in s.text.lower() or "database engine error" in s.text.lower() \
+                                        or "not properly" in s.text.lower() or "db provider" in s.text.lower() \
+                                        or "psqlexception" in s.text.lower() or "query failed" in s.text.lower() \
+                                        or "microsoft sql native" in s.text.lower():
+'''
 
 
 comment = ""
+error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
+             "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]
 
 class MyHTMLParser(HTMLParser):
     def handle_comment(self, data):
@@ -97,6 +105,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
     Details: input tag, cookie, query string(get params) json 형태로
     '''
 
+    global error_msg
+
     data = []
 
     for i, packet in enumerate(req_res_packets):
@@ -106,7 +116,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
             continue
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
         response_body = packet["response"]["body"]
-        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = inputTag(response_body, analysis_data["http_method"], analysis_data["infor_vector"], analysis_data["attack_option"], target_url, packet["request"]["full_url"])
+        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = inputTag(response_body, analysis_data["http_method"], analysis_data["infor_vector"], analysis_data["testPayloads"], target_url, packet["request"]["full_url"])
 
         cors_check = corsCheck(packet)
         if cors_check != "None":
@@ -178,7 +188,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                     impactRate = 2
 
                 # ~~~~~~~~~~~~~attack option
-                if analysis_data["attack_option"] == True:
+                if analysis_data["testPayloads"] == True:
                     # cheat sheet open
                     with open("./cheat_sheet.txt", 'r', encoding='UTF-8') as f:
                         while True:
@@ -191,23 +201,19 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                 attack_param[keys] = cheat_sheet
                                 attack_url = domain_url + url_part.path + "?" + keys + "=" + cheat_sheet
                                 s = requests.Session().post(attack_url)
-                                if s.status_code == 500 or s.status_code == 501 or s.status_code == 502 or s.status_code == 503 \
-                                        or s.status_code == 504 or s.status_code == 505 or s.status_code == 506 or s.status_code == 507 \
-                                        or s.status_code == 508 or s.status_code == 509 or s.status_code == 510:
+                                if s.status_code >= 500 and s.status_code <= 510:
                                     attack_vector["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
                                     attack_vector["doubt"]["SQL injection"]["detect"].append({"param": attack_param})
                                     attack_vector["doubt"]["SQL injection"]["detect"].append({"type": "status 500~510"})
                                     impactRate = 2
 
-                                elif "error in your sql" in s.text.lower() or "server error in" in s.text.lower() \
-                                        or "fatal error" in s.text.lower() or "database engine error" in s.text.lower() \
-                                        or "not properly" in s.text.lower() or "db provider" in s.text.lower() \
-                                        or "psqlexception" in s.text.lower() or "query failed" in s.text.lower() \
-                                        or "microsoft sql native" in s.text.lower():
-                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
-                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"param": attack_param})
-                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
-                                    impactRate = 2
+                                else:
+                                    for check in error_msg:
+                                        if check in s.text.lower():
+                                            attack_vector["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
+                                            attack_vector["doubt"]["SQL injection"]["detect"].append({"param": attack_param})
+                                            attack_vector["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
+                                            impactRate = 2
                                 #else:
                                 #    attack_vector["doubt"]["SQL injection"].pop("detect")
 

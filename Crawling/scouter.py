@@ -38,7 +38,7 @@ def initGlobal():
         "error_result": False,
         "directory_indexing": list(),
         "admin_page": list(),
-        "attack_option": False
+        "testPayloads": False
     }
 
     LOAD_PACKET_INDEXES = list() # automation packet indexes 
@@ -84,9 +84,6 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     analyst.start(DETECT_LIST, LOCK, input_url, req_res_packets, cur_page_links, current_url, packet_indexes, options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
-    db.insertDomains(req_res_packets, cookie_result, packet_indexes, input_url, ANALYSIS_DATA)  # current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
-    db.updateWebInfo(DETECT_LIST[0])
-
     db.insertDomains(req_res_packets, cookie_result, packet_indexes , input_url, ANALYSIS_DATA) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
     db.updateWebInfo(DETECT_LIST[0])
     
@@ -130,8 +127,8 @@ def visit(driver, url, depth, options):
             csp_result = cspAnalysis().start(driver.current_url)
             db.insertCSP(csp_result)
 
-        #if "attackoption" in options["tool"]["optionalJobs"]:
-        #    ANALYSIS_DATA["attack_option"] = True
+        if "testPayloads" in options["tool"]["optionalJobs"]:
+            ANALYSIS_DATA["testPayloads"] = True
 
     packet_obj = PacketCapture()
     packet_obj.start(driver)
@@ -168,7 +165,9 @@ def visit(driver, url, depth, options):
     p.start()
     PROCESS_LIST.append(p)
 
-    if len(PROCESS_LIST) > 3:
+    if options['maximumProcess'] == 0:
+        pass
+    elif len(PROCESS_LIST) > options['maximumProcess']:
         for process in PROCESS_LIST:
             process.join()
         PROCESS_LIST = list()
