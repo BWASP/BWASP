@@ -17,18 +17,18 @@ from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directory
 
 def initGlobal():
     global START_OPTIONS
-    global ANALYSIS_DATA
+    global ANALYSIS_DATA 
     global LOAD_PACKET_INDEXES
     global PROCESS_LIST
     global DETECT_LIST
     global LOCK
 
     START_OPTIONS = {
-        "check": True,
-        "input_url": "",
-        "visited_links": [],
-        "count_links": {},
-        "previous_packet_count": 0  # 누적 패킷 개수
+        "check" : True,
+        "input_url" : "",
+        "visited_links" : [],
+        "count_links" : {},
+        "previous_packet_count" : 0 #누적 패킷 개수
     }
 
     ANALYSIS_DATA = {
@@ -37,17 +37,17 @@ def initGlobal():
         "robots_result": False,
         "error_result": False,
         "directory_indexing": list(),
-        "admin_page": list()
+        "admin_page": list(),
+        "testPayloads": False
     }
 
-    LOAD_PACKET_INDEXES = list()  # automation packet indexes
+    LOAD_PACKET_INDEXES = list() # automation packet indexes 
     PROCESS_LIST = list()
     DETECT_LIST = list()
     LOCK = None
-
+    
 
 initGlobal()
-
 
 def start(url, depth, options):
     global START_OPTIONS
@@ -69,7 +69,6 @@ def start(url, depth, options):
     driver.quit()
     initGlobal()
 
-
 def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result, DETECT_LIST, LOCK, current_url, previous_packet_count, ANALYSIS_DATA):
     global START_OPTIONS
     global LOAD_PACKET_INDEXES
@@ -77,17 +76,17 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     recent_packet_count = len(req_res_packets) + previous_packet_count
     # {"id": "[1, 2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]"}     
     if len(LOAD_PACKET_INDEXES) < recent_packet_count:
-        # 수정 후 LOAD_PACKET_INDEXES = json.loads(Packets().GetAutomationIndex()["retData"])["id"]
+        #수정 후 LOAD_PACKET_INDEXES = json.loads(Packets().GetAutomationIndex()["retData"])["id"]
         LOAD_PACKET_INDEXES = json.loads(Packets().GetAutomationIndex()["retData"]["id"])
 
-    packet_indexes = LOAD_PACKET_INDEXES[previous_packet_count: recent_packet_count]
-    # analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
+    packet_indexes = LOAD_PACKET_INDEXES[previous_packet_count : recent_packet_count]
+    #analyst_result = analyst.start(sysinfo_detectlist,input_url, req_res_packets, cur_page_links, packet_indexes,options['info'])
     analyst.start(DETECT_LIST, LOCK, input_url, req_res_packets, cur_page_links, current_url, packet_indexes, options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
-    db.insertDomains(req_res_packets, cookie_result, packet_indexes, input_url, ANALYSIS_DATA)  # current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
+    db.insertDomains(req_res_packets, cookie_result, packet_indexes , input_url, ANALYSIS_DATA) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
     db.updateWebInfo(DETECT_LIST[0])
-
+    
     return 1
 
 
@@ -116,7 +115,7 @@ def visit(driver, url, depth, options):
         START_OPTIONS["input_url"] = driver.current_url
         START_OPTIONS["visited_links"].append(START_OPTIONS["input_url"])
         START_OPTIONS["check"] = False
-
+        
         if "portScan" in options["tool"]["optionalJobs"]:
             target_port = GetPort().getPortsOffline(START_OPTIONS["input_url"])
             db.insertPorts(target_port, START_OPTIONS["input_url"])
@@ -128,30 +127,47 @@ def visit(driver, url, depth, options):
             csp_result = cspAnalysis().start(driver.current_url)
             db.insertCSP(csp_result)
 
+        if "testPayloads" in options["tool"]["optionalJobs"]:
+            ANALYSIS_DATA["testPayloads"] = True
+
     packet_obj = PacketCapture()
     packet_obj.start(driver)
 
+    cur_page_links = list()
     # 다른 사이트로 Redirect 되었는지 검증.
     if isOpenRedirection(url, driver.current_url, START_OPTIONS["input_url"]):
         packet_obj.filterPath(url)
         packet_obj.packets[0]["open_redirect"] = True
-        cur_page_links = list()
     else:
-        cur_page_links = GetPageLinks(driver.current_url, driver.page_source).start()
-        cur_page_links += GetReslinks(driver.current_url, packet_obj.packets, driver.page_source).start()
+        # page_source는 iframe 안에 있는 html을 가져오지 못함.
+        # 따라서, 각각의 iframe에 접근하여 page_source 를 추출해야 함.
+        count = 0
+        iframes = driver.find_elements_by_tag_name("iframe")
+        while True:
+            cur_page_links += GetPageLinks(driver.current_url, driver.page_source).start()
+            cur_page_links += GetReslinks(driver.current_url, packet_obj.packets, driver.page_source).start()
+
+            if count == len(iframes):
+                break
+
+            driver.switch_to_default_content()
+            driver.switch_to_frame(iframes[count])
+            count += 1
+
         cur_page_links = list(set(packet_obj.deleteFragment(cur_page_links)))
+
     cookie_result = get_cookies.start(driver.current_url, packet_obj.packets)
 
     packet_obj.deleteUselessBody()
     db.insertPackets(packet_obj.packets)
-    p = Process(target=analysis, args=(
-    START_OPTIONS['input_url'], packet_obj.packets, cur_page_links, options, cookie_result, DETECT_LIST, LOCK, driver.current_url, START_OPTIONS["previous_packet_count"],
-    ANALYSIS_DATA))  # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
+    p = Process(target=analysis, args=(START_OPTIONS['input_url'], packet_obj.packets, cur_page_links, options, cookie_result, DETECT_LIST, LOCK, driver.current_url, START_OPTIONS["previous_packet_count"], ANALYSIS_DATA)) # driver 전달 시 에러. (프로세스간 셀레니움 공유가 안되는듯 보임)
     START_OPTIONS["previous_packet_count"] += len(packet_obj.packets)
     p.start()
     PROCESS_LIST.append(p)
 
-    if len(PROCESS_LIST) > 3:
+    if options['maximumProcess'] == 0:
+        pass
+    elif len(PROCESS_LIST) > options['maximumProcess']:
         for process in PROCESS_LIST:
             process.join()
         PROCESS_LIST = list()
@@ -170,7 +186,7 @@ def visit(driver, url, depth, options):
             continue
         if checkCountLink(visit_url, START_OPTIONS["count_links"]):
             continue
-
+        
         START_OPTIONS["visited_links"].append(visit_url)
         visit(driver, visit_url, depth - 1, options)
 
@@ -191,13 +207,13 @@ def checkCountLink(visit_url, count_links):
 
         count_links[visit_path]["count"] += 1
     except:
-        START_OPTIONS["count_links"][visit_path] = {"count": 1}
+        START_OPTIONS["count_links"][visit_path] = {"count" : 1}
 
     return False
 
 
 '''
-    String visit_url: 입력한 url
+    String visit_url: 방문한 url
     String current_url: 현재 페이지의 url
     String target_url: 사용자가 입력한 url 
 '''

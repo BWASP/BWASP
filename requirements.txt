@@ -12,3 +12,4 @@ Werkzeug==2.0.1
 Webdriver-Manager
 flask_cors
 flask_restx
+validators

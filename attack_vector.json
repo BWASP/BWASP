@@ -6,7 +6,8 @@
     "SQL injection": {
       "type": [
         "None"
-      ]
+      ],
+      "detect": []
     },
     "XSS": {
       "type": [
@@ -17,7 +18,9 @@
     "CORS": false,
     "Open Redirect": "url",
     "s3": [],
-    "File Upload": false
+    "File Upload": false,
+    "Reflected XSS": false,
+    "SSRF": false
   },
   "misc": {
     "robots.txt": false,
