@@ -1,5 +1,5 @@
 // Get modules
-import {API as api, createKey, tableBuilder} from '../jHelper.js';
+import {API as api, createKey, createToast, swapElement, tableBuilder} from '../jHelper.js';
 
 // Specified query selectors
 let places = {
@@ -234,7 +234,7 @@ class pagerTools {
             malformedID.packet.forEach((id) => packet[id] = API.jsonDataHandler(packet[id]));
 
             // Base64 Decode
-            ["action_URL_Type"].forEach((target) => {
+            ["action_URL", "action_URL_Type"].forEach((target) => {
                 for(let count = 0; count <= vector[target].length - 1; count++) {
                     vector[target][count] = atob(vector[target][count])
                 }
@@ -306,7 +306,7 @@ class pagerTools {
             };
 
             // Build category
-            rowElement.child.category.innerText = (dataSet.category === 0)
+            rowElement.child.category.innerText = (dataSet.packet.category === 0)
                 ? "Auto"
                 : "Manual";
             rowElement.child.category.classList.add("text-muted", "text-center", "small");
@@ -328,8 +328,8 @@ class pagerTools {
                             method: document.createElement("p")
                         }
 
-                        localSkeleton.method.innerText = dataSet.vector.action_URL[rowNum];
-                        localSkeleton.target.innerText = dataSet.vector.action_URL_Type[rowNum];
+                        localSkeleton.method.innerText = dataSet.vector.action_URL_Type[rowNum];
+                        localSkeleton.target.innerText = dataSet.vector.action_URL[rowNum];
 
                         localSkeleton.parent.classList.add("mt-1", "mb-1");
                         console.log(dataSet.vector.action_URL_Type[rowNum].toLowerCase());
@@ -366,6 +366,7 @@ class pagerTools {
                     if (paramSet[paramSet.length - 1] !== param) rowElement.child.params.appendChild(builder.commaAsElement());
                 })
                 rowElement.parent.appendChild(rowElement.child.params);
+
             } else {
                 rowElement.parent.appendChild(builder.dataNotPresent());
             }
@@ -434,20 +435,52 @@ let pager = new pagerTools();
 let referredDocuments = Object();
 
 const openDetailsModal = (dataSet) => {
-    console.log(dataSet);
+    let accordions = Object(),
+        accordionKeys = {
+            vector: ["cookie", "queryStrings", "tags", "violation", "referredDocument"]
+        };
+
+    Object.keys(accordionKeys).forEach((key) => {
+        accordions[key] = Object();
+        accordionKeys[key].forEach((id) => {
+            let currentObject = document.getElementById(`detailView-vector-${id}-parent`),
+                currentBody = document.getElementById(`detailView-vector-${id}-body`),
+                toggleButton = document.querySelector(`#detailView-vector-${id} > button`);
+
+            toggleButton.setAttribute("aria-expanded", "false");
+            toggleButton.classList.add("collapsed");
+            currentBody.classList.remove("show");
+            currentBody.classList.add("collapse");
+            swapElement(currentObject, document.getElementById("detailView-vector-nonView"));
+            // currentObject.classList.add("d-none");
+            accordions[key][id] = currentObject;
+        })
+    })
+
+    const viewCorrespondingElement = (type, id) => {
+        let currentObject = Object(),
+            targetElement = Object();
+        try{
+            currentObject = document.getElementById(`detailView-${type}-${id}-parent`);
+            targetElement = document.getElementById(`detailView-${type}-parent`);
+        }catch{
+            return createToast("Error", "Cannot find corresponding element", "danger", false);
+        }
+
+        swapElement(currentObject, targetElement);
+    }
+
     /**
      * Build Violation section for details modal
      * @param dataPackage
      */
     const buildViolationElement = async (dataPackage) => {
-        let guideline = Object(),
-            viewArea = document.getElementById("violationViewArea"),
-            packageKeys = Object.keys(dataPackage);
-
-        // Load guideline
-        await fetch("/static/data/documents/kisa.json")
-            .then(blob => blob.json())
-            .then(res => guideline = res);
+        let viewArea = document.getElementById("violationViewArea"),
+            packageKeys = Object.keys(dataPackage),
+            replacement = {
+                code: [["{{", "<code>"], ["}}", "</code>"]]
+            },
+            guideline = await API.communicateRAW("/static/data/documents/kisa.json", "GET", null, true);
 
         // Clear HTML Area
         if (packageKeys.length > 0) viewArea.innerHTML = "";
@@ -475,12 +508,19 @@ const openDetailsModal = (dataSet) => {
                 currentGuideline = guideline.detect[currentElement];
 
             localSkeleton.parent.classList.add("m-3", "p-3", "rounded-custom", "shadow");
-            localSkeleton.flex.classList.add("d-flex");
+            localSkeleton.flex.classList.add("d-flex", "mb-2");
             localSkeleton.child.message.classList.add("mb-0", "fw-bold");
             localSkeleton.child.page.classList.add("mb-0", "text-muted", "ms-auto", "small");
             localSkeleton.child.quote.classList.add("small", "text-muted", "mb-0");
 
-            localSkeleton.child.message.innerText = currentGuideline.message;
+
+            Object.keys(replacement).forEach(target => {
+                replacement[target].forEach((elementTarget) => {
+                    currentGuideline.message = currentGuideline.message.replaceAll(elementTarget[0], elementTarget[1]);
+                })
+            })
+
+            localSkeleton.child.message.innerHTML = currentGuideline.message;
             localSkeleton.child.page.innerText = `P. ${currentGuideline.relatedPage}`;
             localSkeleton.child.quote.innerText = currentGuideline.quote;
 
@@ -504,13 +544,10 @@ const openDetailsModal = (dataSet) => {
         let overallDocuments = Array(),
             viewArea = document.getElementById("referredDocumentViewArea");
         if (Object.keys(referredDocuments).length === 0) {
-            await fetch("/static/data/referredDocuments.json")
-                .then(blob => blob.json())
-                .then(res => referredDocuments = res);
+            referredDocuments = await API.communicateRAW("/static/data/referredDocuments.json", "GET", null, true);
         }
-        if (typeof (referredDocuments[target]) === "undefined") return;
+        if (typeof (referredDocuments[target]) === "undefined") return createToast("Something went wrong", "Data validation error", "danger", false);
         if (!Array.isArray(referredDocuments[target])) {
-            let typeCategory = Object.keys(referredDocuments[target]);
             let localDataSet = referredDocuments[target][(types !== String())
                 ? types
                 : "Generic"];
@@ -529,6 +566,7 @@ const openDetailsModal = (dataSet) => {
             localSkeleton.parent.appendChild(localSkeleton.innerLink);
             viewArea.appendChild(localSkeleton.parent);
         });
+        viewCorrespondingElement("vector", "referredDocument");
     }
 
     let dataKind = ["cookie", "queryString", "tag"],
@@ -570,22 +608,6 @@ const openDetailsModal = (dataSet) => {
     modalDataElement.impact.classList.add("badge", "rounded-pill", "small", `bg-${impactRate[dataSet.vector.impactRate][0]}`);
     modalDataElement.impact.innerText = impactRate[dataSet.vector.impactRate][1];
 
-    // Threats
-    modalDataElement.threat.innerText = "";
-    let doubtList = Object.keys(dataSet.vector.attackVector["doubt"]);
-    document.getElementById("referredDocumentViewArea").innerHTML = "";
-    if (doubtList.length > 0) {
-        doubtList.forEach((currentThreat) => {
-            buildReferredDocs(currentThreat);
-            modalDataElement.threat.innerText +=
-                currentThreat.concat(
-                    (doubtList[doubtList.length - 1] !== currentThreat) ? ", " : ""
-                );
-        });
-    } else {
-        modalDataElement.threat.innerText = "-";
-    }
-
     // URL
     modalDataElement.url.url.innerText = dataSet.vector.URL;
     modalDataElement.url.uri.innerText = dataSet.vector.URI;
@@ -616,9 +638,8 @@ const openDetailsModal = (dataSet) => {
             modalDataElement.actions.appendChild(localSkeleton.parent);
         }
     } else {
-        // dataSet.action.innerHTML = " - ";
+        modalDataElement.actions.innerHTML = " - ";
     }
-
 
     // Create cookie view
     [dataKind[0], dataKind[1]].forEach((currentKind) => {
@@ -644,7 +665,10 @@ const openDetailsModal = (dataSet) => {
             );
             modalElements[currentKind].tablePlace.appendChild(localSkeleton.parent);
         })
-        if (Object.keys(dataSet.vector.Details[currentKind]).length !== 0) modalElements[currentKind].dataPlace.classList.remove("d-none");
+        if (Object.keys(dataSet.vector.Details[currentKind]).length !== 0) {
+            viewCorrespondingElement("vector", "cookie");
+            modalElements[currentKind].dataPlace.classList.remove("d-none");
+        }
         else modalElements[currentKind].noData.classList.remove("d-none");
     })
 
@@ -659,12 +683,33 @@ const openDetailsModal = (dataSet) => {
             localSkeleton.pre.appendChild(localSkeleton.code);
 
             modalElements[dataKind[2]].tablePlace.appendChild(localSkeleton.pre);
+            // viewCorrespondingElement("vector", "details")
         })
         modalElements[dataKind[2]].dataPlace.classList.remove("d-none");
-    } else modalElements[dataKind[2]].noData.classList.remove("d-none");
+        viewCorrespondingElement("vector", "queryStrings");
+    } else {
+        modalElements[dataKind[2]].noData.classList.remove("d-none");
+    }
 
     if (Object.keys(dataSet.vector.attackVector["misc"]).length > 0) {
+        viewCorrespondingElement("vector", "violation");
         buildViolationElement(dataSet.vector.attackVector["misc"]);
+    }
+
+    // Threats
+    modalDataElement.threat.innerText = "";
+    let doubtList = Object.keys(dataSet.vector.attackVector["doubt"]);
+    document.getElementById("referredDocumentViewArea").innerHTML = "";
+    if (doubtList.length > 0) {
+        doubtList.forEach((currentThreat) => {
+            buildReferredDocs(currentThreat);
+            modalDataElement.threat.innerText +=
+                currentThreat.concat(
+                    (doubtList[doubtList.length - 1] !== currentThreat) ? ", " : ""
+                );
+        });
+    } else {
+        modalDataElement.threat.innerText = "-";
     }
 
     hljs.highlightAll();
