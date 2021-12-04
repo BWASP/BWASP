@@ -102,7 +102,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
     for i, packet in enumerate(req_res_packets):
         if not func.isSameDomain(target_url, packet["request"]["full_url"]):
             continue
-        if func.isExistExtension(packet["request"]["full_url"], ["image", "style", "font"]):
+        if func.isExistExtension(packet["request"]["full_url"], ["image", "style", "font", "javascript"]):
             continue
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
         response_body = packet["response"]["body"]
