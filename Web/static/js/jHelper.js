@@ -245,6 +245,10 @@ const createToast = (title, content="", color = "primary", inline = false, durat
     setTimeout(()=>toastBlob.remove(), (duration + 1) * 1000)
 }
 
+const swapElement = (element, moveTo) => {
+    moveTo.appendChild(element);
+}
+
 String.prototype.format = function () {
     let outputText = this;
     for (let arg in arguments) {
@@ -253,4 +257,4 @@ String.prototype.format = function () {
     return outputText;
 };
 
-export {API, createKey, createToast, tableBuilder};
+export {API, createKey, createToast, swapElement, tableBuilder};
