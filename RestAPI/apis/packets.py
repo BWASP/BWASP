@@ -124,7 +124,7 @@ class Packet_data_access_object(object):
                     g.bwasp_db_obj.add(
                         packetsModel(category=0,
                                      statusCode=int(self.insertData[ListOfData]['statusCode']),
-                                     requestType=json.dumps(self.insertData[ListOfData]['requestType']),
+                                     requestType=self.insertData[ListOfData]['requestType'],
                                      requestJson=json.dumps(self.insertData[ListOfData]['requestJson']),
                                      responseHeader=json.dumps(self.insertData[ListOfData]['responseHeader']),
                                      responseBody=str(self.insertData[ListOfData]['responseBody'])
