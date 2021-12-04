@@ -2,12 +2,22 @@ import sqlalchemy as db
 import os
 import json
 from urllib.parse import urlparse, urlunparse
+from html.parser import HTMLParser
 import requests
 
 from Crawling.feature import func
 from Crawling.attack_vector import *
-import requests
 from Crawling.feature.api import *
+
+
+
+
+comment = ""
+
+class MyHTMLParser(HTMLParser):
+    def handle_comment(self, data):
+        global comment
+        comment += data+"\n"
 
 
 def connect(table_name):
@@ -96,7 +106,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
             continue
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
         response_body = packet["response"]["body"]
-        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = inputTag(response_body, analysis_data["http_method"], analysis_data["infor_vector"])
+        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = inputTag(response_body, analysis_data["http_method"], analysis_data["infor_vector"], analysis_data["attack_option"], target_url, packet["request"]["full_url"])
 
         cors_check = corsCheck(packet)
         if cors_check != "None":
@@ -113,6 +123,20 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
 
 
         tag_name_list.append(url_part.query) # hello=world&a=b
+
+        #tag_name, action_page, action_type [ '' ] 값 정리
+        for x in range(len(tag_name_list)):
+            if "" == tag_name_list[x]:
+                tag_name_list.pop(x)
+
+        for x in range(len(action_page)):
+            if "" == action_page[x]:
+                action_page.pop(x)
+
+        for x in range(len(action_type)):
+            if "" == action_type[x]:
+                action_page.pop(x)
+
         #domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
 
         #Query String 정리
@@ -134,13 +158,60 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                 pass
             else:
                 if "<th" in response_body:
+                    '''
                     attack_vector["doubt"]["SQL injection"] = {"type": ["board"]}
                     attack_vector["doubt"]["XSS"] = {"type": ["board"]}
                     impactRate = 2
+                    '''
+
+                    attack_vector["doubt"]["SQL injection"] = {"type": ["board"], "detect": []}
+                    attack_vector["doubt"]["XSS"] = {"type": ["board"]}
+                    impactRate = 2
                 else:
+                    '''
                     attack_vector["doubt"]["SQL injection"] = {"type": ["None"]}
                     attack_vector["doubt"]["XSS"] = {"type": ["None"]}
                     impactRate = 1
+                    '''
+                    attack_vector["doubt"]["SQL injection"] = {"type": ["None"], "detect": []}
+                    attack_vector["doubt"]["XSS"] = {"type": ["None"]}
+                    impactRate = 2
+
+                # ~~~~~~~~~~~~~attack option
+                if analysis_data["attack_option"] == True:
+                    # cheat sheet open
+                    with open("./cheat_sheet.txt", 'r', encoding='UTF-8') as f:
+                        while True:
+                            cheat_sheet = f.readline()
+                            cheat_sheet = cheat_sheet.replace("\n", "")
+
+                            # current page attack
+                            for keys in list(domain_params.keys()):
+                                attack_param = dict()
+                                attack_param[keys] = cheat_sheet
+                                attack_url = domain_url + url_part.path + "?" + keys + "=" + cheat_sheet
+                                s = requests.Session().post(attack_url)
+                                if s.status_code == 500 or s.status_code == 501 or s.status_code == 502 or s.status_code == 503 \
+                                        or s.status_code == 504 or s.status_code == 505 or s.status_code == 506 or s.status_code == 507 \
+                                        or s.status_code == 508 or s.status_code == 509 or s.status_code == 510:
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"param": attack_param})
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"type": "status 500~510"})
+                                    impactRate = 2
+
+                                elif "error in your sql" in s.text.lower() or "server error in" in s.text.lower() \
+                                        or "fatal error" in s.text.lower() or "database engine error" in s.text.lower() \
+                                        or "not properly" in s.text.lower() or "db provider" in s.text.lower() \
+                                        or "psqlexception" in s.text.lower() or "query failed" in s.text.lower() \
+                                        or "microsoft sql native" in s.text.lower():
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"param": attack_param})
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
+                                    impactRate = 2
+                                #else:
+                                #    attack_vector["doubt"]["SQL injection"].pop("detect")
+
+                            if not cheat_sheet: break
             
 
         if not packet["request"]["full_url"] in cookie_result.keys():
@@ -150,6 +221,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
 
         open_redirect = openRedirectionCheck(packet)
         s3_bucket = s3BucketCheck(packet)
+        SSRF = SSRFCheck(packet)
+        Reflected_XSS = ReflectedXSSCheck(packet, target_url)
         # jwt_token = jwtCheck(packet)
         if len(open_redirect) != 0:
             attack_vector["doubt"]["Open Redirect"] = open_redirect
@@ -162,6 +235,16 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
             impactRate = 2
         else:
             attack_vector["doubt"].pop("s3", None)
+
+        if SSRF:
+            attack_vector["doubt"]["SSRF"] = True
+        else:
+            attack_vector["doubt"].pop("SSRF", None)
+
+        if Reflected_XSS:
+            attack_vector["doubt"]["Reflected XSS"] = True
+        else:
+            attack_vector["doubt"].pop("Reflected XSS", None)
 
         #robots.txt check
         if analysis_data["robots_result"] == True:
@@ -187,6 +270,11 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
         else:
             attack_vector["misc"].pop("admin page")
 
+        #comment 주석
+        parser = MyHTMLParser()
+        parser.feed(response_body)
+        
+
         # 패킷 url이 중복된다면 ??
         # json.dumps()
         # getPacketIndex
@@ -199,7 +287,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
             "action_URL": action_page,
             "action_URL_Type": action_type,
             "params": tag_name_list,
-            "comment": "None",
+            "comment": comment,
             "attackVector": attack_vector,
             "impactRate": impactRate,
             "description": "string",
