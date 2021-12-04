@@ -546,7 +546,7 @@ const openDetailsModal = (dataSet) => {
         if (Object.keys(referredDocuments).length === 0) {
             referredDocuments = await API.communicateRAW("/static/data/referredDocuments.json", "GET", null, true);
         }
-        if (typeof (referredDocuments[target]) === "undefined") return createToast("Something went wrong", "Data validation error", "danger", false);
+        if (typeof (referredDocuments[target]) === "undefined") return;
         if (!Array.isArray(referredDocuments[target])) {
             let localDataSet = referredDocuments[target][(types !== String())
                 ? types
@@ -672,7 +672,8 @@ const openDetailsModal = (dataSet) => {
         else modalElements[currentKind].noData.classList.remove("d-none");
     })
 
-    if (dataSet.vector.Details[dataKind[2]].length !== 0) {
+    // console.log(dataSet.vector.Details[dataKind[2]].length);
+    if (dataSet.vector.Details[dataKind[2]].length > 0) {
         dataSet.vector.Details[dataKind[2]].forEach((currentTag) => {
             let localSkeleton = {
                 pre: document.createElement("pre"),
@@ -683,10 +684,9 @@ const openDetailsModal = (dataSet) => {
             localSkeleton.pre.appendChild(localSkeleton.code);
 
             modalElements[dataKind[2]].tablePlace.appendChild(localSkeleton.pre);
-            // viewCorrespondingElement("vector", "details")
         })
         modalElements[dataKind[2]].dataPlace.classList.remove("d-none");
-        viewCorrespondingElement("vector", "queryStrings");
+        viewCorrespondingElement("vector", "tags");
     } else {
         modalElements[dataKind[2]].noData.classList.remove("d-none");
     }
