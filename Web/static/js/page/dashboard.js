@@ -15,17 +15,13 @@ class dashboard {
             data: Object()
         };
         this.viewData = {
-            CVECount: {
-                count: Number(),
-                runCount: Number()
-            }
-        }
+            CVECount: Number()
+        };
         this.job = {
             allJobs: Array(),
             currentJob: Object()
         };
         this.ports = Object();
-        this.flip = true;
     }
 
     async updateView() {
@@ -44,56 +40,50 @@ class dashboard {
     async updatePacketCount() {
         let currentDOM = document.getElementById("receivedPacketsCount");
         if (this.job.allJobs.length > 0) {
-            try{
+            try {
                 let count = {
                     auto: await API.communicateRAW("/api/packet/automation/count"),
                     manual: await API.communicateRAW("/api/packet/manual/count")
                 };
                 currentDOM.innerText = count.auto.count + count.manual.count;
-            }catch (e) {
+            } catch (e) {
                 console.error(e);
             }
         } else currentDOM.innerText = " - ";
     }
 
-    updateRelatedCVEs() {
+    async updateRelatedCVEs() {
         let currentDOM = document.getElementById("relatedCVECount");
         if (this.job.allJobs.length > 0) {
-            if (!this.flip) this.flip = !this.flip;
-            else {
-                this.viewData.CVECount.runCount += 1;
-                Object.keys(this.webEnvironment.data).forEach((currentKey) => {
-                    Object.keys(this.webEnvironment.data[currentKey]).forEach(async (currentLib) => {
-                        currentLib = {
-                            name: currentLib,
-                            version: this.webEnvironment.data[currentKey][currentLib]["version"]
-                        };
-                        await API.communicate(`/api/cve/search/${currentLib.name}/${currentLib.version}/count`, (err, res) => this.addCVECount(res.count));
-                    })
-                })
+            let dataset = this.webEnvironment.data,
+                APIResult = Object(),
+                countedValue = Number();
 
-                // Save to DOM
-                if (this.viewData.CVECount.runCount >= 3)
-                    currentDOM.innerText = (this.viewData.CVECount.count === 0)
-                        ? "-"
-                        : String(this.viewData.CVECount.count);
-                this.addCVECount(0, true);
+            for (const type of Object.keys(dataset)) {
+                for (const lib of Object.keys(dataset[type])) {
+                    APIResult = await API.communicateRAW(`/api/cve/search/${lib}/${dataset[type][lib].version}/count`);
+                    countedValue += APIResult.count;
+                }
             }
-        } else currentDOM.innerText = " - ";
-    }
 
-    addCVECount(count, init = false) {
-        if (init) return this.viewData.CVECount.count = Number();
-        this.viewData.CVECount.count += count;
+            this.viewData.CVECount = countedValue;
+
+            currentDOM.innerText = (this.viewData.CVECount === 0)
+                ? "-"
+                : String(this.viewData.CVECount);
+
+        } else currentDOM.innerText = " - ";
     }
 
     async updateThreatsCount() {
         let currentDOM = document.getElementById("detectedThreatsCount");
         if (this.job.allJobs.length > 0) {
             let count = Object();
-            try{
+            try {
                 count = await API.communicateRAW("/api/domain/count");
-            }catch (e) { return console.error(e); }
+            } catch (e) {
+                return console.error(e);
+            }
 
             currentDOM.innerText = count.count;
         } else currentDOM.innerText = " - ";
@@ -116,8 +106,8 @@ class dashboard {
             targets.forEach((currentTarget) => currentTarget.innerText = portData.count.count);
 
             // Port information
-            if(portData.data.length > 0) {
-                for(const port of portData.data){
+            if (portData.data.length > 0) {
+                for (const port of portData.data) {
                     if (port.result === "Open") {
                         if (!Object.keys(localPorts).includes(port["service"]))
                             localPorts[port["service"]] = Array();
@@ -164,7 +154,7 @@ class dashboard {
                     portView.appendChild(skeleton.parent);
                 });
             }
-        }else targets[1].innerText = " - ";
+        } else targets[1].innerText = " - ";
     }
 
     updateAnalysisLevel() {
@@ -176,13 +166,15 @@ class dashboard {
     async webEnvironments() {
         if (this.job.allJobs.length > 0) {
             let environmentData, localObject = [Object(), Object()];
-            try{
+            try {
                 environmentData = await API.communicateRAW(`${APIEndpoints.webEnvironments}/1`);
                 localObject = {
                     target: environmentData[0].url,
                     data: JSON.parse(environmentData[0].data)
                 }
-            }catch (e) { return console.error(e); }
+            } catch (e) {
+                return console.error(e);
+            }
 
             document.getElementById("webEnvDataPlace").classList.remove("d-none");
             document.getElementById("webEnvDataPlace-detail").classList.remove("d-none");
@@ -199,7 +191,7 @@ class dashboard {
                     document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, this.webEnvironment.data[key]));
                 });
             }
-        }else{
+        } else {
             document.getElementById("webEnvDataPlace").classList.add("d-none");
             document.getElementById("webEnvDataPlace-detail").classList.add("d-none");
             document.getElementById("webEnvDataPlace-noData").classList.remove("d-none");
