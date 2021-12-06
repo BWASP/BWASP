@@ -611,7 +611,11 @@ class optionFrontHandler {
     }
 
     async submitForm() {
-        let res = Object();
+        let res = Object(),
+            submitButton = document.getElementById("document-bottom-submit");
+
+        // Disable submit button to prevent double submission
+        submitButton.classList.add("d-none");
 
         // Create Task ID
         let taskID = new Date().toJSON().substring(0,19);
@@ -624,6 +628,7 @@ class optionFrontHandler {
                 task_id: taskID
             }]);
         }catch{
+            submitButton.classList.remove("d-none");
             return createToast("Error occurred", "Cannot create task", "danger", false);
         }
 
@@ -634,6 +639,7 @@ class optionFrontHandler {
                 taskID: taskID
             });
         }catch{
+            submitButton.classList.remove("d-none");
             return createToast("Error occurred", "Cannot create DB", "danger", false);
         }
 
@@ -652,6 +658,7 @@ class optionFrontHandler {
                     maximumProcess: String(this.inputHandler.formData.maximumProcess)
                 }])
             }catch{
+                submitButton.classList.remove("d-none");
                 return createToast("Error occurred", "Cannot save task", "danger", false);
             }
 
@@ -660,6 +667,7 @@ class optionFrontHandler {
 
             createToast("Job submitted", "Redirecting you to dashboard", "success", false, 3);
             setTimeout(() => {
+                submitButton.classList.remove("d-none");
                 document.location.replace("/dashboard");
             }, 3000);
         }, 1000);
