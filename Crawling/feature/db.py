@@ -9,15 +9,6 @@ from Crawling.feature import func
 from Crawling.attack_vector import *
 from Crawling.feature.api import *
 
-'''
-elif "error in your sql" in s.text.lower() or "server error in" in s.text.lower() \
-                                        or "fatal error" in s.text.lower() or "database engine error" in s.text.lower() \
-                                        or "not properly" in s.text.lower() or "db provider" in s.text.lower() \
-                                        or "psqlexception" in s.text.lower() or "query failed" in s.text.lower() \
-                                        or "microsoft sql native" in s.text.lower():
-'''
-
-
 comment = ""
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
              "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]
@@ -132,20 +123,29 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
         #if len(domain_params) > 0:
 
 
-        tag_name_list.append(url_part.query) # hello=world&a=b
+        #tag_name_list.append(url_part.query) # hello=world&a=b -> parameter error로 인해 수정
 
         #tag_name, action_page, action_type [ '' ] 값 정리
         for x in range(len(tag_name_list)):
-            if "" == tag_name_list[x]:
-                tag_name_list.pop(x)
+            try:
+                if "" == tag_name_list[x]:
+                    tag_name_list.pop(x)
+            except: #indexError: list index out of range
+                pass
 
         for x in range(len(action_page)):
-            if "" == action_page[x]:
-                action_page.pop(x)
+            try:
+                if "" == action_page[x]:
+                    action_page.pop(x)
+            except: #indexError: list index out of range
+                pass
 
         for x in range(len(action_type)):
-            if "" == action_type[x]:
-                action_page.pop(x)
+            try:
+                if "" == action_type[x]:
+                    action_page.pop(x)
+            except: #indexError: list index out of range
+                pass
 
         #domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
 
@@ -157,6 +157,10 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                     param_list = url_part.query.split("&")
                     for param in param_list:
                         domain_params[param.split('=')[0]] = param.split('=')[1]
+                        if param.split("=")[0] in tag_name_list:
+                            pass
+                        else:
+                            tag_name_list.append(param.split("=")[0])
                 else:
                     param = url_part.query
                     domain_params[param.split('=')[0]] = param.split('=')[1]
