@@ -143,9 +143,10 @@ def visit(driver, url, depth, options):
         # 따라서, 각각의 iframe에 접근하여 page_source 를 추출해야 함.
         count = 0
         iframes = driver.find_elements_by_tag_name("iframe")
+        packet_tmp = packet_obj.packets
         while True:
             cur_page_links += GetPageLinks(driver.current_url, driver.page_source).start()
-            cur_page_links += GetReslinks(driver.current_url, packet_obj.packets, driver.page_source).start()
+            cur_page_links += GetReslinks(driver.current_url, packet_tmp, driver.page_source).start()
 
             if count == len(iframes):
                 break
@@ -153,6 +154,7 @@ def visit(driver, url, depth, options):
             driver.switch_to_default_content()
             driver.switch_to_frame(iframes[count])
             count += 1
+            packet_tmp = []
 
         cur_page_links = list(set(packet_obj.deleteFragment(cur_page_links)))
 
