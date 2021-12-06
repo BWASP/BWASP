@@ -44,8 +44,8 @@ class API {
                 "Content-Type": "application/json"
             }
         };
-        if(dataPackage !== null) requestOptions["body"] = JSON.stringify(dataPackage);
-        const communication = await fetch(`${(isLocalhost)?"":this.API.base}${endpoint}`, requestOptions)
+        if (dataPackage !== null) requestOptions["body"] = JSON.stringify(dataPackage);
+        const communication = await fetch(`${(isLocalhost) ? "" : this.API.base}${endpoint}`, requestOptions)
             .catch(error => {
                 error = error.toString().split(": ");
                 throw new APICommunicationError(error[0], error[1]);
@@ -62,17 +62,25 @@ class API {
      * @returns {string} Pure JSON
      */
     jsonDataHandler(str, parseJSON = true) {
-        if (typeof (str) === "object") return str;
+        console.log(typeof (str));
+        if (["object"].includes(typeof (str))) return str;
+        console.log(str);
         let replaceKeyword = ["::SINGLE-QUOTE::", "::DOUBLE-QUOTE::"];
-        str = str
-            .replaceAll("\"", replaceKeyword[1])
-            .replaceAll("\\'", replaceKeyword[0])
-            .replaceAll("'", "\"")
-            .replaceAll(replaceKeyword[0], "'")
-            .replaceAll(replaceKeyword[1], "\"");
-        ["True", "False"].forEach((currentKeyword) => {
-            str = str.replaceAll(currentKeyword, currentKeyword.toLowerCase);
-        })
+        let replaceKeywords = [
+            ["\"", replaceKeyword[1]],
+            ["\\'", replaceKeyword[0]],
+            ["'", "\""],
+            [replaceKeyword[0], "'"],
+            [replaceKeyword[1], "\""],
+            ["True", "true"],
+            ["False", "false"]
+        ];
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            if (e instanceof SyntaxError) replaceKeywords.forEach(key => str = str.replaceAll(key[0], key[1]));
+            else console.error(e);
+        }
         return (parseJSON) ? JSON.parse(str) : str;
     }
 }
@@ -132,7 +140,7 @@ let setMultipleAttributes = (el, attrs) => {
     Object.keys(attrs).forEach(key => el.setAttribute(key, attrs[key]));
 }
 
-const createToast = (title, content="", color = "primary", inline = false, duration = 5) => {
+const createToast = (title, content = "", color = "primary", inline = false, duration = 5) => {
     let prefix = "jFront-Toast";
     let toastAreaID = `${prefix}-Area`;
     let currentToastID = createKey(3, "jFrontToast");
@@ -142,7 +150,7 @@ const createToast = (title, content="", color = "primary", inline = false, durat
         success: "light"
     }[color];
     // Check toast area exists
-    if(document.querySelectorAll(`#${toastAreaID}`).length === 0){
+    if (document.querySelectorAll(`#${toastAreaID}`).length === 0) {
         let localArea = document.createElement("section");
         localArea.id = toastAreaID;
         localArea.classList.add("toast-container", "position-absolute", "top-0", "end-0", "p-3");
@@ -161,7 +169,7 @@ const createToast = (title, content="", color = "primary", inline = false, durat
 
     // Build parent
     toastSkeleton.parent.classList.add("toast", "rounded-custom", "border", `border-${color}`);
-    if(inline) toastSkeleton.parent.classList.add("align-items-center");
+    if (inline) toastSkeleton.parent.classList.add("align-items-center");
     toastSkeleton.parent.id = currentToastID;
     setMultipleAttributes(toastSkeleton.parent, {
         "role": "alert",
@@ -171,13 +179,13 @@ const createToast = (title, content="", color = "primary", inline = false, durat
 
     // Build toast head and elements
     toastSkeleton.header.parent.classList.add((inline)
-        ? "d-flex"
-        : "toast-header",
-    "rounded", `bg-${color}`);
+            ? "d-flex"
+            : "toast-header",
+        "rounded", `bg-${color}`);
     toastSkeleton.header.parent.classList.add(`bg-${color}`);
     toastSkeleton.header.title.classList.add("me-auto");
     toastSkeleton.header.closeButton.classList.add("btn-close");
-    if(inline) toastSkeleton.header.closeButton.classList.add("me-2", "m-auto", `text-${colorMatching}`);
+    if (inline) toastSkeleton.header.closeButton.classList.add("me-2", "m-auto", `text-${colorMatching}`);
     setMultipleAttributes(toastSkeleton.header.closeButton, {
         "type": "button",
         "data-bs-dismiss": "toast",
@@ -186,7 +194,7 @@ const createToast = (title, content="", color = "primary", inline = false, durat
 
     // Build toast body
     toastSkeleton.body.classList.add("toast-body");
-    if(inline) toastSkeleton.body.classList.add(`text-${colorMatching}`);
+    if (inline) toastSkeleton.body.classList.add(`text-${colorMatching}`);
     else toastSkeleton.header.title.classList.add(`text-${colorMatching}`);
 
     // Set values
@@ -194,13 +202,13 @@ const createToast = (title, content="", color = "primary", inline = false, durat
     toastSkeleton.body.innerText = (inline) ? title : content;
 
     // Mix elements
-    if(inline){
+    if (inline) {
         toastSkeleton.header.parent.append(
             toastSkeleton.body,
             toastSkeleton.header.closeButton
         );
         toastSkeleton.parent.appendChild(toastSkeleton.header.parent);
-    }else{
+    } else {
         toastSkeleton.header.parent.append(
             toastSkeleton.header.title,
             toastSkeleton.header.closeButton
@@ -223,7 +231,7 @@ const createToast = (title, content="", color = "primary", inline = false, durat
     currentToast.show();
 
     // Delete toast after duration + 1 sec
-    setTimeout(()=>toastBlob.remove(), (duration + 1) * 1000)
+    setTimeout(() => toastBlob.remove(), (duration + 1) * 1000)
 }
 
 const swapElement = (element, moveTo) => {
