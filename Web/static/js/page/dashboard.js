@@ -37,7 +37,7 @@ class dashboard {
     }
 
     async getCurrentJob() {
-        this.job.allJobs = await API.communicateRAW("/api/job");
+        this.job.allJobs = await API.communicate("/api/job");
     }
 
     async updatePacketCount() {
@@ -45,8 +45,8 @@ class dashboard {
         if (this.job.allJobs.length > 0) {
             try {
                 let count = {
-                    auto: await API.communicateRAW("/api/packet/automation/count"),
-                    manual: await API.communicateRAW("/api/packet/manual/count")
+                    auto: await API.communicate("/api/packet/automation/count"),
+                    manual: await API.communicate("/api/packet/manual/count")
                 };
                 currentDOM.innerText = count.auto.count + count.manual.count;
             } catch (e) {
@@ -65,7 +65,7 @@ class dashboard {
 
                 for (const type of Object.keys(dataset)) {
                     for (const lib of Object.keys(dataset[type])) {
-                        APIResult = await API.communicateRAW(`/api/cve/search/${lib}/${dataset[type][lib].version}/count`);
+                        APIResult = await API.communicate(`/api/cve/search/${lib}/${dataset[type][lib].version}/count`);
                         countedValue += APIResult.count;
                     }
                 }
@@ -87,7 +87,7 @@ class dashboard {
         if (this.job.allJobs.length > 0) {
             let count = Object();
             try {
-                count = await API.communicateRAW("/api/domain/count");
+                count = await API.communicate("/api/domain/count");
             } catch (e) {
                 return console.error(e);
             }
@@ -105,8 +105,8 @@ class dashboard {
 
         if (this.job.allJobs.length > 0) {
             let portData = {
-                count: await API.communicateRAW("/api/ports/count"),
-                data: await API.communicateRAW("/api/ports")
+                count: await API.communicate("/api/ports/count"),
+                data: await API.communicate("/api/ports")
             }
 
             // Set port count
@@ -164,17 +164,11 @@ class dashboard {
         } else targets[1].innerText = " - ";
     }
 
-    updateAnalysisLevel() {
-        API.communicate("/api/job/1", (err, res) => {
-            document.getElementById("analysisLevelView").innerText = (!err) ? res[0].recursiveLevel : "0";
-        })
-    }
-
     async webEnvironments() {
         if (this.job.allJobs.length > 0) {
             let environmentData, localObject = [Object(), Object()];
             try {
-                environmentData = await API.communicateRAW(`${APIEndpoints.webEnvironments}/1`);
+                environmentData = await API.communicate(`${APIEndpoints.webEnvironments}/1`);
                 localObject = {
                     target: environmentData[0].url,
                     data: JSON.parse(environmentData[0].data)

@@ -120,29 +120,30 @@ class pagerTools {
     }
 
     async updateRowCount() {
-        await this.getRowCount((rowCount) => {
-            let maxPageCount = (Math.round(rowCount / this.paging.rowPerPage)),
-                formattedRowCount = rowCount.toLocaleString();
+        let countRes = await API.communicate("/api/domain/count");
+        this.data.rowCount = Number(countRes.count);
 
-            console.log(
-                "Row count: ", rowCount,
-                "\nMax page: ", maxPageCount,
-                "\nRow count: ", this.data.rowCount,
-                "\nCurrent page: ", this.paging.currentPage
-            );
+        let maxPageCount = (Math.round(this.data.rowCount / this.paging.rowPerPage)),
+            formattedRowCount = this.data.rowCount.toLocaleString();
 
-            // Set current rowPerPage value
-            document.getElementById("viewPref-modal-rowPerPage").innerText = (this.paging.rowPerPage > rowCount)
-                ? rowCount
-                : this.paging.rowPerPage;
-            document.getElementById("viewPref-input-rowPerPage").max = rowCount;
-            document.getElementById("viewPref-input-rowPerPage").value = this.paging.rowPerPage;
+        console.log(
+            "Row count: ", this.data.rowCount,
+            "\nMax page: ", maxPageCount,
+            "\nRow count: ", this.data.rowCount,
+            "\nCurrent page: ", this.paging.currentPage
+        );
+
+        // Set current rowPerPage value
+        document.getElementById("viewPref-modal-rowPerPage").innerText = (this.paging.rowPerPage > this.data.rowCount)
+            ? this.data.rowCount
+            : this.paging.rowPerPage;
+        document.getElementById("viewPref-input-rowPerPage").max = this.data.rowCount;
+        document.getElementById("viewPref-input-rowPerPage").value = this.paging.rowPerPage;
 
 
-            document.getElementById("viewPref-modal-allRowCount").innerText = formattedRowCount;
-            document.getElementById("viewPref-input-currentPage").value = this.paging.currentPage;
-            this.updateMaxPage();
-        });
+        document.getElementById("viewPref-modal-allRowCount").innerText = formattedRowCount;
+        document.getElementById("viewPref-input-currentPage").value = this.paging.currentPage;
+        this.updateMaxPage();
         return true;
     }
 
@@ -195,7 +196,7 @@ class pagerTools {
 
     async syncData(requestPage, rowPerPage) {
         this.dataSet = Array();
-        let vectors = await API.communicateRAW(`${APIEndpoints.vectors}/${((requestPage - 1) * rowPerPage) + 1}/${rowPerPage}`),
+        let vectors = await API.communicate(`${APIEndpoints.vectors}/${((requestPage - 1) * rowPerPage) + 1}/${rowPerPage}`),
             malformedID = {
                 vector: ["Details/", "action_URL", "action_URL_Type", "params", "Details"],
                 packet: ["requestJson", "responseHeader"]
@@ -206,9 +207,9 @@ class pagerTools {
         else for (const vector of vectors) {
             let packet = Object();
             try {
-                packet = await API.communicateRAW(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.auto}/${vector["related_Packet"]}`)
+                packet = await API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.auto}/${vector["related_Packet"]}`)
             } catch {
-                packet = await API.communicateRAW(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.manual}/${vector["related_Packet"]}`)
+                packet = await API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.manual}/${vector["related_Packet"]}`)
             }
 
             vector.attackVector = JSON.parse(vector.attackVector);
@@ -419,16 +420,6 @@ class pagerTools {
         document.getElementById("tablePlace").classList.remove("d-none");
         document.getElementById("tablePlaceHolder").classList.remove("d-none");
     }
-
-    async getRowCount(callback) {
-        await API.communicate(
-            "/api/domain/count",
-            (err, res) => {
-                this.data.rowCount = res.count;
-                callback(Number(res.count));
-            });
-    }
-
 }
 
 let pager = new pagerTools();
@@ -480,7 +471,7 @@ const openDetailsModal = (dataSet) => {
             replacement = {
                 code: [["{{", "<code>"], ["}}", "</code>"]]
             },
-            guideline = await API.communicateRAW("/static/data/documents/kisa.json", "GET", null, true);
+            guideline = await API.communicate("/static/data/documents/kisa.json", "GET", null, true);
 
         // Clear HTML Area
         if (packageKeys.length > 0) viewArea.innerHTML = "";
@@ -544,7 +535,7 @@ const openDetailsModal = (dataSet) => {
         let overallDocuments = Array(),
             viewArea = document.getElementById("referredDocumentViewArea");
         if (Object.keys(referredDocuments).length === 0) {
-            referredDocuments = await API.communicateRAW("/static/data/referredDocuments.json", "GET", null, true);
+            referredDocuments = await API.communicate("/static/data/referredDocuments.json", "GET", null, true);
         }
         if (typeof (referredDocuments[target]) === "undefined") return;
         if (!Array.isArray(referredDocuments[target])) {

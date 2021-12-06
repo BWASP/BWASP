@@ -28,25 +28,6 @@ class API {
             })
     }
 
-    async communicate(endpoint, callback) {
-        await this.getFrontConfig();
-        await fetch(this.API.base + endpoint, this.requestOptions)
-            .then(blob => {
-                if (!blob.ok) return callback(blob.status);
-                else blob.json()
-                    .then(res => {
-                        if (this.debug.mode === true
-                            && this.debug["functions"]["printAllOutput"] === true)
-                            console.log(`:: DEBUG : RETURN ::\n${res}`);
-                        callback(null, res);
-                    })
-                    .catch(error => {
-                        console.log(`:: DEBUG : ERROR ::\n${error}`);
-                        callback(error.toString().split(": "))
-                    })
-            })
-    }
-
     /**
      * Communicate with API
      * @param {string} endpoint
@@ -54,7 +35,7 @@ class API {
      * @param {object} dataPackage
      * @param {boolean} isLocalhost
      */
-    async communicateRAW(endpoint, requestType = "GET", dataPackage = null, isLocalhost = false) {
+    async communicate(endpoint, requestType = "GET", dataPackage = null, isLocalhost = false) {
         await this.getFrontConfig();
         let requestOptions = {
             method: requestType,

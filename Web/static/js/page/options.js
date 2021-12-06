@@ -222,7 +222,7 @@ class optionFrontHandler {
         return true;
         let data = Object();
         try{
-            data = await API.communicateRAW("/api/job");
+            data = await API.communicate("/api/job");
 
             // True if available
             return data.length <= 0;
@@ -623,7 +623,7 @@ class optionFrontHandler {
 
         // Submit task
         try{
-            res["CreateTask"] = await API.communicateRAW("/api/task", "POST", [{
+            res["CreateTask"] = await API.communicate("/api/task", "POST", [{
                 targetURL: this.inputHandler.formData.target,
                 task_id: taskID
             }]);
@@ -634,7 +634,7 @@ class optionFrontHandler {
 
         // Create DB
         try{
-            res["CreateDB"] = await API.communicateRAW("/api/task/database/create", "POST", {
+            res["CreateDB"] = await API.communicate("/api/task/database/create", "POST", {
                 targetURL: this.inputHandler.formData.target.replace(/(^\w+:|^)\/\//, '').replaceAll("/", ""),
                 taskID: taskID
             });
@@ -644,14 +644,14 @@ class optionFrontHandler {
         }
 
         // Get task count
-        res["taskCount"] = await API.communicateRAW("/api/task/count");
+        res["taskCount"] = await API.communicate("/api/task/count");
         res["taskCount"] = res["taskCount"].count;
 
         // Wait for 1 Sec
         setTimeout(async () => {
             // Save Task
             try{
-                await API.communicateRAW("/api/job", "POST", [{
+                await API.communicate("/api/job", "POST", [{
                     targetURL: this.inputHandler.formData.target,
                     knownInfo: JSON.stringify(this.inputHandler.formData.info),
                     recursiveLevel: String(this.inputHandler.formData.tool.analysisLevel),
@@ -663,7 +663,7 @@ class optionFrontHandler {
             }
 
             // Send Task
-            API.communicateRAW("/automation/options", "POST", this.inputHandler.formData, true);
+            API.communicate("/automation/options", "POST", this.inputHandler.formData, true);
 
             createToast("Job submitted", "Redirecting you to dashboard", "success", false, 3);
             setTimeout(() => {
