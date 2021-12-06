@@ -15,7 +15,10 @@ class dashboard {
             data: Object()
         };
         this.viewData = {
-            CVECount: Number()
+            CVECount: {
+                count: Number(),
+                needsUpdate: false
+            }
         };
         this.job = {
             allJobs: Array(),
@@ -55,22 +58,26 @@ class dashboard {
     async updateRelatedCVEs() {
         let currentDOM = document.getElementById("relatedCVECount");
         if (this.job.allJobs.length > 0) {
-            let dataset = this.webEnvironment.data,
-                APIResult = Object(),
-                countedValue = Number();
+            if (this.viewData.CVECount.needsUpdate) {
+                let dataset = this.webEnvironment.data,
+                    APIResult = Object(),
+                    countedValue = Number();
 
-            for (const type of Object.keys(dataset)) {
-                for (const lib of Object.keys(dataset[type])) {
-                    APIResult = await API.communicateRAW(`/api/cve/search/${lib}/${dataset[type][lib].version}/count`);
-                    countedValue += APIResult.count;
+                for (const type of Object.keys(dataset)) {
+                    for (const lib of Object.keys(dataset[type])) {
+                        APIResult = await API.communicateRAW(`/api/cve/search/${lib}/${dataset[type][lib].version}/count`);
+                        countedValue += APIResult.count;
+                    }
                 }
+
+                this.viewData.CVECount.count = countedValue;
+
+                currentDOM.innerText = (this.viewData.CVECount.count === 0)
+                    ? "-"
+                    : String(this.viewData.CVECount.count);
+
+                this.viewData.CVECount.needsUpdate = false;
             }
-
-            this.viewData.CVECount = countedValue;
-
-            currentDOM.innerText = (this.viewData.CVECount === 0)
-                ? "-"
-                : String(this.viewData.CVECount);
 
         } else currentDOM.innerText = " - ";
     }
@@ -184,12 +191,16 @@ class dashboard {
             this.webEnvironment.target = localObject.target;
             this.webEnvironment.data = localObject.data;
 
+            // CVE Count must be updated when web environment data has changed.
+            this.viewData.CVECount.needsUpdate = reGenObject;
+
             if (reGenObject) {
                 document.getElementById("webEnvURLPlace").innerText = this.webEnvironment.target;
                 document.getElementById("webEnvDataPlace").innerHTML = "";
                 Object.keys(this.webEnvironment.data).forEach((key) => {
                     document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, this.webEnvironment.data[key]));
                 });
+
             }
         } else {
             document.getElementById("webEnvDataPlace").classList.add("d-none");
