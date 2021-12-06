@@ -428,7 +428,7 @@ let referredDocuments = Object();
 const openDetailsModal = (dataSet) => {
     let accordions = Object(),
         accordionKeys = {
-            vector: ["cookie", "queryStrings", "tags", "violation", "referredDocument"]
+            vector: ["cookie", "queryString", "tags", "violation", "referredDocument"]
         };
 
     Object.keys(accordionKeys).forEach((key) => {
@@ -657,7 +657,7 @@ const openDetailsModal = (dataSet) => {
             modalElements[currentKind].tablePlace.appendChild(localSkeleton.parent);
         })
         if (Object.keys(dataSet.vector.Details[currentKind]).length !== 0) {
-            viewCorrespondingElement("vector", "cookie");
+            viewCorrespondingElement("vector", currentKind);
             modalElements[currentKind].dataPlace.classList.remove("d-none");
         }
         else modalElements[currentKind].noData.classList.remove("d-none");
