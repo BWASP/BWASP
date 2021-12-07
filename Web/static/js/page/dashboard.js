@@ -1,5 +1,5 @@
 // Get modules
-import {API as api} from '../jHelper.js';
+import {API as api, createToast} from '../jHelper.js';
 
 // Define API Endpoints
 const APIEndpoints = {
@@ -10,19 +10,17 @@ let API = await new api();
 
 class dashboard {
     constructor() {
+        this.fileStorage = Object();
         this.webEnvironment = {
-            target: String(),
-            data: Object()
+            target: String(), data: Object()
         };
         this.viewData = {
             CVECount: {
-                count: Number(),
-                needsUpdate: false
+                count: Number(), needsUpdate: false
             }
         };
         this.job = {
-            allJobs: Array(),
-            currentJob: Object()
+            allJobs: Array(), currentJob: Object()
         };
         this.ports = Object();
     }
@@ -59,9 +57,7 @@ class dashboard {
         let currentDOM = document.getElementById("relatedCVECount");
         if (this.job.allJobs.length > 0) {
             if (this.viewData.CVECount.needsUpdate) {
-                let dataset = this.webEnvironment.data,
-                    APIResult = Object(),
-                    countedValue = Number();
+                let dataset = this.webEnvironment.data, APIResult = Object(), countedValue = Number();
 
                 for (const type of Object.keys(dataset)) {
                     for (const lib of Object.keys(dataset[type])) {
@@ -72,9 +68,7 @@ class dashboard {
 
                 this.viewData.CVECount.count = countedValue;
 
-                currentDOM.innerText = (this.viewData.CVECount.count === 0)
-                    ? "-"
-                    : String(this.viewData.CVECount.count);
+                currentDOM.innerText = (this.viewData.CVECount.count === 0) ? "-" : String(this.viewData.CVECount.count);
 
                 this.viewData.CVECount.needsUpdate = false;
             }
@@ -98,10 +92,8 @@ class dashboard {
 
     async updatePorts() {
         let localPorts = Object(),
-            targets = [
-                document.getElementById("portCountViewPlace"),
-                document.getElementById("openedPortsCount")
-            ];
+            targets = [document.getElementById("portCountViewPlace"), document.getElementById("openedPortsCount")],
+            reGenObject = false;
 
         if (this.job.allJobs.length > 0) {
             let portData = {
@@ -116,19 +108,21 @@ class dashboard {
             if (portData.data.length > 0) {
                 for (const port of portData.data) {
                     if (port.result === "Open") {
-                        if (!Object.keys(localPorts).includes(port["service"]))
-                            localPorts[port["service"]] = Array();
+                        if (!Object.keys(localPorts).includes(port["service"])) localPorts[port["service"]] = Array();
                         if (port.port !== "None") localPorts[port["service"]].push(port.port)
                     }
                 }
             }
 
+            // Regen option
+            reGenObject = JSON.stringify(this.ports) !== JSON.stringify(localPorts);
+
             // Open view
-            document.getElementById("portViewPlace-detail").classList.remove("d-none");
+            // document.getElementById("portViewPlace-detail").classList.remove("d-none");
             document.getElementById("portViewPlace-noData").classList.add("d-none");
 
             // Save data if not same data
-            if (JSON.stringify(this.ports) !== JSON.stringify(localPorts)) {
+            if (reGenObject) {
                 // Save ports data
                 this.ports = localPorts;
 
@@ -147,21 +141,34 @@ class dashboard {
                     skeleton.name.classList.add("text-muted", "small", "text-capitalize");
                     skeleton.name.innerText = `${currentType} (${localPorts[currentType].length})`;
                     localPorts[currentType].forEach(currentPort => {
-                        skeleton.ports.innerText += currentPort.concat(
-                            (localPorts[currentType][localPorts[currentType].length - 1] !== currentPort)
-                                ? ", "
-                                : ""
-                        )
+                        skeleton.ports.innerText += currentPort.concat((localPorts[currentType][localPorts[currentType].length - 1] !== currentPort) ? ", " : "")
                     })
 
-                    skeleton.parent.append(
-                        skeleton.name,
-                        skeleton.ports
-                    )
+                    skeleton.parent.append(skeleton.name, skeleton.ports)
                     portView.appendChild(skeleton.parent);
                 });
+                this.updateOverviewPorts();
             }
         } else targets[1].innerText = " - ";
+    }
+
+    updateOverviewPorts() {
+        let viewPlace = document.getElementById("overview-Ports");
+        viewPlace.innerHTML = "";
+
+        Object.keys(this.ports).forEach(type => {
+            let portSkeleton = {
+                parent: document.createElement("li"),
+                type: document.createElement("span")
+            };
+            portSkeleton.type.classList.add("fw-bold");
+            portSkeleton.type.innerText = type;
+            portSkeleton.parent.append(
+                portSkeleton.type,
+                ` : ${this.ports[type].length} Ports`
+            )
+            viewPlace.appendChild(portSkeleton.parent);
+        })
     }
 
     async webEnvironments() {
@@ -170,15 +177,14 @@ class dashboard {
             try {
                 environmentData = await API.communicate(`${APIEndpoints.webEnvironments}/1`);
                 localObject = {
-                    target: environmentData[0].url,
-                    data: JSON.parse(environmentData[0].data)
+                    target: environmentData[0].url, data: JSON.parse(environmentData[0].data)
                 }
             } catch (e) {
                 return console.error(e);
             }
 
             document.getElementById("webEnvDataPlace").classList.remove("d-none");
-            document.getElementById("webEnvDataPlace-detail").classList.remove("d-none");
+            // document.getElementById("webEnvDataPlace-detail").classList.remove("d-none");
             document.getElementById("webEnvDataPlace-noData").classList.add("d-none");
 
             let reGenObject = JSON.stringify(this.webEnvironment) !== JSON.stringify(localObject);
@@ -189,66 +195,232 @@ class dashboard {
             this.viewData.CVECount.needsUpdate = reGenObject;
 
             if (reGenObject) {
-                document.getElementById("webEnvURLPlace").innerText = this.webEnvironment.target;
+                document.getElementById("pageTitle_sub").innerText = `Target: ${this.webEnvironment.target}`;
                 document.getElementById("webEnvDataPlace").innerHTML = "";
-                Object.keys(this.webEnvironment.data).forEach((key) => {
+                let viewArea = document.getElementById("viewArea");
+                viewArea.innerHTML = "";
+                for (const key of Object.keys(this.webEnvironment.data)) {
+                    viewArea.appendChild(await this.buildOverviewEnvironments(key, this.webEnvironment.data[key]));
                     document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, this.webEnvironment.data[key]));
+                }
+                let masonry = new Masonry( '#viewArea', {
+                    columnWidth: 1,
+                    itemSelector: '.grid-item'
                 });
-
             }
         } else {
             document.getElementById("webEnvDataPlace").classList.add("d-none");
-            document.getElementById("webEnvDataPlace-detail").classList.add("d-none");
+            // document.getElementById("webEnvDataPlace-detail").classList.add("d-none");
             document.getElementById("webEnvDataPlace-noData").classList.remove("d-none");
         }
     }
 
-    buildWebEnvCard(type, dataPackage) {
+    async buildOverviewEnvironments(type, dataPackage) {
         let skeleton = {
             parent: document.createElement("div"),
             type: document.createElement("p"),
-            child: document.createElement("div")
+            childBox: document.createElement("div")
         };
-        // Class Set
-        skeleton.parent.classList.add("col-md-6", "mt-3");
-        skeleton.type.classList.add("text-muted", "small", "text-capitalize");
-        // Value Set
+
+        skeleton.parent.classList.add("border", "p-3", "rounded-custom", "grid-item");
+        skeleton.type.classList.add("text-muted", "small", "mb-1", "text-uppercase");
+        skeleton.childBox.classList.add("row");
+
         skeleton.type.innerText = type;
-        Object.keys(dataPackage).forEach((key) => {
-            let data = dataPackage[key],
-                localSkeleton = {
-                    parent: document.createElement("a"),
-                    productImage: document.createElement("img"),
-                    productName: document.createElement("p"),
-                    version: document.createElement("p")
-                },
-                versionCase = (data.version !== 0);
 
-            // set classes
-            localSkeleton.parent.href = "javascript:void(0);";
-            localSkeleton.productImage.width = 30;
-            localSkeleton.productImage.height = 30;
-            localSkeleton.productImage.classList.add("rounded-circle", "shadow-sm", "p-1");
-            localSkeleton.productName.classList.add("mb-0", "ms-2");
-            localSkeleton.parent.classList.add("mt-2", "sizer", "align-items-center", "text-decoration-none");
-            localSkeleton.version.classList.add("mb-0", "badge", "ms-1", "text-dark", "border", "border-secondary");
+        for (const key of Object.keys(dataPackage)) {
+            let childParent = document.createElement("div");
+            childParent.classList.add("col", "mt-2");
 
-            // Set value
-            localSkeleton.productImage.src = `https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src/drivers/webextension/images/icons/${data.icon}`;
-            localSkeleton.productName.innerText = key;
-            if (versionCase) localSkeleton.version.innerText = data.version;
+            childParent.appendChild(await this.buildWebEnvIcon(key, dataPackage[key].icon));
 
-            localSkeleton.parent.append(
-                localSkeleton.productImage,
-                localSkeleton.productName
-            );
-            if (versionCase) localSkeleton.parent.appendChild(localSkeleton.version);
-            skeleton.child.appendChild(localSkeleton.parent);
-        })
+            // console.log(key, dataPackage[key].icon);
+            skeleton.childBox.appendChild(childParent);
+        }
+
+        // Assembly
         skeleton.parent.append(
             skeleton.type,
-            skeleton.child
+            skeleton.childBox
         );
+
+        return skeleton.parent;
+    }
+
+    async getIcon(filename) {
+        let iconURL = {
+            local: `/static/img/icons/${filename}`,
+            alternative: `https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src/drivers/webextension/images/icons/${filename}`
+        };
+        for (const icon of Object.keys(iconURL)) {
+            let checker = new Request(iconURL[icon]);
+            let status = await fetch(checker).then(res => {
+                return res.status;
+            })
+            if (status === 200) return iconURL[icon];
+        }
+    }
+
+    async buildWebEnvIcon(name, filename) {
+        let skeleton = {
+                parent: document.createElement("div"),
+                icon: document.createElement("img")
+            },
+            iconURL = await this.getIcon(filename);
+
+        // Set classes
+        skeleton.parent.classList.add("dashboard", "icon", "rounded-custom", "d-flex", "align-items-center", "justify-content-center");
+        skeleton.icon.classList.add("p-1");
+
+        // Set size
+        skeleton.icon.setAttribute("width", "55");
+        skeleton.icon.setAttribute("height", "55");
+
+        // Set description
+        skeleton.parent.setAttribute("title", name);
+
+        // Set src
+        skeleton.icon.src = iconURL;
+
+        // Assembly elements and return
+        skeleton.parent.appendChild(skeleton.icon);
+        return skeleton.parent;
+    }
+
+    buildWebEnvCard(type, dataPackage) {
+        let skeleton = {
+            parent: document.createElement("section"),
+            type: document.createElement("p"),
+            childBox: document.createElement("div")
+        };
+
+        // Set classes
+        skeleton.parent.classList.add("row", "mb-3", "col-md-6");
+        skeleton.childBox.classList.add("row");
+        skeleton.type.classList.add("col-md-12", "text-muted", "small", "text-capitalize");
+
+        // Set values
+        skeleton.type.innerText = type;
+
+        // Create child
+        Object.keys(dataPackage).forEach(key => {
+            let data = dataPackage[key],
+                versionCase = (data.version !== 0),
+                childSkeleton = {
+                    parent: document.createElement("a"),
+                    icon: document.createElement("img"),
+                    details: {
+                        parent: document.createElement("div"),
+                        name: document.createElement("p"),
+                        version: document.createElement("p")
+                    }
+                };
+
+            // Set classes to child
+            childSkeleton.parent.classList.add("col-md-6", "mb-2", "sizer", "align-items-center", "text-decoration-none");
+            childSkeleton.details.parent.classList.add("ms-2");
+            childSkeleton.icon.classList.add("rounded-custom", "border", "p-1");
+            childSkeleton.details.name.classList.add("mb-0", "h6");
+            childSkeleton.details.version.classList.add("mb-0", "text-muted", "small");
+
+            // Set attrs
+            childSkeleton.parent.href = "javascript:void(0);";
+            childSkeleton.icon.setAttribute("width", "55");
+            childSkeleton.icon.setAttribute("height", "55");
+            childSkeleton.icon.src = `https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src/drivers/webextension/images/icons/${data.icon}`;
+
+            // Set values
+            childSkeleton.details.name.innerText = key;
+            if (versionCase) childSkeleton.details.version.innerText = data.version;
+
+            // Add event listener
+            childSkeleton.parent.addEventListener("click", async () => {
+                let views = {
+                    name: document.getElementById("envDetails-name"),
+                    icon: document.getElementById("envDetails-icon"),
+                    version: document.getElementById("envDetails-version"),
+                    viewPlace: document.getElementById("envDetails-CVEs-viewPlace"),
+                    detectedArea: document.getElementById("envDetails-detectedArea")
+                }
+
+                document.getElementById("envDetails-CVECount-area").classList.add("d-none");
+                document.getElementById("envDetails-CVEs").classList.add("d-none");
+
+                views.name.innerText = key;
+                views.icon.src = childSkeleton.icon.src;
+                views.version.innerText = (versionCase)
+                    ? data.version
+                    : " ";
+                views.detectedArea.innerText = data.detect;
+
+                let modal = new bootstrap.Modal(document.getElementById("envDetails"), {
+                    show: true
+                });
+                modal.show();
+
+                let cve = Object();
+                try {
+                    let baseAPIEndpoint = `/api/cve/search/${key}/${data.version}`;
+                    cve = {
+                        count: await API.communicate(`${baseAPIEndpoint}/count`),
+                        data: await API.communicate(baseAPIEndpoint)
+                    }
+                } catch (e) {
+                    return createToast("Error has occurred", `${e.name}: ${e.message}`, "danger", false);
+                }
+
+                // Remove d-none option to display
+                document.getElementById("envDetails-CVECount-area").classList.remove("d-none");
+                document.getElementById("envDetails-CVEs").classList.remove("d-none");
+
+                // Set count data
+                document.getElementById("envDetails-CVECount").innerText = String(cve.count.count);
+                document.getElementById("envDetails-renderedCVECount").innerText = String(cve.data.length);
+
+                // Render CVE Datas
+                let viewPlace = document.getElementById("envDetails-CVEs-viewPlace");
+                viewPlace.innerHTML = "";
+
+                cve.data.forEach((data) => {
+                    let CVESkeleton = {
+                        parent: document.createElement("div"),
+                        cve: document.createElement("p"),
+                        description: document.createElement("p")
+                    }
+
+                    CVESkeleton.parent.classList.add("shadow-sm", "rounded-custom", "p-3", "mt-2", "mb-2");
+                    CVESkeleton.cve.classList.add("h6", "mb-1", "fw-bold");
+                    CVESkeleton.description.classList.add("text-muted", "mb-0", "small");
+
+                    CVESkeleton.cve.innerText = data.year;
+                    CVESkeleton.description.innerText = data.description;
+
+                    CVESkeleton.parent.append(
+                        CVESkeleton.cve,
+                        CVESkeleton.description
+                    );
+
+                    views.viewPlace.appendChild(CVESkeleton.parent);
+                });
+
+                // alert(`Hello! I am ${key}`);
+                console.log(cve);
+            });
+
+            // Assembly and return
+            childSkeleton.details.parent.append(
+                childSkeleton.details.name,
+                childSkeleton.details.version
+            );
+            childSkeleton.parent.append(
+                childSkeleton.icon,
+                childSkeleton.details.parent
+            );
+            skeleton.childBox.appendChild(childSkeleton.parent);
+            // console.log(skeleton.childBox);
+        })
+
+        skeleton.parent.append(skeleton.type, skeleton.childBox);
         return skeleton.parent;
     }
 }
