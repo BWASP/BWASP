@@ -5,7 +5,6 @@ from urllib.parse import urlparse
 from requests import api
 
 from Crawling.feature import func
-from socket import *
 
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
              "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]
@@ -14,8 +13,6 @@ def attackHeader(target_url):
     dict_data = requests.get(target_url, verify=False).headers
     infor_data = ""
     infor_vector = ""
-    cloud_url = "https://search.censys.io/hosts/" + gethostbyname(urlparse(target_url).netloc)
-    cloud_header = ""
 
     try:
         http_method = requests.options(target_url).headers['Allow'].replace(",", "").split(" ")
@@ -46,10 +43,6 @@ def attackHeader(target_url):
 
     except:
         infor_vector += "Not_X-Frame-Options\n"
-
-    soup = BeautifulSoup(requests.get(target_url), 'html.parser')
-    cloud_header = soup.find('dd').get_text().replace(" ", "").replace("\n", "")
-    print("Cloud: " + cloud_header)
 
     return http_method, infor_vector
 
