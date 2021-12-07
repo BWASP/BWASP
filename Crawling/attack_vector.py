@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 from requests import api
 
 from Crawling.feature import func
+from socket import *
 
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
              "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]
@@ -13,6 +14,9 @@ def attackHeader(target_url):
     dict_data = requests.get(target_url, verify=False).headers
     infor_data = ""
     infor_vector = ""
+    cloud_url = "https://search.censys.io/hosts/" + gethostbyname(urlparse(target_url).netloc)
+    cloud_header = ""
+
     try:
         http_method = requests.options(target_url).headers['Allow'].replace(",", "").split(" ")
     except KeyError:
@@ -43,6 +47,10 @@ def attackHeader(target_url):
     except:
         infor_vector += "Not_X-Frame-Options\n"
 
+    soup = BeautifulSoup(requests.get(target_url), 'html.parser')
+    cloud_header = soup.find('dd').get_text().replace(" ", "").replace("\n", "")
+    print("Cloud: " + cloud_header)
+
     return http_method, infor_vector
 
 
@@ -61,6 +69,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
     attack_vector = dict() #list()
     data = dict()
     impactRate = 0
+    check = 0
 
     text = soup.find_all('input')
     form = soup.find_all('form')
@@ -154,13 +163,20 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                     # ~~~~~~~~~~~~File Upload
                     if tag.attrs['type'] == "file":
                         data["doubt"]["File Upload"] = True
+                        check = 2
 
                         impactRate = 2
                     else:
-                        data["doubt"].pop("File Upload")
+                        if check == 2:
+                            pass
+                        else:
+                            check = 1
                 except:
                     if "File Upload" in data["doubt"]:
                         data["doubt"].pop("File Upload")
+
+        if check == 1:
+            data["doubt"].pop("File Upload")
 
                 # ~~~~~~~~~~~~~attack option
         if attack_option == True:
