@@ -43,6 +43,10 @@ class GetPort:
 
             self.ports_list[str(port_number)] = port_service
 
+        #Cloud Header Check
+        cloud_header = parse_html.find('dd').get_text().replace(" ", "").replace("\n", "")
+        print("Cloud: " + cloud_header)
+
         return self.ports_list
 
     def getPortsOffline(self, target_ip):

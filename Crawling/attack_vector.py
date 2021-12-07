@@ -13,6 +13,7 @@ def attackHeader(target_url):
     dict_data = requests.get(target_url, verify=False).headers
     infor_data = ""
     infor_vector = ""
+
     try:
         http_method = requests.options(target_url).headers['Allow'].replace(",", "").split(" ")
     except KeyError:
@@ -61,6 +62,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
     attack_vector = dict() #list()
     data = dict()
     impactRate = 0
+    check = 0
 
     text = soup.find_all('input')
     form = soup.find_all('form')
@@ -154,13 +156,20 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                     # ~~~~~~~~~~~~File Upload
                     if tag.attrs['type'] == "file":
                         data["doubt"]["File Upload"] = True
+                        check = 2
 
                         impactRate = 2
                     else:
-                        data["doubt"].pop("File Upload")
+                        if check == 2:
+                            pass
+                        else:
+                            check = 1
                 except:
                     if "File Upload" in data["doubt"]:
                         data["doubt"].pop("File Upload")
+
+        if check == 1:
+            data["doubt"].pop("File Upload")
 
                 # ~~~~~~~~~~~~~attack option
         if attack_option == True:
