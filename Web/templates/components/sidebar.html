@@ -1,35 +1,53 @@
-<div class="BWASP-navigation commonPadding">
-    <a class="bg-primary text-decoration-none text-white shadow sizer element-top center-horizontal center-vertical border-rounded"
-        href="/">
-        <h4 class="text-decoration-none text-white mb-0 font-logo">BWASP</h4>
-    </a>
-    <!-- btn-toggle-nav list-unstyled fw-normal pb-1 small -->
-    <div class="bg-white shadow text-dark sizer element-sidebar border-rounded separatedTab">
-        <div class="sidebar-category">
-            <p class="sidebar-element-title collapsed">
-                <a href="/dashboard"><i class="bi bi-activity"></i> Dashboard</a>
-            </p>
-            <hr>
-            <p class="sidebar-title">Interface</p>
-            <ul class="sidebar-element list-unstyled mb-auto">
-                <li class="sidebar-element">
-                    <p class="sidebar-element-title collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
-                        <i class="bi bi-play-fill"></i> Start
-                    </p>
-                    <div class="sidebar-element-content collapse shadow border-rounded" id="home-collapse">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="/automation/options" class="link-dark rounded"><i class="bi bi-gear-fill"></i> Automated</a></li>
-                            <li><a href="#" class="link-dark rounded"><i class="bi bi-people-fill"></i> Manual</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="sidebar-element mt-2">
-                    <p class="sidebar-element-title collapsed">
-                        <a href="/common/attack_vector"><i class="bi bi-activity"></i> Attack Vectors</a>
-                    </p>
-                </li>
-            </ul>
+<aside class="BWASP-navigation p-3 pt-4 pb-4 sidebar shadow">
+    <section class="element-top sizer element-top center-horizontal">
+        <a class="text-decoration-none text-white sidebar-logo" href="/">
+            <h4 class="text-decoration-none text-dark mb-0 font-logo">BWASP</h4>
+            <p class="mb-0 text-muted small">Technical Preview</p>
+        </a>
+    </section>
+    <section class="separatedTab">
+        <div class="sidebar-element">
+            <a href="/dashboard" class="rounded-custom" id="target-dashboard">
+                <i class="bi bi-tv-fill text-primary"></i>
+                Dashboard
+            </a>
         </div>
-    </div>
-    {% include 'components/footer.html' %}
-</div>
+        <div class="sidebar-element">
+            <p class="sidebar-category">Job</p>
+            <a href="/automation/options" class="rounded-custom" id="target-automation-options">
+                <i class="bi bi-play-fill text-primary"></i>
+                Start
+            </a>
+        </div>
+        <div class="sidebar-element">
+            <p class="sidebar-category">Result</p>
+            <a href="/common/attack_vector" class="rounded-custom" id="target-common-attack_vector">
+                <i class="bi bi-paperclip text-primary"></i>
+                Attack Vectors
+            </a>
+            <a href="#" class="rounded-custom">
+                <i class="bi bi-file-earmark-arrow-down-fill text-primary"></i>
+                Export
+            </a>
+        </div>
+    </section>
+</aside>
+
+<script>
+    let sidebar = () => {
+        if(window.location.pathname === "/") return;
+        let side = {
+            uri: window.location.pathname.split("/"),
+            target: "target"
+        };
+        side.uri.splice(0, 1);
+        side.uri.forEach(data => side.target += `-${data}`);
+
+        try{
+            document.getElementById(side.target).classList.add("active");
+        }catch (e){
+            console.error(e);
+        }
+    }
+    sidebar();
+</script>

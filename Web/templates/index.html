@@ -5,106 +5,115 @@
 
 <body>
 {% include 'components/sidebar.html' %}
-<div class="commonPadding w-100">
-    <div class="d-inline-flex sizer element-top">
-        <div class="bg-white h-100 text-dark p-4 pt-3 pb-3 w-100 sizer center-horizontal border-rounded shadow">
-            <h4 class="text-decoration-none mb-0 font-logo">Dashboard</h4>
+
+<div class="modal fade" id="envDetails">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-custom">
+            <div class="modal-body rounded-custom">
+                <div class="d-flex align-items-center">
+                    <img class="rounded-custom border p-1" id="envDetails-icon" width="55" height="55">
+                    <div class="ms-3 w-100">
+                        <div class="d-flex align-items-center">
+                            <p class="mb-0 me-auto h4" id="envDetails-name"></p>
+                            <p class="mb-0 text-muted small">From <span class="text-capitalize" id="envDetails-detectedArea"></span></p>
+                        </div>
+                        <div class="d-flex">
+                            <p class="mb-0 me-auto text-muted small" id="envDetails-version"> </p>
+                            <p class="mb-0 text-muted small d-none" id="envDetails-CVECount-area"><span class="text-capitalize" id="envDetails-CVECount">0</span> CVEs</p>
+                        </div>
+                    </div>
+                </div>
+                <section class="d-none" id="envDetails-CVEs">
+                    <hr>
+                    <section class="mb-2">
+                        <h5 class="fw-bold mb-1">Related CVEs</h5>
+                        <p class="text-muted small">Prints <span id="envDetails-renderedCVECount">0</span> CVEs from top</p>
+                    </section>
+                    <section id="envDetails-CVEs-viewPlace"></section>
+                </section>
+            </div>
         </div>
     </div>
-    <div class="bg-white shadow text-dark sizer element-objects border-rounded separatedTab">
-        <div class="p-4 w-100">
-            <section class="row">
-                <h3 class="col-md-12 fw-bold text-capitalize mb-3">Quick view</h3>
-                <div class="col-md-3 p-1 mt-2">
-                    <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Received Packets</p>
-                        <p class="fs-2 mb-0" id="receivedPacketsCount">
-                            <span class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </span>
-                        </p>
+</div>
+
+<div class="p-4 pt-4 w-100">
+    <div class="d-inline-flex w-100 mb-3">
+        <div class="sizer element-top center-horizontal">
+            <div class="content-page-icon content-page-icon-sizing rounded-custom">
+                <i class="bi bi-tv-fill"></i>
+            </div>
+            <div>
+                <h4 class="text-decoration-none mb-0 font-logo" id="pageTitle">Dashboard</h4>
+                <p class="mb-0 text-muted small" id="pageTitle_sub">No target</p>
+            </div>
+        </div>
+        <div class="sizer element-top center-horizontal d-flex align-items-center ms-auto">
+        </div>
+    </div>
+    <div class="bg-white text-dark sizer element-objects separatedTab">
+        <div class="w-100">
+            <ul class="nav nav-pills mb-3" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-custom active" id="tab-overview" data-bs-toggle="pill" data-bs-target="#pills-overview" type="button" role="tab" aria-controls="pills-overview" aria-selected="true">Overview</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-custom" id="tab-env" data-bs-toggle="pill" data-bs-target="#pills-env" type="button" role="tab" aria-controls="pills-env" aria-selected="false">Environments</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-custom" id="tab-ports" data-bs-toggle="pill" data-bs-target="#pills-ports" type="button" role="tab" aria-controls="pills-ports" aria-selected="false">Ports</button>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <section class="tab-pane fade show active pt-2" id="pills-overview" role="tabpanel" aria-labelledby="tab-overview">
+                    <h5 class="text-capitalize fw-bold">Quick view</h5>
+                    <div class="row mt-3">
+                        <div class="col-md-3 mb-3">
+                            <p class="text-muted small mb-1 text-uppercase">Received</p>
+                            <p class="h5 mb-0"><span id="receivedPacketsCount">-</span> Packets</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <p class="text-muted small mb-1 text-uppercase">Detected</p>
+                            <p class="h5 mb-0"><span id="detectedThreatsCount">-</span> Threats</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <p class="text-muted small mb-1 text-uppercase">Discovered</p>
+                            <p class="h5 mb-0"><span id="openedPortsCount">-</span> Ports</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <p class="text-muted small mb-1 text-uppercase">Estimated</p>
+                            <p class="h5 mb-0"><span id="relatedCVECount">-</span> CVEs</p>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-3 p-1 mt-2">
-                    <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Detected Threats</p>
-                        <p class="fs-2 mb-0" id="detectedThreatsCount">
-                            <span class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </span>
-                        </p>
-                    </div>
-                </div>
-                <div class="col-md-3 p-1 mt-2">
-                    <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Opened Ports</p>
-                        <p class="fs-2 mb-0" id="openedPortsCount">
-                            <span class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </span>
-                        </p>
-                    </div>
-                </div>
-                <div class="col-md-3 p-1 mt-2">
-                    <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Related CVE</p>
-                        <p class="fs-2 mb-0" id="relatedCVECount">
-                            <span class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </span>
-                        </p>
-                    </div>
-                </div>
-                <div class="col-md-3 p-1 mt-2 d-none">
-                    <div class="p-3 border-rounded shadow">
-                        <p class="text-muted small mb-1 text-uppercase">Analysis Level</p>
-                        <p class="fs-2 mb-0" id="analysisLevelView">
-                            <span class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </span>
-                        </p>
-                    </div>
-                </div>
-                <p class="col-md-12 mt-2 text-muted small">Calculated numbers may has numerical errors.</p>
-            </section>
-            <section class="row mt-3 pb-3">
-                <h3 class="col-md-12 fw-bold text-capitalize mb-3">Scan result</h3>
-                <section class="col-md-6 mb-2 p-1">
-                    <div class="p-3 border-rounded shadow">
-                        <section>
-                            <p class="mb-0 text-uppercase">Web Environment Information</p>
-                            <p id="webEnvDataPlace-detail" class="mb-1 text-muted small d-none"><span>of</span> <span class="fw-bold" id="webEnvURLPlace">Unknown</span></p>
-                        </section>
+
+                    <h5 class="text-capitalize mt-4 fw-bold">Environments</h5>
+                    <div class="mt-3 d-flex grid" id="viewArea"></div>
+
+                    <h5 class="text-capitalize mt-3 fw-bold">Ports</h5>
+                    <p class="text-muted small">Detected <span>0</span> Ports.</p>
+                    <ul id="overview-Ports"></ul>
+                </section>
+                <section class="tab-pane fade pt-2" id="pills-env" role="tabpanel" aria-labelledby="tab-env">
+                    <h5 class="text-capitalize fw-bold">Web Environment Information</h5>
+                    <div class="mt-3">
                         <section class="row" id="webEnvDataPlace"></section>
                         <section class="mt-3" id="webEnvDataPlace-noData">
                             <p class="text-center text-muted text-capitalize p-4">No Data</p>
                         </section>
                     </div>
                 </section>
-                <section class="col-md-6 mb-2 p-1">
-                    <div class="p-3 border-rounded shadow">
-                        <section>
-                            <p class="mb-0 text-uppercase">Opened Ports</p>
-                            <p id="portViewPlace-detail" class="mb-1 text-muted small d-none"><span class="fw-bold" id="portCountViewPlace">0</span> ports opened.</p>
-                        </section>
-                        <section class="row" id="portViewPlace"></section>
-                        <section class="mt-3" id="portViewPlace-noData">
-                            <p class="text-center text-muted text-capitalize p-4">No Data</p>
-                        </section>
-                    </div>
+                <section class="tab-pane fade pt-2" id="pills-ports" role="tabpanel" aria-labelledby="pills-ports">
+                    <h5 class="text-capitalize fw-bold">Opened Ports</h5>
+                    <p>We detected <span class="fw-bold" id="portCountViewPlace">0</span> opened ports.</p>
+                    <section class="row" id="portViewPlace"></section>
+                    <section class="mt-3" id="portViewPlace-noData">
+                        <p class="text-center text-muted text-capitalize p-4">No Data</p>
+                    </section>
                 </section>
-            </section>
+            </div>
         </div>
     </div>
 </div>
 
 <script type="module" src="{{ url_for('static', filename='js/page/dashboard.js') }}"></script>
-
-<script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-</script>
 </body>
 </html>

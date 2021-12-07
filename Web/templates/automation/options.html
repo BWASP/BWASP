@@ -34,32 +34,28 @@
 </div>
 
 {% include 'components/sidebar.html' %}
-<div class="commonPadding w-100">
-    <div class="d-inline-flex sizer element-top">
-        <div class="bg-white h-100 text-dark p-4 pt-3 pb-3 w-100 sizer center-horizontal border-rounded shadow">
-            <h4 class="text-decoration-none mb-0 font-logo">Analysis Option</h4>
+<div class="p-4 pt-4 w-100">
+    <div class="d-inline-flex w-100 mb-3">
+        <div class="sizer element-top center-horizontal">
+            <div class="content-page-icon content-page-icon-sizing rounded-custom">
+                <i class="bi bi-play-fill"></i>
+            </div>
+            <div>
+                <h4 class="text-decoration-none mb-0 font-logo" id="pageTitle">Analysis Option</h4>
+                <p class="mb-0 text-muted small" id="pageTitle_sub">Analysis Target</p>
+            </div>
+        </div>
+        <div class="sizer element-top center-horizontal ms-auto">
+            <nav class="p-3 rounded-custom border bg-white shadow-sm" style="--bs-breadcrumb-divider: '>';"
+                 aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0" id="stepsView"></ol>
+            </nav>
         </div>
     </div>
-    <div class="bg-white shadow text-dark sizer element-objects border-rounded separatedTab">
-        <div class="p-4 w-100" id="job-order">
+    <div class="bg-white text-dark sizer element-objects separatedTab">
+        <div class="w-100" id="job-order">
             <section class="h-100">
-                <section class="h-10">
-                    <section class="d-flex align-items-start animate__animated animate__fadeInDown d-none"
-                             id="document-top">
-                        <div class="d-flex align-items-center w-100">
-                            <div class="me-auto">
-                                <h3 class="mb-1 fw-bold" id="stepName">Analysis Target</h3>
-                                <p class="mb-0 text-muted small" id="stepDescription"></p>
-                            </div>
-                            <nav class="p-3 rounded-custom border shadow-sm" style="--bs-breadcrumb-divider: '>';"
-                                 aria-label="breadcrumb">
-                                <ol class="breadcrumb mb-0" id="stepsView">
-                                </ol>
-                            </nav>
-                        </div>
-                    </section>
-                </section>
-                <section class="h-80">
+                <section class="h-90">
                     <section class="d-flex align-items-center h-100 w-100 animate__animated animate__backInUp d-none"
                              id="tab-availabilityCheck-fail">
                         <div class="w-100 d-flex align-items-center justify-content-center p-4 text-danger">

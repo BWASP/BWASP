@@ -30,7 +30,7 @@
                             <td id="detail-threat">Sample One, Sample Two, Sample Three</td>
                         </tr>
                         <tr>
-                            <th class="vector-tableKey" ">URL</th>
+                            <th class="vector-tableKey">URL</th>
                             <td id="detail-url">
                                 <p class="mb-0">
                                     <span id="detail-method" class="badge bg-success text-uppercase me-2 mb-1">GET</span>
@@ -222,28 +222,31 @@
     </div>
 </div>
 {% include 'components/sidebar.html' %}
-<div class="commonPadding w-100">
-    <div class="d-inline-flex sizer element-top">
-        <div class="bg-white h-100 text-dark p-4 pt-3 pb-3 w-100 sizer center-horizontal border-rounded shadow">
-            <h4 class="text-decoration-none mb-0 font-logo" id="pageTitle">Loading...</h4>
+<div class="p-4 pt-4 w-100">
+    <div class="d-inline-flex w-100 mb-3">
+        <div class="sizer element-top center-horizontal">
+            <div class="content-page-icon content-page-icon-sizing rounded-custom">
+                <i class="bi bi-paperclip"></i>
+            </div>
+            <div>
+                <h4 class="text-decoration-none mb-0 font-logo" id="pageTitle">Attack Vectors</h4>
+                <p class="mb-0 text-muted small" id="pageTitle_sub">Loaded 0 Threats.</p>
+            </div>
         </div>
-        <button type="button" id="openHelpModal"
-                class="bg-white p-4 pt-3 pb-3 ms-2 btn btn-link border-rounded shadow"
-                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Help">
-            <h4 class="mb-0"><i class="fas fa-question text-success"></i></h4>
-        </button>
-        <button type="button" id="openPrefModal"
-                class="bg-white p-4 pt-3 pb-3 ms-2 btn btn-link border-rounded shadow"
-                data-bs-toggle="tooltip" data-bs-placement="bottom" title="View preferences">
-            <h4 class="mb-0"><i class="fas fa-cog text-secondary"></i></h4>
-        </button>
-        <button type="button" id="switchToPacket"
-                class="bg-white p-4 pt-3 pb-3 ms-2 btn btn-link border-rounded shadow d-none"
-                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Switch">
-            <h4 class="mb-0"><i class="fas fa-random text-primary"></i></h4>
-        </button>
+        <div class="sizer element-top center-horizontal ms-auto">
+            <button type="button" id="openHelpModal"
+                    class="bg-white content-page-icon-sizing ms-2 btn btn-link border rounded-custom shadow-sm"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Help">
+                <h4 class="mb-0"><i class="fas fa-question text-success"></i></h4>
+            </button>
+            <button type="button" id="openPrefModal"
+                    class="bg-white content-page-icon-sizing ms-2 btn btn-link border rounded-custom shadow-sm"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="View preferences">
+                <h4 class="mb-0"><i class="fas fa-cog text-secondary"></i></h4>
+            </button>
+        </div>
     </div>
-    <div class="bg-white shadow text-dark sizer element-objects-pagination border-rounded separatedTab">
+    <div class="bg-white text-dark sizer element-objects separatedTab">
         <div id="loadingProgress" class="d-flex align-items-center justify-content-center w-100">
             <div>
                 <div class="d-inline-flex pt-5 pb-2">
@@ -267,7 +270,7 @@
                     time</p>
             </div>
         </div>
-        <div class="w-100 p-4 pt-3 pb-3 d-none" id="tablePlaceHolder">
+        <div class="w-100 d-none" id="tablePlaceHolder">
             <div class="table-responsive d-none" id="tablePlace"></div>
         </div>
     </div>

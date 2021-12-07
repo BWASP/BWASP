@@ -5,14 +5,21 @@
 
 <body>
 {% include 'components/sidebar.html' %}
-<div class="commonPadding w-100">
-    <div class="d-inline-flex sizer element-top">
-        <div class="bg-white h-100 text-dark p-4 pt-3 pb-3 w-100 sizer center-horizontal border-rounded shadow">
-            <h4 class="text-decoration-none mb-0 font-logo">Analysis Mode Selection</h4>
+<div class="p-4 pt-4 w-100">
+    <div class="d-inline-flex w-100 mb-3">
+        <div class="sizer element-top center-horizontal">
+            <div class="content-page-icon content-page-icon-sizing rounded-custom">
+                <i class="bi bi-check2-square"></i>
+            </div>
+            <div>
+                <h4 class="text-decoration-none mb-0 font-logo" id="pageTitle">Analysis Mode Selection</h4>
+                <p class="mb-0 text-muted small" id="pageTitle_sub"></p>
+            </div>
         </div>
+        <div class="sizer element-top center-horizontal ms-auto"></div>
     </div>
-    <div class="bg-white shadow text-dark sizer element-objects border-rounded separatedTab">
-        <div class="p-4 w-100" id="job-order">
+    <div class="bg-white text-dark sizer element-objects separatedTab">
+        <div class="w-100">
             <div class="container-fluid d-flex justify-content-center align-items-center h-100">
                 <div class="row">
                     <h5 class="col-md-12 text-center mb-5">Please select the analysis mode.</h5>

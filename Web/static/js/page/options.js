@@ -172,7 +172,7 @@ class optionFrontHandler {
 
         // Document-defined dataa
         this.elements = {
-            stepName: document.getElementById("stepName"),
+            stepName: document.getElementById("pageTitle_sub"),
             stepsView: document.getElementById("stepsView")
         };
 
@@ -257,7 +257,7 @@ class optionFrontHandler {
     }
 
     updateStepTitle(title) {
-        let titleElement = document.getElementById("stepName");
+        let titleElement = document.getElementById("pageTitle_sub");
         titleElement.innerText = title;
         this.swapStatus(titleElement, "clearAnimation");
         titleElement.classList.add("animate__animated", "animate__fadeInDown", "animate__fast");
@@ -278,7 +278,7 @@ class optionFrontHandler {
 
         // Open Analysis target view
         setTimeout(() => {
-            ["document-top", "document-bottom", "tab-0"].forEach((currentElement) => {
+            ["document-bottom", "tab-0"].forEach((currentElement) => {
                 this.swapStatus(document.getElementById(currentElement), "show");
             })
         }, 300);
