@@ -92,7 +92,11 @@ class dashboard {
 
     async updatePorts() {
         let localPorts = Object(),
-            targets = [document.getElementById("portCountViewPlace"), document.getElementById("openedPortsCount")],
+            targets = [
+                document.getElementById("portCountViewPlace"),
+                document.getElementById("portCountViewPlace"),
+                document.getElementById("openedPortsCount")
+            ],
             reGenObject = false;
 
         if (this.job.allJobs.length > 0) {
