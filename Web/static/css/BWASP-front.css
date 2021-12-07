@@ -1,6 +1,5 @@
 /* Font-family */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap');
 
 :root {
     /* Color variables */
@@ -30,6 +29,7 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
+    font-weight: 400 !important;
 }
 
 .text-title {
@@ -60,7 +60,7 @@ body {
 .commonPadding {
     padding: .5rem !important;
 }
-
+/*
 .sidebar-category {
     width: 100% !important;
     padding: 15px;
@@ -73,6 +73,7 @@ body {
     text-transform: uppercase !important;
     margin-bottom: .5rem !important;
 }
+ */
 
 .sidebar-element-title {
     margin-bottom: .25rem !important;

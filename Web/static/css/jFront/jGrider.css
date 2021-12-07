@@ -31,7 +31,6 @@ body{
 
 .sizer.element-top{
     height: var(--sizing-top) !important;
-    margin-bottom: 15px !important;
 }
 
 .sizer.element-sidebar{
@@ -67,8 +66,8 @@ footer>div>p{
     height: 10% !important;
 }
 
-.h-80{
-    height: 80% !important;
+.h-90{
+    height: 90% !important;
 }
 
 .vector-tableKey{

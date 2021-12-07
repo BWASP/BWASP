@@ -1,0 +1,58 @@
+:root{
+    --unified-margin-horizontal: 15px;
+    --unified-margin-vertical: 8px;
+    --sidebar-background-color: #F5F5F5;
+    --sidebar-active-color: #E0E0E0;
+    --sidebar-category-color: #9E9E9E;
+}
+
+.sidebar{
+    background-color: var(--sidebar-background-color) !important;
+}
+
+.sidebar-logo{
+    font-weight: 500 !important;
+}
+
+/* Paddings */
+.sidebar-logo, div.sidebar-element > p.sidebar-category{
+    padding-left: var(--unified-margin-horizontal);
+    padding-right: var(--unified-margin-horizontal);
+}
+
+div.sidebar-element > a{
+    padding: var(--unified-margin-vertical) var(--unified-margin-horizontal) !important;
+}
+
+/* Margins */
+.sidebar > section > div.sidebar-element{
+    margin-top: 20px !important;
+    margin-bottom: 20px !important;
+}
+
+/* Colors */
+div.sidebar-element > p.sidebar-category{
+    text-transform: uppercase !important;
+    margin-bottom: .2rem;
+    font-size: .9em !important;
+    color: var(--sidebar-category-color) !important;
+}
+
+.sidebar > section > div.sidebar-element > a{
+    text-decoration: none !important;
+    margin-bottom: 5px;
+    font-size: 17px;
+    display: block;
+    color: black;
+    width: 100%;
+}
+
+.sidebar > section > div.sidebar-element > a.active {
+    font-weight: 600;
+    background-color: var(--sidebar-active-color);
+}
+
+.sidebar > section > div.sidebar-element > a:hover{
+    font-weight: 700 !important;
+    background-color: var(--sidebar-active-color);
+}

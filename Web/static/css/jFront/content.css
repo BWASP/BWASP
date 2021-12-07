@@ -1,0 +1,33 @@
+.content-page-icon-sizing{
+    width: 55px;
+    height: 55px;
+}
+
+.content-page-icon{
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #EEEEEE;
+    margin-right: 15px;
+}
+
+.content-page-icon > i{
+    font-size: 1.75rem;
+    color: #616161;
+    margin-bottom: 0;
+}
+
+.dashboard.icon{
+    width: 70px;
+    height: 70px;
+    background-color: #EEEEEE;
+}
+
+.nav-link {
+    color: #757575 !important;
+}
+.nav-link.active {
+    background-color: #EEEEEE !important;
+    font-weight: 600;
+    color: black !important;
+}
