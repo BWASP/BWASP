@@ -10,6 +10,7 @@ let API = await new api();
 
 class dashboard {
     constructor() {
+        this.iconURL = Object();
         this.fileStorage = Object();
         this.webEnvironment = {
             target: String(), data: Object()
@@ -252,6 +253,12 @@ class dashboard {
     }
 
     async getIcon(filename) {
+        // Return icon URL from saved location
+        if(Object.keys(this.iconURL).includes(filename)) return this.iconURL[filename].url;
+        else this.iconURL[filename] = {
+            url: String()
+        }
+
         let iconURL = {
             alternative: `https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src/drivers/webextension/images/icons/${filename}`,
             local: `/static/img/icons/${filename}`
@@ -263,7 +270,10 @@ class dashboard {
                     return res.status;
                 })
                 .catch(err => console.log(err));
-            if (status === 200) return iconURL[icon];
+            if (status === 200) {
+                this.iconURL[filename].url = iconURL[icon];
+                return iconURL[icon];
+            }
         }
     }
 
