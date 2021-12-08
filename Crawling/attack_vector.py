@@ -16,7 +16,7 @@ def attackHeader(target_url):
 
     try:
         http_method = requests.options(target_url, verify=False).headers['Allow'].replace(",", "").split(" ")
-    except KeyError:
+    except: #KeyError or ConnectionError
         http_method = "private"
 
     try:

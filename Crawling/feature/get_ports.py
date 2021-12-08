@@ -31,7 +31,7 @@ class GetPort:
             try:
                 target_ip = gethostbyname(urlparse(target_ip).netloc)
             except:
-                return self.ports_list, None
+                return self.ports_list, self.cloud_info
 
         parse_html = BeautifulSoup(
             requests.get(self.port_scan["online"]["Get_port_information_url"] + target_ip, verify=False).text,
