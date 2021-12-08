@@ -97,6 +97,8 @@ def visit(driver, url, depth, options):
     global DETECT_LIST
     global LOCK
 
+    print("asfdfasdfasdfasdfasddasfsdafasdfasdfasd111111111111111111")
+
     try:
         driver.get(url)
         alert = driver.switch_to_alert()
@@ -105,6 +107,7 @@ def visit(driver, url, depth, options):
         pass
 
     if START_OPTIONS["check"]:
+        print("asfdfasdfasdfasdfasddasfsdafasdfasdfasd22222222222222222")
         ANALYSIS_DATA["directory_indexing"] = directoryIndexing(driver.current_url)
         ANALYSIS_DATA["admin_page"] = adminPage(driver.current_url)
         ANALYSIS_DATA["http_method"], ANALYSIS_DATA["infor_vector"] = attackHeader(driver.current_url)
