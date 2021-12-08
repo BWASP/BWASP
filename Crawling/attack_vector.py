@@ -15,7 +15,7 @@ def attackHeader(target_url):
     infor_vector = ""
 
     try:
-        http_method = requests.options(target_url).headers['Allow'].replace(",", "").split(" ")
+        http_method = requests.options(target_url, verify=False).headers['Allow'].replace(",", "").split(" ")
     except KeyError:
         http_method = "private"
 
@@ -83,7 +83,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                     pass
             except KeyError:
                 continue
-            if tag.attrs['type'] != "submit" and len(text) != 0:
+            if tag.attrs['type'] != "submit" and len(text) != 0 and tag.attrs['type'] != "checkbox":
                 tag_list.append(base64.b64encode(str(tag).encode('utf-8')).decode('utf-8'))  # input tag 값 ex) <input ~
                 try:
                     tag_name_list.append(tag.attrs['name'].replace("'", "").replace("+", "").replace("\"", ""))
@@ -234,7 +234,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                                 except:  # input tag not name except
                                     pass
 
-                            s = requests.Session().post(attack_url, data=param)
+                            s = requests.Session().post(attack_url, data=param, verify=False)
 
                             if s.status_code >= 500 and s.status_code <= 510:
                                 data["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
@@ -360,12 +360,12 @@ def jwtCheck(packet):
 def robotsTxt(url):
     # 주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf [page 726] robots.txt not set
     url = url.split("/")[0] + "//" + url.split("/")[2] + "/robots.txt"
-    return True if "user-agent" not in requests.get(url).text.lower() or 404 == requests.get(url).status_code else False
+    return True if "user-agent" not in requests.get(url, verify=False).text.lower() or 404 == requests.get(url, verify=False).status_code else False
 
 def errorPage(url):
     # 주요정보통신기반시설_기술적_취약점_뿐석_평가_방법_상세가이드.pdf [page 678] Error Page not set
     url = url.split("/")[0] + "//" + url.split("/")[2] + "/weasxczxcqh/weasxczxcqh.html"
-    return True if 404 == requests.get(url).status_code and "not found" in requests.get(url).text.lower() else False
+    return True if 404 == requests.get(url, verify=False).status_code and "not found" in requests.get(url, verify=False).text.lower() else False
 
 def directoryIndexing(target_url):
     return_data = list()
@@ -382,7 +382,7 @@ def directoryIndexing(target_url):
     query = 'intitle:"Index Of" inurl:"{target_domain}"'.format(target_domain=target_domain)
     api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
 
-    res = requests.get(api_url)
+    res = requests.get(api_url, verify=False)
 
     if res.status_code == 200:
         api_result = res.json()
@@ -432,7 +432,7 @@ def adminPage(target_url):
         query = 'site:{DOMAIN} AND ({INURL_LIST})'.format(DOMAIN=target_domain, INURL_LIST=" | ".join(inurl_list))
         api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
         # print(api_url)
-        res = requests.get(api_url)
+        res = requests.get(api_url, verify=False)
         if res.status_code == 200:
             api_result = res.json()
             if "items" not in api_result.keys():

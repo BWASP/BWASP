@@ -9,7 +9,7 @@ def attackHeader(target_url):
     infor_data = ""
     infor_vector = ""
     try:
-        http_method = requests.options(target_url).headers['Allow'].replace(",", "").split(" ")
+        http_method = requests.options(target_url, verify=False).headers['Allow'].replace(",", "").split(" ")
     except KeyError:
         http_method = "private"
 
@@ -258,12 +258,12 @@ def jwtCheck(packet):
 
 def robotsTxt(current_url):
     # 주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf [page 726] robots.txt not set
-    return True if "user-agent" not in requests.get(current_url).text.lower() or 404 == requests.get(current_url).status_code else False
+    return True if "user-agent" not in requests.get(current_url, verify=False).text.lower() or 404 == requests.get(current_url, verify=False).status_code else False
 
 
 def errorPage(current_url):
     # 주요정보통신기반시설_기술적_취약점_뿐석_평가_방법_상세가이드.pdf [page 678] Error Page not set
-    return True if 404 == requests.get(current_url).status_code and "not found" in requests.get(current_url).text.lower() else False
+    return True if 404 == requests.get(current_url, verify=False).status_code and "not found" in requests.get(current_url, verify=False).text.lower() else False
 
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼

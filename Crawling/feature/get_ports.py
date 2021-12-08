@@ -33,7 +33,7 @@ class GetPort:
                 return self.ports_list
 
         parse_html = BeautifulSoup(
-            requests.get(self.port_scan["online"]["Get_port_information_url"] + target_ip).text,
+            requests.get(self.port_scan["online"]["Get_port_information_url"] + target_ip, verify=False).text,
             features="html.parser")
 
         for select_idx in parse_html.select('h2'):
