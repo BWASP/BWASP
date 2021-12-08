@@ -205,9 +205,9 @@ class dashboard {
                 viewArea.innerHTML = "";
                 for (const key of Object.keys(this.webEnvironment.data)) {
                     viewArea.appendChild(await this.buildOverviewEnvironments(key, this.webEnvironment.data[key]));
-                    document.getElementById("webEnvDataPlace").appendChild(this.buildWebEnvCard(key, this.webEnvironment.data[key]));
+                    document.getElementById("webEnvDataPlace").appendChild(await this.buildWebEnvCard(key, this.webEnvironment.data[key]));
                 }
-                let masonry = new Masonry( '#viewArea', {
+                let masonry = new Masonry('#viewArea', {
                     columnWidth: 1,
                     itemSelector: '.grid-item'
                 });
@@ -258,9 +258,11 @@ class dashboard {
         };
         for (const icon of Object.keys(iconURL)) {
             let checker = new Request(iconURL[icon]);
-            let status = await fetch(checker).then(res => {
-                return res.status;
-            })
+            let status = await fetch(checker)
+                .then(res => {
+                    return res.status;
+                })
+                .catch(err => console.log(err));
             if (status === 200) return iconURL[icon];
         }
     }
@@ -291,7 +293,7 @@ class dashboard {
         return skeleton.parent;
     }
 
-    buildWebEnvCard(type, dataPackage) {
+    async buildWebEnvCard(type, dataPackage) {
         let skeleton = {
             parent: document.createElement("section"),
             type: document.createElement("p"),
@@ -307,7 +309,7 @@ class dashboard {
         skeleton.type.innerText = type;
 
         // Create child
-        Object.keys(dataPackage).forEach(key => {
+        for (const key of Object.keys(dataPackage)) {
             let data = dataPackage[key],
                 versionCase = (data.version !== 0),
                 childSkeleton = {
@@ -331,7 +333,7 @@ class dashboard {
             childSkeleton.parent.href = "javascript:void(0);";
             childSkeleton.icon.setAttribute("width", "55");
             childSkeleton.icon.setAttribute("height", "55");
-            childSkeleton.icon.src = `https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src/drivers/webextension/images/icons/${data.icon}`;
+            childSkeleton.icon.src = await this.getIcon(data.icon);
 
             // Set values
             childSkeleton.details.name.innerText = key;
@@ -422,7 +424,7 @@ class dashboard {
             );
             skeleton.childBox.appendChild(childSkeleton.parent);
             // console.log(skeleton.childBox);
-        })
+        }
 
         skeleton.parent.append(skeleton.type, skeleton.childBox);
         return skeleton.parent;
