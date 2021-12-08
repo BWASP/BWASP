@@ -205,12 +205,8 @@ class pagerTools {
         // If no data present
         if (vectors.length === 0) return returnError("No data");
         else for (const vector of vectors) {
-            let packet = Object();
-            try {
-                packet = await API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.auto}/${vector["related_Packet"]}`)
-            } catch {
-                packet = await API.communicate(`${APIEndpoints.packets.base}/${APIEndpoints.packets.type.manual}/${vector["related_Packet"]}`)
-            }
+            let packet = await API.communicate(`${APIEndpoints.packets.base}/${vector["related_Packet"]}`);
+            packet = packet[0];
 
             vector.attackVector = JSON.parse(vector.attackVector);
 
