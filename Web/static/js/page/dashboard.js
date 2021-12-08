@@ -253,8 +253,8 @@ class dashboard {
 
     async getIcon(filename) {
         let iconURL = {
-            local: `/static/img/icons/${filename}`,
-            alternative: `https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src/drivers/webextension/images/icons/${filename}`
+            alternative: `https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src/drivers/webextension/images/icons/${filename}`,
+            local: `/static/img/icons/${filename}`
         };
         for (const icon of Object.keys(iconURL)) {
             let checker = new Request(iconURL[icon]);
