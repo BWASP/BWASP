@@ -635,7 +635,10 @@ class optionFrontHandler {
         // Create DB
         try{
             res["CreateDB"] = await API.communicate("/api/task/database/create", "POST", {
-                targetURL: this.inputHandler.formData.target.replace(/(^\w+:|^)\/\//, '').replaceAll("/", ""),
+                targetURL: this.inputHandler.formData.target
+                    .replace(/(^\w+:|^)\/\//, '')
+                    .replaceAll("/", "")
+                    .replaceAll(":", "_"),
                 taskID: taskID
             });
         }catch{
