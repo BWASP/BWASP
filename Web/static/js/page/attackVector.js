@@ -49,6 +49,7 @@ const elements = {
         packets: []
     },
     coloring = {
+        none: "bg-danger",
         post: "bg-primary",
         get: "bg-success"
     },
@@ -232,11 +233,11 @@ class pagerTools {
 
             // Base64 Decode
             ["action_URL", "action_URL_Type"].forEach((target) => {
-                for(let count = 0; count <= vector[target].length - 1; count++) {
+                for (let count = 0; count <= vector[target].length - 1; count++) {
                     vector[target][count] = atob(vector[target][count])
                 }
             })
-            for(let count = 0; count <= vector.Details.tag.length - 1; count++) {
+            for (let count = 0; count <= vector.Details.tag.length - 1; count++) {
                 vector.Details.tag[count] = atob(vector.Details.tag[count])
             }
             // vector.action_URL_Type.forEach((id) => console.log(vector.action_URL_Type));
@@ -318,19 +319,21 @@ class pagerTools {
             // Build action if present
             if (dataSet.vector.action_URL.length !== 0) {
                 for (let rowNum = 0; rowNum <= dataSet.vector.action_URL.length - 1; rowNum++) {
-                    if(dataSet.vector.action_URL[rowNum] !== ""){
+                    if (dataSet.vector.action_URL[rowNum] !== "") {
                         let localSkeleton = {
-                            parent: document.createElement("div"),
-                            target: document.createElement("p"),
-                            method: document.createElement("p")
-                        }
+                                parent: document.createElement("div"),
+                                target: document.createElement("p"),
+                                method: document.createElement("p")
+                            },
+                            methodType = dataSet.vector.action_URL_Type[rowNum];
 
-                        localSkeleton.method.innerText = dataSet.vector.action_URL_Type[rowNum];
+                        if(methodType === undefined) methodType = "None";
+
+                        localSkeleton.method.innerText = methodType;
                         localSkeleton.target.innerText = dataSet.vector.action_URL[rowNum];
 
                         localSkeleton.parent.classList.add("mt-1", "mb-1");
-                        console.log(dataSet.vector.action_URL_Type[rowNum].toLowerCase());
-                        localSkeleton.method.classList.add("badge", coloring[dataSet.vector.action_URL_Type[rowNum].toLowerCase()], "text-uppercase", "me-2", "mb-1");
+                        localSkeleton.method.classList.add("badge", coloring[methodType.toLowerCase()], "text-uppercase", "me-2", "mb-1");
                         localSkeleton.target.classList.add("mb-0", "text-break");
 
                         localSkeleton.parent.append(
@@ -447,10 +450,10 @@ const openDetailsModal = (dataSet) => {
     const viewCorrespondingElement = (type, id) => {
         let currentObject = Object(),
             targetElement = Object();
-        try{
+        try {
             currentObject = document.getElementById(`detailView-${type}-${id}-parent`);
             targetElement = document.getElementById(`detailView-${type}-parent`);
-        }catch{
+        } catch {
             return createToast("Error", "Cannot find corresponding element", "danger", false);
         }
 
@@ -655,8 +658,7 @@ const openDetailsModal = (dataSet) => {
         if (Object.keys(dataSet.vector.Details[currentKind]).length !== 0) {
             viewCorrespondingElement("vector", currentKind);
             modalElements[currentKind].dataPlace.classList.remove("d-none");
-        }
-        else modalElements[currentKind].noData.classList.remove("d-none");
+        } else modalElements[currentKind].noData.classList.remove("d-none");
     })
 
     // console.log(dataSet.vector.Details[dataKind[2]].length);
