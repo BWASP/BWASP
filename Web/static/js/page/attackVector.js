@@ -108,6 +108,9 @@ class pagerTools {
     constructor() {
         this.className = "pagerTools";
         this.API = new api();
+        this.syncedData = {
+            packets: Object()
+        };
         this.dataSet = Array();
         this.paging = {
             currentPage: 1,
@@ -196,8 +199,12 @@ class pagerTools {
     }
 
     async syncData(requestPage, rowPerPage) {
+        let requestPages = {
+            from: ((requestPage - 1) * rowPerPage) + 1,
+            to: rowPerPage
+        }
         this.dataSet = Array();
-        let vectors = await API.communicate(`${APIEndpoints.vectors}/${((requestPage - 1) * rowPerPage) + 1}/${rowPerPage}`),
+        let vectors = await API.communicate(`${APIEndpoints.vectors}/${requestPages.from}/${requestPages.to}`),
             malformedID = {
                 vector: ["Details/", "action_URL", "action_URL_Type", "params", "Details"],
                 packet: ["requestJson", "responseHeader"]
@@ -206,9 +213,16 @@ class pagerTools {
         // If no data present
         if (vectors.length === 0) return returnError("No data");
         else for (const vector of vectors) {
-            let packet = await API.communicate(`${APIEndpoints.packets.base}/${vector["related_Packet"]}`);
-            packet = packet[0];
+            let packet = Object();
 
+            if(Object.keys(this.syncedData).includes(String(vector["related_Packet"]))) packet = this.syncedData[vector["related_Packet"]];
+            else {
+                packet = await API.communicate(`${APIEndpoints.packets.base}/${vector["related_Packet"]}`);
+                packet = packet[0];
+                this.syncedData[vector["related_Packet"]] = packet;
+            }
+
+            // Parse attack vector
             vector.attackVector = JSON.parse(vector.attackVector);
 
             // Fix malformed JSON

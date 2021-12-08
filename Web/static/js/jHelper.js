@@ -62,9 +62,7 @@ class API {
      * @returns {string} Pure JSON
      */
     jsonDataHandler(str, parseJSON = true) {
-        console.log(typeof (str));
         if (["object"].includes(typeof (str))) return str;
-        console.log(str);
         let replaceKeyword = ["::SINGLE-QUOTE::", "::DOUBLE-QUOTE::"];
         let replaceKeywords = [
             ["\"", replaceKeyword[1]],
