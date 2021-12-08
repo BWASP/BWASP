@@ -120,7 +120,8 @@ def visit(driver, url, depth, options):
             target_port = GetPort().getPortsOffline(START_OPTIONS["input_url"])
             db.insertPorts(target_port, START_OPTIONS["input_url"])
         else:
-            target_port = GetPort().getPortsOnline(START_OPTIONS["input_url"])
+            target_port, cloud_info = GetPort().getPortsOnline(START_OPTIONS["input_url"])
+            DETECT_LIST[0] = cloud_info
             db.insertPorts(target_port, START_OPTIONS["input_url"])
 
         if "CSPEvaluate" in options["tool"]["optionalJobs"]:

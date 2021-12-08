@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 class GetPort:
     def __init__(self):
         self.ports_list = dict()  # if port is open, get in
+        self.cloud_info = dict()
         self.wellKnown_ports = [80, 8080, 443, 20, 21, 22, 23, 25, 53, 5357, 110, 123, 161, 1433, 3306, 1521, 135, 139, 137, 138, 445, 514, 8443, 3389, 8090, 42, 70, 79, 88, 118,
                                 156, 220]
         self.service_of_port = {'3306': 'mysql', '1521': 'oracle', '8080': 'tomcat', '8443': 'https', '8090': 'tomcat', '220': 'imap3'}
@@ -30,7 +31,7 @@ class GetPort:
             try:
                 target_ip = gethostbyname(urlparse(target_ip).netloc)
             except:
-                return self.ports_list
+                return self.ports_list, None
 
         parse_html = BeautifulSoup(
             requests.get(self.port_scan["online"]["Get_port_information_url"] + target_ip, verify=False).text,
@@ -44,10 +45,19 @@ class GetPort:
             self.ports_list[str(port_number)] = port_service
 
         #Cloud Header Check
-        cloud_header = parse_html.find('dd').get_text().replace(" ", "").replace("\n", "")
-        print("Cloud: " + cloud_header)
+        cloud_count = parse_html.find_all('dl', class_='dl dl-horizontal')[0].find_all('dt')
+        for x in range(len(cloud_count)):
+            cloud_count[x] = str(cloud_count[x])
 
-        return self.ports_list
+        cloud_count = cloud_count.index('<dt>Network</dt>')
+        cloud_header = parse_html.find_all('dl', class_='dl dl-horizontal')[0].find_all('dd')[cloud_count].get_text().replace(
+            " ", "").replace("\n", "")
+
+        self.cloud_info["Cloud Provider"] = {
+            cloud_header: {"detect": "censys", "version": 0, "request": [], "response": [], "url": [],
+                           "icon": "cloud.png"}}
+
+        return self.ports_list, self.cloud_info
 
     def getPortsOffline(self, target_ip):
         if re.search(self.port_pattern, target_ip):
