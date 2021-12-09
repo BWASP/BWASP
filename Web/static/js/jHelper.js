@@ -3,6 +3,11 @@ function APICommunicationError(name, message) {
     this.name = name;
 }
 
+function NoSuchCookies(target, message) {
+    this.target = target;
+    this.message = message;
+}
+
 class API {
     constructor() {
         this.API = String();
@@ -48,11 +53,14 @@ class API {
         const communication = await fetch(`${(isLocalhost) ? "" : this.API.base}${endpoint}`, requestOptions)
             .catch(error => {
                 error = error.toString().split(": ");
-                throw new APICommunicationError(error[0], error[1]);
+                throw new APICommunicationError("Can't receive data", "Database may not created or API Service is down for now.");
+                // throw new APICommunicationError(error[0], error[1]);
             });
         const dataset = await communication.json();
         if (communication.ok) return dataset;
-        if (!communication.ok) throw new APICommunicationError("Error", communication.statusText);
+        if (!communication.ok) {
+            throw new APICommunicationError("Error", communication.statusText);
+        }
     }
 
     /**
@@ -116,6 +124,35 @@ class tableBuilder {
         let comma = document.createElement("span");
         comma.innerText = ", ";
         return comma;
+    }
+}
+
+class Cookies {
+    create(name, value, validDay = 1, path = "/") {
+        this.delete(name);
+        let date = new Date();
+        date.setTime(date.getTime() + validDay * 60 * 60 * 24 * 1000);
+        document.cookie = `${name}=${value};expires=${date.toUTCString()};path=${path}`;
+        return true;
+    }
+
+    read(name) {
+        for(const cookie of document.cookie.split(";")){
+            let parsedCookie = cookie
+                .replaceAll(" ", "")
+                .split("=");
+            if(parsedCookie[0] === name) return parsedCookie[1];
+        }
+        return false;
+    }
+
+    delete(name) {
+        // No such cookies
+        if(this.read(name) === null) return false;
+
+        let date = new Date();
+        document.cookie = `${name}=; expires=${date.toUTCString()}; path=/`;
+        return true;
     }
 }
 
@@ -199,7 +236,7 @@ const createToast = (title, content = "", color = "primary", inline = false, dur
     toastSkeleton.header.title.innerText = title;
     toastSkeleton.body.innerText = (inline) ? title : content;
 
-    // Mix elements
+    // Assemble elements
     if (inline) {
         toastSkeleton.header.parent.append(
             toastSkeleton.body,
@@ -236,6 +273,12 @@ const swapElement = (element, moveTo) => {
     moveTo.appendChild(element);
 }
 
+const dataSlicer = (str, length, splitChar = "...") => {
+    let newStr = str.substr(0, length);
+    if (str.length > length) newStr += splitChar;
+    return newStr;
+}
+
 String.prototype.format = function () {
     let outputText = this;
     for (let arg in arguments) {
@@ -244,4 +287,4 @@ String.prototype.format = function () {
     return outputText;
 };
 
-export {API, createKey, createToast, swapElement, tableBuilder};
+export {API, tableBuilder, Cookies, createKey, createToast, swapElement, dataSlicer};
