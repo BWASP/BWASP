@@ -71,36 +71,6 @@ let stateHandler = {
     ],
     isModalFullscreen = false
 
-// Helper functions
-let returnError = (errorMessage = ["No data", ""]) => {
-    let condition = {
-        isFromHelper: Array.isArray(errorMessage),
-        isString: (typeof (errorMessage) !== "string")
-    };
-
-    // Flexible data reactor
-    let messages = [
-        (condition.isFromHelper)
-            ? errorMessage.name
-            : (condition.isString)
-                ? errorMessage[0]
-                : errorMessage,
-        (condition.isFromHelper)
-            ? errorMessage.message
-            : (condition.isString)
-                ? errorMessage[1]
-                : "",
-    ];
-
-    document.getElementById("errMsgTitle").innerText = messages[0];
-    document.getElementById("errMsgDesc").innerText = messages[1];
-    document.getElementById("loadingProgress").classList.add("d-none");
-    document.getElementById("resultNoData").classList.remove("d-none");
-
-    // Will be removed in future commits.
-    console.error(`:: ERROR :: `, errorMessage);
-};
-
 // define api communicator
 let API = await new api();
 
@@ -120,8 +90,42 @@ class pagerTools {
             rowCount: Number(),
             pageCount: 1
         };
+        this.error = false;
         this.directories = Object();
     }
+
+    // Helper functions
+    returnError(errorMessage = ["No data", ""]) {
+        this.error = true;
+        let condition = {
+            isFromHelper: typeof (errorMessage) === "object",
+            isLocal: Array.isArray(errorMessage),
+            isString: (typeof (errorMessage) !== "string")
+        };
+
+        // Flexible data reactor
+        let messages = [
+            (condition.isFromHelper)
+                ? errorMessage.name
+                : (condition.isLocal)
+                    ? errorMessage[0]
+                    : errorMessage,
+            (condition.isFromHelper)
+                ? errorMessage.message
+                : (condition.isLocal)
+                    ? errorMessage[1]
+                    : "",
+        ];
+
+        document.getElementById("tablePlaceHolder").classList.add("d-none");
+        document.getElementById("errMsgTitle").innerText = messages[0];
+        document.getElementById("errMsgDesc").innerText = messages[1];
+        document.getElementById("loadingProgress").classList.add("d-none");
+        document.getElementById("resultNoData").classList.remove("d-none");
+
+        // Will be removed in future commits.
+        console.error(`:: ERROR :: `, errorMessage);
+    };
 
     async updateRowCount() {
         let countRes = await API.communicate("/api/domain/count");
@@ -188,13 +192,17 @@ class pagerTools {
         document.getElementById("tablePlace").classList.add("d-none");
         document.getElementById("tablePlaceHolder").classList.add("d-none");
 
-        // Update value
-        document.getElementById("rowPerPage").innerText = this.paging.rowPerPage;
-
-        // Do job
+        // Receive data from API
         await this.syncData(this.paging.currentPage, this.paging.rowPerPage);
-        this.buildTable();
 
+        // Return if has error
+        if(this.error) return;
+
+        // Update value
+        document.getElementById("rowPerPage").innerText = String(this.dataSet.length);
+
+        // Build table and hide modal
+        this.buildTable();
         modals.viewEngine.hide();
     }
 
@@ -204,6 +212,12 @@ class pagerTools {
             to: rowPerPage
         }
         this.dataSet = Array();
+        try {
+            await API.communicate(`${APIEndpoints.vectors}/${requestPages.from}/${requestPages.to}`)
+        } catch (e) {
+            return this.returnError(e);
+        }
+
         let vectors = await API.communicate(`${APIEndpoints.vectors}/${requestPages.from}/${requestPages.to}`),
             malformedID = {
                 vector: ["Details/", "action_URL", "action_URL_Type", "params", "Details"],
@@ -211,11 +225,11 @@ class pagerTools {
             };
 
         // If no data present
-        if (vectors.length === 0) return returnError("No data");
+        if (vectors.length === 0) return this.returnError("No data");
         else for (const vector of vectors) {
             let packet = Object();
 
-            if(Object.keys(this.syncedData).includes(String(vector["related_Packet"]))) packet = this.syncedData[vector["related_Packet"]];
+            if (Object.keys(this.syncedData).includes(String(vector["related_Packet"]))) packet = this.syncedData[vector["related_Packet"]];
             else {
                 packet = await API.communicate(`${APIEndpoints.packets.base}/${vector["related_Packet"]}`);
                 packet = packet[0];
@@ -341,7 +355,7 @@ class pagerTools {
                             },
                             methodType = dataSet.vector.action_URL_Type[rowNum];
 
-                        if(methodType === undefined) methodType = "None";
+                        if (methodType === undefined) methodType = "None";
 
                         localSkeleton.method.innerText = methodType;
                         localSkeleton.target.innerText = dataSet.vector.action_URL[rowNum];
