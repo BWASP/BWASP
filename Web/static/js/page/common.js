@@ -3,6 +3,7 @@ import {Cookies, createToast} from '../jHelper.js';
 
 let cookies = new Cookies(),
     initialFrontConfig = {
+        darkMode: false,
         dashboard: {
             refreshRate: 3,
             stopRequestWhenFailed: false
@@ -18,6 +19,7 @@ while(true){
     try{
         frontConfig = JSON.parse(frontConfig);
     }catch {
+        cookies.delete(targetCookieName);
         // createToast("Config validation fail", "Config JSON structure has corrupted.\nDeleted config", "danger");
     }
     console.log(frontConfig);

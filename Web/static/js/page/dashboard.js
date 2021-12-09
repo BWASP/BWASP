@@ -1,5 +1,5 @@
 // Get modules
-import {API as api, createToast} from '../jHelper.js';
+import {API as api, Cookies, createToast} from '../jHelper.js';
 
 // Define API Endpoints
 const APIEndpoints = {
@@ -59,11 +59,13 @@ class dashboard {
         if (this.job.allJobs.length > 0) {
             if (this.viewData.CVECount.needsUpdate) {
                 let dataset = this.webEnvironment.data, APIResult = Object(), countedValue = Number();
-
                 for (const type of Object.keys(dataset)) {
-                    for (const lib of Object.keys(dataset[type])) {
-                        APIResult = await API.communicate(`/api/cve/search/${lib}/${dataset[type][lib].version}/count`);
-                        countedValue += APIResult.count;
+                    if(!Number.isInteger(Number(type))) {
+                        for (const lib of Object.keys(dataset[type])) {
+                            console.log(type, lib);
+                            APIResult = await API.communicate(`/api/cve/search/${lib}/${dataset[type][lib].version}/count`);
+                            countedValue += APIResult.count;
+                        }
                     }
                 }
 
@@ -205,8 +207,10 @@ class dashboard {
                 let viewArea = document.getElementById("viewArea");
                 viewArea.innerHTML = "";
                 for (const key of Object.keys(this.webEnvironment.data)) {
-                    viewArea.appendChild(await this.buildOverviewEnvironments(key, this.webEnvironment.data[key]));
-                    document.getElementById("webEnvDataPlace").appendChild(await this.buildWebEnvCard(key, this.webEnvironment.data[key]));
+                    if(!Number.isInteger(Number(key))) {
+                        viewArea.appendChild(await this.buildOverviewEnvironments(key, this.webEnvironment.data[key]));
+                        document.getElementById("webEnvDataPlace").appendChild(await this.buildWebEnvCard(key, this.webEnvironment.data[key]));
+                    }
                 }
                 let masonry = new Masonry('#viewArea', {
                     columnWidth: 1,
@@ -261,7 +265,8 @@ class dashboard {
 
         let iconURL = {
             alternative: `https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src/drivers/webextension/images/icons/${filename}`,
-            local: `/static/img/icons/${filename}`
+            local: `/static/img/icons/${filename}`,
+            unknown: "/static/img/icons/unknown.png"
         };
         for (const icon of Object.keys(iconURL)) {
             let checker = new Request(iconURL[icon]);
