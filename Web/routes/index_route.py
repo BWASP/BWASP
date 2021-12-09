@@ -14,4 +14,4 @@ def mode_selection():
 
 @bp.route('/dashboard')
 def index():
-    return render_template('index.html', Title="홈 - BWASP")
+    return render_template('index.html', Title="Home - BWASP")
