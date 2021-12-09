@@ -20,8 +20,8 @@
             </a>
         </div>
         <div class="sidebar-element">
-            <p class="sidebar-category">Result</p>
-            <a href="/common/attack_vector" class="rounded-custom" id="target-common-attack_vector">
+            <p class="sidebar-category">Report</p>
+            <a href="/report/attack_vector" class="rounded-custom" id="target-common-attack_vector">
                 <i class="bi bi-paperclip text-primary"></i>
                 Attack Vectors
             </a>
@@ -32,22 +32,4 @@
         </div>
     </section>
 </aside>
-
-<script>
-    let sidebar = () => {
-        if(window.location.pathname === "/") return;
-        let side = {
-            uri: window.location.pathname.split("/"),
-            target: "target"
-        };
-        side.uri.splice(0, 1);
-        side.uri.forEach(data => side.target += `-${data}`);
-
-        try{
-            document.getElementById(side.target).classList.add("active");
-        }catch (e){
-            console.error(e);
-        }
-    }
-    sidebar();
-</script>
+<script type="module" src="/static/js/page/common.js"></script>

@@ -34,7 +34,8 @@ div.sidebar-element > a{
 div.sidebar-element > p.sidebar-category{
     text-transform: uppercase !important;
     margin-bottom: .2rem;
-    font-size: .9em !important;
+    font-size: .75em !important;
+    font-weight: 600;
     color: var(--sidebar-category-color) !important;
 }
 
