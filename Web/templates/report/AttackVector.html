@@ -156,22 +156,6 @@
                     <p class="text-capitalize text-muted small">Change the view config below</p>
                 </section>
                 <section>
-                    <!--
-                    <div>
-                        <label for="viewPref-input-dataCat" class="form-label">Data Category</label>
-                        <br>
-                        <div class="btn-group w-100" role="group" aria-label="Basic radio toggle button group">
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="btnradio1">Automation</label>
-
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
-                            <label class="btn btn-outline-primary" for="btnradio2">Mixed</label>
-
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="btnradio3">Manual</label>
-                        </div>
-                    </div>
-                    -->
                     <div>
                         <div class="d-flex">
                             <label for="viewPref-input-rowPerPage" class="form-label">Row per page</label>
@@ -179,7 +163,7 @@
                                 / <span id="viewPref-modal-allRowCount">1</span></p>
                         </div>
                         <input type="range" class="form-range" id="viewPref-input-rowPerPage" value="5" max="0" min="5"
-                               step="5">
+                               step="1">
                     </div>
                     <div class="mt-3">
                         <div class="d-flex">
@@ -207,7 +191,7 @@
 </div>
 <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content bg-transparent">
             <div class="border-rounded shadow modal-storage">
                 <h3 class="text-dark fw-bolder mb-3">Manual</h3>
                 <p class="mb-0">Click <span class="text-primary">URL</span> to check all payloads.</p>
