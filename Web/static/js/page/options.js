@@ -200,9 +200,11 @@ class optionFrontHandler {
                 let disabledRiskLock = document.createElement("p");
                 disabledRiskLock.classList.add("text-danger", "ms-2", "mb-0", "small", "fw-bold", "animate__animated", "animate__fadeInLeft");
                 disabledRiskLock.innerText = "(Risk Protection Disabled)";
+                document.getElementById("pageIcon").classList.remove("border-success");
+                document.getElementById("pageIcon").classList.add("border-danger");
                 document.getElementById("optionsHead").appendChild(disabledRiskLock);
 
-                createToast("Risk Lock Disabled", "All features are now available.", "danger", false);
+                createToast("Safe Mode Disabled", "All features are now available.", "danger", false);
             }, 300);
         } else {
             disableRiskLock.show();
@@ -383,7 +385,7 @@ class optionFrontHandler {
 
             // Set Attributes
             localSkeleton.parent.classList.add("col-md-3");
-            localSkeleton.subParent.classList.add("form-check");
+            localSkeleton.subParent.classList.add("form-check", "form-switch");
             localSkeleton.child.checkbox.classList.add("form-check-input");
             localSkeleton.child.checkbox.setAttribute("type", "checkbox");
             localSkeleton.child.checkbox.id = currentElementID;

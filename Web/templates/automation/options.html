@@ -37,7 +37,7 @@
 <div class="p-4 pt-4 w-100">
     <div class="d-inline-flex w-100 mb-3">
         <div class="sizer element-top center-horizontal">
-            <div class="content-page-icon content-page-icon-sizing rounded-custom">
+            <div class="content-page-icon content-page-icon-sizing rounded-custom border border-success" id="pageIcon">
                 <i class="bi bi-play-fill"></i>
             </div>
             <div>
@@ -46,6 +46,12 @@
             </div>
         </div>
         <div class="sizer element-top center-horizontal ms-auto">
+            <button type="button" id="call-disableRiskLock"
+                    class="bg-white ps-1 btn btn-link border border-success rounded-custom shadow-sm d-flex text-success text-decoration-none p-2 ps-3 pe-3 me-3"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Disable Risk Lock">
+                <h4 class="mb-0"><i class="bi bi-lock-fill"></i></h4>
+                <p class="mb-0 pt-1 ms-2">Safe Mode</p>
+            </button>
             <nav class="p-3 rounded-custom border bg-white shadow-sm" style="--bs-breadcrumb-divider: '>';"
                  aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0" id="stepsView"></ol>
@@ -131,10 +137,6 @@
                         <section class="row">
                             <div class="col-md-12 mt-3 d-flex align-items-center" id="optionsHead">
                                 <h3 class="text-primary fw-bold mb-0">Optional</h3>
-                                <button type="button" class="btn rounded-custom btn-danger ms-auto"
-                                        id="call-disableRiskLock">
-                                    Disable Risk Lock
-                                </button>
                             </div>
                             <section class="mt-3">
                                 <section class="d-flex align-items-center mb-3">

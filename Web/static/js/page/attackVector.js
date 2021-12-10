@@ -1,5 +1,5 @@
 // Get modules
-import {API as api, createKey, createToast, swapElement, tableBuilder} from '../jHelper.js';
+import {API as api, createKey, createToast, swapElement, dataSlicer, tableBuilder} from '../jHelper.js';
 
 // Specified query selectors
 let places = {
@@ -77,6 +77,7 @@ let API = await new api();
 class pagerTools {
     constructor() {
         this.className = "pagerTools";
+        this.maxLength = 50;
         this.API = new api();
         this.syncedData = {
             packets: Object()
@@ -339,7 +340,7 @@ class pagerTools {
             rowElement.parent.appendChild(rowElement.child.category);
 
             // Build URL
-            rowElement.child.URL.innerText = dataSet.vector.URL + dataSet.vector.URI;
+            rowElement.child.URL.innerText = dataSlicer(dataSet.vector.URL + dataSet.vector.URI, this.maxLength);
             rowElement.child.URL.classList.add("text-break");
             // rowElement.child.URL.classList.add("text-break");
             rowElement.parent.appendChild(rowElement.child.URL);
@@ -358,7 +359,7 @@ class pagerTools {
                         if (methodType === undefined) methodType = "None";
 
                         localSkeleton.method.innerText = methodType;
-                        localSkeleton.target.innerText = dataSet.vector.action_URL[rowNum];
+                        localSkeleton.target.innerText = dataSlicer(dataSet.vector.action_URL[rowNum], this.maxLength);
 
                         localSkeleton.parent.classList.add("mt-1", "mb-1");
                         localSkeleton.method.classList.add("badge", coloring[methodType.toLowerCase()], "text-uppercase", "me-2", "mb-1");
