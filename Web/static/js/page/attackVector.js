@@ -602,8 +602,10 @@ class detailsModal {
                 console.log(key, doubt.data[key], referredDocuments[key]);
                 if (typeof (referredDocuments[key]) === "undefined") continue;
                 if (!Array.isArray(referredDocuments[key])) {
-                    for(const type of doubt.data[key].type){
-                        let localDataSet = referredDocuments[key][(type !== "None") ? type : "Generic"];
+                    for(const type of doubt.data[key].detect){
+                        console.log(key, type);
+                        let localDataSet = referredDocuments[key.split("(")[0]][(type !== "None") ? type : "Generic"];
+                        console.log(localDataSet);
                         localDataSet.forEach(currentValue => overallDocuments.push(currentValue));
                     }
                 } else referredDocuments[key].forEach((currentValue) => overallDocuments.push(currentValue));
@@ -712,6 +714,20 @@ class detailsModal {
             }
         } else {
             modalDataElement.actions.innerHTML = " - ";
+        }
+
+        // Threats
+        modalDataElement.threat.innerText = "";
+        let doubtList = Object.keys(dataset.vector.attackVector["doubt"]);
+        if (doubtList.length > 0) {
+            doubtList.forEach((currentThreat) => {
+                modalDataElement.threat.innerText +=
+                    currentThreat.concat(
+                        (doubtList[doubtList.length - 1] !== currentThreat) ? ", " : ""
+                    );
+            });
+        } else {
+            modalDataElement.threat.innerText = "-";
         }
     }
 
