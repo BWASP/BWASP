@@ -33,4 +33,4 @@ def create_app(config=None):
 
 if __name__ == '__main__':
     application = create_app()
-    application.run(host="0.0.0.0", port=20002, debug=True)
+    application.run(host="0.0.0.0", port=20002, debug=False)
