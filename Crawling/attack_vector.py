@@ -5,9 +5,11 @@ from urllib.parse import urlparse
 from requests import api
 
 from Crawling.feature import func
+from Crawling.feature.keywordCmp import keywordCmp
 
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
              "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]
+
 
 def attackHeader(target_url):
     dict_data = requests.get(target_url, verify=False).headers
@@ -16,7 +18,7 @@ def attackHeader(target_url):
 
     try:
         http_method = requests.options(target_url, verify=False).headers['Allow'].replace(",", "").split(" ")
-    except: #KeyError or ConnectionError
+    except:  # KeyError or ConnectionError
         http_method = "private"
 
     try:
@@ -59,10 +61,13 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
     tag_name_list = list()
     action_page = list()
     action_type = list()
-    attack_vector = dict() #list()
+    attack_vector = dict()  # list()
     data = dict()
     impactRate = 0
     check = 0
+    cmp_sql_check = False
+    cmp_sql_xss_check = False
+    cmp_logic_check = False
 
     text = soup.find_all('input')
     form = soup.find_all('form')
@@ -127,16 +132,35 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                 except:
                     pass
 
+                cmp_sql_check = keywordCmp().keywordCmp_SQL(tag_name_list, cmp_sql_check)
+                cmp_sql_xss_check = keywordCmp().keywordCmp_SQL_XSS(tag_name_list, cmp_sql_xss_check)
+                cmp_logic_check = keywordCmp().keywordCmp_Logic(tag_name_list, cmp_logic_check)
+
                 if "board" in data["doubt"]["SQL injection"]["type"] or "board" in data["doubt"]["XSS"]["type"] \
                         or "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"][
                     "type"] \
                         or "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
                     pass
-                else:
+                elif cmp_sql_check:
+                    data["doubt"]["SQL injection"]["type"].append("None")
+
+                    impactRate = 1
+                elif cmp_sql_xss_check:
                     data["doubt"]["SQL injection"]["type"].append("None")
                     data["doubt"]["XSS"]["type"].append("None")
 
                     impactRate = 1
+                elif cmp_logic_check:
+                    data["doubt"]["Logic Flaw"] = True
+
+                    impactRate = 1
+                else:
+                    if "SQL injection" in data["doubt"]:
+                        pass
+                    else:
+                        data["doubt"]["Parameter"] = True
+
+                        impactRate = 0
 
                 if "Not_HttpOnly" in infor_vector:
                     if "HttpOnly" not in data["doubt"]["XSS"]["required"]:
@@ -171,7 +195,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
         if check == 1:
             data["doubt"].pop("File Upload")
 
-                # ~~~~~~~~~~~~~attack option
+            # ~~~~~~~~~~~~~attack option
         if attack_option == True:
             # cheat sheet open
             with open("./cheat_sheet.txt", 'r', encoding='UTF-8') as f:
@@ -250,7 +274,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                                         data["doubt"]["SQL injection"]["detect"].append({"param": param})
                                         data["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
                                         impactRate = 2
-                            #else:
+                            # else:
                             #    data["doubt"]["SQL injection"].pop("detect")
                         except:
                             pass
@@ -284,7 +308,6 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
             except:
                 pass
 
-                
     return tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate
 
 
@@ -301,6 +324,7 @@ def corsCheck(packet):
 
     return cors_check
 
+
 def openRedirectionCheck(packet):
     try:
         if packet["open_redirect"]:
@@ -308,21 +332,21 @@ def openRedirectionCheck(packet):
     except:
         return ""
 
+
 def s3BucketCheck(packet):
     return_s3_url = []
-    patterns = [    "s3\.[a-zA-Z0-9.-]+\.com",
-                    "[a-zA-Z0-9.-]+\.s3\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9.-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*"
-                    "[a-zA-Z0-9.-]+\.s3-[a-zA-Z0-9-]\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9.-]+\.s3-website[.-](?: eu|ap|us|ca|sa|cn)",
-                    "[\/\/]?s3\.amazonaws\.com\/[a-zA-Z0-9\-\/]*",
-                    "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{3,63}\.s3[\.-](?: eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
-                    "[a-zA-Z0-9\.\-]{3,63}\.s3-website[\.-](?: eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*"]
-    
+    patterns = ["s3\.[a-zA-Z0-9.-]+\.com",
+                "[a-zA-Z0-9.-]+\.s3\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9.-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*"
+                "[a-zA-Z0-9.-]+\.s3-[a-zA-Z0-9-]\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9.-]+\.s3-website[.-](?: eu|ap|us|ca|sa|cn)",
+                "[\/\/]?s3\.amazonaws\.com\/[a-zA-Z0-9\-\/]*",
+                "[\/\/]?s3-[a-z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com/[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9-]+\.s3-[a-zA-Z0-9-]+\.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9\.\-]{3,63}\.s3[\.-](?: eu|ap|us|ca|sa)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9\.\-]{0,63}\.?s3.amazonaws\.com[\/]?[a-zA-Z0-9\-\/]*",
+                "[a-zA-Z0-9\.\-]{3,63}\.s3-website[\.-](?: eu|ap|us|ca|sa|cn)-\w{2,14}-\d{1,2}\.amazonaws.com[\/]?[a-zA-Z0-9\-\/]*"]
 
     for pattern in patterns:
         regex = re.compile(pattern)
@@ -335,6 +359,7 @@ def s3BucketCheck(packet):
             return_s3_url += req_body
 
     return list(set(return_s3_url))
+
 
 def jwtCheck(packet):
     return_jwt = []
@@ -357,20 +382,25 @@ def jwtCheck(packet):
         return_jwt += req_header + req_body + res_header + res_body
     return list(set(return_jwt))
 
+
 def robotsTxt(url):
     # 주요정보통신기반시설_기술적_취약점_분석_평가_방법_상세가이드.pdf [page 726] robots.txt not set
     url = url.split("/")[0] + "//" + url.split("/")[2] + "/robots.txt"
-    return True if "user-agent" not in requests.get(url, verify=False).text.lower() or 404 == requests.get(url, verify=False).status_code else False
+    return True if "user-agent" not in requests.get(url, verify=False).text.lower() or 404 == requests.get(url,
+                                                                                                           verify=False).status_code else False
+
 
 def errorPage(url):
     # 주요정보통신기반시설_기술적_취약점_뿐석_평가_방법_상세가이드.pdf [page 678] Error Page not set
     url = url.split("/")[0] + "//" + url.split("/")[2] + "/weasxczxcqh/weasxczxcqh.html"
-    return True if 404 == requests.get(url, verify=False).status_code and "not found" in requests.get(url, verify=False).text.lower() else False
+    return True if 404 == requests.get(url, verify=False).status_code and "not found" in requests.get(url,
+                                                                                                      verify=False).text.lower() else False
+
 
 def directoryIndexing(target_url):
     return_data = list()
     api_key = func.apiKeyLoad()
-    
+
     if api_key == False:
         print("[!] API 키가 없습니다.")
         return return_data
@@ -380,7 +410,8 @@ def directoryIndexing(target_url):
 
     target_domain = urlparse(target_url).netloc
     query = 'intitle:"Index Of" inurl:"{target_domain}"'.format(target_domain=target_domain)
-    api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
+    api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(
+        GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
 
     res = requests.get(api_url, verify=False)
 
@@ -391,7 +422,7 @@ def directoryIndexing(target_url):
             return return_data
 
         search_result = api_result["items"]
-        
+
         for item in search_result:
             if item["title"].find("Index") != 0:
                 continue
@@ -407,6 +438,7 @@ def directoryIndexing(target_url):
 
     return return_data
 
+
 def adminPage(target_url):
     api_key = func.apiKeyLoad()
     return_data = list()
@@ -415,7 +447,7 @@ def adminPage(target_url):
     if api_key == False:
         print("[!] API 키가 없습니다.")
         return return_data
-    
+
     GOOGLE_ENGINE_ID = api_key["google"]["google_search_api"]["engine_id"]
     GOOGLE_SEARCH_API = api_key["google"]["google_search_api"]["api"]
 
@@ -430,7 +462,8 @@ def adminPage(target_url):
             inurl_list.append("inurl:{}".format(directory))
 
         query = 'site:{DOMAIN} AND ({INURL_LIST})'.format(DOMAIN=target_domain, INURL_LIST=" | ".join(inurl_list))
-        api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
+        api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(
+            GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
         # print(api_url)
         res = requests.get(api_url, verify=False)
         if res.status_code == 200:
@@ -442,14 +475,15 @@ def adminPage(target_url):
                 search_result = api_result["items"]
                 for item in search_result:
                     return_data.append({
-                        "title" : item["title"],
+                        "title": item["title"],
                         "link": item["link"]
                     })
         else:
             print("[!] API server error.")
             # print(res.json())
-    
+
     return return_data
+
 
 def ReflectedXSSCheck(packet: dict, target_url: str) -> bool:
     if not func.isSameDomain(packet["request"]["full_url"], target_url):
@@ -463,23 +497,24 @@ def ReflectedXSSCheck(packet: dict, target_url: str) -> bool:
             soup = BeautifulSoup(packet["response"]["body"], "html.parser")
         except:
             return False
-        
+
         for query in queries:
             datas = query.split("=")
 
             if len(datas) != 2:
                 break
-            
-            input_tag = soup.find("input", {"name" : datas[0]})
+
+            input_tag = soup.find("input", {"name": datas[0]})
             if input_tag and datas[1] == input_tag.get("value"):
                 return True
-                
+
     return False
+
 
 def SSRFCheck(packet: dict) -> bool:
     if "open_redirect" in packet.keys():
         return False
-    
+
     if packet["request"]["method"] == "GET":
         queries = urlparse(packet["request"]["full_url"]).query.split("&")
         for data in queries:
@@ -495,10 +530,10 @@ def SSRFCheck(packet: dict) -> bool:
         body = packet["request"]["body"]
         pattern = "((?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)"
         result = re.findall(pattern, body)
-        
+
         if len(result) != 0:
             return True
-            
+
     return False
 
 
