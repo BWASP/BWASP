@@ -1,6 +1,8 @@
 // Get modules
 import {API as api, createKey, createToast, swapElement, dataSlicer, tableBuilder} from '../jHelper.js';
 
+let builder = new tableBuilder();
+
 // Specified query selectors
 let places = {
     detailView: {
@@ -76,6 +78,7 @@ let API = await new api();
 
 class pagerTools {
     constructor() {
+        this.builder = new tableBuilder();
         this.className = "pagerTools";
         this.maxLength = 50;
         this.API = new api();
@@ -197,7 +200,7 @@ class pagerTools {
         await this.syncData(this.paging.currentPage, this.paging.rowPerPage);
 
         // Return if has error
-        if(this.error) return;
+        if (this.error) return;
 
         // Update value
         document.getElementById("rowPerPage").innerText = String(this.dataSet.length);
@@ -281,8 +284,7 @@ class pagerTools {
     }
 
     buildTable() {
-        let builder = new tableBuilder(),
-            table = {
+        let table = {
                 ID: createKey(),
                 place: document.getElementById("tablePlace"),
                 holder: document.getElementById("tablePlaceHolder"),
@@ -374,7 +376,7 @@ class pagerTools {
                 }
                 rowElement.parent.appendChild(rowElement.child.action.parent);
             } else {
-                rowElement.parent.appendChild(builder.dataNotPresent());
+                rowElement.parent.appendChild(this.builder.dataNotPresent());
             }
 
             // Build params if present
@@ -392,12 +394,12 @@ class pagerTools {
                     let codeElement = document.createElement("code");
                     codeElement.innerText = param;
                     rowElement.child.params.appendChild(codeElement);
-                    if (paramSet[paramSet.length - 1] !== param) rowElement.child.params.appendChild(builder.commaAsElement());
+                    if (paramSet[paramSet.length - 1] !== param) rowElement.child.params.appendChild(this.builder.commaAsElement());
                 })
                 rowElement.parent.appendChild(rowElement.child.params);
 
             } else {
-                rowElement.parent.appendChild(builder.dataNotPresent());
+                rowElement.parent.appendChild(this.builder.dataNotPresent());
             }
 
             // Build vulnerability doubt
@@ -407,11 +409,11 @@ class pagerTools {
                 let codeElement = document.createElement("code");
                 codeElement.innerText = param;
                 rowElement.child.threat.appendChild(codeElement);
-                if (paramSet[paramSet.length - 1] !== param) rowElement.child.threat.appendChild(builder.commaAsElement());
+                if (paramSet[paramSet.length - 1] !== param) rowElement.child.threat.appendChild(this.builder.commaAsElement());
             })
             rowElement.parent.appendChild((paramSet.length !== 0)
                 ? rowElement.child.threat
-                : builder.dataNotPresent()
+                : this.builder.dataNotPresent()
             );
 
             // Build Method
@@ -432,13 +434,19 @@ class pagerTools {
             table.elements.tbody.append(rowElement.parent);
 
             // Add event listener for each line
-            rowElement.parent.addEventListener("click", () => openDetailsModal(dataSet));
+            rowElement.parent.addEventListener("click", async () => {
+                let modal = new detailsModal({
+                    vectors: document.getElementById("detailView-vector")
+                });
+                await modal.open(dataSet);
+                // openDetailsModal(dataSet)
+            });
 
             // console.log(dataSet);
         });
         // Build table element
         table.elements.table.append(
-            builder.buildHead(elements[currentState.type]),
+            this.builder.buildHead(elements[currentState.type]),
             table.elements.tbody
         )
 
@@ -448,53 +456,70 @@ class pagerTools {
         document.getElementById("tablePlace").classList.remove("d-none");
         document.getElementById("tablePlaceHolder").classList.remove("d-none");
     }
+
+    createAccordion(title, HTMLObject) {
+        let skeleton = {
+            parent: document.createElement("div"),
+            title: {
+                parent: document.createElement("h2"),
+                button: document.createElement("button")
+            },
+            body: {
+                parent: document.createElement("div"),
+                childBox: document.createElement("div")
+            }
+        }, elementID = {
+            head: createKey(3, "accordion"),
+            body: createKey(3, "accordion")
+        }
+
+        // Create parent
+        skeleton.parent.classList.add("accordion-item");
+
+        // Create head
+        skeleton.title.parent.classList.add("accordion-header");
+        skeleton.title.parent.id = elementID.head;
+
+        skeleton.title.button.classList.add("accordion-button", "collapsed");
+        skeleton.title.button.type = "button";
+        skeleton.title.button.setAttribute("data-bs-toggle", "collapse");
+        skeleton.title.button.setAttribute("aria-expanded", "false");
+        skeleton.title.button.setAttribute("data-bs-target", `#${elementID.body}`);
+        skeleton.title.button.setAttribute("aria-controls", elementID.body);
+        skeleton.title.button.innerText = title;
+
+        skeleton.title.parent.appendChild(skeleton.title.button);
+
+        // Build body
+        skeleton.body.parent.classList.add("accordion-collapse", "collapse");
+        skeleton.body.parent.id = elementID.body;
+        skeleton.body.parent.setAttribute("aria-labelledby", elementID.head);
+
+        skeleton.body.childBox.classList.add("accordion-body");
+        skeleton.body.childBox.append(HTMLObject);
+
+        skeleton.body.parent.appendChild(skeleton.body.childBox);
+
+        // Assembly
+        skeleton.parent.append(
+            skeleton.title.parent,
+            skeleton.body.parent
+        );
+
+        return skeleton.parent;
+    }
 }
 
 let pager = new pagerTools();
 let referredDocuments = Object();
 
-const openDetailsModal = (dataSet) => {
-    let accordions = Object(),
-        accordionKeys = {
-            vector: ["cookie", "queryString", "tags", "violation", "referredDocument"]
-        };
-
-    Object.keys(accordionKeys).forEach((key) => {
-        accordions[key] = Object();
-        accordionKeys[key].forEach((id) => {
-            let currentObject = document.getElementById(`detailView-vector-${id}-parent`),
-                currentBody = document.getElementById(`detailView-vector-${id}-body`),
-                toggleButton = document.querySelector(`#detailView-vector-${id} > button`);
-
-            toggleButton.setAttribute("aria-expanded", "false");
-            toggleButton.classList.add("collapsed");
-            currentBody.classList.remove("show");
-            currentBody.classList.add("collapse");
-            swapElement(currentObject, document.getElementById("detailView-vector-nonView"));
-            // currentObject.classList.add("d-none");
-            accordions[key][id] = currentObject;
-        })
-    })
-
-    const viewCorrespondingElement = (type, id) => {
-        let currentObject = Object(),
-            targetElement = Object();
-        try {
-            currentObject = document.getElementById(`detailView-${type}-${id}-parent`);
-            targetElement = document.getElementById(`detailView-${type}-parent`);
-        } catch {
-            return createToast("Error", "Cannot find corresponding element", "danger", false);
-        }
-
-        swapElement(currentObject, targetElement);
+class detailsModal {
+    constructor(viewParent) {
+        this.viewParent = viewParent;
     }
 
-    /**
-     * Build Violation section for details modal
-     * @param dataPackage
-     */
-    const buildViolationElement = async (dataPackage) => {
-        let viewArea = document.getElementById("violationViewArea"),
+    async buildViolationElement(dataPackage) {
+        let element = document.createElement("div"),
             packageKeys = Object.keys(dataPackage),
             replacement = {
                 code: [["{{", "<code>"], ["}}", "</code>"]]
@@ -502,7 +527,7 @@ const openDetailsModal = (dataSet) => {
             guideline = await API.communicate("/static/data/documents/kisa.json", "GET", null, true);
 
         // Clear HTML Area
-        if (packageKeys.length > 0) viewArea.innerHTML = "";
+        if (packageKeys.length > 0) element.innerHTML = "";
 
         // Create skeleton
         let skeleton = {
@@ -556,22 +581,34 @@ const openDetailsModal = (dataSet) => {
             skeleton.parent.appendChild(localSkeleton.parent);
         })
 
-        viewArea.appendChild(skeleton.parent);
-    };
+        element.appendChild(skeleton.parent);
 
-    const buildReferredDocs = async (target, types = String()) => {
-        let overallDocuments = Array(),
-            viewArea = document.getElementById("referredDocumentViewArea");
-        if (Object.keys(referredDocuments).length === 0) {
+        this.viewParent.vectors.appendChild(pager.createAccordion("Violation", element));
+    }
+
+    async buildReferredDocs(dataset) {
+        let doubt = {
+                data: dataset.vector.attackVector["doubt"],
+                keys: Object.keys(dataset.vector.attackVector["doubt"])
+            },
+            overallDocuments = Array(),
+            parent = document.createElement("div");
+
+        console.log(doubt.keys.length);
+
+        if(doubt.keys.length > 0) {
             referredDocuments = await API.communicate("/static/data/referredDocuments.json", "GET", null, true);
+            for(const key of doubt.keys) {
+                console.log(key, doubt.data[key], referredDocuments[key]);
+                if (typeof (referredDocuments[key]) === "undefined") continue;
+                if (!Array.isArray(referredDocuments[key])) {
+                    for(const type of doubt.data[key].type){
+                        let localDataSet = referredDocuments[key][(type !== "None") ? type : "Generic"];
+                        localDataSet.forEach(currentValue => overallDocuments.push(currentValue));
+                    }
+                } else referredDocuments[key].forEach((currentValue) => overallDocuments.push(currentValue));
+            }
         }
-        if (typeof (referredDocuments[target]) === "undefined") return;
-        if (!Array.isArray(referredDocuments[target])) {
-            let localDataSet = referredDocuments[target][(types !== String())
-                ? types
-                : "Generic"];
-            localDataSet.forEach((currentValue) => overallDocuments.push(currentValue));
-        } else referredDocuments[target].forEach((currentValue) => overallDocuments.push(currentValue));
 
         overallDocuments.forEach((currentDocument) => {
             let localSkeleton = {
@@ -583,116 +620,17 @@ const openDetailsModal = (dataSet) => {
             localSkeleton.innerLink.target = "_BLANK";
             localSkeleton.innerLink.innerHTML = `${currentDocument["name"]} - ${currentDocument["author"]}`;
             localSkeleton.parent.appendChild(localSkeleton.innerLink);
-            viewArea.appendChild(localSkeleton.parent);
+            parent.appendChild(localSkeleton.parent);
         });
-        viewCorrespondingElement("vector", "referredDocument");
+
+        this.viewParent.vectors.appendChild(
+            pager.createAccordion("Referred Document", parent)
+        );
     }
 
-    let dataKind = ["cookie", "queryString", "tag"],
-        modalElements = Object();
-
-    places.detailView.view.className = "";
-    places.detailView.view.classList.add("modal-content", "p-4", "border-rounded", "shadow");
-
-
-    // Initialize table elements
-    dataKind.forEach((currentKind) => {
-        modalElements[currentKind] = {
-            noData: document.getElementById(`detail-${currentKind}`),
-            dataPlace: document.getElementById(`detail-${currentKind}-data`),
-            tablePlace: document.getElementById(`tablePlace-${currentKind}`)
-        }
-        modalElements[currentKind].noData.classList.add("d-none");
-        modalElements[currentKind].dataPlace.classList.add("d-none");
-        modalElements[currentKind].tablePlace.innerHTML = "";
-    })
-
-    // Set current row ID
-    document.getElementById("currentRowID").innerText = dataSet.vector.id;
-
-    // Set each value - impact
-    let modalDataElement = {
-        impact: document.getElementById("detail-impact"),
-        threat: document.getElementById("detail-threat"),
-        url: {
-            method: document.getElementById("detail-method"),
-            url: document.getElementById("detail-URL"),
-            uri: document.getElementById("detail-URI"),
-        },
-        actions: document.getElementById("detail-actions")
-    };
-
-    // Impact rate
-    modalDataElement.impact.className = "";
-    modalDataElement.impact.classList.add("badge", "rounded-pill", "small", `bg-${impactRate[dataSet.vector.impactRate][0]}`);
-    modalDataElement.impact.innerText = impactRate[dataSet.vector.impactRate][1];
-
-    // URL
-    modalDataElement.url.url.innerText = dataSet.vector.URL;
-    modalDataElement.url.uri.innerText = dataSet.vector.URI;
-    modalDataElement.url.method.innerText = dataSet.packet.requestType.toUpperCase();
-
-    // Actions
-    modalDataElement.actions.innerHTML = " - ";
-    if (dataSet.vector.action_URL_Type.length > 0) {
-        modalDataElement.actions.innerHTML = "";
-        for (let currentRow = 0; currentRow <= dataSet.vector.action_URL.length - 1; currentRow++) {
-            let localSkeleton = {
-                parent: document.createElement("p"),
-                method: document.createElement("span"),
-                target: document.createElement("span")
-            }
-            localSkeleton.method.classList.add("badge", "text-uppercase", "me-2", "mb-1",
-                (typeof (coloring[dataSet.vector.action_URL_Type[currentRow].toLowerCase()]) === "undefined")
-                    ? "bg-warning"
-                    : coloring[dataSet.vector.action_URL_Type[currentRow].toLowerCase()]);
-            localSkeleton.target.classList.add("text-break");
-
-            localSkeleton.method.innerText = dataSet.vector.action_URL_Type[currentRow];
-            localSkeleton.target.innerText = dataSet.vector.action_URL[currentRow];
-            localSkeleton.parent.append(
-                localSkeleton.method,
-                localSkeleton.target
-            );
-            modalDataElement.actions.appendChild(localSkeleton.parent);
-        }
-    } else {
-        modalDataElement.actions.innerHTML = " - ";
-    }
-
-    // Create cookie view
-    [dataKind[0], dataKind[1]].forEach((currentKind) => {
-        Object.keys(dataSet.vector.Details[currentKind]).forEach((currentData) => {
-            let localSkeleton = {
-                parent: document.createElement("tr"),
-                key: document.createElement("th"),
-                value: {
-                    parent: document.createElement("td"),
-                    value: document.createElement("code")
-                }
-            };
-            localSkeleton.key.innerText = currentData;
-            localSkeleton.value.value.innerText = dataSet.vector.Details[currentKind][currentData];
-            localSkeleton.value.parent.appendChild(localSkeleton.value.value);
-
-            localSkeleton.key.classList.add("text-break");
-            localSkeleton.value.parent.classList.add("text-break");
-
-            localSkeleton.parent.append(
-                localSkeleton.key,
-                localSkeleton.value.parent
-            );
-            modalElements[currentKind].tablePlace.appendChild(localSkeleton.parent);
-        })
-        if (Object.keys(dataSet.vector.Details[currentKind]).length !== 0) {
-            viewCorrespondingElement("vector", currentKind);
-            modalElements[currentKind].dataPlace.classList.remove("d-none");
-        } else modalElements[currentKind].noData.classList.remove("d-none");
-    })
-
-    // console.log(dataSet.vector.Details[dataKind[2]].length);
-    if (dataSet.vector.Details[dataKind[2]].length > 0) {
-        dataSet.vector.Details[dataKind[2]].forEach((currentTag) => {
+    buildTags(dataset) {
+        let codeParent = document.createElement("div");
+        dataset.vector.Details.tag.forEach((currentTag) => {
             let localSkeleton = {
                 pre: document.createElement("pre"),
                 code: document.createElement("code")
@@ -701,39 +639,149 @@ const openDetailsModal = (dataSet) => {
             localSkeleton.code.innerText = currentTag;
             localSkeleton.pre.appendChild(localSkeleton.code);
 
-            modalElements[dataKind[2]].tablePlace.appendChild(localSkeleton.pre);
+            codeParent.appendChild(localSkeleton.pre);
         })
-        modalElements[dataKind[2]].dataPlace.classList.remove("d-none");
-        viewCorrespondingElement("vector", "tags");
-    } else {
-        modalElements[dataKind[2]].noData.classList.remove("d-none");
+        this.viewParent.vectors.appendChild(pager.createAccordion("Tags", codeParent));
+
+        if (typeof (hljs) !== "object") createToast("Code highlighting disabled", "HLJS Not found", "danger");
+        else hljs.highlightAll();
     }
 
-    if (Object.keys(dataSet.vector.attackVector["misc"]).length > 0) {
-        viewCorrespondingElement("vector", "violation");
-        buildViolationElement(dataSet.vector.attackVector["misc"]);
+    buildToTables(dataset, type) {
+        console.log(type, dataset.vector.Details, dataset.vector.Details[type[0]]);
+        let data = dataset.vector.Details[type[0]],
+            formedData = Array();
+
+        if (Object.keys(data).length > 0) {
+            Object.keys(data).forEach(lib => {
+                formedData.push([lib, data[lib]]);
+            })
+
+            let builtTable = builder.buildTable(["Key", "Value"], formedData);
+
+            this.viewParent.vectors.appendChild(pager.createAccordion(type[1], builtTable));
+        }
     }
+
+    writeVectorValues(dataset) {
+        // Set each value - impact
+        let modalDataElement = {
+            impact: document.getElementById("detail-impact"),
+            threat: document.getElementById("detail-threat"),
+            url: {
+                method: document.getElementById("detail-method"),
+                url: document.getElementById("detail-URL"),
+                uri: document.getElementById("detail-URI"),
+            },
+            actions: document.getElementById("detail-actions")
+        };
+
+        // Impact rate
+        modalDataElement.impact.className = "";
+        modalDataElement.impact.classList.add("badge", "rounded-pill", "small", `bg-${impactRate[dataset.vector.impactRate][0]}`);
+        modalDataElement.impact.innerText = impactRate[dataset.vector.impactRate][1];
+
+        // URL
+        modalDataElement.url.url.innerText = dataset.vector.URL;
+        modalDataElement.url.uri.innerText = dataset.vector.URI;
+        modalDataElement.url.method.innerText = dataset.packet.requestType.toUpperCase();
+
+        // Actions
+        modalDataElement.actions.innerHTML = " - ";
+        if (dataset.vector.action_URL_Type.length > 0) {
+            modalDataElement.actions.innerHTML = "";
+            for (let currentRow = 0; currentRow <= dataset.vector.action_URL.length - 1; currentRow++) {
+                let localSkeleton = {
+                    parent: document.createElement("p"),
+                    method: document.createElement("span"),
+                    target: document.createElement("span")
+                }
+                localSkeleton.method.classList.add("badge", "text-uppercase", "me-2", "mb-1",
+                    (typeof (coloring[dataset.vector.action_URL_Type[currentRow].toLowerCase()]) === "undefined")
+                        ? "bg-warning"
+                        : coloring[dataset.vector.action_URL_Type[currentRow].toLowerCase()]);
+                localSkeleton.target.classList.add("text-break");
+
+                localSkeleton.method.innerText = dataset.vector.action_URL_Type[currentRow];
+                localSkeleton.target.innerText = dataset.vector.action_URL[currentRow];
+                localSkeleton.parent.append(
+                    localSkeleton.method,
+                    localSkeleton.target
+                );
+                modalDataElement.actions.appendChild(localSkeleton.parent);
+            }
+        } else {
+            modalDataElement.actions.innerHTML = " - ";
+        }
+    }
+
+    async open(dataset) {
+        let viewArea = {
+            vector: document.getElementById("detailView-vector")
+        };
+
+        // Initialize
+        Object.keys(viewArea).forEach(area => viewArea[area].innerHTML = "");
+
+        // Set current row ID
+        document.getElementById("currentRowID").innerText = dataset.vector.id;
+
+        // Build vectors
+        await this.buildToTables(dataset, ["cookie", "Cookies"]);
+        await this.buildToTables(dataset, ["queryString", "Query String"]);
+        await this.writeVectorValues(dataset);
+        if (dataset.vector.Details.tag.length > 0) this.buildTags(dataset);
+        if (Object.keys(dataset.vector.attackVector["misc"]).length > 0) await this.buildViolationElement(dataset.vector.attackVector["misc"]);
+        if (Object.keys(dataset.vector.attackVector["doubt"]).length > 0) await this.buildReferredDocs(dataset);
+
+        /*
+    let viewParent = {
+        vectors: document.getElementById("detailView-vector")
+    };
+    viewParent.vectors.innerHTML = "";
+
+    let dataKind = ["cookie", "queryString", "tag"],
+        modalElements = Object();
+
+    places.detailView.view.className = "";
+    places.detailView.view.classList.add("modal-content", "p-4", "border-rounded", "shadow");
+
+    // Set current row ID
+    document.getElementById("currentRowID").innerText = dataSet.vector.id;
 
     // Threats
     modalDataElement.threat.innerText = "";
     let doubtList = Object.keys(dataSet.vector.attackVector["doubt"]);
-    document.getElementById("referredDocumentViewArea").innerHTML = "";
     if (doubtList.length > 0) {
+        let refParent = document.createElement("div");
+        console.log("doubtList: ", doubtList);
         doubtList.forEach((currentThreat) => {
-            buildReferredDocs(currentThreat);
+            console.log("currentThreat: ", currentThreat);
+            buildReferredDocs(currentThreat).then(parent => refParent.appendChild(parent));
             modalDataElement.threat.innerText +=
                 currentThreat.concat(
                     (doubtList[doubtList.length - 1] !== currentThreat) ? ", " : ""
                 );
         });
+
+        viewParent.vectors.appendChild(pager.createAccordion("Referred Documents", refParent));
     } else {
         modalDataElement.threat.innerText = "-";
     }
 
-    hljs.highlightAll();
+    if (typeof (hljs) !== "object") createToast("Code highlighting disabled", "HLJS Not found", "danger");
+    else hljs.highlightAll();
+
     modals.detailView.show();
 
     console.log(dataSet);
+
+     */
+
+        // Build
+
+        modals.detailView.show();
+    }
 }
 
 document.getElementById("openPrefModal").addEventListener("click", () => pager.openPagingOption());
