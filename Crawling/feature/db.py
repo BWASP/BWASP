@@ -8,6 +8,7 @@ import requests
 from Crawling.feature import func
 from Crawling.attack_vector import *
 from Crawling.feature.api import *
+from Crawling.feature.keywordCmp import keywordCmp
 
 comment = ""
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
@@ -65,6 +66,10 @@ def insertCSP(csp_result):
 # TODO
 # 중복된 url 이 있을 경우, 데이터를 넣어야 하는가?
 def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, analysis_data):
+    cmp_sql_check = False
+    cmp_sql_xss_check = False
+    cmp_logic_check = False
+
     # db_connect, db_table = connect("domain")
     '''
     [
@@ -164,6 +169,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                 else:
                     param = url_part.query
                     domain_params[param.split('=')[0]] = param.split('=')[1]
+                    tag_name_list.append(param.split('=')[0])
             except:
                 domain_params[param.split('=')[0]] = "None"
 
@@ -222,6 +228,38 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                 #    attack_vector["doubt"]["SQL injection"].pop("detect")
 
                             if not cheat_sheet: break
+
+        #keywordCmp
+        cmp_sql_check = keywordCmp().keywordCmp_SQL(tag_name_list, cmp_sql_check)
+        cmp_sql_xss_check = keywordCmp().keywordCmp_SQL_XSS(tag_name_list, cmp_sql_xss_check)
+        cmp_logic_check = keywordCmp().keywordCmp_Logic(tag_name_list, cmp_logic_check)
+        if cmp_sql_check:
+            if "board" in attack_vector["doubt"]["SQL injection"]["type"] or "account" in attack_vector["doubt"]["SQL injection"]["type"]:
+                pass
+            else:
+                attack_vector["doubt"]["SQL injection"]["type"] = ["None"]
+                impactRate = 1
+        elif cmp_sql_xss_check:
+            if "board" in attack_vector["doubt"]["SQL injection"]["type"] or "board" in attack_vector["doubt"]["XSS"]["type"] \
+                    or "account" in attack_vector["doubt"]["SQL injection"]["type"] or "account" in attack_vector["doubt"]["XSS"][
+                "type"] \
+                    or "None" in attack_vector["doubt"]["SQL injection"]["type"] or "None" in attack_vector["doubt"]["XSS"]["type"]:
+                pass
+            else:
+                attack_vector["doubt"]["SQL injection"]["type"] = ["None"]
+                attack_vector["doubt"]["XSS"]["type"] = ["None"]
+                impactRate = 1
+        elif cmp_logic_check:
+            attack_vector["doubt"]["Logic Flaw"] = True
+
+            impactRate = 1
+        else:
+            if "SQL injection" in attack_vector["doubt"]:
+                pass
+            else:
+                attack_vector["doubt"]["Parameter"] = True
+
+                impactRate = 0
             
 
         if not packet["request"]["full_url"] in cookie_result.keys():

@@ -45,17 +45,20 @@ class GetPort:
             self.ports_list[str(port_number)] = port_service
 
         #Cloud Header Check
-        cloud_count = parse_html.find_all('dl', class_='dl dl-horizontal')[0].find_all('dt')
-        for x in range(len(cloud_count)):
-            cloud_count[x] = str(cloud_count[x])
+        try:
+            cloud_count = parse_html.find_all('dl', class_='dl dl-horizontal')[0].find_all('dt')
+            for x in range(len(cloud_count)):
+                cloud_count[x] = str(cloud_count[x])
 
-        cloud_count = cloud_count.index('<dt>Network</dt>')
-        cloud_header = parse_html.find_all('dl', class_='dl dl-horizontal')[0].find_all('dd')[cloud_count].get_text().replace(
-            " ", "").replace("\n", "")
+            cloud_count = cloud_count.index('<dt>Network</dt>')
+            cloud_header = parse_html.find_all('dl', class_='dl dl-horizontal')[0].find_all('dd')[cloud_count].get_text().replace(
+                " ", "").replace("\n", "")
 
-        self.cloud_info["Cloud Provider"] = {
-            cloud_header: {"detect": "censys", "version": 0, "request": [], "response": [], "url": [],
-                           "icon": "cloud.png"}}
+            self.cloud_info["Cloud Provider"] = {
+                cloud_header: {"detect": "censys", "version": 0, "request": [], "response": [], "url": [],
+                               "icon": "cloud.png"}}
+        except: #index error??
+            pass
 
         return self.ports_list, self.cloud_info
 
