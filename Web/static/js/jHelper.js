@@ -92,20 +92,67 @@ class API {
 }
 
 class tableBuilder {
+    buildTable(thead, element){
+        if(!Array.isArray(element) || !Array.isArray(thead)) return;
+        for(const elem of element){
+            if(!Array.isArray(elem)) return;
+            else if(elem.length !== thead.length) return;
+        }
+        let parent = document.createElement("table");
+        parent.classList.add("table");
+        parent.id = createKey(3, "table");
+
+        // Build head
+        parent.appendChild(this.buildHead(thead));
+
+        // Build body
+        let tableBody = document.createElement("tbody");
+
+        element.forEach(elem => {
+            let tr = document.createElement("tr");
+            let th = document.createElement("th");
+
+            th.classList.add("text-break");
+            th.innerText = elem[0];
+            elem.splice(0, 1)
+            tr.appendChild(th);
+
+            elem.forEach(value => {
+                console.log(value);
+                let td = {
+                    parent: document.createElement("td"),
+                    value: document.createElement("code")
+                };
+
+                td.parent.classList.add("text-break");
+
+                td.value.innerText = value;
+                td.parent.appendChild(td.value);
+                tr.appendChild(td.parent);
+            })
+            tableBody.appendChild(tr);
+        });
+
+        parent.appendChild(tableBody);
+
+        return parent;
+    }
+
     /**
      * Builds table <thead> element
      * @param {Array} elements
      * @return {Object} thead
      */
     buildHead(elements) {
-        if (typeof (elements) !== "object" || elements.length === 0) return Error("tableBuilder.buildHead() : Expected array of heading elements");
+        if (!Array.isArray(elements) || elements.length === 0) return Error("tableBuilder.buildHead() : Expected array of heading elements");
         let thead = {
             parent: document.createElement("thead"),
             child: document.createElement("tr")
         };
         elements.forEach((currentElement) => {
             let tmpElement = document.createElement("th");
-            tmpElement.classList.add("text-center");
+            // tmpElement.classList.add("text-center");
+            tmpElement.scope = "col";
             tmpElement.innerText = currentElement;
             thead.child.appendChild(tmpElement);
         })

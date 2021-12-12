@@ -11,9 +11,9 @@
                 <div class="d-flex align-items-center">
                     <h3 class="text-dark fw-bolder mb-0 font-logo">Detail View</h3>
                     <p class="text-capitalize text-muted small ms-2 mb-0">of vector No. <span id="currentRowID">0</span></p>
-                    <div class="ms-auto d-inline-flex">
-                        <a class="h4 text-muted element-clickable" id="toggleDetailViewModalSize"><i id="togglerIcon" class="fas fa-expand-alt"></i></a>
-                        <a href="#" data-bs-dismiss="modal" class="ms-3 h4 text-danger text-decoration-none"><i class="fas fa-times"></i></a>
+                    <div class="ms-auto d-inline-flex p-2 ps-3 pe-3 shadow-sm rounded-custom">
+                        <a class="h4 text-muted element-clickable mb-0" id="toggleDetailViewModalSize"><i id="togglerIcon" class="fas fa-expand-alt"></i></a>
+                        <a href="#" data-bs-dismiss="modal" class="ms-3 mb-0 h4 text-danger text-decoration-none"><i class="fas fa-times"></i></a>
                     </div>
                 </div>
             </section>
@@ -46,102 +46,10 @@
                     </table>
                 </section>
                 <section>
-                    <div class="d-none" id="detailView-vector-nonView">
-
-                    </div>
-                    <div class="accordion" id="detailView-vector-parent">
-                        <div class="accordion-item" id="detailView-vector-cookie-parent">
-                            <h2 class="accordion-header" id="detailView-vector-cookie">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#detailView-vector-cookie-body" aria-expanded="false" aria-controls="detailView-vector-cookie-body">
-                                    Cookie
-                                </button>
-                            </h2>
-                            <div id="detailView-vector-cookie-body" class="accordion-collapse collapse" aria-labelledby="detailView-vector-cookie">
-                                <div class="accordion-body">
-                                    <section class="d-none" id="detail-cookie">
-                                        <p class="text-center text-muted text-capitalize p-4">No Data</p>
-                                    </section>
-                                    <section class="d-none table-responsive" id="detail-cookie-data">
-                                        <table class="table">
-                                            <thead>
-                                            <tr>
-                                                <th scope="col">Key</th>
-                                                <th scope="col">Value</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="tablePlace-cookie"></tbody>
-                                        </table>
-                                    </section>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item" id="detailView-vector-queryString-parent">
-                            <h2 class="accordion-header" id="detailView-vector-queryString">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#detailView-vector-queryString-body" aria-expanded="false" aria-controls="detailView-vector-queryString-body">
-                                    Query Strings
-                                </button>
-                            </h2>
-                            <div id="detailView-vector-queryString-body" class="accordion-collapse collapse" aria-labelledby="detailView-vector-queryString">
-                                <div class="accordion-body">
-                                    <section class="d-none" id="detail-queryString">
-                                        <p class="text-center text-muted text-capitalize p-4">No Data</p>
-                                    </section>
-                                    <section class="d-none table-responsive" id="detail-queryString-data">
-                                        <table class="table">
-                                            <thead>
-                                            <tr>
-                                                <th scope="col">Key</th>
-                                                <th scope="col">Value</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="tablePlace-queryString"></tbody>
-                                        </table>
-                                    </section>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item" id="detailView-vector-tags-parent">
-                            <h2 class="accordion-header" id="detailView-vector-tags">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#detailView-vector-tags-body" aria-expanded="false" aria-controls="detailView-vector-tags-body">
-                                    Tags
-                                </button>
-                            </h2>
-                            <div id="detailView-vector-tags-body" class="accordion-collapse collapse" aria-labelledby="detailView-vector-tags">
-                                <div class="accordion-body">
-                                    <section class="d-none" id="detail-tag">
-                                        <p class="text-center text-muted text-capitalize p-4">No Data</p>
-                                    </section>
-                                    <section class="d-none table-responsive" id="detail-tag-data">
-                                        <div id="tablePlace-tag"></div>
-                                    </section>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item" id="detailView-vector-violation-parent">
-                            <h2 class="accordion-header" id="detailView-vector-violation">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#detailView-vector-violation-body" aria-expanded="false" aria-controls="detailView-vector-violation-body">
-                                    Violation
-                                </button>
-                            </h2>
-                            <div id="detailView-vector-violation-body" class="accordion-collapse collapse" aria-labelledby="detailView-vector-violation">
-                                <div class="accordion-body">
-                                    <div id="violationViewArea"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item" id="detailView-vector-referredDocument-parent">
-                            <h2 class="accordion-header" id="detailView-vector-referredDocument">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#detailView-vector-referredDocument-body" aria-expanded="false" aria-controls="detailView-vector-referredDocument-body">
-                                    Referred Documents
-                                </button>
-                            </h2>
-                            <div id="detailView-vector-referredDocument-body" class="accordion-collapse collapse" aria-labelledby="detailView-vector-referredDocument">
-                                <div class="accordion-body">
-                                    <ul id="referredDocumentViewArea"></ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <h4 class="fw-bold mb-3">Vector Data</h4>
+                    <div class="accordion" id="detailView-vector"></div>
+                    <h4 class="fw-bold mt-4 mb-3">Packet Data</h4>
+                    <div class="accordion" id="detailView-packet"></div>
                 </section>
             </div>
         </div>
