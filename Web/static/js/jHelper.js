@@ -92,11 +92,12 @@ class API {
 }
 
 class tableBuilder {
-    buildTable(thead, element){
-        if(!Array.isArray(element) || !Array.isArray(thead)) return;
-        for(const elem of element){
-            if(!Array.isArray(elem)) return;
-            else if(elem.length !== thead.length) return;
+    buildTable(thead, element) {
+        // console.log("\nelement: ", element, "\n\n");
+        if (!Array.isArray(element) || !Array.isArray(thead)) return;
+        for (const elem of element) {
+            if (!Array.isArray(elem)) return;
+            else if (elem.length !== thead.length) return;
         }
         let parent = document.createElement("table");
         parent.classList.add("table");
@@ -113,12 +114,11 @@ class tableBuilder {
             let th = document.createElement("th");
 
             th.classList.add("text-break");
-            th.innerText = elem[0];
+            th.innerText = elem[0].value;
             elem.splice(0, 1)
             tr.appendChild(th);
 
             elem.forEach(value => {
-                console.log(value);
                 let td = {
                     parent: document.createElement("td"),
                     value: document.createElement("code")
@@ -126,8 +126,8 @@ class tableBuilder {
 
                 td.parent.classList.add("text-break");
 
-                td.value.innerText = value;
-                td.parent.appendChild(td.value);
+                if (!value.raw) td.value.innerText = value.value;
+                td.parent.appendChild((value.raw) ? value.value : td.value);
                 tr.appendChild(td.parent);
             })
             tableBody.appendChild(tr);
@@ -160,6 +160,17 @@ class tableBuilder {
         return thead.parent;
     }
 
+    createBadge(text, background = "primary") {
+        let colorSet = {
+            primary: "white",
+            warning: "dark"
+        }
+        let badge = document.createElement("p");
+        badge.classList.add("badge", "small", `bg-${background}`, `text-${colorSet[background]}`, "mb-0", "ms-1", "me-1");
+        badge.innerHTML = text;
+        return badge;
+    }
+
     dataNotPresent() {
         let noData = document.createElement("td");
         noData.innerText = " - ";
@@ -184,18 +195,18 @@ class Cookies {
     }
 
     read(name) {
-        for(const cookie of document.cookie.split(";")){
+        for (const cookie of document.cookie.split(";")) {
             let parsedCookie = cookie
                 .replaceAll(" ", "")
                 .split("=");
-            if(parsedCookie[0] === name) return parsedCookie[1];
+            if (parsedCookie[0] === name) return parsedCookie[1];
         }
         return false;
     }
 
     delete(name) {
         // No such cookies
-        if(this.read(name) === null) return false;
+        if (this.read(name) === null) return false;
 
         let date = new Date();
         document.cookie = `${name}=; expires=${date.toUTCString()}; path=/`;

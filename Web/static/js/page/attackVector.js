@@ -436,7 +436,8 @@ class pagerTools {
             // Add event listener for each line
             rowElement.parent.addEventListener("click", async () => {
                 let modal = new detailsModal({
-                    vectors: document.getElementById("detailView-vector")
+                    vectors: document.getElementById("detailView-vector"),
+                    packets: document.getElementById("detailView-packet")
                 });
                 await modal.open(dataSet);
                 // openDetailsModal(dataSet)
@@ -518,6 +519,74 @@ class detailsModal {
         this.viewParent = viewParent;
     }
 
+    async open(dataset) {
+        let viewArea = {
+            vector: document.getElementById("detailView-vector")
+        };
+
+        // Initialize
+        Object.keys(viewArea).forEach(area => viewArea[area].innerHTML = "");
+
+        // Set current row ID
+        document.getElementById("currentRowID").innerText = dataset.vector.id;
+
+        // Build vectors
+        await this.buildToTables(dataset, ["cookie", "Cookies"]);
+        await this.buildToTables(dataset, ["queryString", "Query String"]);
+        await this.writeVectorValues(dataset);
+        if (dataset.vector.Details.tag.length > 0) this.buildTags(dataset);
+        if (Object.keys(dataset.vector.attackVector["misc"]).length > 0) await this.buildViolationElement(dataset.vector.attackVector["misc"]);
+        if (Object.keys(dataset.vector.attackVector["doubt"]).length > 0) await this.buildReferredDocs(dataset);
+        await this.buildDoubt(dataset);
+
+        // Build Packets
+        await this.buildPacketRequest(dataset);
+
+        // Log dataset
+        console.log(dataset);
+
+        // Build
+        modals.detailView.show();
+    }
+
+    buildPacketRequest(dataset) {
+        let headers = [
+                {
+                    name: "Request Header",
+                    data: dataset.packet.requestJson.headers
+                },
+                {
+                    name: "Response Header",
+                    data: dataset.packet.responseHeader
+                }
+            ],
+            responseData = Array();
+
+        for(const header of headers){
+            responseData = Array();
+
+            for (const type of Object.keys(header.data)) {
+                responseData.push([
+                    {
+                        value: type,
+                        raw: false
+                    },
+                    {
+                        value: header.data[type],
+                        raw: false
+                    }
+                ]);
+            }
+
+            this.viewParent.packets.appendChild(
+                pager.createAccordion(header.name, builder.buildTable(
+                    ["Key", "Value"],
+                    responseData
+                ))
+            );
+        }
+    }
+
     async buildViolationElement(dataPackage) {
         let element = document.createElement("div"),
             packageKeys = Object.keys(dataPackage),
@@ -586,6 +655,64 @@ class detailsModal {
         this.viewParent.vectors.appendChild(pager.createAccordion("Violation", element));
     }
 
+    buildDoubt(dataset) {
+        let doubt = dataset.vector.attackVector["doubt"],
+            renderData = Array();
+
+        for (const vuln in doubt) {
+            let currentData = [{
+                value: vuln,
+                raw: false
+            }], virtual = {
+                div: document.createElement("div"),
+                space: Array()
+            }
+            console.log("vuln: ", vuln, "\nData: ", doubt[vuln]);
+            switch (typeof (doubt[vuln])) {
+                case "string":
+                    currentData.push({
+                        value: doubt[vuln],
+                        raw: false
+                    });
+                    break;
+                case "boolean":
+                    /*
+                    currentData.push({
+                        value: builder.createBadge((doubt[vuln]) ? "True" : "False"),
+                        raw: true
+                    });
+                     */
+                    break;
+                case "object":
+                    for (const type of [["type", "warning"], ["required", "danger"]]) {
+                        if (doubt[vuln][type[0]] !== undefined && doubt[vuln][type[0]][0] !== "None" && doubt[vuln][type[0]].length > 0) {
+                            for (const data of doubt[vuln][type[0]]) virtual.space.push([doubt[vuln][type[0]][0], type[1]]);
+                        }
+                    }
+
+                    for (const data of virtual.space) virtual.div.appendChild(builder.createBadge(data[0], data[1]));
+
+                    currentData.push({
+                        value: virtual.div,
+                        raw: true
+                    });
+
+                    break;
+                default:
+                    console.log("Nope!");
+            }
+
+            // console.log("currentData: ", currentData.length, currentData);
+            if (currentData.length > 1) renderData.push(currentData);
+        }
+
+        let builtTable = builder.buildTable(["Type", "Value"], renderData);
+        console.log(builtTable);
+        this.viewParent.vectors.appendChild(
+            pager.createAccordion("Predictable Vulnerabilities", builtTable)
+        )
+    }
+
     async buildReferredDocs(dataset) {
         let doubt = {
                 data: dataset.vector.attackVector["doubt"],
@@ -596,13 +723,13 @@ class detailsModal {
 
         console.log(doubt.keys.length);
 
-        if(doubt.keys.length > 0) {
+        if (doubt.keys.length > 0) {
             referredDocuments = await API.communicate("/static/data/referredDocuments.json", "GET", null, true);
-            for(const key of doubt.keys) {
-                console.log(key, doubt.data[key], referredDocuments[key]);
+            for (const key of doubt.keys) {
+                // console.log(key, doubt.data[key], referredDocuments[key]);
                 if (typeof (referredDocuments[key]) === "undefined") continue;
                 if (!Array.isArray(referredDocuments[key])) {
-                    for(const type of doubt.data[key].detect){
+                    for (const type of doubt.data[key].detect) {
                         console.log(key, type);
                         let localDataSet = referredDocuments[key.split("(")[0]][(type !== "None") ? type : "Generic"];
                         console.log(localDataSet);
@@ -650,13 +777,22 @@ class detailsModal {
     }
 
     buildToTables(dataset, type) {
-        console.log(type, dataset.vector.Details, dataset.vector.Details[type[0]]);
+        // console.log(dataset, type, dataset.vector.Details, dataset.vector.Details[type[0]]);
         let data = dataset.vector.Details[type[0]],
             formedData = Array();
 
         if (Object.keys(data).length > 0) {
             Object.keys(data).forEach(lib => {
-                formedData.push([lib, data[lib]]);
+                formedData.push([
+                    {
+                        value: lib,
+                        raw: false
+                    },
+                    {
+                        value: data[lib],
+                        raw: false
+                    }
+                ]);
             })
 
             let builtTable = builder.buildTable(["Key", "Value"], formedData);
@@ -729,74 +865,6 @@ class detailsModal {
         } else {
             modalDataElement.threat.innerText = "-";
         }
-    }
-
-    async open(dataset) {
-        let viewArea = {
-            vector: document.getElementById("detailView-vector")
-        };
-
-        // Initialize
-        Object.keys(viewArea).forEach(area => viewArea[area].innerHTML = "");
-
-        // Set current row ID
-        document.getElementById("currentRowID").innerText = dataset.vector.id;
-
-        // Build vectors
-        await this.buildToTables(dataset, ["cookie", "Cookies"]);
-        await this.buildToTables(dataset, ["queryString", "Query String"]);
-        await this.writeVectorValues(dataset);
-        if (dataset.vector.Details.tag.length > 0) this.buildTags(dataset);
-        if (Object.keys(dataset.vector.attackVector["misc"]).length > 0) await this.buildViolationElement(dataset.vector.attackVector["misc"]);
-        if (Object.keys(dataset.vector.attackVector["doubt"]).length > 0) await this.buildReferredDocs(dataset);
-
-        /*
-    let viewParent = {
-        vectors: document.getElementById("detailView-vector")
-    };
-    viewParent.vectors.innerHTML = "";
-
-    let dataKind = ["cookie", "queryString", "tag"],
-        modalElements = Object();
-
-    places.detailView.view.className = "";
-    places.detailView.view.classList.add("modal-content", "p-4", "border-rounded", "shadow");
-
-    // Set current row ID
-    document.getElementById("currentRowID").innerText = dataSet.vector.id;
-
-    // Threats
-    modalDataElement.threat.innerText = "";
-    let doubtList = Object.keys(dataSet.vector.attackVector["doubt"]);
-    if (doubtList.length > 0) {
-        let refParent = document.createElement("div");
-        console.log("doubtList: ", doubtList);
-        doubtList.forEach((currentThreat) => {
-            console.log("currentThreat: ", currentThreat);
-            buildReferredDocs(currentThreat).then(parent => refParent.appendChild(parent));
-            modalDataElement.threat.innerText +=
-                currentThreat.concat(
-                    (doubtList[doubtList.length - 1] !== currentThreat) ? ", " : ""
-                );
-        });
-
-        viewParent.vectors.appendChild(pager.createAccordion("Referred Documents", refParent));
-    } else {
-        modalDataElement.threat.innerText = "-";
-    }
-
-    if (typeof (hljs) !== "object") createToast("Code highlighting disabled", "HLJS Not found", "danger");
-    else hljs.highlightAll();
-
-    modals.detailView.show();
-
-    console.log(dataSet);
-
-     */
-
-        // Build
-
-        modals.detailView.show();
     }
 }
 
