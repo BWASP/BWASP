@@ -41,7 +41,7 @@ def start(detect_list, lock, url, cur_page_links, current_url, req_res_packets, 
     global cat_meta
     global packet_indexes
 
-    category = list(range(1, 96))
+    category = list(range(1, 97))
 
     data = loadCategory(category)
     cat_meta = loadCategory_meta()

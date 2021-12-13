@@ -958,5 +958,13 @@
     },
     "icon": "lighttpd.png",
     "website": "http://www.lighttpd.net"
+  },
+  "log4j": {
+    "cats": [
+      96
+    ],
+    "html": "(?:log4j\\.class)|(?:log4jRCE\\.class)|(?:log4j\\.xml)|(?:log4j\\.properties)",
+    "icon": "log4j.png",
+    "website": "https://logging.apache.org/log4j/2.x/"
   }
 }

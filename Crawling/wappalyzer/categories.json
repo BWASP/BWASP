@@ -366,5 +366,9 @@
   "95": {
     "name": "Digital asset management",
     "priority": 9
+  },
+  "96": {
+    "name": "Java Library",
+    "priority": 1
   }
 }

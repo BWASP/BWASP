@@ -388,6 +388,16 @@ def postWebInfo(input_url):
 
 # 이후로 업데이트를 통해 data 값 갱신
 def updateWebInfo(analyst_result):
+    """ log4j 탐지 임시 코드
+    try:
+        if "Apache" in str(analyst_result) or "Java" in str(analyst_result):
+            log4j_info = dict()
+            log4j_info["Java Library"] = {"log4j": {"detect": "censys", "version": 0, "request": [], "response": [], "url": [],"icon": "log4j.png"}}
+            analyst_result += log4j_info
+    except: #Apache, Java String check
+        pass
+    """
+
     data = []
     # db_connect, db_table = connect("systeminfo")
     value = {
