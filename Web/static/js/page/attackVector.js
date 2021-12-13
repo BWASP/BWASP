@@ -1,7 +1,16 @@
 // Get modules
-import {API as api, createKey, createToast, swapElement, dataSlicer, tableBuilder} from '../jHelper.js';
+import {
+    API as api,
+    createKey,
+    createToast,
+    swapElement,
+    dataSlicer,
+    tableBuilder as TBuilder,
+    elementBuilder as EBuilder
+} from '../jHelper.js';
 
-let builder = new tableBuilder();
+let tableBuilder = new TBuilder();
+let elementBuilder = new EBuilder();
 
 // Specified query selectors
 let places = {
@@ -78,7 +87,7 @@ let API = await new api();
 
 class pagerTools {
     constructor() {
-        this.builder = new tableBuilder();
+        this.builder = new TBuilder();
         this.className = "pagerTools";
         this.maxLength = 50;
         this.API = new api();
@@ -537,12 +546,31 @@ class detailsModal {
 
         // Build Packets
         await this.buildPacketRequest(dataset);
+        await this.buildResponseData(dataset);
 
         // Log dataset
         console.log(dataset);
 
         // Build
         modals.detailView.show();
+    }
+
+    buildResponseData(dataset) {
+        let url = dataset.vector.URI.split("?")[0].split("."),
+            supportedExt = ["html"];
+
+        this.viewParent.packets.appendChild(
+            pager.createAccordion(
+                "Response Data",
+                elementBuilder.createCode(
+                    dataset.packet.responseBody,
+                    (supportedExt.includes(url[url.length - 1]))
+                        ? url[url.length - 1]
+                        : supportedExt[0]
+                )
+            )
+        );
+        // elementBuilder.initCode();
     }
 
     buildPacketRequest(dataset) {
@@ -558,7 +586,7 @@ class detailsModal {
             ],
             responseData = Array();
 
-        for(const header of headers){
+        for (const header of headers) {
             responseData = Array();
 
             for (const type of Object.keys(header.data)) {
@@ -575,7 +603,7 @@ class detailsModal {
             }
 
             this.viewParent.packets.appendChild(
-                pager.createAccordion(header.name, builder.buildTable(
+                pager.createAccordion(header.name, tableBuilder.buildTable(
                     ["Key", "Value"],
                     responseData
                 ))
@@ -671,14 +699,6 @@ class detailsModal {
                         raw: false
                     });
                     break;
-                case "boolean":
-                    /*
-                    currentData.push({
-                        value: builder.createBadge((doubt[vuln]) ? "True" : "False"),
-                        raw: true
-                    });
-                     */
-                    break;
                 case "object":
                     for (const type of [["type", "warning"], ["required", "danger"]]) {
                         if (doubt[vuln][type[0]] !== undefined && doubt[vuln][type[0]][0] !== "None" && doubt[vuln][type[0]].length > 0) {
@@ -686,7 +706,7 @@ class detailsModal {
                         }
                     }
 
-                    for (const data of virtual.space) virtual.div.appendChild(builder.createBadge(data[0], data[1]));
+                    for (const data of virtual.space) virtual.div.appendChild(elementBuilder.createBadge(data[0], data[1]));
 
                     currentData.push({
                         value: virtual.div,
@@ -702,7 +722,7 @@ class detailsModal {
             if (currentData.length > 1) renderData.push(currentData);
         }
 
-        let builtTable = builder.buildTable(["Type", "Value"], renderData);
+        let builtTable = tableBuilder.buildTable(["Type", "Value"], renderData);
         console.log(builtTable);
         this.viewParent.vectors.appendChild(
             pager.createAccordion("Predictable Vulnerabilities", builtTable)
@@ -755,21 +775,10 @@ class detailsModal {
 
     buildTags(dataset) {
         let codeParent = document.createElement("div");
-        dataset.vector.Details.tag.forEach((currentTag) => {
-            let localSkeleton = {
-                pre: document.createElement("pre"),
-                code: document.createElement("code")
-            };
-            localSkeleton.code.classList.add("language-html");
-            localSkeleton.code.innerText = currentTag;
-            localSkeleton.pre.appendChild(localSkeleton.code);
-
-            codeParent.appendChild(localSkeleton.pre);
-        })
+        dataset.vector.Details.tag.forEach(currentTag => codeParent.appendChild(elementBuilder.createCode(currentTag, "html")))
         this.viewParent.vectors.appendChild(pager.createAccordion("Tags", codeParent));
 
-        if (typeof (hljs) !== "object") createToast("Code highlighting disabled", "HLJS Not found", "danger");
-        else hljs.highlightAll();
+        elementBuilder.initCode();
     }
 
     buildToTables(dataset, type) {
@@ -791,7 +800,7 @@ class detailsModal {
                 ]);
             })
 
-            let builtTable = builder.buildTable(["Key", "Value"], formedData);
+            let builtTable = tableBuilder.buildTable(["Key", "Value"], formedData);
 
             this.viewParent.vectors.appendChild(pager.createAccordion(type[1], builtTable));
         }

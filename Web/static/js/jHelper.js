@@ -91,6 +91,36 @@ class API {
     }
 }
 
+class elementBuilder {
+    createCode(code, lang) {
+        let localSkeleton = {
+            pre: document.createElement("pre"),
+            code: document.createElement("code")
+        };
+        localSkeleton.code.classList.add(`language-${lang}`);
+        localSkeleton.code.innerText = code;
+        localSkeleton.pre.appendChild(localSkeleton.code);
+
+        return localSkeleton.pre;
+    }
+
+    initCode() {
+        if (typeof (hljs) !== "object") createToast("Code highlighting disabled", "HLJS Not found", "danger");
+        else hljs.highlightAll();
+    }
+
+    createBadge(text, background = "primary") {
+        let colorSet = {
+            primary: "white",
+            warning: "dark"
+        }
+        let badge = document.createElement("p");
+        badge.classList.add("badge", "small", `bg-${background}`, `text-${colorSet[background]}`, "mb-0", "ms-1", "me-1");
+        badge.innerHTML = text;
+        return badge;
+    }
+}
+
 class tableBuilder {
     buildTable(thead, element) {
         // console.log("\nelement: ", element, "\n\n");
@@ -158,17 +188,6 @@ class tableBuilder {
         })
         thead.parent.appendChild(thead.child);
         return thead.parent;
-    }
-
-    createBadge(text, background = "primary") {
-        let colorSet = {
-            primary: "white",
-            warning: "dark"
-        }
-        let badge = document.createElement("p");
-        badge.classList.add("badge", "small", `bg-${background}`, `text-${colorSet[background]}`, "mb-0", "ms-1", "me-1");
-        badge.innerHTML = text;
-        return badge;
     }
 
     dataNotPresent() {
@@ -345,4 +364,4 @@ String.prototype.format = function () {
     return outputText;
 };
 
-export {API, tableBuilder, Cookies, createKey, createToast, swapElement, dataSlicer};
+export {API, tableBuilder, elementBuilder, Cookies, createKey, createToast, swapElement, dataSlicer};
