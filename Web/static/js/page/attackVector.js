@@ -520,12 +520,8 @@ class detailsModal {
     }
 
     async open(dataset) {
-        let viewArea = {
-            vector: document.getElementById("detailView-vector")
-        };
-
         // Initialize
-        Object.keys(viewArea).forEach(area => viewArea[area].innerHTML = "");
+        Object.keys(this.viewParent).forEach(area => this.viewParent[area].innerHTML = "");
 
         // Set current row ID
         document.getElementById("currentRowID").innerText = dataset.vector.id;
