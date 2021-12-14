@@ -68,6 +68,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
     cmp_sql_check = False
     cmp_sql_xss_check = False
     cmp_logic_check = False
+    attack_tmp = dict()
 
     text = soup.find_all('input')
     form = soup.find_all('form')
@@ -261,18 +262,20 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                             s = requests.Session().post(attack_url, data=param, verify=False)
 
                             if s.status_code >= 500 and s.status_code <= 510:
-                                data["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
-                                data["doubt"]["SQL injection"]["detect"].append({"param": param})
-                                data["doubt"]["SQL injection"]["detect"].append({"type": "status 500~510"})
+                                attack_tmp["url"] = attack_url
+                                attack_tmp["param"] = param
+                                attack_tmp["type"] = "status 500~510"
+                                data["doubt"]["SQL injection"]["detect"].append(attack_tmp)
                                 impactRate = 2
 
 
                             else:
                                 for check in error_msg:
                                     if check in s.text.lower():
-                                        data["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
-                                        data["doubt"]["SQL injection"]["detect"].append({"param": param})
-                                        data["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
+                                        attack_tmp["url"] = attack_url
+                                        attack_tmp["param"] = param
+                                        attack_tmp["type"] = "error message (O)"
+                                        data["doubt"]["SQL injection"]["detect"].append(attack_tmp)
                                         impactRate = 2
                             # else:
                             #    data["doubt"]["SQL injection"].pop("detect")

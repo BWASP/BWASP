@@ -70,6 +70,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
     cmp_sql_xss_check = False
     cmp_logic_check = False
 
+    attack_tmp = dict()
+
     # db_connect, db_table = connect("domain")
     '''
     [
@@ -212,17 +214,19 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                 attack_url = domain_url + url_part.path + "?" + keys + "=" + cheat_sheet
                                 s = requests.Session().post(attack_url, verify=False)
                                 if s.status_code >= 500 and s.status_code <= 510:
-                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
-                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"param": attack_param})
-                                    attack_vector["doubt"]["SQL injection"]["detect"].append({"type": "status 500~510"})
+                                    attack_tmp["url"] = attack_url
+                                    attack_tmp["param"] = param
+                                    attack_tmp["type"] = "status 500~510"
+                                    data["doubt"]["SQL injection"]["detect"].append(attack_tmp)
                                     impactRate = 2
 
                                 else:
                                     for check in error_msg:
                                         if check in s.text.lower():
-                                            attack_vector["doubt"]["SQL injection"]["detect"].append({"url": attack_url})
-                                            attack_vector["doubt"]["SQL injection"]["detect"].append({"param": attack_param})
-                                            attack_vector["doubt"]["SQL injection"]["detect"].append({"type": "error message (O)"})
+                                            attack_tmp["url"] = attack_url
+                                            attack_tmp["param"] = param
+                                            attack_tmp["type"] = "error message (O)"
+                                            data["doubt"]["SQL injection"]["detect"].append(attack_tmp)
                                             impactRate = 2
                                 #else:
                                 #    attack_vector["doubt"]["SQL injection"].pop("detect")
