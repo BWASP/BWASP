@@ -217,7 +217,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                     attack_tmp["url"] = attack_url
                                     attack_tmp["param"] = param
                                     attack_tmp["type"] = "status 500~510"
-                                    data["doubt"]["SQL injection"]["detect"].append(attack_tmp)
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append(attack_tmp)
                                     impactRate = 2
 
                                 else:
@@ -226,7 +226,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                             attack_tmp["url"] = attack_url
                                             attack_tmp["param"] = param
                                             attack_tmp["type"] = "error message (O)"
-                                            data["doubt"]["SQL injection"]["detect"].append(attack_tmp)
+                                            attack_vector["doubt"]["SQL injection"]["detect"].append(attack_tmp)
                                             impactRate = 2
                                 #else:
                                 #    attack_vector["doubt"]["SQL injection"].pop("detect")
