@@ -1,24 +1,29 @@
 {
-    "info": {
-        "allowMethod": []
+  "info": {
+    "allowMethod": []
+  },
+  "doubt": {
+    "SQL injection": {
+      "type": [
+        "None"
+      ],
+      "detect": []
     },
-    "doubt": {
-        "SQL injection": {
-            "type": [
-                "None"
-            ]
-        },
-        "XSS": {
-            "type": [
-                "None"
-            ],
-            "required": []
-        },
-        "CORS": false,
-        "File Upload": false
+    "XSS": {
+      "type": [
+        "None"
+      ],
+      "required": []
     },
-    "misc": {
-        "robots.txt": false,
-        "error": false
-    }
+    "CORS": false,
+    "Open Redirect": "url",
+    "s3": [],
+    "File Upload": false,
+    "Reflected XSS": false,
+    "SSRF": false
+  },
+  "misc": {
+    "robots.txt": false,
+    "error": false
+  }
 }

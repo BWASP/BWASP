@@ -73,35 +73,6 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
     attack_tmp = dict()
 
     # db_connect, db_table = connect("domain")
-    '''
-    [
-    {
-    "id": 0,
-    "relatePacket": 0
-    "URL": "string",
-    "URI": "string",
-    "params": "string",
-    "comment": "string",
-    "attackVector": "string",
-    "typicalServerity": "string",
-    "description": "string",
-    "Details": "string"
-    }
-    ]
-    '''
-
-    '''
-    id: primary key
-    relatedPacket: packet 
-    url: http://kitribob.kr/
-    uri: /asdf/1.php
-    param: 인자 값 (json)
-    comment: 해당 페이지의 주석
-    attackVector: SQL Injection, XSS
-    typeicalServerity: 0 (취약점 영향도 low, normal, high)
-    description: 취약점 설명 또는 관련 url
-    Details: input tag, cookie, query string(get params) json 형태로
-    '''
 
     global error_msg
 

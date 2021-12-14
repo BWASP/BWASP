@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 import requests, json, re, base64, sys, os
-
+from Crawling.feature.keywordCmp import keywordCmp
+from urllib.parse import urlparse
+from modules import func
 #sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 
@@ -10,7 +12,7 @@ def attackHeader(target_url):
     infor_vector = ""
     try:
         http_method = requests.options(target_url, verify=False).headers['Allow'].replace(",", "").split(" ")
-    except KeyError:
+    except: #KeyError or ConnectionError
         http_method = "private"
 
     try:
@@ -55,6 +57,10 @@ def inputTag(response_body, http_method, infor_vector):
     attack_vector = dict()  # list()
     data = dict()
     impactRate = 0
+    check = 0
+    cmp_sql_check = False
+    cmp_sql_xss_check = False
+    cmp_logic_check = False
 
     text = soup.find_all('input')
     form = soup.find_all('form')
@@ -72,12 +78,12 @@ def inputTag(response_body, http_method, infor_vector):
             try:
                 if tag.attrs['type']:
                     pass
-            except KeyError:
+            except: #KeyError
                 continue
-            if tag.attrs['type'] != "submit" and len(text) != 0:
+            if tag.attrs['type'] != "submit" and len(text) != 0 and tag.attrs['type'] != "checkbox":
                 tag_list.append(base64.b64encode(str(tag).encode('utf-8')).decode('utf-8'))  # input tag 값 ex) <input ~
                 try:
-                    tag_name_list.append(tag.attrs['name'])
+                    tag_name_list.append(tag.attrs['name'].replace("'", "").replace("+", "").replace("\"", ""))
                 except:
                     pass
 
@@ -117,15 +123,35 @@ def inputTag(response_body, http_method, infor_vector):
                 except:
                     pass
 
+                cmp_sql_check = keywordCmp().keywordCmp_SQL(tag_name_list, cmp_sql_check)
+                cmp_sql_xss_check = keywordCmp().keywordCmp_SQL_XSS(tag_name_list, cmp_sql_xss_check)
+                cmp_logic_check = keywordCmp().keywordCmp_Logic(tag_name_list, cmp_logic_check)
+
                 if "board" in data["doubt"]["SQL injection"]["type"] or "board" in data["doubt"]["XSS"]["type"] \
-                        or "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"]["type"] \
+                        or "account" in data["doubt"]["SQL injection"]["type"] or "account" in data["doubt"]["XSS"][
+                    "type"] \
                         or "None" in data["doubt"]["SQL injection"]["type"] or "None" in data["doubt"]["XSS"]["type"]:
                     pass
-                else:
+                elif cmp_sql_check:
+                    data["doubt"]["SQL injection"]["type"].append("None")
+
+                    impactRate = 1
+                elif cmp_sql_xss_check:
                     data["doubt"]["SQL injection"]["type"].append("None")
                     data["doubt"]["XSS"]["type"].append("None")
 
                     impactRate = 1
+                elif cmp_logic_check:
+                    data["doubt"]["Logic Flaw"] = True
+
+                    impactRate = 1
+                else:
+                    if "SQL injection" in data["doubt"]:
+                        pass
+                    else:
+                        data["doubt"]["Parameter"] = True
+
+                        impactRate = 0
 
                 if "Not_HttpOnly" in infor_vector:
                     if "HttpOnly" not in data["doubt"]["XSS"]["required"]:
@@ -145,13 +171,20 @@ def inputTag(response_body, http_method, infor_vector):
                     # ~~~~~~~~~~~~File Upload
                     if tag.attrs['type'] == "file":
                         data["doubt"]["File Upload"] = True
+                        check = 2
 
                         impactRate = 2
                     else:
-                        data["doubt"].pop("File Upload")
+                        if check == 2:
+                            pass
+                        else:
+                            check = 1
                 except:
                     if "File Upload" in data["doubt"]:
                         data["doubt"].pop("File Upload")
+
+        if check == 1:
+            data["doubt"].pop("File Upload")
 
         attack_vector = data
 
@@ -265,6 +298,56 @@ def errorPage(current_url):
     # 주요정보통신기반시설_기술적_취약점_뿐석_평가_방법_상세가이드.pdf [page 678] Error Page not set
     return True if 404 == requests.get(current_url, verify=False).status_code and "not found" in requests.get(current_url, verify=False).text.lower() else False
 
+def ReflectedXSSCheck(packet: dict, target_url: str) -> bool:
+    if not func.isSameDomain(packet["request"]["full_url"], target_url):
+        return False
+
+    queries = urlparse(packet["request"]["full_url"]).query
+
+    if queries:
+        queries = queries.split("&")
+        try:
+            soup = BeautifulSoup(packet["response"]["body"], "html.parser")
+        except:
+            return False
+
+        for query in queries:
+            datas = query.split("=")
+
+            if len(datas) != 2:
+                break
+
+            input_tag = soup.find("input", {"name": datas[0]})
+            if input_tag and datas[1] == input_tag.get("value"):
+                return True
+
+    return False
+
+
+def SSRFCheck(packet: dict) -> bool:
+    if "open_redirect" in packet.keys():
+        return False
+
+    if packet["request"]["method"] == "GET":
+        queries = urlparse(packet["request"]["full_url"]).query.split("&")
+        for data in queries:
+            datas = data.split("=")
+
+            if len(datas) != 2:
+                continue
+
+            if func.isStringAnUrl(datas[1]):
+                return True
+
+    elif packet["request"]["method"] == "POST":
+        body = packet["request"]["body"]
+        pattern = "((?:http|ftp|https)(?:://)([\w_-]+((\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?)"
+        result = re.findall(pattern, body)
+
+        if len(result) != 0:
+            return True
+
+    return False
 
 # input tag 함수, Packets에서 불러오는 Cookie 값 + QueryString(Parameter) JSON 형태 예시 -> domain 테이블 Details 컬럼
 """

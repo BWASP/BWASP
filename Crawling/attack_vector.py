@@ -87,7 +87,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
             try:
                 if tag.attrs['type']:
                     pass
-            except KeyError:
+            except: #KeyError
                 continue
             if tag.attrs['type'] != "submit" and len(text) != 0 and tag.attrs['type'] != "checkbox":
                 tag_list.append(base64.b64encode(str(tag).encode('utf-8')).decode('utf-8'))  # input tag 값 ex) <input ~

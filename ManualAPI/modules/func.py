@@ -1,7 +1,7 @@
 from urllib.parse import urlparse, urlunparse
-import os, sys, os
-
-#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+import os, json
+import validators
+from validators import ValidationFailure
 
 
 def isSameDomain(target_url, visit_url):
@@ -57,7 +57,8 @@ def isExistExtension(url, keys):
     extensions_dict = {
         "image": ["png", "gif", "jpg", "jpeg", "webp", "tiff", "bmp", "svg", "jpe", "jif", "jfif", "jfi", "ico"],
         "style": ["css", "scss"],
-        "font": ["woff2"]
+        "font": ["woff2", "ttf", "woff"],
+        "javascript": ["js"]
     }
 
     for key in keys:
@@ -68,7 +69,7 @@ def isExistExtension(url, keys):
         parse_url = urlparse(url)
 
         # Check only path
-        url_path_extension = parse_url.path.split(".")[::-1][0]
+        url_path_extension = parse_url.path.split(".")[::-1][0].lower()
         if url_path_extension in extension_list:
             return True
 
@@ -85,3 +86,22 @@ def isExistExtension(url, keys):
         #         return True
 
     return False
+
+
+def isStringAnUrl(url_string: str) -> bool:
+    result = validators.url(url_string)
+
+    if isinstance(result, ValidationFailure):
+        return False
+
+    return True
+
+
+def apiKeyLoad():
+    try:
+        f = open("./Crawling/config/api.json")
+        data = json.load(f)
+        return data
+
+    except FileNotFoundError:
+        return False
