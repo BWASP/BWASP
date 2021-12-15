@@ -543,6 +543,7 @@ class detailsModal {
         if (Object.keys(dataset.vector.attackVector["misc"]).length > 0) await this.buildViolationElement(dataset.vector.attackVector["misc"]);
         if (Object.keys(dataset.vector.attackVector["doubt"]).length > 0) await this.buildReferredDocs(dataset);
         await this.buildDoubt(dataset);
+        await this.buildTestOptionResult(dataset);
 
         // Build Packets
         await this.buildPacketRequest(dataset);
@@ -553,6 +554,94 @@ class detailsModal {
 
         // Build
         modals.detailView.show();
+    }
+
+    buildTestOptionResult(dataset) {
+        let processedData = Object(),
+            doubts = dataset.vector.attackVector.doubt,
+            virtual = {
+                div: document.createElement("div")
+            };
+
+        // Processing data
+        for (const key of Object.keys(doubts)) {
+            let doubt = doubts[key];
+            if (doubt.detect === undefined || typeof (doubt.detect) !== "object" || doubt.detect.length <= 0) continue;
+            if (processedData[key] === undefined) processedData[key] = Array();
+
+            for (const data of doubt.detect) {
+                if (processedData[key][data.type] === undefined) processedData[key][data.type] = Array();
+                processedData[key][data.type].push({
+                    target: data.url,
+                    param: data.param
+                })
+            }
+        }
+
+        // Create view by processed data
+        for (const method of Object.keys(processedData)) {
+            let methodView = document.createElement("h5");
+            methodView.classList.add("mb-3");
+            methodView.innerText = method;
+            virtual.div.appendChild(methodView);
+
+            for (const type of Object.keys(processedData[method])) {
+                let tableDiv = document.createElement("div"),
+                    processedParams = Array();
+
+                for (const data of processedData[method][type]) {
+                    processedParams = Array();
+
+                    for (const param of Object.keys(data.param)) processedParams.push([
+                        {
+                            value: param,
+                            raw: false
+                        },
+                        {
+                            value: data.param[param],
+                            raw: false
+                        }
+                    ]);
+
+                    let table = tableBuilder.buildTable(
+                        ["Key", "Value"],
+                        [
+                            [
+                                {
+                                    value: "Target",
+                                    raw: false
+                                },
+                                {
+                                    value: data.target,
+                                    raw: false
+                                }
+                            ],
+                            [
+                                {
+                                    value: "Param",
+                                    raw: false
+                                },
+                                {
+                                    value: tableBuilder.buildTable(
+                                        ["ID", "Value"],
+                                        processedParams
+                                    ),
+                                    raw: true
+                                }
+                            ]
+                        ]
+                    )
+                    tableDiv.appendChild(table);
+                }
+                virtual.div.appendChild(
+                    pager.createAccordion(type, tableDiv)
+                )
+            }
+        }
+
+        this.viewParent.vectors.appendChild(
+            pager.createAccordion("Tested payloads", virtual.div)
+        );
     }
 
     buildResponseData(dataset) {
@@ -702,7 +791,7 @@ class detailsModal {
                 case "object":
                     for (const type of [["type", "warning"], ["required", "danger"]]) {
                         if (doubt[vuln][type[0]] !== undefined && doubt[vuln][type[0]][0] !== "None" && doubt[vuln][type[0]].length > 0) {
-                            for (const data of doubt[vuln][type[0]]) virtual.space.push([doubt[vuln][type[0]][0], type[1]]);
+                            for (const data of doubt[vuln][type[0]]) virtual.space.push([data, type[1]]);
                         }
                     }
 
@@ -741,18 +830,20 @@ class detailsModal {
 
         if (doubt.keys.length > 0) {
             referredDocuments = await API.communicate("/static/data/referredDocuments.json", "GET", null, true);
+            let ref = Array();
             for (const key of doubt.keys) {
-                // console.log(key, doubt.data[key], referredDocuments[key]);
-                if (typeof (referredDocuments[key]) === "undefined") continue;
-                if (!Array.isArray(referredDocuments[key])) {
-                    for (const type of doubt.data[key].detect) {
-                        console.log(key, type);
-                        let localDataSet = referredDocuments[key.split("(")[0]][(type !== "None") ? type : "Generic"];
-                        console.log(localDataSet);
-                        localDataSet.forEach(currentValue => overallDocuments.push(currentValue));
-                    }
-                } else referredDocuments[key].forEach((currentValue) => overallDocuments.push(currentValue));
+                let storage = Array();
+
+                if (referredDocuments[key] === undefined) return createToast("Error", "Cannot find requested document");
+                else {
+                    if (Array.isArray(referredDocuments[key])) storage = referredDocuments[key];
+                    else storage = referredDocuments[key]["Generic"];
+                }
+
+                storage.forEach(data => ref.push(data));
             }
+
+            ref.forEach(currentValue => overallDocuments.push(currentValue));
         }
 
         overallDocuments.forEach((currentDocument) => {
