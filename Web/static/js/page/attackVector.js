@@ -85,6 +85,16 @@ let stateHandler = {
 // define api communicator
 let API = await new api();
 
+// Modal toggler
+const toggleModalSize = (fixed = null) => {
+    if(typeof(fixed) === "boolean") isModalFullscreen = fixed;
+    let toggleKeywords = ["remove", "add"];
+    document.getElementById("togglerIcon").className = `fas fa-${(isModalFullscreen) ? "expand" : "compress"}-alt`;
+    places.detailView.container.classList[toggleKeywords[Number(isModalFullscreen)]]("modal-lg");
+    places.detailView.container.classList[toggleKeywords[Number(!isModalFullscreen)]]("modal-fullscreen");
+    isModalFullscreen = !isModalFullscreen;
+}
+
 class pagerTools {
     constructor() {
         this.builder = new TBuilder();
@@ -531,6 +541,7 @@ class detailsModal {
     async open(dataset) {
         // Initialize
         Object.keys(this.viewParent).forEach(area => this.viewParent[area].innerHTML = "");
+        toggleModalSize(true);
 
         // Set current row ID
         document.getElementById("currentRowID").innerText = dataset.vector.id;
@@ -983,14 +994,7 @@ document.getElementById("viewPref-input-currentPage").addEventListener("change",
 
 document.getElementById("viewPref-button-save").addEventListener("click", () => pager.buildPage());
 
-document.getElementById("toggleDetailViewModalSize").addEventListener("click", () => {
-    let toggleKeywords = ["remove", "add"];
-    document.getElementById("togglerIcon").className
-        = `fas fa-${(isModalFullscreen) ? "expand" : "compress"}-alt`;
-    places.detailView.container.classList[toggleKeywords[Number(isModalFullscreen)]]("modal-lg");
-    places.detailView.container.classList[toggleKeywords[Number(!isModalFullscreen)]]("modal-fullscreen");
-    isModalFullscreen = !isModalFullscreen;
-})
+document.getElementById("toggleDetailViewModalSize").addEventListener("click", toggleModalSize);
 
 window.onload = () => {
     pager.buildPage().then(() => {
