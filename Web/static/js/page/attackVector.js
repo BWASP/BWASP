@@ -578,6 +578,9 @@ class detailsModal {
             }
         }
 
+        // Stop if no data present
+        if(Object.keys(processedData).length <= 0) return;
+
         // Create view by processed data
         for (const method of Object.keys(processedData)) {
             let methodView = document.createElement("h5");
@@ -804,18 +807,19 @@ class detailsModal {
 
                     break;
                 default:
-                    console.log("Nope!");
+                    continue;
             }
 
             // console.log("currentData: ", currentData.length, currentData);
             if (currentData.length > 1) renderData.push(currentData);
         }
 
-        let builtTable = tableBuilder.buildTable(["Type", "Value"], renderData);
-        console.log(builtTable);
-        this.viewParent.vectors.appendChild(
-            pager.createAccordion("Predictable Vulnerabilities", builtTable)
-        )
+        if(renderData.length > 0) {
+            let builtTable = tableBuilder.buildTable(["Type", "Value"], renderData);
+            this.viewParent.vectors.appendChild(
+                pager.createAccordion("Predictable Vulnerabilities", builtTable)
+            )
+        }
     }
 
     async buildReferredDocs(dataset) {
