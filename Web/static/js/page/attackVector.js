@@ -556,6 +556,7 @@ class detailsModal {
         await this.buildDoubt(dataset);
         await this.buildTestOptionResult(dataset);
         await this.buildAllowMethods(dataset);
+        await this.buildComment(dataset);
 
         // Build Packets
         await this.buildPacketRequest(dataset);
@@ -566,6 +567,21 @@ class detailsModal {
 
         // Build
         modals.detailView.show();
+    }
+
+    buildComment(dataset) {
+        let comment = dataset.vector.comment;
+        if(comment === "") return;
+
+        this.viewParent.vectors.appendChild(
+            pager.createAccordion(
+                "Comment",
+                elementBuilder.createCode(
+                    comment,
+                    "html"
+                )
+            )
+        );
     }
 
     buildAllowMethods(dataset) {
