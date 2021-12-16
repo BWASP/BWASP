@@ -1,5 +1,5 @@
 // Get modules
-import {API as api, Cookies, createToast} from '../jHelper.js';
+import {API as api, elementBuilder as EBuilder, tableBuilder as TBuilder, Cookies, createToast} from '../jHelper.js';
 
 // Define API Endpoints
 const APIEndpoints = {
@@ -7,6 +7,10 @@ const APIEndpoints = {
 }
 
 let API = await new api();
+let builder = {
+    element: new EBuilder(),
+    table: new TBuilder()
+}
 
 class dashboard {
     constructor() {
@@ -17,22 +21,89 @@ class dashboard {
         };
         this.viewData = {
             CVECount: {
-                count: Number(), needsUpdate: false
+                count: Number(),
+                needsUpdate: false
             }
         };
         this.job = {
-            allJobs: Array(), currentJob: Object()
+            allJobs: Array(),
+            currentJob: Object()
         };
         this.ports = Object();
+        this.CSP = {
+            data: Object(),
+            needsUpdate: false
+        }
     }
 
     async updateView() {
         await this.getCurrentJob();
         await this.webEnvironments();
+        await this.getCSP();
+        this.updateVisibleItems();
+        this.updateCSPView();
         this.updatePacketCount();
         this.updateThreatsCount();
         this.updateRelatedCVEs();
         this.updatePorts();
+    }
+
+    updateVisibleItems() {
+        // CSP
+        let CSPElement = {
+                pill: document.getElementById("CSPSelectionPill"),
+                view: document.getElementById("pills-CSP"),
+                table: document.getElementById("CSPViewPlace")
+            },
+            CSPCondition = typeof (this.CSP.data) === "object" && this.CSP.data.length > 0;
+        Object.keys(CSPElement).forEach(key => CSPElement[key].classList[(CSPCondition) ? "remove" : "add"]("d-none"));
+    }
+
+    async getCSP() {
+        this.CSP.data = await API.communicate("/api/cspevaluator");
+    }
+
+    updateCSPView() {
+        if(typeof (this.CSP.data) !== "object" || this.CSP.data.length <= 0) return;
+        let CSPData = JSON.parse(this.CSP.data[0].header),
+            tableData = Array(),
+            virtualDiv = document.createElement("div"),
+            viewPlace = document.getElementById("CSPViewPlace");
+
+        virtualDiv.classList.add("col-md-12");
+
+        for(const key of Object.keys(CSPData)){
+            let data = [{
+                value: key,
+                raw: false
+            }], job = false;
+
+            if(typeof(CSPData[key]) === "string"){
+                data.push({
+                    value: CSPData[key],
+                    raw: false
+                })
+                job = true;
+            }else if(Array.isArray(CSPData[key])){
+                let tmpDiv = document.createElement("div");
+                CSPData[key].forEach(name => tmpDiv.appendChild(builder.element.createBadge(name)));
+                data.push({
+                    value: tmpDiv,
+                    raw: true
+                })
+                job = true;
+            }
+
+            if(job) tableData.push(data);
+        }
+
+        virtualDiv.appendChild(builder.table.buildTable(
+            ["Key", "Value"],
+            tableData
+        ));
+
+        viewPlace.innerHTML = "";
+        viewPlace.appendChild(virtualDiv);
     }
 
     async getCurrentJob() {
@@ -60,9 +131,9 @@ class dashboard {
             if (this.viewData.CVECount.needsUpdate) {
                 let dataset = this.webEnvironment.data, APIResult = Object(), countedValue = Number();
                 for (const type of Object.keys(dataset)) {
-                    if(!Number.isInteger(Number(type))) {
+                    if (!Number.isInteger(Number(type))) {
                         for (const lib of Object.keys(dataset[type])) {
-                            console.log(type, lib);
+                            // console.log(type, lib);
                             APIResult = await API.communicate(`/api/cve/search/${lib}/${dataset[type][lib].version}/count`);
                             countedValue += APIResult.count;
                         }
@@ -207,7 +278,7 @@ class dashboard {
                 let viewArea = document.getElementById("viewArea");
                 viewArea.innerHTML = "";
                 for (const key of Object.keys(this.webEnvironment.data)) {
-                    if(!Number.isInteger(Number(key))) {
+                    if (!Number.isInteger(Number(key))) {
                         viewArea.appendChild(await this.buildOverviewEnvironments(key, this.webEnvironment.data[key]));
                         document.getElementById("webEnvDataPlace").appendChild(await this.buildWebEnvCard(key, this.webEnvironment.data[key]));
                     }
@@ -258,7 +329,7 @@ class dashboard {
 
     async getIcon(filename) {
         // Return icon URL from saved location
-        if(Object.keys(this.iconURL).includes(filename)) return this.iconURL[filename].url;
+        if (Object.keys(this.iconURL).includes(filename)) return this.iconURL[filename].url;
         else this.iconURL[filename] = {
             url: String()
         }

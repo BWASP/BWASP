@@ -62,6 +62,9 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link rounded-custom" id="tab-ports" data-bs-toggle="pill" data-bs-target="#pills-ports" type="button" role="tab" aria-controls="pills-ports" aria-selected="false">Ports</button>
                 </li>
+                <li class="nav-item d-none" id="CSPSelectionPill" role="presentation">
+                    <button class="nav-link rounded-custom" id="tab-CSP" data-bs-toggle="pill" data-bs-target="#pills-CSP" type="button" role="tab" aria-controls="pills-CSP" aria-selected="false">CSP</button>
+                </li>
             </ul>
             <div class="tab-content">
                 <section class="tab-pane fade show active pt-2" id="pills-overview" role="tabpanel" aria-labelledby="tab-overview">
@@ -107,6 +110,10 @@
                     <section class="mt-3" id="portViewPlace-noData">
                         <p class="text-center text-muted text-capitalize p-4">No Data</p>
                     </section>
+                </section>
+                <section class="tab-pane fade pt-2 d-none" id="pills-CSP" role="tabpanel" aria-labelledby="pills-CSP">
+                    <h5 class="text-capitalize fw-bold">CSP</h5>
+                    <section class="row mt-4" id="CSPViewPlace"></section>
                 </section>
             </div>
         </div>
