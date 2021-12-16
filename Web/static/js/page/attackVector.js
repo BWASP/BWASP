@@ -87,7 +87,7 @@ let API = await new api();
 
 // Modal toggler
 const toggleModalSize = (fixed = null) => {
-    if(typeof(fixed) === "boolean") isModalFullscreen = fixed;
+    if (typeof (fixed) === "boolean") isModalFullscreen = fixed;
     let toggleKeywords = ["remove", "add"];
     document.getElementById("togglerIcon").className = `fas fa-${(isModalFullscreen) ? "expand" : "compress"}-alt`;
     places.detailView.container.classList[toggleKeywords[Number(isModalFullscreen)]]("modal-lg");
@@ -555,6 +555,7 @@ class detailsModal {
         if (Object.keys(dataset.vector.attackVector["doubt"]).length > 0) await this.buildReferredDocs(dataset);
         await this.buildDoubt(dataset);
         await this.buildTestOptionResult(dataset);
+        await this.buildAllowMethods(dataset);
 
         // Build Packets
         await this.buildPacketRequest(dataset);
@@ -565,6 +566,20 @@ class detailsModal {
 
         // Build
         modals.detailView.show();
+    }
+
+    buildAllowMethods(dataset) {
+        let allowMethod = dataset.vector.attackVector.info.allowMethod,
+            virtualDiv = document.createElement("div");
+        virtualDiv.classList.add("d-inline-flex");
+
+        if (allowMethod.length <= 0) return;
+
+        for (const method of allowMethod) {
+            virtualDiv.appendChild(elementBuilder.createBadge(method));
+        }
+
+        this.viewParent.vectors.appendChild(pager.createAccordion("Allow Methods", virtualDiv));
     }
 
     buildTestOptionResult(dataset) {
@@ -590,7 +605,7 @@ class detailsModal {
         }
 
         // Stop if no data present
-        if(Object.keys(processedData).length <= 0) return;
+        if (Object.keys(processedData).length <= 0) return;
 
         // Create view by processed data
         for (const method of Object.keys(processedData)) {
@@ -825,7 +840,7 @@ class detailsModal {
             if (currentData.length > 1) renderData.push(currentData);
         }
 
-        if(renderData.length > 0) {
+        if (renderData.length > 0) {
             let builtTable = tableBuilder.buildTable(["Type", "Value"], renderData);
             this.viewParent.vectors.appendChild(
                 pager.createAccordion("Predictable Vulnerabilities", builtTable)
