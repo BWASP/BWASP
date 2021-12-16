@@ -2,7 +2,7 @@ from flask import g
 from flask_restx import (
     Resource, fields, Namespace
 )
-import sys, os
+import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
