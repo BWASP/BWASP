@@ -1,0 +1,17 @@
+key
+rating
+level
+item
+price
+vote
+rank
+point
+age
+score
+poll
+cost
+pay
+money
+coupon
+card
+level
