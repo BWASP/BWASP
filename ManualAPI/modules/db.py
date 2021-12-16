@@ -44,7 +44,7 @@ from html.parser import HTMLParser
 from modules import func
 from modules.attack_vector import *
 from modules.api import *
-from modules import keywordCmp
+from modules.keywordList import keywordCmp
 
 class MyHTMLParser(HTMLParser):
     def handle_comment(self, data):

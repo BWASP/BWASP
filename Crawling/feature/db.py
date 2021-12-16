@@ -8,7 +8,7 @@ import requests
 from Crawling.feature import func
 from Crawling.attack_vector import *
 from Crawling.feature.api import *
-from Crawling.feature.keywordCmp import keywordCmp
+from Crawling.feature.keywordList import keywordCmp
 
 comment = ""
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",

@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import requests, json, re, base64, sys, os
-from modules import keywordCmp
+from modules.keywordList import keywordCmp
 from urllib.parse import urlparse
 from modules import func
 #sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))

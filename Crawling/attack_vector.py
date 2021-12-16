@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from requests import api
 
 from Crawling.feature import func
-from Crawling.feature.keywordCmp import keywordCmp
+from Crawling.feature.keywordList import keywordCmp
 
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
              "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]
