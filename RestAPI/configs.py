@@ -33,6 +33,13 @@ class Developments_config(Config):
         Flask Config for Development
     """
     DEBUG = True
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(BASE_PATH, "databases/TEST_DB.db")}'
+    SQLALCHEMY_BINDS = {
+        "CVELIST": f'sqlite:///{os.path.join(BASE_PATH, "databases/CVELIST.db")}',
+        "TASK_MANAGER": f'sqlite:///{os.path.join(BASE_PATH, "databases/TASK_MANAGER.db")}',
+        "BWASP": f'sqlite:///{os.path.join(BASE_PATH, "databases/TEST_DB.db")}'
+    }
 
 
 class Production_config(Config):
