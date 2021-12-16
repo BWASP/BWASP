@@ -124,9 +124,9 @@ class inputHandler {
             (objects.maximumProcesses <= this.maximum.maximumProcesses);
         if (condition) {
             this.formData.tool.analysisLevel = objects.analysisLevel;
-            document.getElementById("overview-recursiveLevel").innerText = this.formData.tool.analysisLevel;
+            document.getElementById("overview-recursiveLevel").innerText = (Number(this.formData.tool.analysisLevel) === this.maximum.recursiveLevel) ? "Maximum" : this.formData.tool.analysisLevel;
             this.formData.maximumProcess = objects.maximumProcesses;
-            document.getElementById("overview-maximumProcess").innerText = this.formData.maximumProcess;
+            document.getElementById("overview-maximumProcess").innerText = (Number(this.formData.maximumProcess) === 0) ? "Unlimited" : this.formData.maximumProcess;
         }
         this.formData.API.google.key = objects.API.google.key;
         document.getElementById("overview-googleSearchAPI-APIKey").innerText = objects.API.google.key;
