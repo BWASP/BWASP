@@ -18,6 +18,7 @@ def create_app(config=None):
 
     # Config initialization
     from configs import Developments_config, Production_config
+    app.config['DEBUG'] = False  # NOT TESTING is False or TESTING is True
     if app.config['DEBUG']:
         config = Developments_config()
     else:
@@ -44,6 +45,17 @@ def create_app(config=None):
 
     task_db.create_all(bind='TASK_MANAGER')
 
+    if app.config['DEBUG']:
+        # Database create
+        from models.BWASP.CSPEVALUATOR import CSPEVALUATOR_DB
+        from models.BWASP.PORTS import ports
+        from models.BWASP.PACKET import packet
+        from models.BWASP.SYSTEMINFO import systeminfo
+        from models.BWASP.JOB import job
+        from models.BWASP.DOMAIN import domain
+
+        bwasp_db.create_all(bind='BWASP')
+
     @app.before_request
     def before_request():
         g.bwasp_db_obj = bwasp_db.session
@@ -66,4 +78,4 @@ def create_app(config=None):
 
 if __name__ == '__main__':
     application = create_app()
-    application.run(host="0.0.0.0", port=20102, debug=False)
+    application.run(host="0.0.0.0", port=20102, debug=True)
