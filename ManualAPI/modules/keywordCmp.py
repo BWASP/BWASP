@@ -37,7 +37,7 @@ class keywordCmp:
 
     def keywordCmp_Logic(self, tag_name_list, cmp_logic_check):
         data_list = list()
-        with open(".//ManualAPI/modules/LOGIC.txt", 'r', encoding='UTF-8') as f:
+        with open("./ManualAPI/modules/LOGIC.txt", 'r', encoding='UTF-8') as f:
             while True:
                 param = f.readline().replace("\n", "")
                 if not param:
