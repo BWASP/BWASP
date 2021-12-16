@@ -54,14 +54,11 @@ def insertPackets(req_res_packets):
 def insertCSP(csp_result):
     ### REST API Code
     # url = "http://localhost:20102/api/csp_evaluator"
-    print("gogogogogogogogogo@@@@@@")
-    print(csp_result)
     data_format = dict()
     csp_data = list()
     data_format["header"] = csp_result
     csp_data.append(data_format)
     csp_data = json.dumps(csp_data)
-    print(csp_data)
     CSPEvaluator().PostCSPEvaluator(csp_data)
 
 
@@ -189,7 +186,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                 s = requests.Session().post(attack_url, verify=False)
                                 if s.status_code >= 500 and s.status_code <= 510:
                                     attack_tmp["url"] = attack_url
-                                    attack_tmp["param"] = attack_param
+                                    attack_tmp["param"] = attack_param #attack_param 수정 필요함 2021.12.16 - dict가 아니라 list로 다 포함되도록 해야 할 듯
                                     attack_tmp["type"] = "status 500~510"
                                     attack_vector["doubt"]["SQL injection"]["detect"].append(attack_tmp)
                                     impactRate = 2
@@ -198,7 +195,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                     for check in error_msg:
                                         if check in s.text.lower():
                                             attack_tmp["url"] = attack_url
-                                            attack_tmp["param"] = attack_param
+                                            attack_tmp["param"] = attack_param #attack_param 수정 필요함 2021.12.16 - dict가 아니라 list로 다 포함되도록 해야 할 듯
                                             attack_tmp["type"] = "error message (O)"
                                             attack_vector["doubt"]["SQL injection"]["detect"].append(attack_tmp)
                                             impactRate = 2
