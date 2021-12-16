@@ -589,7 +589,7 @@ class detailsModal {
             virtualDiv = document.createElement("div");
         virtualDiv.classList.add("d-inline-flex");
 
-        if (allowMethod.length <= 0) return;
+        if (allowMethod === undefined || allowMethod.length <= 0) return;
 
         for (const method of allowMethod) {
             virtualDiv.appendChild(elementBuilder.createBadge(method));
