@@ -203,6 +203,8 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                 while True:
                     cheat_sheet = f.readline()
                     cheat_sheet = cheat_sheet.replace("\n", "")
+                    print("check1111111111111111111111111111111111")
+                    print(cheat_sheet)
 
                     # action page attack
                     for tag in form:
@@ -223,17 +225,18 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
 
                             if s.status_code >= 500 and s.status_code <= 510:
                                 attack_tmp["url"] = attack_url
-                                attack_tmp["param"] = param #param 수정 필요함 2021.12.16 - dict가 아니라 list로 다 포함되도록 해야 할 듯
+                                attack_tmp["param"] = param
                                 attack_tmp["type"] = "status 500~510"
                                 data["doubt"]["SQL injection"]["detect"].append(attack_tmp)
                                 impactRate = 2
+                                print(param)
 
 
                             else:
                                 for check in error_msg:
                                     if check in s.text.lower():
                                         attack_tmp["url"] = attack_url
-                                        attack_tmp["param"] = param #param 수정 필요함 2021.12.16 - dict가 아니라 list로 다 포함되도록 해야 할 듯
+                                        attack_tmp["param"] = param
                                         attack_tmp["type"] = "error message (O)"
                                         data["doubt"]["SQL injection"]["detect"].append(attack_tmp)
                                         impactRate = 2
