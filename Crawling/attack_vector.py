@@ -400,16 +400,11 @@ def errorPage(url):
                                                                                                       verify=False).text.lower() else False
 
 
-def directoryIndexing(target_url):
+def directoryIndexing(target_url, api_key):
     return_data = list()
-    api_key = func.apiKeyLoad()
 
-    if api_key == False:
-        print("[!] API 키가 없습니다.")
-        return return_data
-
-    GOOGLE_ENGINE_ID = api_key["google"]["google_search_api"]["engine_id"]
-    GOOGLE_SEARCH_API = api_key["google"]["google_search_api"]["api"]
+    GOOGLE_ENGINE_ID = api_key["engineId"]
+    GOOGLE_SEARCH_API = api_key["key"]
 
     target_domain = urlparse(target_url).netloc
     query = 'intitle:"Index Of" inurl:"{target_domain}"'.format(target_domain=target_domain)
@@ -420,6 +415,7 @@ def directoryIndexing(target_url):
 
     if res.status_code == 200:
         api_result = res.json()
+        
         if "items" not in api_result.keys():
             print("[*] No search data.")
             return return_data
@@ -437,22 +433,16 @@ def directoryIndexing(target_url):
     else:
         print("[!] API State_code: {}".format(res.status_code))
         print("[!] Please check API response.")
-        # print("Print response: {}".format(res.text))
+        print(res.json())
 
     return return_data
 
 
-def adminPage(target_url):
-    api_key = func.apiKeyLoad()
+def adminPage(target_url, api_key):
     return_data = list()
     target_domain = urlparse(target_url).netloc
-
-    if api_key == False:
-        print("[!] API 키가 없습니다.")
-        return return_data
-
-    GOOGLE_ENGINE_ID = api_key["google"]["google_search_api"]["engine_id"]
-    GOOGLE_SEARCH_API = api_key["google"]["google_search_api"]["api"]
+    GOOGLE_ENGINE_ID = api_key["engineId"]
+    GOOGLE_SEARCH_API = api_key["key"]
 
     f = open("./Crawling/directory.json")
     directory_list = json.load(f)
@@ -467,10 +457,11 @@ def adminPage(target_url):
         query = 'site:{DOMAIN} AND ({INURL_LIST})'.format(DOMAIN=target_domain, INURL_LIST=" | ".join(inurl_list))
         api_url = "https://customsearch.googleapis.com/customsearch/v1?cx={GOOGLE_ENGINE_ID}&key={GOOGLE_SEARCH_API}&q={QUERY}".format(
             GOOGLE_ENGINE_ID=GOOGLE_ENGINE_ID, GOOGLE_SEARCH_API=GOOGLE_SEARCH_API, QUERY=query)
-        # print(api_url)
+
         res = requests.get(api_url, verify=False)
         if res.status_code == 200:
             api_result = res.json()
+            
             if "items" not in api_result.keys():
                 print("[*] No search data.")
                 continue
@@ -482,8 +473,9 @@ def adminPage(target_url):
                         "link": item["link"]
                     })
         else:
-            print("[!] API server error.")
-            # print(res.json())
+            print("[!] API State_code: {}".format(res.status_code))
+            print("[!] Please check API response.")
+            print(res.json())
 
     return return_data
 
