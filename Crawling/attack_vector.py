@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import requests, json, re, base64
+import requests, json, re, base64, copy
 from urllib.parse import urlparse
 
 from requests import api
@@ -9,7 +9,6 @@ from Crawling.feature.keywordList import keywordCmp
 
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
              "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]
-
 
 def attackHeader(target_url):
     dict_data = requests.get(target_url, verify=False).headers
@@ -203,8 +202,6 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                 while True:
                     cheat_sheet = f.readline()
                     cheat_sheet = cheat_sheet.replace("\n", "")
-                    print("check1111111111111111111111111111111111")
-                    print(cheat_sheet)
 
                     # action page attack
                     for tag in form:
@@ -224,13 +221,12 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                             s = requests.Session().post(attack_url, data=param, verify=False)
 
                             if s.status_code >= 500 and s.status_code <= 510:
+                                #deep 복사
                                 attack_tmp["url"] = attack_url
                                 attack_tmp["param"] = param
                                 attack_tmp["type"] = "status 500~510"
-                                data["doubt"]["SQL injection"]["detect"].append(attack_tmp)
+                                data["doubt"]["SQL injection"]["detect"].append(copy.deepcopy(attack_tmp))
                                 impactRate = 2
-                                print(param)
-
 
                             else:
                                 for check in error_msg:
@@ -238,7 +234,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                                         attack_tmp["url"] = attack_url
                                         attack_tmp["param"] = param
                                         attack_tmp["type"] = "error message (O)"
-                                        data["doubt"]["SQL injection"]["detect"].append(attack_tmp)
+                                        data["doubt"]["SQL injection"]["detect"].append(copy.deepcopy(attack_tmp))
                                         impactRate = 2
                             # else:
                             #    data["doubt"]["SQL injection"].pop("detect")

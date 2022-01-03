@@ -4,6 +4,7 @@ import json
 from urllib.parse import urlparse, urlunparse
 from html.parser import HTMLParser
 import requests
+import copy
 
 from Crawling.feature import func
 from Crawling.attack_vector import *
@@ -185,19 +186,19 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                 attack_url = domain_url + url_part.path + "?" + keys + "=" + cheat_sheet
                                 s = requests.Session().post(attack_url, verify=False)
                                 if s.status_code >= 500 and s.status_code <= 510:
-                                    attack_tmp["url"] = attack_url
+                                    attack_tmp["url"] = packet["request"]["full_url"]
                                     attack_tmp["param"] = attack_param
                                     attack_tmp["type"] = "status 500~510"
-                                    attack_vector["doubt"]["SQL injection"]["detect"].append(attack_tmp)
+                                    attack_vector["doubt"]["SQL injection"]["detect"].append(copy.deepcopy(attack_tmp))
                                     impactRate = 2
 
                                 else:
                                     for check in error_msg:
                                         if check in s.text.lower():
-                                            attack_tmp["url"] = attack_url
+                                            attack_tmp["url"] = packet["request"]["full_url"]
                                             attack_tmp["param"] = attack_param
                                             attack_tmp["type"] = "error message (O)"
-                                            attack_vector["doubt"]["SQL injection"]["detect"].append(attack_tmp)
+                                            attack_vector["doubt"]["SQL injection"]["detect"].append(copy.deepcopy(attack_tmp))
                                             impactRate = 2
                                 #else:
                                 #    attack_vector["doubt"]["SQL injection"].pop("detect")
