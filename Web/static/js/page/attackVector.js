@@ -589,6 +589,7 @@ class detailsModal {
                 skeleton.title.classList.add("mb-0", "fw-bold");
                 skeleton.title.innerText = pack.title;
                 skeleton.url.href = pack.link;
+                skeleton.url.classList.add("text-break");
                 skeleton.url.innerText = pack.link;
                 skeleton.parent.append(
                     skeleton.title,
