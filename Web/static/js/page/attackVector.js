@@ -557,6 +557,7 @@ class detailsModal {
         await this.buildTestOptionResult(dataset);
         await this.buildAllowMethods(dataset);
         await this.buildComment(dataset);
+        this.buildOSINT(dataset);
 
         // Build Packets
         await this.buildPacketRequest(dataset);
@@ -569,9 +570,49 @@ class detailsModal {
         modals.detailView.show();
     }
 
+    buildOSINT(dataset){
+        let OSINTdata = {
+            index: dataset.vector.attackVector.misc["indexing"],
+            adminPage: dataset.vector.attackVector.misc["admin page"]
+        },
+            space = document.createElement("div");
+
+        const createData = (dataPackage) => {
+            let parent = document.createElement("div");
+            if(!Array.isArray(dataPackage)) return null;
+            else dataPackage.forEach(pack => {
+                let skeleton = {
+                    parent: document.createElement("div"),
+                    title: document.createElement("p"),
+                    url: document.createElement("a")
+                }
+                skeleton.title.classList.add("mb-0", "fw-bold");
+                skeleton.title.innerText = pack.title;
+                skeleton.url.href = pack.link;
+                skeleton.url.innerText = pack.link;
+                skeleton.parent.append(
+                    skeleton.title,
+                    skeleton.url
+                );
+                skeleton.parent.classList.add("mt-2");
+                parent.appendChild(skeleton.parent);
+            })
+            return parent;
+        }
+
+        [["index", "Indexing"], ["adminPage", "Admin Page"]].forEach(type => {
+            if (typeof (OSINTdata[type[0]]) !== "undefined" && OSINTdata[type[0]].length > 0) {
+                space.append(pager.createAccordion(type[1], createData(OSINTdata[type[0]])));
+            }
+        })
+
+        this.viewParent.vectors.appendChild(pager.createAccordion("OSINT", space));
+        console.log(OSINTdata);
+    }
+
     buildComment(dataset) {
         let comment = dataset.vector.comment;
-        if(comment === "") return;
+        if (comment === "") return;
 
         this.viewParent.vectors.appendChild(
             pager.createAccordion(
@@ -766,7 +807,7 @@ class detailsModal {
 
         skeleton.parent.appendChild(skeleton.documentName);
 
-        packageKeys.forEach((currentElement) => {
+        packageKeys.forEach(currentElement => {
             let localSkeleton = {
                     parent: document.createElement("div"),
                     flex: document.createElement("div"),
@@ -777,6 +818,9 @@ class detailsModal {
                     }
                 },
                 currentGuideline = guideline.detect[currentElement];
+
+            // Passing when data not exists
+            if (typeof (currentGuideline) === "undefined") return;
 
             localSkeleton.parent.classList.add("m-3", "p-3", "rounded-custom", "shadow");
             localSkeleton.flex.classList.add("d-flex", "mb-2");
