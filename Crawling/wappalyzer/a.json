@@ -1934,7 +1934,6 @@
       "Server": "(?:Apache(?:$|/([\\d.]+)|[^/-])|(?:^|\\b)HTTPD)\\;version:\\1"
     },
     "icon": "Apache.svg",
-    "implies": "log4j",
     "website": "http://apache.org"
   },
   "Apache JSPWiki": {
