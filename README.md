@@ -18,7 +18,9 @@ pip3 install -r requirements.txt
 python3 start.py
 ```
 
-click here to go [guide-en-documentation](https://github.com/BWASP/BWASP/GUIDE_en.md)
+## BWASP Tool Guide
+* [guide-ko-documentation](https://github.com/BWASP/BWASP/GUIDE_ko.md)
+* [guide-en-documentation](https://github.com/BWASP/BWASP/GUIDE_en.md)
 
 ## Roadmap
 * Add OSINT feature (find subdomains)
