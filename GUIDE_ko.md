@@ -2,20 +2,20 @@
 
 ## 자동 분석 기능
 
-![그림 1](./assets/bwaspgit1.png)
+![그림 1](./assets/bwaspgit1.PNG)
 
 [그림 1]과 같이 처음 URL에 접근하면 Automated, Manual 두 방식이 있는 것을 볼 수 있다.
 Automated를 클릭하면 자동 분석 기능을 실행할 수 있다.
 
-![그림 2](./assets/bwaspgit2.png)
+![그림 2](./assets/bwaspgit2.PNG)
 
 [그림 1]에서 자동 분석 기능을 실행하면 [그림 2]와 같이 대상 URL이 기본으로 testasp가 되어있는데 테스트하려는 사이트를 입력하고 Proceed 버튼을 클릭한다.
 
-![그림 3](./assets/bwaspgit3.png)
+![그림 3](./assets/bwaspgit3.PNG)
 
 그러면 이미 알고 있는 정보를 입력할 수 있는 화면으로 전환되는데 이미 알고 있는 정보가 있다면 해당 환경을 클릭하고 버전도 입력할 수 있다. (대상 URL에 알고 있는 정보가 없다면 바로 Proceed 버튼을 클릭한다.)
 
-![그림 4](./assets/bwaspgit4.png)
+![그림 4](./assets/bwaspgit4.PNG)
 
 [Essential]
 
@@ -35,7 +35,7 @@ Automated를 클릭하면 자동 분석 기능을 실행할 수 있다.
 
     	정리하자면 위 옵션 중에 해당하는 값이 없으면 없는 상태로 Proceed 버튼을 클릭하여 넘어가면 된다.
 
-![그림 5](./assets/bwaspgit5.png)
+![그림 5](./assets/bwaspgit5.PNG)
 
 넘어가면 최종 입력된 정보를 확인할 수 있는 페이지로 전환된다. 여기 정보를 요약하면 아래와 같다.
 
@@ -48,19 +48,19 @@ Automated를 클릭하면 자동 분석 기능을 실행할 수 있다.
 
 위 값들을 최종 확인 후 Submit 버튼을 클릭하면 바로 자동 분석 기능이 수행된다!
 
-![그림 6](./assets/bwaspgit6.png)
+![그림 6](./assets/bwaspgit6.PNG)
 
 [그림 5]에서 Submit 버튼을 누르면 실시간 알림이 출력되고 조금만 기다리면 바로 자동으로 Dashboard 화면으로 전환된다. 이후 실시간으로 가져오는 웹 환경 정보와 포트 정보 그리고 CVE 개수를 파악할 수 있다.
 
 여기서 [그림 6]에서 입력한 URL 정보를 다시 확인할 수 있으며 이후 다른 정보로 다시 분석을 진행하고 싶을 때는 왼쪽 사이드에 있는 Start 버튼을 클릭하여 [그림 2]로 돌아가서 분석을 진행할 수 있다.
 
-![그림 7](./assets/bwaspgit7.png)
+![그림 7](./assets/bwaspgit7.PNG)
 
 진행되는 중간에 Attack Vector를 실시간으로 보고 싶을 때 [그림 7]의 왼쪽 사이드에서 Attack Vectors를 클릭하면 [그림 7]과 같이 Attack Vector를 확인할 수 있다. 추가되는 실시간 데이터들은 [그림 7]에서 오른쪽 설정 아이콘을 통해 UPDATE를 하면 지속적으로 추가되는 데이터를 볼 수 있다.
 
 그리고 각 분석된 정보 레코드를 클릭하면 자세한 정보를 모달로 확인할 수 있다.
 
-![그림 8](./assets/bwaspgit8.png)
+![그림 8](./assets/bwaspgit8.PNG)
 
 모달에서는 아래와 같은 정보를 확인할 수 있다.
 1.	레코드에서 보던 영향도, 예측된 취약점 항목 등 기본 정보
@@ -72,7 +72,7 @@ Automated를 클릭하면 자동 분석 기능을 실행할 수 있다.
 
 디자인의 경우 현재 업데이트되어 [그림 9]보다 더 깔끔하게 확인할 수 있다.
 
-![그림 9](./assets/bwaspgit9.png)
+![그림 9](./assets/bwaspgit9.PNG)
 
 [그림 7]에서 말한 설정 아이콘(톱니바퀴)을 클릭하면 나오는 화면이 [그림 9]이다.
 
@@ -82,50 +82,50 @@ Automated를 클릭하면 자동 분석 기능을 실행할 수 있다.
 
 ## 수동 분석 기능
 
-![그림 10](./assets/crxgit0.png)
+![그림 10](./assets/crxgit0.PNG)
 
 [그림 10]과 같이 BWASP Companion 크롬 확장 프로그램을 clone으로 설치한다.
 
-![그림 11](./assets/crxgit1.png)
+![그림 11](./assets/crxgit1.PNG)
 
 Chrome Extension을 등록하기 위해 chrome://extensions에 접근하여 확장 프로그램 로드 버튼을 누른다.
 
-![그림 12](./assets/crxgit2.png)
+![그림 12](./assets/crxgit2.PNG)
 
 Git으로 받은 크롬 확장 프로그램 폴더를 선택한다.
 
-![그림 13](./assets/crxgit3.png)
+![그림 13](./assets/crxgit3.PNG)
 
 이후 [그림 12]에서 로드된 확장 프로그램을 활성화한다.
 
-![그림 14](./assets/bwaspgit1.png)
+![그림 14](./assets/bwaspgit1.PNG)
 
 수동 분석 기능과 자동 분석 기능이 같은 URL에 같은 DB를 사용해야 하기 때문에 시작 방식은 우선 자동으로 시작을 한 상태여야 수동도 같은 DB를 활용할 수 있다.
 
 [그림 14]와 같이 오른쪽에 있는 Manual 버튼은 향후 Chrome Extension을 Chrome WebStore에 올려서 해당 링크로 설치할 수 있는 안내로 활용될 버튼이다.
 
-![그림 15](./assets/crxgit4.png)
+![그림 15](./assets/crxgit4.PNG)
 
 로그인, 인증 등 절차를 거친 후 추가 분석을 진행할 수 있도록 크롬 확장 프로그램을 이용할 수 있다. 위와 같은 버튼을 클릭하면 아래와 같은 결과를 볼 수 있다.
 
-![그림 16](./assets/crxgit5.png)
+![그림 16](./assets/crxgit5.PNG)
 
 시작하면 디버깅 표시가 나온다면 정상적으로 진행된 것이다. 해당 페이지에 대한 정보를 받기 위해 시작 버튼 후 새로고침(F5)를 한 번 진행해야 한다.
 
-![그림 17](./assets/crxgit6.png)
+![그림 17](./assets/crxgit6.PNG)
 
 그리고 Python Flask Attack Vector를 거쳐서 정보를 전달받고 확인할 수 있다.
 
-![그림 18](./assets/crxgit7.png)
+![그림 18](./assets/crxgit7.PNG)
 
 리피터 사용 방법도 Analysis와 동일하게 실행 버튼을 누른 뒤 새로고침(F5)를 진행하면 된다.
 
-![그림 19](./assets/crxgit8.png)
+![그림 19](./assets/crxgit8.PNG)
 
 편의 기능을 추가로 제공하고자 Decode와 Encode가 포함된 Dencode 사이트를 iframe 형태로 제공한다.
 
 위 사이트를 통해 추가로 인코딩 디코딩 관련 문제를 빠르게 해당 도구를 활용하여 해결할 수 있다.
 
-![그림 20](./assets/crxgit9.png)
+![그림 20](./assets/crxgit9.PNG)
 
 공격 벡터를 모아보던 곳으로 다시 오면 크롬 확장 프로그램으로 진행했던 결과들도 같이 볼 수 있다. 누르게 되면 위에서 보던 모달 표기와 같이 상세하게 분석된 내용을 확인할 수 있다.

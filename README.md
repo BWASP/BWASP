@@ -19,8 +19,8 @@ python3 start.py
 ```
 
 ## BWASP Tool Guide
-* [guide-ko-documentation](https://github.com/BWASP/BWASP/GUIDE_ko.md)
-* [guide-en-documentation](https://github.com/BWASP/BWASP/GUIDE_en.md)
+* [guide-ko-documentation](./GUIDE_ko.md)
+* [guide-en-documentation](./GUIDE_en.md)
 
 ## Roadmap
 * Add OSINT feature (find subdomains)
@@ -34,9 +34,6 @@ python3 start.py
 * Joomyeong Lee ([@PecentZero](https://github.com/PecentZero))
 * PL: Jiheon Choi ([@jiheon-dev](https://github.com/jiheon-dev))
 * Mentor: Gangseok Lee ([@codeengn](https://github.com/codeengn)), Sehan Park ([@combab0](https://github.com/combab0))
-
-## Contact mail
-* bwasptop9@gmail.com
 
 ## Acknowledgement
 This work was supported by Korea Information Technology Research Institute (KITRI) Best of the Best (BoB) Program 10th vulnerability analysis track.
