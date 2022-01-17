@@ -8,7 +8,7 @@ The BWASP Project supports:
 * Find Attack vector automatically.
 (e.g. SQL Injection, Cross-site Scripting)
 * Detect website technology.
-* Log4J vulnerability scan (partically supports java language)
+* Log4J vulnerability scan (Partially supports java language)
 * HTTP REST API
 
 ## Getting started
