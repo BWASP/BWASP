@@ -247,6 +247,7 @@ def isOpenRedirection(visit_url, current_url, target_url):
 def initSelenium():
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("lang=ko_KR")
+    chrome_options.add_argument("--headless")
     chrome_options.add_experimental_option("prefs", {
         "download_restrictions": 3
     })
