@@ -131,7 +131,7 @@ As for how to use the repeater, press the run button in the same way as Analysis
 
 ![Figure-19](./assets/crxgit8.PNG)
 
-In order to provide additional convenience functions, the Dencode site including Decode and Encode is provided in the form of an ifframe.
+In order to provide additional convenience functions, the Dencode site including Decode and Encode is provided in the form of an iframe.
 
 Through the above site, additional problems related to encoding decoding can be quickly solved using the tool.
 
