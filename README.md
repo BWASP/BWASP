@@ -25,6 +25,9 @@ python3 start.py
 ## Roadmap
 * Add OSINT feature (find subdomains)
 
+## Reference
+Web Infra Environment Analysis: wappalyzer(https://github.com/AliasIO/wappalyzer)
+
 ## Contributor
 * Dohun Koo ([@dohunny](https://github.com/dohunny))
 * Sanghyeon Lee ([@isanghyeon](https://github.como/isanghyeon))
