@@ -1,6 +1,6 @@
 # BWASP
 
-The BoB Web Application Security Project (BWASP) is an open-source, analysis tool to support offensive hackers, attackers.
+The BoB Web Application Security Project (BWASP) is an open-source, analysis tool to support for Web Vulnerability Manual Analysis hackers.
 
 BWASP supports performing automated analysis and manual analysis.
 
