@@ -1,8 +1,6 @@
 from bs4 import BeautifulSoup
 import requests, json, re, base64, copy
-from urllib.parse import urlparse
-
-from requests import api
+from urllib.parse import urlparse, unquote
 
 from Crawling.feature import func
 from Crawling.feature.keywordList import keywordCmp
@@ -472,12 +470,12 @@ def SSRFCheck(packet: dict) -> bool:
     if packet["request"]["method"] == "GET":
         queries = urlparse(packet["request"]["full_url"]).query.split("&")
         for data in queries:
-            datas = data.split("=")
+            param = data.split("=")
 
-            if len(datas) != 2:
-                continue
+            if len(param) != 2:
+                continue  
 
-            if func.isStringAnUrl(datas[1]):
+            if func.isStringAnUrl(unquote(param[1])):
                 return True
 
     elif packet["request"]["method"] == "POST":
