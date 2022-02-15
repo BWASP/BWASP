@@ -1007,8 +1007,7 @@ class detailsModal {
         modalDataElement.impact.innerText = impactRate[dataset.vector.impactRate][1];
 
         // URL
-        modalDataElement.url.url.innerText = dataset.vector.URL;
-        modalDataElement.url.uri.innerText = dataset.vector.URI;
+        modalDataElement.url.url.innerText = dataset.vector.URL + dataset.vector.URI;
         modalDataElement.url.method.innerText = dataset.packet.requestType.toUpperCase();
 
         // Actions

@@ -536,6 +536,7 @@ window.onload = () => {
         try{
             await render.updateView();
         } catch (e) {
+            document.getElementById("currentJobStatus").innerText = "Standby";
             console.error("[Dashboard Handler] Data not received.");
         }
     }, 3000);
