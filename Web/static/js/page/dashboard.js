@@ -3,7 +3,19 @@ import {API as api, elementBuilder as EBuilder, tableBuilder as TBuilder, Cookie
 
 // Define API Endpoints
 const APIEndpoints = {
-    webEnvironments: "/api/systeminfo"
+    webEnvironments: "/api/systeminfo",
+    job: "/api/job",
+    count: {
+        packet: {
+            auto: "/api/packet/automation/count",
+            manual: "/api/packet/manual/count",
+        },
+        domain: "/api/domain/count",
+        port: "/api/ports/count"
+    },
+    searchCVE: "/api/cve/search",
+    ports: "/api/ports",
+    CSP: "/api/cspevaluator"
 }
 
 let API = await new api();
@@ -60,7 +72,7 @@ class dashboard {
     }
 
     async getCSP() {
-        this.CSP.data = await API.communicate("/api/cspevaluator");
+        this.CSP.data = await API.communicate(APIEndpoints.CSP);
     }
 
     updateCSPView() {
@@ -107,7 +119,7 @@ class dashboard {
     }
 
     async getCurrentJob() {
-        this.job.allJobs = await API.communicate("/api/job");
+        this.job.allJobs = await API.communicate(APIEndpoints.job);
     }
 
     async updatePacketCount() {
@@ -115,8 +127,8 @@ class dashboard {
         if (this.job.allJobs.length > 0) {
             try {
                 let count = {
-                    auto: await API.communicate("/api/packet/automation/count"),
-                    manual: await API.communicate("/api/packet/manual/count")
+                    auto: await API.communicate(APIEndpoints.count.packet.auto),
+                    manual: await API.communicate(APIEndpoints.count.packet.manual)
                 };
                 currentDOM.innerText = count.auto.count + count.manual.count;
             } catch (e) {
@@ -134,7 +146,7 @@ class dashboard {
                     if (!Number.isInteger(Number(type))) {
                         for (const lib of Object.keys(dataset[type])) {
                             // console.log(type, lib);
-                            APIResult = await API.communicate(`/api/cve/search/${lib}/${dataset[type][lib].version}/count`);
+                            APIResult = await API.communicate(`${APIEndpoints.searchCVE}/${lib}/${dataset[type][lib].version}/count`);
                             countedValue += APIResult.count;
                         }
                     }
@@ -155,7 +167,7 @@ class dashboard {
         if (this.job.allJobs.length > 0) {
             let count = Object();
             try {
-                count = await API.communicate("/api/domain/count");
+                count = await API.communicate(APIEndpoints.count.domain);
             } catch (e) {
                 return console.error(e);
             }
@@ -175,8 +187,8 @@ class dashboard {
 
         if (this.job.allJobs.length > 0) {
             let portData = {
-                count: await API.communicate("/api/ports/count"),
-                data: await API.communicate("/api/ports")
+                count: await API.communicate(APIEndpoints.count.port),
+                data: await API.communicate(APIEndpoints.ports)
             }
 
             // Set port count
@@ -452,7 +464,7 @@ class dashboard {
 
                 let cve = Object();
                 try {
-                    let baseAPIEndpoint = `/api/cve/search/${key}/${data.version}`;
+                    let baseAPIEndpoint = `${APIEndpoints.searchCVE}/${key}/${data.version}`;
                     cve = {
                         count: await API.communicate(`${baseAPIEndpoint}/count`),
                         data: await API.communicate(baseAPIEndpoint)
@@ -521,6 +533,10 @@ window.onload = () => {
     let render = new dashboard();
     render.updateView();
     setInterval(async () => {
-        await render.updateView();
+        try{
+            await render.updateView();
+        } catch (e) {
+            console.error("[Dashboard Handler] Data not received.");
+        }
     }, 3000);
 }
