@@ -37,7 +37,7 @@ Web Infra Environment Analysis: wappalyzer(https://github.com/AliasIO/wappalyzer
 
 ## Contributor
 * Dohun Koo ([@dohunny](https://github.com/dohunny))
-* Sanghyeon Lee ([@isanghyeon](https://github.como/isanghyeon))
+* Sanghyeon Lee ([@isanghyeon](https://github.com/isanghyeon))
 * Joowon Kim ([@arrester](https://github.com/arrester))
 * Jongmin Kim ([@Universe1122](https://github.com/Universe1122))
 * Joonyoung Jeong ([@jeongjy0317](https://github.com/jeongjy0317))
