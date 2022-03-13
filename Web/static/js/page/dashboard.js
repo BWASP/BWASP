@@ -507,7 +507,6 @@ class dashboard {
                     views.viewPlace.appendChild(CVESkeleton.parent);
                 });
 
-                // alert(`Hello! I am ${key}`);
                 console.log(cve);
             });
 
@@ -527,17 +526,19 @@ class dashboard {
         skeleton.parent.append(skeleton.type, skeleton.childBox);
         return skeleton.parent;
     }
-}
 
-window.onload = () => {
-    let render = new dashboard();
-    render.updateView();
-    setInterval(async () => {
+    async combinedUpdater() {
         try{
-            await render.updateView();
+            await this.updateView();
         } catch (e) {
             document.getElementById("currentJobStatus").innerText = "Standby";
             console.error("[Dashboard Handler] Data not received.");
         }
-    }, 3000);
+    }
+}
+
+window.onload = () => {
+    let render = new dashboard();
+    render.combinedUpdater();
+    setInterval(async () => render.combinedUpdater(), 3000);
 }
