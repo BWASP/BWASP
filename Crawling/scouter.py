@@ -84,7 +84,7 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     analyst.start(DETECT_LIST, LOCK, input_url, req_res_packets, cur_page_links, current_url, packet_indexes, options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
-    db.insertDomains(req_res_packets, cookie_result, packet_indexes , input_url, ANALYSIS_DATA) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
+    db.insertDomains(req_res_packets, cookie_result, packet_indexes , input_url, ANALYSIS_DATA,options["cookie"]) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
     db.updateWebInfo(DETECT_LIST[0])
     
     return 1
@@ -105,6 +105,13 @@ def visit(driver, url, depth, options):
         pass
 
     if START_OPTIONS["check"]:
+        options["cookie"]="_ga=GA1.2.665683561.1657193256; _gid=GA1.2.1773806678.1657193256; ASP.NET_SessionId=wi2sujtyruny5fdaxatwp5pr; _gat_gtag_UA_103021028_2=1"
+        if "=" in options["cookie"]:
+            for each_cookie in options["cookie"].split(";"):
+                split_point = each_cookie.index("=")
+                if split_point:
+                    driver.add_cookie({'name': each_cookie[0:split_point].lstrip() , 'value': each_cookie[split_point+1:]})
+        driver.refresh()
         ANALYSIS_DATA["directory_indexing"] = directoryIndexing(driver.current_url, options["API"]["google"])
         ANALYSIS_DATA["admin_page"] = adminPage(driver.current_url, options["API"]["google"])
         ANALYSIS_DATA["http_method"], ANALYSIS_DATA["infor_vector"] = attackHeader(driver.current_url)
