@@ -105,7 +105,8 @@ def visit(driver, url, depth, options):
         pass
 
     if START_OPTIONS["check"]:
-        options["cookie"]="_ga=GA1.2.665683561.1657193256; _gid=GA1.2.1773806678.1657193256; ASP.NET_SessionId=wi2sujtyruny5fdaxatwp5pr; _gat_gtag_UA_103021028_2=1"
+        #keep session with cookie 
+        options["cookie"]="" #  cookie format is same with document.cookie(javascript command , remove http_only option)
         if "=" in options["cookie"]:
             for each_cookie in options["cookie"].split(";"):
                 split_point = each_cookie.index("=")
