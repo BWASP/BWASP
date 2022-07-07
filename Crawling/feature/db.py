@@ -15,6 +15,8 @@ comment = ""
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
              "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]
 
+cookie = dict()
+
 class MyHTMLParser(HTMLParser):
     def handle_comment(self, data):
         global comment
@@ -66,7 +68,7 @@ def insertCSP(csp_result):
 # REST API: 도훈 Domains
 # TODO
 # 중복된 url 이 있을 경우, 데이터를 넣어야 하는가?
-def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, analysis_data):
+def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, analysis_data, session):
     cmp_sql_check = False
     cmp_sql_xss_check = False
     cmp_logic_check = False
@@ -76,6 +78,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
     # db_connect, db_table = connect("domain")
 
     global error_msg
+    global cookie
 
     data = []
 
@@ -173,6 +176,15 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
 
                 # ~~~~~~~~~~~~~attack option
                 if analysis_data["testPayloads"] == True:
+                    # session cookie setting code
+                    session = session.split('; ')
+                    for i in range(len(session)):
+                        session_key = session[i].split('=')[0]
+                        session_value = session[i].split('=')[1]
+                        cookie[session_key] = session_value
+                    
+                    print(cookie)
+
                     # cheat sheet open
                     with open("./cheat_sheet.txt", 'r', encoding='UTF-8') as f:
                         while True:
@@ -184,7 +196,7 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                 attack_param = dict()
                                 attack_param[keys] = cheat_sheet
                                 attack_url = domain_url + url_part.path + "?" + keys + "=" + cheat_sheet
-                                s = requests.Session().post(attack_url, verify=False)
+                                s = requests.Session().post(attack_url, verify=False, cookies=cookie)
                                 if s.status_code >= 500 and s.status_code <= 510:
                                     attack_tmp["url"] = packet["request"]["full_url"]
                                     attack_tmp["param"] = attack_param
