@@ -3,6 +3,7 @@ import re
 from urllib.parse import urlparse, urlunparse
 from bs4 import BeautifulSoup
 from multiprocessing import Lock
+import os
 
 from Crawling.feature import func
 
@@ -460,3 +461,31 @@ def detectVersion(regex, regex_results, type="search"):
         version = 0
         
     return version
+
+
+def getSubdomain(target: str) -> list:
+    return_data = list()
+
+    try:
+        netloc = urlparse(target).netloc
+        netloc = re.sub("`|$|{|;", "", netloc, flags=re.MULTILINE)
+
+        if not netloc:
+            return return_data
+        
+        if netloc.find("www") == 0:
+            netloc = netloc.replace("www.", "")
+        
+        data = os.popen(f"./assetfinder -subs-only {netloc}").read()
+        data = list(set(data.split("\n")))
+        
+        for d in data:
+            if len(d) == 0 or d == netloc:
+                continue
+            return_data.append(d)
+
+        return return_data
+    
+    except Exception as e:
+        print("[!] Get Subdomain Error: ", e)
+        return return_data
