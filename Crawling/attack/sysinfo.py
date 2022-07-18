@@ -4,6 +4,7 @@ from urllib.parse import urlparse, urlunparse
 from bs4 import BeautifulSoup
 from multiprocessing import Lock
 import os
+import platform
 
 from Crawling.feature import func
 
@@ -463,29 +464,84 @@ def detectVersion(regex, regex_results, type="search"):
     return version
 
 
-def getSubdomain(target: str) -> list:
-    return_data = list()
+def getSubdomain(target: str) -> dict:
+    """ Get subdoamin list from target.
+
+    You can call this function like the code below.
+    `getSubdomain('http://blog.naver.com')` or `getSubdomain('blog.naver.com/this/is/path')`.
+    Return dictionary type including subdomain list or error.
+    - success: {
+        "result" : "success",
+        "data" : ["m.blog.naver.com", "upload.blog.naver.com", ...]
+    }
+    - error: {
+        "result" : "error",
+        "message" : "[Error info] [Error detail]"
+    }
+    
+    Args:
+        - target: Value of target's url or host.
+    Returns:
+        - Return dict type data.
+    """
+
+    def run(binary_name: str, netloc: str) -> dict:
+        try:
+            data = os.popen(f"./assets/{binary_name} -subs-only {netloc}").read()
+            data = list(set(data.split("\n")))
+            result = list()
+
+            for d in data:
+                if len(d) == 0 or d == netloc:
+                    continue
+                result.append(d)
+
+            return {
+                "result" : "success",
+                "data" : result
+            }
+
+        except Exception as e:
+            return {
+                "result" : "error",
+                "message" : e
+            }
+
 
     try:
         netloc = urlparse(target).netloc
-        netloc = re.sub("`|$|{|;", "", netloc, flags=re.MULTILINE)
+        netloc = re.sub("`|\$|{|}|;|\||&|%", "", netloc, flags=re.MULTILINE)
+        os_info = platform.system()
+        result = dict()
 
-        if not netloc:
-            return return_data
+        if not netloc or len(netloc) == 0:
+            return {
+                "result" : "error",
+                "message" : "Host를 다시 확인해 주세요."
+            }
         
-        if netloc.find("www") == 0:
-            netloc = netloc.replace("www.", "")
+        if os_info == "Linux":
+            result = run("assetfinder", netloc)
+        elif os_info == "Windows":
+            result = run("assetfinder.exe", netloc)
+        else:
+            return {
+                "result" : "error",
+                "message" : "해당 기능은 Linux, Windows에서만 제공됩니다."
+            }
         
-        data = os.popen(f"./assetfinder -subs-only {netloc}").read()
-        data = list(set(data.split("\n")))
-        
-        for d in data:
-            if len(d) == 0 or d == netloc:
-                continue
-            return_data.append(d)
+        if result["result"] == "success":
+            return result
+        else:
+            return {
+                "result" : "error",
+                "message" : "subdomain 기능에서 에러가 발생했습니다. " + str(result["message"])
+            }
 
-        return return_data
     
     except Exception as e:
         print("[!] Get Subdomain Error: ", e)
-        return return_data
+        return {
+            "result" : "error",
+            "message" : "예기치 못한 에러가 발생했습니다. " + str(e)
+        }
