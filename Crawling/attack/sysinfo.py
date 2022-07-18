@@ -485,9 +485,9 @@ def getSubdomain(target: str) -> dict:
         - Return dict type data.
     """
 
-    def run(binary_name: str, netloc: str) -> dict:
+    def run(binary_path: str, netloc: str) -> dict:
         try:
-            data = os.popen(f"./assets/{binary_name} -subs-only {netloc}").read()
+            data = os.popen(f"{binary_path} -subs-only {netloc}").read()
             data = list(set(data.split("\n")))
             result = list()
 
@@ -521,9 +521,9 @@ def getSubdomain(target: str) -> dict:
             }
         
         if os_info == "Linux":
-            result = run("assetfinder", netloc)
+            result = run("./assets/assetfinder", netloc)
         elif os_info == "Windows":
-            result = run("assetfinder.exe", netloc)
+            result = run(".\\assets\\assetfinder.exe", netloc)
         else:
             return {
                 "result" : "error",
