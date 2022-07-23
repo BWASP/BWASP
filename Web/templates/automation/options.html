@@ -92,9 +92,9 @@
                     </section>
                     <section class="h-100 w-100 separatedTab d-none" id="tab-2">
                         <section class="w-100 row">
-                            <h3 class="col-md-12 my-3 text-success fw-bold">Essential</h3>
-                            <div class="col-md-12 my-3">
-                                <div class="form-group my-3">
+                            <h3 class="col-md-12 mt-3 mb-3 text-success fw-bold">Essential</h3>
+                            <div class="col-md-12">
+                                <div class="form-group">
                                     <div class="d-flex">
                                         <label for="input-recursiveLevel">Analysis recursive level</label>
                                         <p class="mb-0 ms-auto small text-muted">Max: <span id="maximumRecursiveLevel">NaN</span>
@@ -110,8 +110,8 @@
                                         analysis.</p>
                                 </div>
                             </div>
-                            <div class="col-md-12 my-3">
-                                <div class="form-group my-3">
+                            <div class="col-md-12 mt-3">
+                                <div class="form-group">
                                     <div class="d-flex">
                                         <label for="input-maximumProcesses">Maximum Processes</label>
                                         <p class="mb-0 ms-auto small text-muted">Max: <span id="maximumProcessesView">NaN</span>
@@ -130,10 +130,10 @@
                             <hr class="col-md-12 mt-4 mb-4">
                         </section>
                         <section class="row">
-                            <div class="col-md-12 my-3 d-flex align-items-center" id="optionsHead">
+                            <div class="col-md-12 mt-3 d-flex align-items-center" id="optionsHead">
                                 <h3 class="text-primary fw-bold mb-0">Optional</h3>
                             </div>
-                            <section class="my-3">
+                            <section class="mt-3">
                                 <section class="d-flex align-items-center mb-3">
                                     <h5 class="fw-bold mb-0">Options</h5>
                                     <p class="text-muted small ms-3 mt-1 mb-0">Select the options that can analyze more
@@ -141,11 +141,26 @@
                                 </section>
                                 <section class="row" id="optionsViewPlace"></section>
                             </section>
-                            <section class="my-3">
+                            <section class="mt-3">
+                                <section class="d-flex align-items-center mb-3">
+                                    <h5 class="fw-bold mb-0">Sessions</h5>
+                                    <p class="text-muted small ms-3 mt-1 mb-0">Input session information</p>
+                                </section>
+                                <section class="row" id="sessionForm">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="session-id"
+                                                   placeholder='{"session-id": "id", }'>
+                                            <label for="session-id">User session id</label>
+                                        </div>
+                                    </div>
+                                </section>
+                            </section>
+                            <section class="mt-3">
                                 <section class="d-flex align-items-center mb-3">
                                     <h5 class="fw-bold mb-0">Google Search API</h5>
                                     <p class="text-muted small ms-3 mt-1 mb-0">Google Search API will used to analyze
-                                        for TI & OWASP-Based analysis.</p>
+                                        for OWASP-Based analysis.</p>
                                 </section>
                                 <section class="row" id="googleSearchAPIForm">
                                     <div class="col-md-6">
@@ -168,23 +183,41 @@
                     </section>
                     <section class="h-100 w-100 separatedTab d-none" id="tab-3">
                         <section class="w-100">
-                            <section class="pb-4 pt-2">
-                                <p class="my-1">BWASP will start analysis to</p>
-                                <h2 id="overview-targetURL" class="fw-bolder">undefined</h2>
-                                <p class="my-1">for
-                                    <span class="text-primary fw-bold" id="overview-recursiveLevel">NaN</span> levels with
-                                    up to <span class="text-primary fw-bold" id="overview-maximumProcess">NaN</span> processes.
-                                </p>
+                            <section>
+                                <h5 class="text-muted small">Target URL</h5>
+                                <p id="overview-targetURL">undefined</p>
+                                <hr>
                             </section>
-                            <section class="py-3 border-bottom border-top">
+                            <section>
+                                <div class="d-flex mb-2">
+                                    <p class="text-muted small mb-0">Analysis recursive level: </p>
+                                    <p class="small text-primary ms-2 mb-0" id="overview-recursiveLevel">NaN</p>
+                                </div>
+                                <div class="d-flex">
+                                    <p class="text-muted small mb-0">Maximum Processes: </p>
+                                    <p class="small text-primary ms-2 mb-0" id="overview-maximumProcess">NaN</p>
+                                </div>
+                                <hr>
+                            </section>
+                            <section>
                                 <h5 class="text-muted small">Environmental Information</h5>
                                 <section class="d-flex" id="overview-environment"></section>
+                                <hr>
                             </section>
-                            <section class="py-3 border-bottom">
+                            <section>
                                 <h5 class="text-muted small">Selected Options</h5>
                                 <section class="d-flex" id="overview-options"></section>
+                                <hr>
                             </section>
-                            <section class="py-3 border-bottom">
+                            <section>
+                                <p class="text-muted small mb-3">Session ID</p>
+                                <div class="d-flex mb-2">
+                                    <p class="text-muted small mb-0">Session Info: </p>
+                                    <p class="small text-primary ms-2 mb-0" id="overview-session-ID">undefined</p>
+                                </div>
+                                <hr>
+                            </section>
+                            <section>
                                 <p class="text-muted small mb-3">Google Search API</p>
                                 <div class="d-flex mb-2">
                                     <p class="text-muted small mb-0">API Key: </p>

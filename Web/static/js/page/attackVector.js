@@ -1007,8 +1007,8 @@ class detailsModal {
         modalDataElement.impact.innerText = impactRate[dataset.vector.impactRate][1];
 
         // URL
-        modalDataElement.url.url.innerText = dataset.vector.URL + dataset.vector.URI;
-        modalDataElement.url.url.href = dataset.vector.URL + dataset.vector.URI;
+        modalDataElement.url.url.innerText = dataset.vector.URL;
+        modalDataElement.url.uri.innerText = dataset.vector.URI;
         modalDataElement.url.method.innerText = dataset.packet.requestType.toUpperCase();
 
         // Actions
@@ -1019,7 +1019,7 @@ class detailsModal {
                 let localSkeleton = {
                     parent: document.createElement("p"),
                     method: document.createElement("span"),
-                    target: document.createElement("a")
+                    target: document.createElement("span")
                 }
                 localSkeleton.method.classList.add("badge", "text-uppercase", "me-2", "mb-1",
                     (typeof (coloring[dataset.vector.action_URL_Type[currentRow].toLowerCase()]) === "undefined")
@@ -1028,7 +1028,6 @@ class detailsModal {
                 localSkeleton.target.classList.add("text-break");
 
                 localSkeleton.method.innerText = dataset.vector.action_URL_Type[currentRow];
-                localSkeleton.target.href = dataset.vector.action_URL_Type[currentRow];
                 localSkeleton.target.innerText = dataset.vector.action_URL[currentRow];
                 localSkeleton.parent.append(
                     localSkeleton.method,
