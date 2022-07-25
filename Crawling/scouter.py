@@ -115,7 +115,7 @@ def visit(driver, url, depth, options):
         driver.refresh()
         ANALYSIS_DATA["directory_indexing"] = directoryIndexing(driver.current_url, options["API"]["google"])
         ANALYSIS_DATA["admin_page"] = adminPage(driver.current_url, options["API"]["google"])
-        ANALYSIS_DATA["http_method"], ANALYSIS_DATA["infor_vector"] = attackHeader(driver.current_url)
+        ANALYSIS_DATA["http_method"], ANALYSIS_DATA["infor_vector"] = attackHeader(driver.current_url, options["Session"])
         ANALYSIS_DATA["robots_result"] = robotsTxt(driver.current_url)
         ANALYSIS_DATA["error_result"] = errorPage(driver.current_url)
         db.postWebInfo(driver.current_url)

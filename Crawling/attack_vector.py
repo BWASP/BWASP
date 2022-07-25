@@ -10,7 +10,13 @@ error_msg = ["error in your sql", "server error in", "fatal error", "database en
 
 cookie = dict()
 
-def attackHeader(target_url):
+def attackHeader(target_url, session):
+    session = session.split('; ')
+    for i in range(len(session)):
+        session_key = session[i].split('=')[0]
+        session_value = session[i].split('=')[1]
+        cookie[session_key] = session_value
+    
     dict_data = requests.get(target_url, verify=False, cookies=cookie).headers
     infor_data = ""
     infor_vector = ""
@@ -204,8 +210,6 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                 session_key = session[i].split('=')[0]
                 session_value = session[i].split('=')[1]
                 cookie[session_key] = session_value
-            
-            print(cookie)
 
             # cheat sheet open
             with open("./cheat_sheet.txt", 'r', encoding='UTF-8') as f:
