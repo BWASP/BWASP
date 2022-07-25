@@ -84,7 +84,7 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     analyst.start(DETECT_LIST, LOCK, input_url, req_res_packets, cur_page_links, current_url, packet_indexes, options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
-    db.insertDomains(req_res_packets, cookie_result, packet_indexes , input_url, ANALYSIS_DATA,options["cookie"]) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
+    db.insertDomains(req_res_packets, cookie_result, packet_indexes , input_url, ANALYSIS_DATA,options["Session"]) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
     db.updateWebInfo(DETECT_LIST[0])
     
     return 1
@@ -106,12 +106,12 @@ def visit(driver, url, depth, options):
 
     if START_OPTIONS["check"]:
         #keep session with cookie 
-        options["cookie"]="" #  cookie format is same with document.cookie(javascript command , remove http_only option)
-        if "=" in options["cookie"]:
-            for each_cookie in options["cookie"].split(";"):
-                split_point = each_cookie.index("=")
+        #options["cookie"]=""   cookie format is same with document.cookie(javascript command , remove http_only option)
+        if "=" in options["Session"]:
+            for each_session in options["Session"].split(";"):
+                split_point = each_session.index("=")
                 if split_point:
-                    driver.add_cookie({'name': each_cookie[0:split_point].lstrip() , 'value': each_cookie[split_point+1:]})
+                    driver.add_cookie({'name': each_session[0:split_point].lstrip() , 'value': each_session[split_point+1:]})
         driver.refresh()
         ANALYSIS_DATA["directory_indexing"] = directoryIndexing(driver.current_url, options["API"]["google"])
         ANALYSIS_DATA["admin_page"] = adminPage(driver.current_url, options["API"]["google"])
