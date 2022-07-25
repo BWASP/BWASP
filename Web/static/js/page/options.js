@@ -1,6 +1,9 @@
 // Get modules
 import {API as api, createKey, createToast} from '../jHelper.js';
 
+let API = new api(),
+    requestData = {tool: Object(), info: Object(), target: Object()};
+
 const patterns = {
         targetURL: /^http[s]?:///
     },
@@ -8,8 +11,7 @@ const patterns = {
         keyboard: false,
         backdrop: 'static',
         show: true
-    }),
-    API = new api();
+    });
 
 
 class inputHandler {
@@ -27,6 +29,7 @@ class inputHandler {
             },
             info: Array(),
             target: String(),
+            Session: String(),
             API: {
                 google: {
                     key: String(),
@@ -42,6 +45,7 @@ class inputHandler {
     }
 
     pagingHandler(page) {
+        console.info(JSON.stringify(this.formData));
         switch (page) {
             case 0:
                 return this.validateURL({
@@ -109,6 +113,7 @@ class inputHandler {
         let objects = {
             analysisLevel: Number(document.getElementById("input-recursiveLevel").value),
             maximumProcesses: Number(document.getElementById("input-maximumProcesses").value),
+            Session: String(document.getElementById("session-id").value),
             API: {
                 google: {
                     key: document.getElementById("googleSearchAPI-APIKey").value,
@@ -116,6 +121,7 @@ class inputHandler {
                 }
             }
         };
+
         let condition =
             (objects.analysisLevel <= this.maximum.recursiveLevel) &&
             (objects.maximumProcesses <= this.maximum.maximumProcesses);
@@ -125,6 +131,8 @@ class inputHandler {
             this.formData.maximumProcess = objects.maximumProcesses;
             document.getElementById("overview-maximumProcess").innerText = (Number(this.formData.maximumProcess) === 0) ? "Unlimited" : this.formData.maximumProcess;
         }
+        this.formData.Session = objects.Session;
+        document.getElementById("overview-session-ID").innerText = objects.Session;
         this.formData.API.google.key = objects.API.google.key;
         document.getElementById("overview-googleSearchAPI-APIKey").innerText = objects.API.google.key;
         this.formData.API.google.engineId = objects.API.google.engineId;
@@ -472,7 +480,7 @@ class optionFrontHandler {
             currentElementID["version"] = `${currentElementID}-version`;
 
             // Set Attributes
-            localSkeleton.parent.classList.add("col-md-3", "py-1", "d-flex", "align-items-center");
+            localSkeleton.parent.classList.add("col-md-3", "pb-1", "pt-1", "d-flex", "align-items-center");
             localSkeleton.subParent.classList.add("form-check");
             localSkeleton.child.checkbox.classList.add("form-check-input");
             localSkeleton.child.checkbox.setAttribute("type", "checkbox");
@@ -567,23 +575,12 @@ class optionFrontHandler {
             submit: document.getElementById("document-bottom-submit"),
             proceed: document.getElementById("document-bottom-next")
         };
-
-        // Validation
-        if(!force) {
-            // If target step(page) is out of range (of JSON file index)
-            if (to > this.steps.length - 1) return createToast("Error", "Request page index out of range", "danger");
-            // If input values in current page got an error
-            else if (!this.inputHandler.pagingHandler(from)) return createToast("Error", "Value error occurred in current page", "danger");
-            // If requested same page as currently presented.
-            else if (this.currentStep === to) return createToast("Notice", "Requested same page (Current view)", "primary");
-        }
-
-        try{
-            document.getElementById(`step-${from}`).classList.add("text-muted");
-            document.getElementById(`step-${to}`).classList.remove("text-muted");
-        } catch (e) {
-            console.error(`[MUTED ERROR] Ignored untracked error in swapPage function`);
-        }
+        // If target step(page) is out of range (of JSON file index)
+        if (to > this.steps.length - 1 && !force) return createToast("Error", "Request page index out of range", "danger");
+        // If input values in current page got an error
+        else if (!this.inputHandler.pagingHandler(from) && !force) return createToast("Error", "Value error occurred in current page", "danger");
+        // If requested same page as currently presented.
+        else if (this.currentStep === to && !force) return createToast("Notice", "Requested same page (Current view)", "primary");
 
         if(to === this.steps.length - 1) {
             this.inputHandler.pagingHandler(to);

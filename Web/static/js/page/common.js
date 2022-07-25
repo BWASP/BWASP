@@ -22,7 +22,7 @@ while(true){
         cookies.delete(targetCookieName);
         // createToast("Config validation fail", "Config JSON structure has corrupted.\nDeleted config", "danger");
     }
-    // console.log(frontConfig);
+    console.log(frontConfig);
 
     if(typeof(frontConfig) === "object") break;
     else {
