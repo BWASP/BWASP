@@ -11,12 +11,12 @@ error_msg = ["error in your sql", "server error in", "fatal error", "database en
 cookie = dict()
 
 def attackHeader(target_url):
-    dict_data = requests.get(target_url, verify=False).headers
+    dict_data = requests.get(target_url, verify=False, cookies=cookie).headers
     infor_data = ""
     infor_vector = ""
 
     try:
-        http_method = requests.options(target_url, verify=False).headers['Allow'].replace(",", "").split(" ")
+        http_method = requests.options(target_url, verify=False, cookies=cookie).headers['Allow'].replace(",", "").split(" ")
     except:  # KeyError or ConnectionError
         http_method = "private"
 
@@ -48,8 +48,9 @@ def attackHeader(target_url):
     return http_method, infor_vector
 
 
-def inputTag(response_body, http_method, infor_vector, attack_option, target_url, current_url):
+def inputTag(response_body, http_method, infor_vector, attack_option, target_url, current_url, session):
     global error_msg
+    global cookie
     # form tag action and input tag and input name parse
     try:
         soup = BeautifulSoup(response_body, 'html.parser')
@@ -197,6 +198,15 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
 
             # ~~~~~~~~~~~~~attack option
         if attack_option == True:
+            # session cookie setting code
+            session = session.split('; ')
+            for i in range(len(session)):
+                session_key = session[i].split('=')[0]
+                session_value = session[i].split('=')[1]
+                cookie[session_key] = session_value
+            
+            print(cookie)
+
             # cheat sheet open
             with open("./cheat_sheet.txt", 'r', encoding='UTF-8') as f:
                 while True:
@@ -218,7 +228,7 @@ def inputTag(response_body, http_method, infor_vector, attack_option, target_url
                                 except:  # input tag not name except
                                     pass
 
-                            s = requests.Session().post(attack_url, data=param, verify=False)
+                            s = requests.Session().post(attack_url, data=param, verify=False, cookies=cookie)
 
                             if s.status_code >= 500 and s.status_code <= 510:
                                 #deep 복사
