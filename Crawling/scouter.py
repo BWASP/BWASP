@@ -99,12 +99,6 @@ def visit(driver, url, depth, options):
 
     try:
         driver.get(url)
-        alert = driver.switch_to_alert()
-        alert.accept()
-    except:
-        pass
-
-    if START_OPTIONS["check"]:
         #keep session with cookie 
         #options["cookie"]=""   cookie format is same with document.cookie(javascript command , remove http_only option)
         if "=" in options["Session"]:
@@ -113,6 +107,12 @@ def visit(driver, url, depth, options):
                 if split_point:
                     driver.add_cookie({'name': each_session[0:split_point].lstrip() , 'value': each_session[split_point+1:]})
         driver.refresh()
+        alert = driver.switch_to_alert()
+        alert.accept()
+    except:
+        pass
+
+    if START_OPTIONS["check"]:
         ANALYSIS_DATA["directory_indexing"] = directoryIndexing(driver.current_url, options["API"]["google"])
         ANALYSIS_DATA["admin_page"] = adminPage(driver.current_url, options["API"]["google"])
         ANALYSIS_DATA["http_method"], ANALYSIS_DATA["infor_vector"] = attackHeader(driver.current_url, options["Session"])
