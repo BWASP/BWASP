@@ -22,11 +22,13 @@ class task(TASK_MANAGER_DB.Model):
 
     id = TASK_MANAGER_DB.Column(TASK_MANAGER_DB.Integer, primary_key=True, autoincrement=True)
     targetURL = TASK_MANAGER_DB.Column(TASK_MANAGER_DB.TEXT, nullable=False)
+    subURL = TASK_MANAGER_DB.Column(TASK_MANAGER_DB.TEXT, nullable=False)
     task_id = TASK_MANAGER_DB.Column(TASK_MANAGER_DB.TEXT, nullable=False, unique=True)
 
-    def __init__(self, targetURL, task_id, **kwargs):
+    def __init__(self, targetURL, subURL, task_id, **kwargs):
         self.targetURL = targetURL
+        self.subURL = subURL
         self.task_id = task_id
 
     def __repr__(self):
-        return f"<task('{self.targetURL}', '{self.task_id}', '{self.done}')>"
+        return f"<task('{self.targetURL}', '{self.subURL}', '{self.task_id}', '{self.done}')>"
