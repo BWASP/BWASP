@@ -34,7 +34,7 @@ Web Infra Environment Analysis: wappalyzer(https://github.com/AliasIO/wappalyzer
 
 ## Contact and News
 * bwasptop9@gmail.com
-* BWASP twitter(https://twitter.com/bwasp_pentest)
+* [BWASP twitter](https://twitter.com/bwasp_pentest)
 
 ## Contributor
 * Dohun Koo ([@dohunny](https://github.com/dohunny))
