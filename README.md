@@ -47,7 +47,7 @@ python3 start.py
 
 
 #### (6) Leverage manual analysis capabilities
-<img src="https://github.com/BWASP/BWASP/blob/main/assets/6%20%EC%88%98%EB%8F%99%20%EB%B6%84%EC%84%9D%20%EA%B8%B0%EB%8A%A5%20%ED%99%9C%EC%9A%A9.gif/>
+<img src="https://github.com/BWASP/BWASP/blob/main/assets/6%20%EC%88%98%EB%8F%99%20%EB%B6%84%EC%84%9D%20%EA%B8%B0%EB%8A%A5%20%ED%99%9C%EC%9A%A9.gif"/>
 
 
 ## Roadmap
