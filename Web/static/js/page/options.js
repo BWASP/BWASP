@@ -102,12 +102,10 @@ class inputHandler {
 
     validateURL(objects) {
         let condition = patterns.targetURL.test(objects.targetURL.value);
-
         if (condition) {
             this.formData.target = objects.targetURL.value;
             document.getElementById("overview-targetURL").innerText = this.formData.target;
         }
-
         return condition;
     }
 
@@ -154,7 +152,7 @@ class inputHandler {
             }
 
             skeleton.parent.classList.add("mb-0", "me-2");
-            skeleton.info.classList.add("badge", "border", `border-${(currentOption.issue) ? "danger" : "primary"}`, "text-dark");
+            skeleton.info.classList.add("badge", "border", `border-${(currentOption.issue)?"danger":"primary"}`, "text-dark");
 
             skeleton.info.append(currentOption.display);
             skeleton.parent.appendChild(skeleton.info);
@@ -200,7 +198,7 @@ class optionFrontHandler {
             document.getElementById('disableRiskLock').remove();
 
             document.getElementById('call-disableRiskLock').classList.add("animate__animated", "animate__fadeOutRight");
-            setTimeout(() => {
+            setTimeout(()=> {
                 document.getElementById('call-disableRiskLock').remove()
 
                 // Add RiskLock Disabled
@@ -230,12 +228,12 @@ class optionFrontHandler {
     async checkAvailability() {
         return true;
         let data = Object();
-        try {
+        try{
             data = await API.communicate("/api/job");
 
             // True if available
             return data.length <= 0;
-        } catch {
+        }catch{
             return true
         }
     }
@@ -398,21 +396,21 @@ class optionFrontHandler {
             localSkeleton.child.checkbox.id = currentElementID;
             localSkeleton.child.checkbox.value = dataPackage.optionID;
             localSkeleton.child.label.classList.add("form-check-label");
-            if (dataPackage.issue) localSkeleton.child.label.classList.add("text-danger");
+            if(dataPackage.issue) localSkeleton.child.label.classList.add("text-danger");
             localSkeleton.child.label.htmlFor = currentElementID;
             localSkeleton.child.label.innerText = dataPackage.display;
 
             // Event listener
             localSkeleton.child.checkbox.addEventListener("change", () => {
                 let condition = localSkeleton.child.checkbox.checked;
-                if (dataPackage.issue && this.riskLock) {
+                if(dataPackage.issue && this.riskLock) {
                     localSkeleton.child.checkbox.checked = false;
                     return createToast("Option restricted", `You must disable Risk Lock before select this option (${dataPackage.display})`, "danger", false);
                 }
-                if (condition) this.inputHandler.formData.tool.optionalJobs.push(dataPackage.optionID);
+                if(condition) this.inputHandler.formData.tool.optionalJobs.push(dataPackage.optionID);
                 else {
                     let targetIndex = this.inputHandler.formData.tool.optionalJobs.indexOf(dataPackage.optionID);
-                    if (targetIndex === -1) return createToast("Data processing error", "Can't find index of string in array", "danger", false);
+                    if(targetIndex === -1) return createToast("Data processing error", "Can't find index of string in array", "danger", false);
                     else this.inputHandler.formData.tool.optionalJobs.splice(targetIndex, 1);
                 }
             });
@@ -584,11 +582,11 @@ class optionFrontHandler {
         // If requested same page as currently presented.
         else if (this.currentStep === to && !force) return createToast("Notice", "Requested same page (Current view)", "primary");
 
-        if (to === this.steps.length - 1) {
+        if(to === this.steps.length - 1) {
             this.inputHandler.pagingHandler(to);
             buttons.submit.classList.remove("d-none");
             buttons.proceed.classList.add("d-none");
-        } else {
+        }else{
             buttons.submit.classList.add("d-none");
             buttons.proceed.classList.remove("d-none");
         }
@@ -627,22 +625,22 @@ class optionFrontHandler {
         submitButton.classList.add("d-none");
 
         // Create Task ID
-        let taskID = new Date().toJSON().substring(0, 19);
+        let taskID = new Date().toJSON().substring(0,19);
         ["T", ":", "-"].forEach((char) => taskID = taskID.replaceAll(char, ""));
 
         // Submit task
-        try {
+        try{
             res["CreateTask"] = await API.communicate("/api/task", "POST", [{
                 targetURL: this.inputHandler.formData.target,
-                                task_id: taskID
+                task_id: taskID
             }]);
-        } catch {
+        }catch{
             submitButton.classList.remove("d-none");
             return createToast("Error occurred", "Cannot create task", "danger", false);
         }
 
         // Create DB
-        try {
+        try{
             res["CreateDB"] = await API.communicate("/api/task/database/create", "POST", {
                 targetURL: this.inputHandler.formData.target
                     .replace(/(^\w+:|^)\/\//, '')
@@ -650,7 +648,7 @@ class optionFrontHandler {
                     .replaceAll(":", "_"),
                 taskID: taskID
             });
-        } catch {
+        }catch{
             submitButton.classList.remove("d-none");
             return createToast("Error occurred", "Cannot create DB", "danger", false);
         }
@@ -662,14 +660,14 @@ class optionFrontHandler {
         // Wait for 1 Sec
         setTimeout(async () => {
             // Save Task
-            try {
+            try{
                 await API.communicate("/api/job", "POST", [{
                     targetURL: this.inputHandler.formData.target,
                     knownInfo: JSON.stringify(this.inputHandler.formData.info),
                     recursiveLevel: String(this.inputHandler.formData.tool.analysisLevel),
                     maximumProcess: String(this.inputHandler.formData.maximumProcess)
                 }])
-            } catch {
+            }catch{
                 submitButton.classList.remove("d-none");
                 return createToast("Error occurred", "Cannot save task", "danger", false);
             }

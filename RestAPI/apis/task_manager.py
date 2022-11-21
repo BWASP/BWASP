@@ -18,7 +18,6 @@ ns = Namespace('api/task', description='task operations')
 task = ns.model('task model', {
     'id': fields.Integer(readonly=True, description='Task initialization(task) id for unique identifier'),
     'targetURL': fields.String(required=True, description='target URL'),
-    'subURL': fields.String(required=True, description='sub domain URL'),
     'task_id': fields.String(required=True, description='task id')
 })
 
@@ -32,8 +31,7 @@ task_return_post_method = ns.model('task Return Post Message', {
 
 task_create_and_db = ns.model('New task db create', {
     "taskID": fields.String(required=True, description='task id (yyyynmmddhhmmss'),
-    "targetURL": fields.String(required=True, description='target URL'),
-    'subURL': fields.String(required=True, description='sub domain URL')
+    "targetURL": fields.String(required=True, description='target URL')
 })
 
 
@@ -46,8 +44,7 @@ class task_data_access_object(object):
 
         self.database_information = {
             "taskID": "",
-            "targetURL": "",
-            'subURL': ""
+            "targetURL": ""
         }
 
     def get_return_row_count(self):
@@ -67,12 +64,8 @@ class task_data_access_object(object):
                 self.insertData = data
 
                 for ListOfData in range(len(data)):
-                    if self.insertData[ListOfData]["subURL"] is None or not self.insertData[ListOfData]["subURL"]:
-                        self.insertData[ListOfData]["subURL"] = ""
-
                     g.task_db_obj.add(
                         taskModel(targetURL=self.insertData[ListOfData]["targetURL"],
-                                  subURL=self.insertData[ListOfData]["subURL"],
                                   task_id=self.insertData[ListOfData]["task_id"]
                                   )
                     )
@@ -112,12 +105,8 @@ class task_data_access_object(object):
                 for values_idx in self.insertData.values():
                     values_idx_list.append(values_idx)
 
-
-                app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[0] + "-" + values_idx_list[2] + ".db")}'
-                app.config["SQLALCHEMY_BINDS"]['BWASP'] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[0] + "-" + values_idx_list[2] + ".db")}'
-
-                print(app.config["SQLALCHEMY_DATABASE_URI"])
-                print(app.config["SQLALCHEMY_BINDS"]['BWASP'])
+                app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[1] + "-" + values_idx_list[0] + ".db")}'
+                app.config["SQLALCHEMY_BINDS"]['BWASP'] = f'sqlite:///{os.path.join(BASE_PATH, "databases/" + values_idx_list[1] + "-" + values_idx_list[0] + ".db")}'
 
                 # Database create
                 from models.BWASP.CSPEVALUATOR import CSPEVALUATOR_DB

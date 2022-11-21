@@ -10,7 +10,6 @@
     :license: LICENSE_NAME, see LICENSE_FILE for more details.
 """
 import sys, os
-
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from .model_returnObj import bwasp_db as JOB_DB
