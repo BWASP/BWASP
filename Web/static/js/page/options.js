@@ -29,7 +29,6 @@ class inputHandler {
             },
             info: Array(),
             target: String(),
-            subDomain: String(),
             Session: String(),
             API: {
                 google: {
@@ -50,8 +49,7 @@ class inputHandler {
         switch (page) {
             case 0:
                 return this.validateURL({
-                    targetURL: document.getElementById("input-targetURL"),
-                    subDomain: document.getElementById("input-sub-domain")
+                    targetURL: document.getElementById("input-targetURL")
                 });
             case 1:
                 this.inputHandling();
@@ -104,17 +102,13 @@ class inputHandler {
 
     validateURL(objects) {
         let condition = patterns.targetURL.test(objects.targetURL.value);
-        let subDomainCondition = patterns.targetURL.test(objects.subDomain.value);
 
         if (condition) {
             this.formData.target = objects.targetURL.value;
             document.getElementById("overview-targetURL").innerText = this.formData.target;
         }
-        if (subDomainCondition && objects.subDomain.value !== "https://[www].example.com") {
-            this.formData.subDomain = objects.subDomain.value;
-            document.getElementById("overview-subDomain").innerText = this.formData.subDomain;
-        }
-        return condition || subDomainCondition;
+
+        return condition;
     }
 
     validateOptions() {
@@ -640,8 +634,7 @@ class optionFrontHandler {
         try {
             res["CreateTask"] = await API.communicate("/api/task", "POST", [{
                 targetURL: this.inputHandler.formData.target,
-                subURL: this.inputHandler.formData.subDomain,
-                task_id: taskID
+                                task_id: taskID
             }]);
         } catch {
             submitButton.classList.remove("d-none");
@@ -655,7 +648,6 @@ class optionFrontHandler {
                     .replace(/(^\w+:|^)\/\//, '')
                     .replaceAll("/", "")
                     .replaceAll(":", "_"),
-                subURL: this.inputHandler.formData.subDomain,
                 taskID: taskID
             });
         } catch {
@@ -673,7 +665,6 @@ class optionFrontHandler {
             try {
                 await API.communicate("/api/job", "POST", [{
                     targetURL: this.inputHandler.formData.target,
-                    subURL: this.inputHandler.formData.subDomain,
                     knownInfo: JSON.stringify(this.inputHandler.formData.info),
                     recursiveLevel: String(this.inputHandler.formData.tool.analysisLevel),
                     maximumProcess: String(this.inputHandler.formData.maximumProcess)
