@@ -1,10 +1,8 @@
-import json
-
 from flask import g
 from flask_restx import (
     Resource, fields, Namespace
 )
-import sys, os
+import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -16,7 +14,8 @@ ns = Namespace('api/systeminfo', description='system info operations')
 systeminfo = ns.model('SystemInfo', {
     'id': fields.Integer(readonly=True, description='system-info id for unique identifier'),
     'url': fields.String(required=True, description='target URL'),
-    'data': fields.String(required=True, attributes="data", description='target system information')
+    'data': fields.String(required=True, description='target system information'),
+    "subDomain": fields.String(required=True, description='target sub domains')
 })
 
 systeminfo_return_post_method = ns.model('system information return post message', {
@@ -26,6 +25,11 @@ systeminfo_return_post_method = ns.model('system information return post message
 update_systeminfo = ns.model('update in system information data', {
     'id': fields.Integer(required=True, description='system-info id for unique identifier'),
     'data': fields.String(required=True, description='target system information')
+})
+
+update_subdomain = ns.model('update in system information data', {
+    'id': fields.Integer(required=True, description='system-info id for unique identifier'),
+    'subDomain': fields.String(required=True, description='target sub domains')
 })
 
 
@@ -52,7 +56,7 @@ class Systeminfo_data_access_object(object):
         ns.abort(404, f"System-info {id} doesn't exist")
 
     def create(self, data):
-        if str(type(data)) == "<class 'list'>":
+        if type(data) == list:
             try:
                 self.insertData = data
 
@@ -70,18 +74,28 @@ class Systeminfo_data_access_object(object):
 
         return Return_object().return_post_http_status_message(Type=False)
 
-    def update(self, data):
-        if str(type(data)) == "<class 'list'>":
+    def update(self, data, Type: str = 'Sub' | 'Sys'):
+        if type(data) == list:
             try:
                 self.updateData = data
 
-                for ListofData in range(len(data)):
-                    g.bwasp_db_obj.query(systeminfoModel).filter(
-                        systeminfoModel.id == int(self.updateData[ListofData]["id"])
-                    ).update(
-                        {'data': json.dumps(self.updateData[ListofData]["data"])}
-                    )
-                    g.bwasp_db_obj.commit()
+                if Type == 'Sub':
+                    for ListofData in range(len(data)):
+                        g.bwasp_db_obj.query(systeminfoModel).filter(
+                            systeminfoModel.id == int(self.updateData[ListofData]["id"])
+                        ).update(
+                            {'subDomain': json.dumps(self.updateData[ListofData]["subDomain"])}
+                        )
+                        g.bwasp_db_obj.commit()
+
+                if Type == 'Sys':
+                    for ListofData in range(len(data)):
+                        g.bwasp_db_obj.query(systeminfoModel).filter(
+                            systeminfoModel.id == int(self.updateData[ListofData]["id"])
+                        ).update(
+                            {'data': json.dumps(self.updateData[ListofData]["data"])}
+                        )
+                        g.bwasp_db_obj.commit()
 
                 return Return_object().return_patch_http_status_message(Type=True)
             except:
@@ -111,13 +125,6 @@ class SystemInfo_list(Resource):
         """Create system information"""
         return Systeminfo_DAO.create(ns.payload)
 
-    @ns.doc('Update system information')
-    @ns.expect(update_systeminfo)
-    @ns.marshal_with(systeminfo_return_post_method)
-    def patch(self):
-        """Update a data given its identifier"""
-        return Systeminfo_DAO.update(ns.payload)
-
 
 @ns.route('/<int:id>')
 @ns.response(404, 'systeminfo not found')
@@ -130,3 +137,27 @@ class Single_systemInfo_list(Resource):
     def get(self, id):
         """Fetch a given resource"""
         return Systeminfo_DAO.get(id=id, Type=True)
+
+
+@ns.route('/sysinfo')
+class Single_subdomain_list(Resource):
+    """Show a single subdomain item"""
+
+    @ns.doc('Update system information')
+    @ns.expect(update_systeminfo)
+    @ns.marshal_with(systeminfo_return_post_method)
+    def patch(self):
+        """Update a data given its identifier"""
+        return Systeminfo_DAO.update(ns.payload, 'Sys')
+
+
+@ns.route('/sub-domain')
+class Single_subdomain_list(Resource):
+    """Show a single subdomain item"""
+
+    @ns.doc('Update subdomain information')
+    @ns.expect(update_subdomain)
+    @ns.marshal_with(systeminfo_return_post_method)
+    def patch(self):
+        """Update a data given its identifier"""
+        return Systeminfo_DAO.update(ns.payload, 'Sub')

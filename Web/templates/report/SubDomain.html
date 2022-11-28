@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include 'components/head.html' %}
+
+<body>
+<div class="modal fade" id="detailViewModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div id="detailViewModalContainer" class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div id="detailViewModalContentView" class="modal-content p-4 border-rounded shadow">
+            <section class="mb-3">
+                <div class="d-flex align-items-center">
+                    <h3 class="text-dark fw-bolder mb-0 font-logo">Detail View</h3>
+                    <p class="text-capitalize text-muted small ms-2 mb-0">of vector No. <span id="currentRowID">0</span></p>
+                    <div class="ms-auto d-inline-flex p-2 ps-3 pe-3 shadow-sm rounded-custom">
+                        <a class="h4 text-muted element-clickable mb-0" id="toggleDetailViewModalSize"><i id="togglerIcon" class="fas fa-expand-alt"></i></a>
+                        <a href="#" data-bs-dismiss="modal" class="ms-3 mb-0 h4 text-danger text-decoration-none"><i class="fas fa-times"></i></a>
+                    </div>
+                </div>
+            </section>
+            <div class="modal-body p-0">
+                <section class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                        <tr>
+                            <th class="vector-tableKey">Impact</th>
+                            <td><span class="badge rounded-pill bg-success small" id="detail-impact">Low</span></td>
+                        </tr>
+                        <tr>
+                            <th class="vector-tableKey">Threat</th>
+                            <td id="detail-threat">Sample One, Sample Two, Sample Three</td>
+                        </tr>
+                        <tr>
+                            <th class="vector-tableKey">URL</th>
+                            <td id="detail-url">
+                                <p class="mb-0">
+                                    <span id="detail-method" class="badge bg-success text-uppercase me-2 mb-1">GET</span>
+                                    <span id="detail-URL">https://example.com</span><span class="text-muted" id="detail-URI">/this?is=Sample</span>
+                                </p>
+                            <td>
+                        </tr>
+                        <tr>
+                            <th class="vector-tableKey">Actions</th>
+                            <td id="detail-actions"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <section>
+                    <h4 class="fw-bold mb-3">Vector Data</h4>
+                    <div class="accordion" id="detailView-vector"></div>
+                    <h4 class="fw-bold mt-4 mb-3">Packet Data</h4>
+                    <div class="accordion" id="detailView-packet"></div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="viewEnginePrefModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content bg-transparent">
+            <div class="border-rounded bg-light shadow p-4">
+                <section class="mb-3">
+                    <h3 class="text-dark fw-bolder mb-0 font-logo">View Configuration</h3>
+                    <p class="text-capitalize text-muted small">Change the view config below</p>
+                </section>
+                <section>
+                    <div>
+                        <div class="d-flex">
+                            <label for="viewPref-input-rowPerPage" class="form-label">Row per page</label>
+                            <p class="ms-auto mb-0"><span class="text-primary" id="viewPref-modal-rowPerPage">10</span>
+                                / <span id="viewPref-modal-allRowCount">1</span></p>
+                        </div>
+                        <input type="range" class="form-range" id="viewPref-input-rowPerPage" value="5" max="0" min="5"
+                               step="1">
+                    </div>
+                    <div class="mt-3">
+                        <div class="d-flex">
+                            <label for="viewPref-input-currentPage" class="form-label">Current page</label>
+                            <p class="ms-auto mb-0"><span class="text-primary" id="viewPref-modal-currentPage">0</span>
+                                / <span id="viewPref-modal-pageCount">0</span></p>
+                        </div>
+                        <input type="range" class="form-range" id="viewPref-input-currentPage" value="0" max="0" min="1"
+                               step="1">
+                    </div>
+                </section>
+            </div>
+            <div class="mt-3">
+                <div class="sizer">
+                    <button type="button" class="col btn btn-warning border border-rounded border-white shadow m-1"
+                            data-bs-dismiss="modal">Back
+                    </button>
+                    <button type="button" id="viewPref-button-save"
+                            class="col btn btn-success border border-rounded border-white shadow m-1">Update
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content bg-transparent">
+            <div class="border-rounded shadow modal-storage">
+                <h3 class="text-dark fw-bolder mb-3">Manual</h3>
+                <p class="mb-0">Click <span class="text-primary">URL</span> to check all payloads.</p>
+                <p class="mb-0">Click <span class="text-primary">Payload Detail</span> to view related packets.</p>
+            </div>
+            <div class="border-rounded shadow mt-3">
+                <button type="button" class="btn btn-success border border-white w-100" data-bs-dismiss="modal">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'components/sidebar.html' %}
+<div class="p-4 pt-4 w-100">
+    <div class="d-inline-flex w-100 mb-3">
+        <div class="sizer element-top center-horizontal">
+            <div class="content-page-icon content-page-icon-sizing rounded-custom">
+                <i class="bi bi-paperclip"></i>
+            </div>
+            <div>
+                <h4 class="text-decoration-none mb-0 font-logo" id="pageTitle">Sub Domain</h4>
+                <p class="mb-0 text-muted small" id="pageTitle_sub">Found <span id="rowPerPage">0</span> Domains.</p>
+            </div>
+        </div>
+        <div class="sizer element-top center-horizontal ms-auto">
+            <button type="button" id="openHelpModal"
+                    class="bg-white content-page-icon-sizing ms-2 btn btn-link border rounded-custom shadow-sm"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Help">
+                <h4 class="mb-0"><i class="fas fa-question text-success"></i></h4>
+            </button>
+            <button type="button" id="openPrefModal"
+                    class="bg-white content-page-icon-sizing ms-2 btn btn-link border rounded-custom shadow-sm"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="View preferences">
+                <h4 class="mb-0"><i class="fas fa-cog text-secondary"></i></h4>
+            </button>
+        </div>
+    </div>
+    <div class="bg-white text-dark sizer element-objects separatedTab">
+        <div id="loadingProgress" class="d-flex align-items-center justify-content-center w-100">
+            <div>
+                <div class="d-inline-flex pt-5 pb-2">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <h3 class="ms-3 mb-0 text-dark">Requesting data</h3>
+                </div>
+            </div>
+        </div>
+        <div id="resultNoData" class="d-flex text-danger align-items-center justify-content-center w-100 d-none">
+            <div>
+                <div class="d-inline-flex pt-5 pb-2">
+                    <h3 class="mb-0">
+                        <i class="fa fa-ban"></i>
+                    </h3>
+                    <h3 class="ms-3 mb-0" id="errMsgTitle">No data.</h3>
+                </div>
+                <p class="pt-3 text-muted text-center" id="errMsgDesc">Refresh it if this screen lasts for a long time</p>
+            </div>
+        </div>
+        <div class="w-100 d-none" id="tablePlaceHolder">
+            <div class="table-responsive d-none" id="tablePlace"></div>
+        </div>
+    </div>
+</div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+<script type="module" src="{{ url_for('static', filename='js/page/subDomain.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='libs/highlight/atom-one-light.min.css') }}">
+</body>
+</html>

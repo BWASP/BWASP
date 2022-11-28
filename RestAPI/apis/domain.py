@@ -144,6 +144,7 @@ class Paging_domain_list(Resource):
 class Count_domain_list(Resource):
     """Show count of all domain data"""
 
+
     @ns.doc('Get count of all domain data')
     @ns.marshal_with(domain_count)
     def get(self):
