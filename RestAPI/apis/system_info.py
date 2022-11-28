@@ -64,7 +64,8 @@ class Systeminfo_data_access_object(object):
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
                         systeminfoModel(url=str(self.insertData[ListOfData]["url"]),
-                                        data=json.dumps(self.insertData[ListOfData]["data"])
+                                        data=json.dumps(self.insertData[ListOfData]["data"]),
+                                        subDomain=json.dumps(self.insertData[ListOfData]["subDomain"])
                                         )
                     )
                     g.bwasp_db_obj.commit()
@@ -75,7 +76,7 @@ class Systeminfo_data_access_object(object):
 
         return Return_object().return_post_http_status_message(Type=False)
 
-    def update(self, data, Type: str = Union['Sub', 'Sys']):
+    def update(self, data, Type: str):
         if type(data) == list:
             try:
                 self.updateData = data
@@ -141,7 +142,7 @@ class Single_systemInfo_list(Resource):
 
 
 @ns.route('/sysinfo')
-class Single_subdomain_list(Resource):
+class Single_systeminfo(Resource):
     """Show a single subdomain item"""
 
     @ns.doc('Update system information')
@@ -153,7 +154,7 @@ class Single_subdomain_list(Resource):
 
 
 @ns.route('/sub-domain')
-class Single_subdomain_list(Resource):
+class Single_subdomain(Resource):
     """Show a single subdomain item"""
 
     @ns.doc('Update subdomain information')
