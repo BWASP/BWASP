@@ -21,11 +21,11 @@ csp_evaluator_return_post = ns.model('CSP Evaluator Return Post Message', {
 })
 
 
-class Csp_evaluator_data_access_object(object):
+class csp_evaluator_data_access_object(object):
     def __init__(self):
         self.counter = 0
-        self.selectData = ""
-        self.insertData = ""
+        self.selected_data = ""
+        self.inserted_data = ""
 
     def get_return_row_count(self):
         self.counter = g.bwasp_db_obj.query(CSPEvaluatorModel).count()
@@ -33,24 +33,24 @@ class Csp_evaluator_data_access_object(object):
 
     def get(self, id=None, Type=False):
         if Type is False and id is None:
-            self.selectData = g.bwasp_db_obj.query(CSPEvaluatorModel).all()
-            return self.selectData
+            self.selected_data = g.bwasp_db_obj.query(CSPEvaluatorModel).all()
+            return self.selected_data
 
         if Type is not False and self.get_return_row_count() >= id > 0:
-            self.selectData = g.bwasp_db_obj.query(CSPEvaluatorModel).filter(CSPEvaluatorModel.id == id).all()
-            return self.selectData
+            self.selected_data = g.bwasp_db_obj.query(CSPEvaluatorModel).filter(CSPEvaluatorModel.id == id).all()
+            return self.selected_data
 
         ns.abort(404, f"CSPEvaluator data {id} doesn't exist")
 
     def create(self, data):
         if str(type(data)) == "<class 'list'>":
             try:
-                self.insertData = data
+                self.inserted_data = data
 
                 for ListOfData in range(len(data)):
                     g.bwasp_db_obj.add(
                         CSPEvaluatorModel(
-                            header=json.dumps(self.insertData[ListOfData]["header"])
+                            header=json.dumps(self.inserted_data[ListOfData]["header"])
                         )
                     )
                     g.bwasp_db_obj.commit()
@@ -62,7 +62,7 @@ class Csp_evaluator_data_access_object(object):
         return Return_object().return_post_http_status_message(Type=False)
 
 
-data_access_object_for_csp_evaluator = Csp_evaluator_data_access_object()
+data_access_object_for_csp_evaluator = csp_evaluator_data_access_object()
 
 
 # CSP Evaluator

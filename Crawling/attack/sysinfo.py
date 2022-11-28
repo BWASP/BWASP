@@ -3,26 +3,26 @@ import re
 from urllib.parse import urlparse, urlunparse
 from bs4 import BeautifulSoup
 from multiprocessing import Lock
+import os
 
 from Crawling.feature import func
 
 
 # Main Function
 
-
-def loadCategory_meta():
-    file = "./Crawling/wappalyzer/categories.json"
+def load_category_meta():
+    file = os.path.abspath("./Crawling/wappalyzer/categories.json")
     f = open(file, "r", encoding="utf-8")
     data = json.load(f)
     f.close()
     return data
 
 
-def loadCategory(category):
+def load_category(category):
     return_data = {}
 
     for name in "abcdefghijklmnopqrstuvwxyz_":
-        file = "./Crawling/wappalyzer/{}.json".format(name)
+        file = os.path.abspath("./Crawling/wappalyzer/{}.json".format(name))
 
         f = open(file, "r", encoding="utf-8")
         data = json.load(f)
@@ -43,8 +43,8 @@ def start(detect_list, lock, url, cur_page_links, current_url, req_res_packets, 
 
     category = list(range(1, 97))
 
-    data = loadCategory(category)
-    cat_meta = loadCategory_meta()
+    data = load_category(category)
+    cat_meta = load_category_meta()
     packet_indexes = packet_indexes_[:]
 
     # detect_list
@@ -111,7 +111,7 @@ def retCatrepresnt(cats):
     return cat_represent
 
 
-def initResult(detect_list, cats, app):
+def init_result(detect_list, cats, app):
     detect_temp = detect_list[0]
 
     if cats not in detect_temp:
@@ -153,7 +153,7 @@ def appendResult(detect_list, lock, cats, app, detectype, version, request_index
 
     request_index = retRelatedpacketidx(request_index)
     response_index = retRelatedpacketidx(response_index)
-    initResult(detect_list, cats, app)
+    init_result(detect_list, cats, app)
     detect_temp = detect_list[0]
 
     if detectype and detectype not in detect_temp[cats][app]["detect"]:

@@ -60,7 +60,7 @@ def start(url, depth, options):
     DETECT_LIST.append({})
     LOCK = manager.Lock()
 
-    driver = initSelenium()
+    driver = initial_load_selenium()
     visit(driver, url, depth, options)
 
     for each_process in PROCESS_LIST:
@@ -244,7 +244,7 @@ def isOpenRedirection(visit_url, current_url, target_url):
     return False
 
 
-def initSelenium():
+def initial_load_selenium():
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("lang=ko_KR")
     chrome_options.add_argument("--headless")
