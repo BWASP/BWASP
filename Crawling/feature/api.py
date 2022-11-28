@@ -1,4 +1,5 @@
 import os, requests, datetime
+from typing import Union
 
 
 class Config(object):
@@ -170,7 +171,7 @@ class SystemInfo:
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
-    def PATCHSystemInfo(self, data, Type: str = 'Sub' | 'Sys'):  # SystemInfo data Update
+    def PATCHSystemInfo(self, data, Type: str = Union['Sub', 'Sys']):  # SystemInfo data Update
         if Type == 'Sub':
             self.responseObj = self.requestObj.patch(
                 url=self.URL_PREFIX + "/sub-domain",
