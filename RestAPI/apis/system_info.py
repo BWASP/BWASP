@@ -2,6 +2,7 @@ from flask import g
 from flask_restx import (
     Resource, fields, Namespace
 )
+from typing import Union
 import sys, os, json
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -74,7 +75,7 @@ class Systeminfo_data_access_object(object):
 
         return Return_object().return_post_http_status_message(Type=False)
 
-    def update(self, data, Type: str = 'Sub' | 'Sys'):
+    def update(self, data, Type: str = Union['Sub', 'Sys']):
         if type(data) == list:
             try:
                 self.updateData = data
