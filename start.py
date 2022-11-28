@@ -6,7 +6,7 @@ import subprocess
 
 if __name__ == "__main__":
     try:
-        # webbrowser.open("http://localhost:20102")
+        webbrowser.open("http://localhost:20102")
         webbrowser.open("http://localhost:20002")
         app = subprocess.Popen([sys.executable, "Web/app.py"])
         app2 = subprocess.Popen([sys.executable, "ManualAPI/app.py"])
