@@ -160,6 +160,7 @@ class SystemInfo:
         }
 
     def PostSystemInfo(self, data):  # SystemInfo data insert
+        print(f"[Crwaller] data:: {data}")
         self.responseObj = self.requestObj.post(
             url=self.URL_PREFIX,
             headers=self.requestHeaders,
@@ -171,7 +172,8 @@ class SystemInfo:
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
-    def PATCHSystemInfo(self, data, Type: str = Union['Sub', 'Sys']):  # SystemInfo data Update
+    def PATCHSystemInfo(self, data, Type: str):  # SystemInfo data Update
+        print(f"Type:: {Type} \n data:: {data}")
         if Type == 'Sub':
             self.responseObj = self.requestObj.patch(
                 url=self.URL_PREFIX + "/sub-domain",

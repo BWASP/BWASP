@@ -15,10 +15,11 @@ comment = ""
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
              "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]
 
+
 class MyHTMLParser(HTMLParser):
     def handle_comment(self, data):
         global comment
-        comment += data+"\n"
+        comment += data + "\n"
 
 
 def connect(table_name):
@@ -86,7 +87,8 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
             continue
         # 공격 벡터 input 태그 분석 input_tag 함수는 attack_vector.py에서 사용하는 함수
         response_body = packet["response"]["body"]
-        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = inputTag(response_body, analysis_data["http_method"], analysis_data["infor_vector"], analysis_data["testPayloads"], target_url, packet["request"]["full_url"])
+        tag_list, tag_name_list, attack_vector, action_page, action_type, impactRate = inputTag(response_body, analysis_data["http_method"], analysis_data["infor_vector"],
+                                                                                                analysis_data["testPayloads"], target_url, packet["request"]["full_url"])
 
         cors_check = corsCheck(packet)
         if cors_check != "None":
@@ -94,41 +96,40 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
             impactRate = 2
         else:
             attack_vector["doubt"].pop("CORS")
-            
+
         url_part = urlparse(packet["request"]["full_url"])
         domain_url = urlunparse(url_part._replace(params="", query="", fragment="", path=""))
         domain_uri = urlunparse(url_part._replace(scheme="", netloc=""))
 
-        #if len(domain_params) > 0:
+        # if len(domain_params) > 0:
 
+        # tag_name_list.append(url_part.query) # hello=world&a=b -> parameter error로 인해 수정
 
-        #tag_name_list.append(url_part.query) # hello=world&a=b -> parameter error로 인해 수정
-
-        #tag_name, action_page, action_type [ '' ] 값 정리
+        # tag_name, action_page, action_type [ '' ] 값 정리
         for x in range(len(tag_name_list)):
             try:
                 if "" == tag_name_list[x]:
                     tag_name_list.pop(x)
-            except: #indexError: list index out of range
+            except:  # indexError: list index out of range
                 pass
 
         for x in range(len(action_page)):
             try:
                 if "" == action_page[x]:
                     action_page.pop(x)
-            except: #indexError: list index out of range
+            except:  # indexError: list index out of range
                 pass
 
         for x in range(len(action_type)):
             try:
                 if "" == action_type[x]:
                     action_page.pop(x)
-            except: #indexError: list index out of range
+            except:  # indexError: list index out of range
                 pass
 
-        #domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
+        # domain_params = packet["request"]["body"] if packet["request"]["body"] else "None"
 
-        #Query String 정리
+        # Query String 정리
         domain_params = dict()
         if url_part.query != "":
             try:
@@ -200,12 +201,12 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                                             attack_tmp["type"] = "error message (O)"
                                             attack_vector["doubt"]["SQL injection"]["detect"].append(copy.deepcopy(attack_tmp))
                                             impactRate = 2
-                                #else:
+                                # else:
                                 #    attack_vector["doubt"]["SQL injection"].pop("detect")
 
                             if not cheat_sheet: break
 
-        #keywordCmp
+        # keywordCmp
         cmp_sql_check = keywordCmp().keywordCmp_SQL(tag_name_list, cmp_sql_check)
         cmp_sql_xss_check = keywordCmp().keywordCmp_SQL_XSS(tag_name_list, cmp_sql_xss_check)
         cmp_logic_check = keywordCmp().keywordCmp_Logic(tag_name_list, cmp_logic_check)
@@ -236,7 +237,6 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
                 attack_vector["doubt"]["Parameter"] = True
 
                 impactRate = 0
-            
 
         if not packet["request"]["full_url"] in cookie_result.keys():
             domain_cookie = {}
@@ -270,34 +270,33 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
         else:
             attack_vector["doubt"].pop("Reflected XSS", None)
 
-        #robots.txt check
+        # robots.txt check
         if analysis_data["robots_result"] == True:
             attack_vector["misc"]["robots.txt"] = analysis_data["robots_result"]
         else:
             attack_vector["misc"].pop("robots.txt")
 
-        #Error Page check
+        # Error Page check
         if analysis_data["error_result"] == True:
             attack_vector["misc"]["error"] = analysis_data["error_result"]
         else:
             attack_vector["misc"].pop("error")
-        
+
         # directory indexing check
         if len(analysis_data["directory_indexing"]) != 0:
             attack_vector["misc"]["indexing"] = analysis_data["directory_indexing"]
         else:
             attack_vector["misc"].pop("indexing")
-        
+
         # admin page check
         if len(analysis_data["admin_page"]) != 0:
             attack_vector["misc"]["admin page"] = analysis_data["admin_page"]
         else:
             attack_vector["misc"].pop("admin page")
 
-        #comment 주석
+        # comment 주석
         parser = MyHTMLParser()
         parser.feed(response_body)
-        
 
         # 패킷 url이 중복된다면 ??
         # json.dumps()
@@ -353,10 +352,12 @@ def insertPorts(port_list, target_url):
 # REST API: 주명 WebInfo
 # 맨처음에 url , data를 포함한 post 한번 먼저 실행
 def postWebInfo(input_url):
+    print("================== Web Information Post Method ==================")
     data = []
     value = {
         "url": input_url,
-        "data": "None"
+        "data": "None",
+        "subDomain": "None"
     }
     data.append(value)
     SystemInfo().PostSystemInfo(json.dumps(data))
@@ -382,7 +383,7 @@ def updateWebInfo(analyst_result):
     }
     data.append(value)
     # api 수정 전
-    #SystemInfo().PATCHSystemInfo(json.dumps(value))
+    # SystemInfo().PATCHSystemInfo(json.dumps(value))
     # api 수정후 아래 코드로 바꾸기
     SystemInfo().PATCHSystemInfo(json.dumps(data), Type='Sys')
 
