@@ -170,12 +170,20 @@ class SystemInfo:
         else:
             return {"status": self.responseObj.status_code, "message": "Failed", "retData": "None"}
 
-    def PATCHSystemInfo(self, data):  # SystemInfo data Update
-        self.responseObj = self.requestObj.patch(
-            url=self.URL_PREFIX,
-            headers=self.requestHeaders,
-            data=data
-        )
+    def PATCHSystemInfo(self, data, Type: str = 'Sub' | 'Sys'):  # SystemInfo data Update
+        if Type == 'Sub':
+            self.responseObj = self.requestObj.patch(
+                url=self.URL_PREFIX + "/sub-domain",
+                headers=self.requestHeaders,
+                data=data
+            )
+
+        if Type == 'Sys':
+            self.responseObj = self.requestObj.patch(
+                url=self.URL_PREFIX + "/sysinfo",
+                headers=self.requestHeaders,
+                data=data
+            )
 
         if self.responseObj.status_code == 200:
             return {"status": self.responseObj.status_code, "message": "Success", "retData": self.responseObj.json()}
