@@ -28,7 +28,7 @@ update_systeminfo = ns.model('update in system information data', {
     'data': fields.String(required=True, description='target system information')
 })
 
-update_subdomain = ns.model('update in system information data', {
+update_subdomain = ns.model('update in subdomain information data', {
     'id': fields.Integer(required=True, description='system-info id for unique identifier'),
     'subDomain': fields.String(required=True, description='target sub domains')
 })
@@ -80,15 +80,16 @@ class Systeminfo_data_access_object(object):
         if type(data) == list:
             try:
                 self.updateData = data
-
                 if Type == 'Sub':
+                    print(
+                        self.updateData
+                    )
                     for ListofData in range(len(data)):
                         g.bwasp_db_obj.query(systeminfoModel).filter(
                             systeminfoModel.id == int(self.updateData[ListofData]["id"])
                         ).update(
                             {'subDomain': json.dumps(self.updateData[ListofData]["subDomain"])}
                         )
-                        g.bwasp_db_obj.commit()
 
                 if Type == 'Sys':
                     for ListofData in range(len(data)):
@@ -97,8 +98,9 @@ class Systeminfo_data_access_object(object):
                         ).update(
                             {'data': json.dumps(self.updateData[ListofData]["data"])}
                         )
-                        g.bwasp_db_obj.commit()
-
+                print("commit started")
+                g.bwasp_db_obj.commit()
+                print("commit ended")
                 return Return_object().return_patch_http_status_message(Type=True)
             except:
                 g.bwasp_db_obj.rollback()
@@ -143,7 +145,7 @@ class Single_systemInfo_list(Resource):
 
 @ns.route('/sysinfo')
 class Single_systeminfo(Resource):
-    """Show a single subdomain item"""
+    """Show a single system information item"""
 
     @ns.doc('Update system information')
     @ns.expect(update_systeminfo)

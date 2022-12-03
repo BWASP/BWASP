@@ -4,57 +4,58 @@
 {% include 'components/head.html' %}
 
 <body>
-<div class="modal fade" id="detailViewModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div id="detailViewModalContainer" class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
-        <div id="detailViewModalContentView" class="modal-content p-4 border-rounded shadow">
-            <section class="mb-3">
-                <div class="d-flex align-items-center">
-                    <h3 class="text-dark fw-bolder mb-0 font-logo">Detail View</h3>
-                    <p class="text-capitalize text-muted small ms-2 mb-0">of vector No. <span id="currentRowID">0</span></p>
-                    <div class="ms-auto d-inline-flex p-2 ps-3 pe-3 shadow-sm rounded-custom">
-                        <a class="h4 text-muted element-clickable mb-0" id="toggleDetailViewModalSize"><i id="togglerIcon" class="fas fa-expand-alt"></i></a>
-                        <a href="#" data-bs-dismiss="modal" class="ms-3 mb-0 h4 text-danger text-decoration-none"><i class="fas fa-times"></i></a>
-                    </div>
-                </div>
-            </section>
-            <div class="modal-body p-0">
-                <section class="table-responsive">
-                    <table class="table table-borderless">
-                        <tbody>
-                        <tr>
-                            <th class="vector-tableKey">Impact</th>
-                            <td><span class="badge rounded-pill bg-success small" id="detail-impact">Low</span></td>
-                        </tr>
-                        <tr>
-                            <th class="vector-tableKey">Threat</th>
-                            <td id="detail-threat">Sample One, Sample Two, Sample Three</td>
-                        </tr>
-                        <tr>
-                            <th class="vector-tableKey">URL</th>
-                            <td id="detail-url">
-                                <p class="mb-0">
-                                    <span id="detail-method" class="badge bg-success text-uppercase me-2 mb-1">GET</span>
-                                    <span id="detail-URL">https://example.com</span><span class="text-muted" id="detail-URI">/this?is=Sample</span>
-                                </p>
-                            <td>
-                        </tr>
-                        <tr>
-                            <th class="vector-tableKey">Actions</th>
-                            <td id="detail-actions"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </section>
-                <section>
-                    <h4 class="fw-bold mb-3">Vector Data</h4>
-                    <div class="accordion" id="detailView-vector"></div>
-                    <h4 class="fw-bold mt-4 mb-3">Packet Data</h4>
-                    <div class="accordion" id="detailView-packet"></div>
-                </section>
-            </div>
-        </div>
-    </div>
-</div>
+
+{#<div class="modal fade" id="detailViewModal" tabindex="-1" role="dialog" aria-hidden="true">#}
+{#    <div id="detailViewModalContainer" class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">#}
+{#        <div id="detailViewModalContentView" class="modal-content p-4 border-rounded shadow">#}
+{#            <section class="mb-3">#}
+{#                <div class="d-flex align-items-center">#}
+{#                    <h3 class="text-dark fw-bolder mb-0 font-logo">Detail View</h3>#}
+{#                    <p class="text-capitalize text-muted small ms-2 mb-0">of vector No. <span id="currentRowID">0</span></p>#}
+{#                    <div class="ms-auto d-inline-flex p-2 ps-3 pe-3 shadow-sm rounded-custom">#}
+{#                        <a class="h4 text-muted element-clickable mb-0" id="toggleDetailViewModalSize"><i id="togglerIcon" class="fas fa-expand-alt"></i></a>#}
+{#                        <a href="#" data-bs-dismiss="modal" class="ms-3 mb-0 h4 text-danger text-decoration-none"><i class="fas fa-times"></i></a>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </section>#}
+{#            <div class="modal-body p-0">#}
+{#                <section class="table-responsive">#}
+{#                    <table class="table table-borderless">#}
+{#                        <tbody>#}
+{#                        <tr>#}
+{#                            <th class="vector-tableKey">Impact</th>#}
+{#                            <td><span class="badge rounded-pill bg-success small" id="detail-impact">Low</span></td>#}
+{#                        </tr>#}
+{#                        <tr>#}
+{#                            <th class="vector-tableKey">Threat</th>#}
+{#                            <td id="detail-threat">Sample One, Sample Two, Sample Three</td>#}
+{#                        </tr>#}
+{#                        <tr>#}
+{#                            <th class="vector-tableKey">URL</th>#}
+{#                            <td id="detail-url">#}
+{#                                <p class="mb-0">#}
+{#                                    <span id="detail-method" class="badge bg-success text-uppercase me-2 mb-1">GET</span>#}
+{#                                    <span id="detail-URL">https://example.com</span><span class="text-muted" id="detail-URI">/this?is=Sample</span>#}
+{#                                </p>#}
+{#                            <td>#}
+{#                        </tr>#}
+{#                        <tr>#}
+{#                            <th class="vector-tableKey">Actions</th>#}
+{#                            <td id="detail-actions"></td>#}
+{#                        </tr>#}
+{#                        </tbody>#}
+{#                    </table>#}
+{#                </section>#}
+{#                <section>#}
+{#                    <h4 class="fw-bold mb-3">Vector Data</h4>#}
+{#                    <div class="accordion" id="detailView-vector"></div>#}
+{#                    <h4 class="fw-bold mt-4 mb-3">Packet Data</h4>#}
+{#                    <div class="accordion" id="detailView-packet"></div>#}
+{#                </section>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
 <div class="modal fade" id="viewEnginePrefModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content bg-transparent">
@@ -121,7 +122,7 @@
                 <i class="bi bi-paperclip"></i>
             </div>
             <div>
-                <h4 class="text-decoration-none mb-0 font-logo" id="pageTitle">Sub Domain</h4>
+                <h4 class="text-decoration-none mb-0 font-logo" id="pageTitle">Sub Domains</h4>
                 <p class="mb-0 text-muted small" id="pageTitle_sub">Found <span id="rowPerPage">0</span> Domains.</p>
             </div>
         </div>
@@ -131,11 +132,11 @@
                     data-bs-toggle="tooltip" data-bs-placement="bottom" title="Help">
                 <h4 class="mb-0"><i class="fas fa-question text-success"></i></h4>
             </button>
-            <button type="button" id="openPrefModal"
-                    class="bg-white content-page-icon-sizing ms-2 btn btn-link border rounded-custom shadow-sm"
-                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="View preferences">
-                <h4 class="mb-0"><i class="fas fa-cog text-secondary"></i></h4>
-            </button>
+{#            <button type="button" id="openPrefModal"#}
+{#                    class="bg-white content-page-icon-sizing ms-2 btn btn-link border rounded-custom shadow-sm"#}
+{#                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="View preferences">#}
+{#                <h4 class="mb-0"><i class="fas fa-cog text-secondary"></i></h4>#}
+{#            </button>#}
         </div>
     </div>
     <div class="bg-white text-dark sizer element-objects separatedTab">

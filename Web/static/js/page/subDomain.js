@@ -15,7 +15,7 @@ let elementBuilder = new EBuilder();
 // Specified query selectors
 let places = {
     detailView: {
-        modal: document.getElementById("detailViewModal"),
+        // modal: document.getElementById("detailViewModal"),
         container: document.getElementById("detailViewModalContainer"),
         view: document.getElementById("detailViewModalContentView")
     },
@@ -36,14 +36,12 @@ let modals = {
     }),
     userHelp: new bootstrap.Modal(places.help.modal, {
         show: true
-    }),
-    detailView: new bootstrap.Modal(places.detailView.modal, {
-        show: true
     })
 };
 
 // Define API Endpoints
 const APIEndpoints = {
+    subDomain: "/api/systeminfo",
     vectors: "/api/domain",
     packets: {
         base: "/api/packet",
@@ -56,7 +54,7 @@ const APIEndpoints = {
 
 // Other frontend rendering option / values
 const elements = {
-        vectors: ["Type", "URL", "Action", "Params", "Threat", "Method", "Impact"],
+        vectors: ["Type", "Sub Domain"],
         packets: []
     },
     coloring = {
@@ -150,33 +148,33 @@ class pagerTools {
         console.error(`:: ERROR :: `, errorMessage);
     };
 
-    async updateRowCount() {
-        let countRes = await API.communicate("/api/domain/count");
-        this.data.rowCount = Number(countRes.count);
-
-        let maxPageCount = (Math.round(this.data.rowCount / this.paging.rowPerPage)),
-            formattedRowCount = this.data.rowCount.toLocaleString();
-
-        console.log(
-            "Row count: ", this.data.rowCount,
-            "\nMax page: ", maxPageCount,
-            "\nRow count: ", this.data.rowCount,
-            "\nCurrent page: ", this.paging.currentPage
-        );
-
-        // Set current rowPerPage value
-        document.getElementById("viewPref-modal-rowPerPage").innerText = (this.paging.rowPerPage > this.data.rowCount)
-            ? this.data.rowCount
-            : this.paging.rowPerPage;
-        document.getElementById("viewPref-input-rowPerPage").max = this.data.rowCount;
-        document.getElementById("viewPref-input-rowPerPage").value = this.paging.rowPerPage;
-
-
-        document.getElementById("viewPref-modal-allRowCount").innerText = formattedRowCount;
-        document.getElementById("viewPref-input-currentPage").value = this.paging.currentPage;
-        this.updateMaxPage();
-        return true;
-    }
+    // async updateRowCount() {
+    //     let countRes = await API.communicate("/api/domain/count");
+    //     this.data.rowCount = Number(countRes.count);
+    //
+    //     let maxPageCount = (Math.round(this.data.rowCount / this.paging.rowPerPage)),
+    //         formattedRowCount = this.data.rowCount.toLocaleString();
+    //
+    //     console.log(
+    //         "Row count: ", this.data.rowCount,
+    //         "\nMax page: ", maxPageCount,
+    //         "\nRow count: ", this.data.rowCount,
+    //         "\nCurrent page: ", this.paging.currentPage
+    //     );
+    //
+    //     // Set current rowPerPage value
+    //     document.getElementById("viewPref-modal-rowPerPage").innerText = (this.paging.rowPerPage > this.data.rowCount)
+    //         ? this.data.rowCount
+    //         : this.paging.rowPerPage;
+    //     document.getElementById("viewPref-input-rowPerPage").max = this.data.rowCount;
+    //     document.getElementById("viewPref-input-rowPerPage").value = this.paging.rowPerPage;
+    //
+    //
+    //     document.getElementById("viewPref-modal-allRowCount").innerText = formattedRowCount;
+    //     document.getElementById("viewPref-input-currentPage").value = this.paging.currentPage;
+    //     this.updateMaxPage();
+    //     return true;
+    // }
 
     updateMaxPage() {
         this.data.pageCount = Math.round(this.data.rowCount / this.paging.rowPerPage);
@@ -188,11 +186,11 @@ class pagerTools {
         document.getElementById("viewPref-modal-currentPage").innerText = this.paging.currentPage;
     }
 
-    openPagingOption() {
-        this.updateRowCount().then(() => {
-            modals.viewEngine.show();
-        });
-    }
+    // openPagingOption() {
+    //     this.updateRowCount().then(() => {
+    //         modals.viewEngine.show();
+    //     });
+    // }
 
 
     toggleLoader(type) {
@@ -216,7 +214,7 @@ class pagerTools {
         document.getElementById("tablePlaceHolder").classList.add("d-none");
 
         // Receive data from API
-        await this.syncData(this.paging.currentPage, this.paging.rowPerPage);
+        await this.syncData();
 
         // Return if has error
         if (this.error) return;
@@ -229,41 +227,28 @@ class pagerTools {
         modals.viewEngine.hide();
     }
 
-    async syncData(requestPage, rowPerPage) {
-        let requestPages = {
-            from: ((requestPage - 1) * rowPerPage) + 1,
-            to: rowPerPage
-        }
+    async syncData() {
+
         this.dataSet = Array();
         try {
-            await API.communicate(`${APIEndpoints.vectors}/${requestPages.from}/${requestPages.to}`)
+            await API.communicate(`${APIEndpoints.subDomain}`)
         } catch (e) {
             return this.returnError(e);
         }
 
-        let vectors = await API.communicate(`${APIEndpoints.vectors}/${requestPages.from}/${requestPages.to}`),
+        let vectors = await API.communicate(`${APIEndpoints.subDomain}`),
             malformedID = {
-                vector: ["Details/", "action_URL", "action_URL_Type", "params", "Details"],
-                packet: ["requestJson", "responseHeader"]
+                subDomain: ["subDomain"]
             };
 
         // If no data present
         if (vectors.length === 0) return this.returnError("No data");
         else for (const vector of vectors) {
-            let packet = Object();
-
-            if (Object.keys(this.syncedData).includes(String(vector["related_Packet"]))) packet = this.syncedData[vector["related_Packet"]];
-            else {
-                packet = await API.communicate(`${APIEndpoints.packets.base}/${vector["related_Packet"]}`);
-                packet = packet[0];
-                this.syncedData[vector["related_Packet"]] = packet;
-            }
-
             // Parse attack vector
-            vector.attackVector = JSON.parse(vector.attackVector);
+            vector.subDomain = JSON.parse(vector.subDomain);
 
             // Fix malformed JSON
-            malformedID.vector.forEach((id) => {
+            malformedID.subDomain.forEach((id) => {
                 // Check if scans recursively
                 let recursive = id.includes("/");
                 if (recursive) id = id.replaceAll("/", "");
@@ -280,22 +265,10 @@ class pagerTools {
                     })
                 }
             });
-            malformedID.packet.forEach((id) => packet[id] = API.jsonDataHandler(packet[id]));
 
-            // Base64 Decode
-            ["action_URL", "action_URL_Type"].forEach((target) => {
-                for (let count = 0; count <= vector[target].length - 1; count++) {
-                    vector[target][count] = atob(vector[target][count])
-                }
-            })
-            for (let count = 0; count <= vector.Details.tag.length - 1; count++) {
-                vector.Details.tag[count] = atob(vector.Details.tag[count])
-            }
-            // vector.action_URL_Type.forEach((id) => console.log(vector.action_URL_Type));
 
             this.dataSet.push({
-                vector: vector,
-                packet: packet
+                subDomain: vector
             })
         }
 
@@ -533,529 +506,7 @@ class pagerTools {
 let pager = new pagerTools();
 let referredDocuments = Object();
 
-class detailsModal {
-    constructor(viewParent) {
-        this.viewParent = viewParent;
-    }
-
-    async open(dataset) {
-        // Initialize
-        Object.keys(this.viewParent).forEach(area => this.viewParent[area].innerHTML = "");
-        toggleModalSize(true);
-
-        // Set current row ID
-        document.getElementById("currentRowID").innerText = dataset.vector.id;
-
-        // Build vectors
-        await this.buildToTables(dataset, ["cookie", "Cookies"]);
-        await this.buildToTables(dataset, ["queryString", "Query String"]);
-        await this.writeVectorValues(dataset);
-        if (dataset.vector.Details.tag.length > 0) this.buildTags(dataset);
-        if (Object.keys(dataset.vector.attackVector["misc"]).length > 0) await this.buildViolationElement(dataset.vector.attackVector["misc"]);
-        if (Object.keys(dataset.vector.attackVector["doubt"]).length > 0) await this.buildReferredDocs(dataset);
-        await this.buildDoubt(dataset);
-        await this.buildTestOptionResult(dataset);
-        await this.buildAllowMethods(dataset);
-        await this.buildComment(dataset);
-        this.buildOSINT(dataset);
-
-        // Build Packets
-        await this.buildPacketRequest(dataset);
-        await this.buildResponseData(dataset);
-
-        // Log dataset
-        console.log(dataset);
-
-        // Build
-        modals.detailView.show();
-    }
-
-    buildOSINT(dataset) {
-        let OSINTdata = {
-                index: dataset.vector.attackVector.misc["indexing"],
-                adminPage: dataset.vector.attackVector.misc["admin page"]
-            },
-            space = document.createElement("div");
-
-        const createData = (dataPackage) => {
-            let parent = document.createElement("div");
-            if (!Array.isArray(dataPackage)) return null;
-            else dataPackage.forEach(pack => {
-                let skeleton = {
-                    parent: document.createElement("div"),
-                    title: document.createElement("p"),
-                    url: document.createElement("a")
-                }
-                skeleton.title.classList.add("mb-0", "fw-bold");
-                skeleton.title.innerText = pack.title;
-                skeleton.url.href = pack.link;
-                skeleton.url.classList.add("text-break");
-                skeleton.url.innerText = pack.link;
-                skeleton.parent.append(
-                    skeleton.title,
-                    skeleton.url
-                );
-                skeleton.parent.classList.add("mt-2");
-                parent.appendChild(skeleton.parent);
-            })
-            return parent;
-        }
-
-        [["index", "Indexing"], ["adminPage", "Admin Page"]].forEach(type => {
-            if (typeof (OSINTdata[type[0]]) !== "undefined" && OSINTdata[type[0]].length > 0) {
-                space.append(pager.createAccordion(type[1], createData(OSINTdata[type[0]])));
-            }
-        })
-
-        this.viewParent.vectors.appendChild(pager.createAccordion("OSINT", space));
-        console.log(OSINTdata);
-    }
-
-    buildComment(dataset) {
-        let comment = dataset.vector.comment;
-        if (comment === "") return;
-
-        this.viewParent.vectors.appendChild(
-            pager.createAccordion(
-                "Comment",
-                elementBuilder.createCode(
-                    comment,
-                    "html"
-                )
-            )
-        );
-    }
-
-    buildAllowMethods(dataset) {
-        let allowMethod = dataset.vector.attackVector.info.allowMethod,
-            virtualDiv = document.createElement("div");
-        virtualDiv.classList.add("d-inline-flex");
-
-        if (allowMethod === undefined || allowMethod.length <= 0) return;
-
-        for (const method of allowMethod) {
-            virtualDiv.appendChild(elementBuilder.createBadge(method));
-        }
-
-        this.viewParent.vectors.appendChild(pager.createAccordion("Allow Methods", virtualDiv));
-    }
-
-    buildTestOptionResult(dataset) {
-        let processedData = Object(),
-            doubts = dataset.vector.attackVector.doubt,
-            virtual = {
-                div: document.createElement("div")
-            };
-
-        // Processing data
-        for (const key of Object.keys(doubts)) {
-            let doubt = doubts[key];
-            if (doubt.detect === undefined || typeof (doubt.detect) !== "object" || doubt.detect.length <= 0) continue;
-            if (processedData[key] === undefined) processedData[key] = Array();
-
-            for (const data of doubt.detect) {
-                if (processedData[key][data.type] === undefined) processedData[key][data.type] = Array();
-                processedData[key][data.type].push({
-                    target: data.url,
-                    param: data.param
-                })
-            }
-        }
-
-        // Stop if no data present
-        if (Object.keys(processedData).length <= 0) return;
-
-        // Create view by processed data
-        for (const method of Object.keys(processedData)) {
-            let methodView = document.createElement("h5");
-            methodView.classList.add("mb-3");
-            methodView.innerText = method;
-            virtual.div.appendChild(methodView);
-
-            for (const type of Object.keys(processedData[method])) {
-                let tableDiv = document.createElement("div"),
-                    processedParams = Array();
-
-                for (const data of processedData[method][type]) {
-                    processedParams = Array();
-
-                    for (const param of Object.keys(data.param)) processedParams.push([
-                        {
-                            value: param,
-                            raw: false
-                        },
-                        {
-                            value: data.param[param],
-                            raw: false
-                        }
-                    ]);
-
-                    let table = tableBuilder.buildTable(
-                        ["Key", "Value"],
-                        [
-                            [
-                                {
-                                    value: "Target",
-                                    raw: false
-                                },
-                                {
-                                    value: data.target,
-                                    raw: false
-                                }
-                            ],
-                            [
-                                {
-                                    value: "Param",
-                                    raw: false
-                                },
-                                {
-                                    value: tableBuilder.buildTable(
-                                        ["ID", "Value"],
-                                        processedParams
-                                    ),
-                                    raw: true
-                                }
-                            ]
-                        ]
-                    )
-                    tableDiv.appendChild(table);
-                }
-                virtual.div.appendChild(
-                    pager.createAccordion(type, tableDiv)
-                )
-            }
-        }
-
-        this.viewParent.vectors.appendChild(
-            pager.createAccordion("Tested payloads", virtual.div)
-        );
-    }
-
-    buildResponseData(dataset) {
-        let url = dataset.vector.URI.split("?")[0].split("."),
-            supportedExt = ["html"];
-
-        this.viewParent.packets.appendChild(
-            pager.createAccordion(
-                "Response Data",
-                elementBuilder.createCode(
-                    dataset.packet.responseBody,
-                    (supportedExt.includes(url[url.length - 1]))
-                        ? url[url.length - 1]
-                        : supportedExt[0]
-                )
-            )
-        );
-        // elementBuilder.initCode();
-    }
-
-    buildPacketRequest(dataset) {
-        let headers = [
-                {
-                    name: "Request Header",
-                    data: dataset.packet.requestJson.headers
-                },
-                {
-                    name: "Response Header",
-                    data: dataset.packet.responseHeader
-                }
-            ],
-            responseData = Array();
-
-        for (const header of headers) {
-            responseData = Array();
-
-            for (const type of Object.keys(header.data)) {
-                responseData.push([
-                    {
-                        value: type,
-                        raw: false
-                    },
-                    {
-                        value: header.data[type],
-                        raw: false
-                    }
-                ]);
-            }
-
-            this.viewParent.packets.appendChild(
-                pager.createAccordion(header.name, tableBuilder.buildTable(
-                    ["Key", "Value"],
-                    responseData
-                ))
-            );
-        }
-    }
-
-    async buildViolationElement(dataPackage) {
-        let element = document.createElement("div"),
-            packageKeys = Object.keys(dataPackage),
-            replacement = {
-                code: [["{{", "<code>"], ["}}", "</code>"]]
-            },
-            guideline = await API.communicate("/static/data/documents/kisa.json", "GET", null, true);
-
-        // Clear HTML Area
-        if (packageKeys.length > 0) element.innerHTML = "";
-
-        // Create skeleton
-        let skeleton = {
-            parent: document.createElement("section"),
-            documentName: document.createElement("h5")
-        }
-        skeleton.documentName.classList.add("fw-bolder", "mb-3");
-        skeleton.documentName.innerText = `[${guideline.document.fileType.toUpperCase()}, ${guideline.document.released}] ${guideline.document.name}`;
-
-        skeleton.parent.appendChild(skeleton.documentName);
-
-        packageKeys.forEach(currentElement => {
-            let localSkeleton = {
-                    parent: document.createElement("div"),
-                    flex: document.createElement("div"),
-                    child: {
-                        message: document.createElement("p"),
-                        page: document.createElement("p"),
-                        quote: document.createElement("p")
-                    }
-                },
-                currentGuideline = guideline.detect[currentElement];
-
-            // Passing when data not exists
-            if (typeof (currentGuideline) === "undefined") return;
-
-            localSkeleton.parent.classList.add("m-3", "p-3", "rounded-custom", "shadow");
-            localSkeleton.flex.classList.add("d-flex", "mb-2");
-            localSkeleton.child.message.classList.add("mb-0", "fw-bold");
-            localSkeleton.child.page.classList.add("mb-0", "text-muted", "ms-auto", "small");
-            localSkeleton.child.quote.classList.add("small", "text-muted", "mb-0");
-
-
-            Object.keys(replacement).forEach(target => {
-                replacement[target].forEach((elementTarget) => {
-                    currentGuideline.message = currentGuideline.message.replaceAll(elementTarget[0], elementTarget[1]);
-                })
-            })
-
-            localSkeleton.child.message.innerHTML = currentGuideline.message;
-            localSkeleton.child.page.innerText = `P. ${currentGuideline.relatedPage}`;
-            localSkeleton.child.quote.innerText = currentGuideline.quote;
-
-            localSkeleton.flex.append(
-                localSkeleton.child.message,
-                localSkeleton.child.page
-            );
-
-            localSkeleton.parent.append(
-                localSkeleton.flex,
-                localSkeleton.child.quote
-            );
-
-            skeleton.parent.appendChild(localSkeleton.parent);
-        })
-
-        element.appendChild(skeleton.parent);
-
-        this.viewParent.vectors.appendChild(pager.createAccordion("Violation", element));
-    }
-
-    buildDoubt(dataset) {
-        let doubt = dataset.vector.attackVector["doubt"],
-            renderData = Array();
-
-        for (const vuln in doubt) {
-            let currentData = [{
-                value: vuln,
-                raw: false
-            }], virtual = {
-                div: document.createElement("div"),
-                space: Array()
-            }
-            console.log("vuln: ", vuln, "\nData: ", doubt[vuln]);
-            switch (typeof (doubt[vuln])) {
-                case "string":
-                    currentData.push({
-                        value: doubt[vuln],
-                        raw: false
-                    });
-                    break;
-                case "object":
-                    for (const type of [["type", "warning"], ["required", "danger"]]) {
-                        if (doubt[vuln][type[0]] !== undefined && doubt[vuln][type[0]][0] !== "None" && doubt[vuln][type[0]].length > 0) {
-                            for (const data of doubt[vuln][type[0]]) virtual.space.push([data, type[1]]);
-                        }
-                    }
-
-                    for (const data of virtual.space) virtual.div.appendChild(elementBuilder.createBadge(data[0], data[1]));
-
-                    currentData.push({
-                        value: virtual.div,
-                        raw: true
-                    });
-
-                    break;
-                default:
-                    continue;
-            }
-
-            // console.log("currentData: ", currentData.length, currentData);
-            if (currentData.length > 1) renderData.push(currentData);
-        }
-
-        if (renderData.length > 0) {
-            let builtTable = tableBuilder.buildTable(["Type", "Value"], renderData);
-            this.viewParent.vectors.appendChild(
-                pager.createAccordion("Predictable Vulnerabilities", builtTable)
-            )
-        }
-    }
-
-    async buildReferredDocs(dataset) {
-        let doubt = {
-                data: dataset.vector.attackVector["doubt"],
-                keys: Object.keys(dataset.vector.attackVector["doubt"])
-            },
-            overallDocuments = Array(),
-            parent = document.createElement("div");
-
-        console.log(doubt.keys.length);
-
-        if (doubt.keys.length > 0) {
-            referredDocuments = await API.communicate("/static/data/referredDocuments.json", "GET", null, true);
-            let ref = Array();
-            for (const key of doubt.keys) {
-                let storage = Array();
-
-                if (referredDocuments[key] === undefined) return createToast("Error", "Cannot find requested document");
-                else {
-                    if (Array.isArray(referredDocuments[key])) storage = referredDocuments[key];
-                    else storage = referredDocuments[key]["Generic"];
-                }
-
-                storage.forEach(data => ref.push(data));
-            }
-
-            ref.forEach(currentValue => overallDocuments.push(currentValue));
-        }
-
-        overallDocuments.forEach((currentDocument) => {
-            let localSkeleton = {
-                parent: document.createElement("li"),
-                innerLink: document.createElement("a")
-            };
-            localSkeleton.innerLink.classList.add("text-decoration-none");
-            localSkeleton.innerLink.href = currentDocument.link;
-            localSkeleton.innerLink.target = "_BLANK";
-            localSkeleton.innerLink.innerHTML = `${currentDocument["name"]} - ${currentDocument["author"]}`;
-            localSkeleton.parent.appendChild(localSkeleton.innerLink);
-            parent.appendChild(localSkeleton.parent);
-        });
-
-        this.viewParent.vectors.appendChild(
-            pager.createAccordion("Referred Document", parent)
-        );
-    }
-
-    buildTags(dataset) {
-        let codeParent = document.createElement("div");
-        dataset.vector.Details.tag.forEach(currentTag => codeParent.appendChild(elementBuilder.createCode(currentTag, "html")))
-        this.viewParent.vectors.appendChild(pager.createAccordion("Tags", codeParent));
-
-        elementBuilder.initCode();
-    }
-
-    buildToTables(dataset, type) {
-        // console.log(dataset, type, dataset.vector.Details, dataset.vector.Details[type[0]]);
-        let data = dataset.vector.Details[type[0]],
-            formedData = Array();
-
-        if (Object.keys(data).length > 0) {
-            Object.keys(data).forEach(lib => {
-                formedData.push([
-                    {
-                        value: lib,
-                        raw: false
-                    },
-                    {
-                        value: data[lib],
-                        raw: false
-                    }
-                ]);
-            })
-
-            let builtTable = tableBuilder.buildTable(["Key", "Value"], formedData);
-
-            this.viewParent.vectors.appendChild(pager.createAccordion(type[1], builtTable));
-        }
-    }
-
-    writeVectorValues(dataset) {
-        // Set each value - impact
-        let modalDataElement = {
-            impact: document.getElementById("detail-impact"),
-            threat: document.getElementById("detail-threat"),
-            url: {
-                method: document.getElementById("detail-method"),
-                url: document.getElementById("detail-URL"),
-                uri: document.getElementById("detail-URI"),
-            },
-            actions: document.getElementById("detail-actions")
-        };
-
-        // Impact rate
-        modalDataElement.impact.className = "";
-        modalDataElement.impact.classList.add("badge", "rounded-pill", "small", `bg-${impactRate[dataset.vector.impactRate][0]}`);
-        modalDataElement.impact.innerText = impactRate[dataset.vector.impactRate][1];
-
-        // URL
-        modalDataElement.url.url.innerText = dataset.vector.URL;
-        modalDataElement.url.uri.innerText = dataset.vector.URI;
-        modalDataElement.url.method.innerText = dataset.packet.requestType.toUpperCase();
-
-        // Actions
-        modalDataElement.actions.innerHTML = " - ";
-        if (dataset.vector.action_URL_Type.length > 0) {
-            modalDataElement.actions.innerHTML = "";
-            for (let currentRow = 0; currentRow <= dataset.vector.action_URL.length - 1; currentRow++) {
-                let localSkeleton = {
-                    parent: document.createElement("p"),
-                    method: document.createElement("span"),
-                    target: document.createElement("span")
-                }
-                localSkeleton.method.classList.add("badge", "text-uppercase", "me-2", "mb-1",
-                    (typeof (coloring[dataset.vector.action_URL_Type[currentRow].toLowerCase()]) === "undefined")
-                        ? "bg-warning"
-                        : coloring[dataset.vector.action_URL_Type[currentRow].toLowerCase()]);
-                localSkeleton.target.classList.add("text-break");
-
-                localSkeleton.method.innerText = dataset.vector.action_URL_Type[currentRow];
-                localSkeleton.target.innerText = dataset.vector.action_URL[currentRow];
-                localSkeleton.parent.append(
-                    localSkeleton.method,
-                    localSkeleton.target
-                );
-                modalDataElement.actions.appendChild(localSkeleton.parent);
-            }
-        } else {
-            modalDataElement.actions.innerHTML = " - ";
-        }
-
-        // Threats
-        modalDataElement.threat.innerText = "";
-        let doubtList = Object.keys(dataset.vector.attackVector["doubt"]);
-        if (doubtList.length > 0) {
-            doubtList.forEach((currentThreat) => {
-                modalDataElement.threat.innerText +=
-                    currentThreat.concat(
-                        (doubtList[doubtList.length - 1] !== currentThreat) ? ", " : ""
-                    );
-            });
-        } else {
-            modalDataElement.threat.innerText = "-";
-        }
-    }
-}
-
-document.getElementById("openPrefModal").addEventListener("click", () => pager.openPagingOption());
+// document.getElementById("openPrefModal").addEventListener("click", () => pager.openPagingOption());
 
 document.getElementById("viewPref-input-rowPerPage").addEventListener("change", function () {
     document.getElementById("viewPref-modal-rowPerPage").innerText = this.value;
@@ -1069,8 +520,6 @@ document.getElementById("viewPref-input-currentPage").addEventListener("change",
 })
 
 document.getElementById("viewPref-button-save").addEventListener("click", () => pager.buildPage());
-
-document.getElementById("toggleDetailViewModalSize").addEventListener("click", toggleModalSize);
 
 window.onload = () => {
     pager.buildPage().then(() => {
