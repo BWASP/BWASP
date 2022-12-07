@@ -3,6 +3,8 @@ import re
 from urllib.parse import urlparse, urlunparse
 from bs4 import BeautifulSoup
 from multiprocessing import Lock
+import os
+import platform
 
 from Crawling.feature import func
 
@@ -62,7 +64,7 @@ def start(detect_list, lock, url, cur_page_links, current_url, req_res_packets, 
 
             # 이미 탐지한 app일 때
             if cats in detect_list[0] and app in detect_list[0][cats]:
-                # version 까지 획득했다면 더 이상 조회 x 
+                # version 까지 획득했다면 더 이상 조회 x
                 if detect_list[0][cats][app]["version"] != 0:
                     continue
 
@@ -92,7 +94,7 @@ def start(detect_list, lock, url, cur_page_links, current_url, req_res_packets, 
 
                 if "cookies" in list(data[app].keys()):
                     detectCookies(detect_list, lock, packet, data, i, cats, app)
-                    
+
     # return detect_list
 
 
@@ -144,7 +146,7 @@ def appendResult(detect_list, lock, cats, app, detectype, version, request_index
     lock.acquire()
 
     if cats in detect_list[0] and app in detect_list[0][cats]:
-        # version 까지 획득했다면 더 이상 조회 x 
+        # version 까지 획득했다면 더 이상 조회 x
         if detect_list[0][cats][app]["version"] != 0:
             return lock.release()
         else:
@@ -327,10 +329,10 @@ def detectMeta(detect_list, lock, packet, data, index, cats, app):
     html = BeautifulSoup(packet["response"]["body"], features="html.parser")
     for meta_regex in data[app]["meta"].values():
         try:
-            pattern = re.compile(meta_regex.split('\\;')[0],re.I)
-        except: 
+            pattern = re.compile(meta_regex.split('\\;')[0], re.I)
+        except:
             pattern = re.compile("DonotD!ete!ct")
-        meta_tag = html.find("meta", {"name":data[app]["meta"].keys()})
+        meta_tag = html.find("meta", {"name": data[app]["meta"].keys()})
 
         if meta_tag and meta_tag.has_attr("content"):
             regex_result = pattern.search(meta_tag['content'])
@@ -390,7 +392,7 @@ def detectDom(detect_list, lock, packet, data, index, cats, app):
                                         appendImplies(detect_list, lock, app, -1, index)
                         # if key_name == "properties" 아직 구현 x, 2가지만 해당됨
                         # 일단은 properties는 name과 같은 느낌이라 생각 , attrs로 존재 여무 확인
-                        # 아직은 dict 구조지만 값은 비교안함 
+                        # 아직은 dict 구조지만 값은 비교안함
 
             # dictionary 형태가 아니라 단일 값으로 존재할 때
 
@@ -458,5 +460,87 @@ def detectVersion(regex, regex_results, type="search"):
 
     if not version:
         version = 0
-        
+
     return version
+
+
+def getSubdomain(target: str) -> dict:
+    """ Get subdoamin list from target.
+
+    You can call this function like the code below.
+    `getSubdomain('http://blog.naver.com')` or `getSubdomain('blog.naver.com/this/is/path')`.
+    Return dictionary type including subdomain list or error.
+    - success: {
+        "result" : "success",
+        "data" : ["m.blog.naver.com", "upload.blog.naver.com", ...]
+    }
+    - error: {
+        "result" : "error",
+        "message" : "[Error info] [Error detail]"
+    }
+
+    Args:
+        - target: Value of target's url or host.
+    Returns:
+        - Return dict type data.
+    """
+
+    def run(binary_path: str, netloc: str) -> dict:
+        try:
+            data = os.popen(f"{binary_path} -subs-only {netloc}").read()
+            data = list(set(data.split("\n")))
+            result = list()
+
+            for d in data:
+                if len(d) == 0 or d == netloc:
+                    continue
+                result.append(d)
+
+            return {
+                "result": "success",
+                "data": result
+            }
+
+        except Exception as e:
+            return {
+                "result": "error",
+                "message": e
+            }
+
+    try:
+        netloc = urlparse(target).netloc
+        netloc = re.sub("`|\$|{|}|;|\||&|%", "", netloc, flags=re.MULTILINE)
+        os_info = platform.system()
+        result = dict()
+
+        if not netloc or len(netloc) == 0:
+            return {
+                "result": "error",
+                "message": "Host를 다시 확인해 주세요."
+            }
+
+        if os_info == "Linux":
+            result = run("./assets/assetfinder", netloc)
+        elif os_info == "Windows":
+            result = run(".\\assets\\assetfinder.exe", netloc)
+        else:
+            return {
+                "result": "error",
+                "message": "해당 기능은 Linux, Windows에서만 제공됩니다."
+            }
+
+        if result["result"] == "success":
+            return result
+        else:
+            return {
+                "result": "error",
+                "message": "subdomain 기능에서 에러가 발생했습니다. " + str(result["message"])
+            }
+
+
+    except Exception as e:
+        print("[!] Get Subdomain Error: ", e)
+        return {
+            "result": "error",
+            "message": "예기치 못한 에러가 발생했습니다. " + str(e)
+        }
