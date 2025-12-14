@@ -1,7 +1,6 @@
 from urllib.parse import urlparse, urlunparse
 import os, json
 import validators
-from validators import ValidationFailure
 
 def isSameDomain(target_url, visit_url):
     try:
@@ -84,7 +83,7 @@ def isExistExtension(url, keys):
 def isStringAnUrl(url_string: str) -> bool:
     result = validators.url(url_string)
 
-    if isinstance(result, ValidationFailure):
+    if not result:
         return False
         
     return True
