@@ -360,7 +360,14 @@ class Scanner:
         recent_packet_count = len(req_res_packets) + previous_packet_count
         
         if len(load_packet_indexes) < recent_packet_count:
-            load_packet_indexes = json.loads(Packets().GetAutomationIndex()["retData"]["id"])
+            # API 응답에서 패킷 인덱스 목록 가져오기
+            api_response = Packets().GetAutomationIndex()
+            if api_response["status"] == 200 and api_response["retData"]:
+                # retData가 {"id": [...]} 형태
+                load_packet_indexes = api_response["retData"].get("id", [])
+            else:
+                logger.warning(f"패킷 인덱스 조회 실패: {api_response}")
+                load_packet_indexes = []
         
         packet_indexes = load_packet_indexes[previous_packet_count:recent_packet_count]
         

@@ -33,10 +33,9 @@ def connect(table_name):
     return db_connect, db_table
 
 
-# REST API: 종민 Packets
+# REST API: Packets - API를 통해 패킷 데이터 저장
 def insertPackets(req_res_packets):
-    api_url = "http://localhost:20102/api/packets/automation"
-    headers = {"Content-Type": "application/json; charset=utf-8"}
+    """패킷 데이터를 API를 통해 저장"""
     data = []
 
     for packet in req_res_packets:
@@ -49,20 +48,22 @@ def insertPackets(req_res_packets):
         }
         data.append(params)
 
-    Packets().PostAutomation(json.dumps(data))
-    # res = requests.post(api_url, headers=headers, data=json.dumps(data))
+    result = Packets().PostAutomation(json.dumps(data))
+    if result["status"] != 201:
+        print(f"[WARNING] 패킷 저장 실패: {result}")
 
 
-# REST API: 주원 CSP, Ports
+# REST API: CSP - CSP 평가 결과를 API를 통해 저장
 def insertCSP(csp_result):
-    ### REST API Code
-    # url = "http://localhost:20102/api/csp_evaluator"
+    """CSP 평가 결과를 API를 통해 저장"""
     data_format = dict()
     csp_data = list()
     data_format["header"] = csp_result
     csp_data.append(data_format)
     csp_data = json.dumps(csp_data)
-    CSPEvaluator().PostCSPEvaluator(csp_data)
+    result = CSPEvaluator().PostCSPEvaluator(csp_data)
+    if result["status"] != 201:
+        print(f"[WARNING] CSP 저장 실패: {result}")
 
 
 # REST API: 도훈 Domains
@@ -335,11 +336,14 @@ def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, an
         }
         data.append(query)
 
-    Domain().PostDomain(json.dumps(data))
+    result = Domain().PostDomain(json.dumps(data))
+    if result["status"] != 201:
+        print(f"[WARNING] 도메인 저장 실패: {result}")
 
 
-# REST API: 주원 CSP, Ports
+# REST API: Ports - 포트 스캔 결과를 API를 통해 저장
 def insertPorts(port_list, target_url):
+    """포트 스캔 결과를 API를 통해 저장"""
     data = []
     for port in port_list.keys():
         value = {
@@ -349,54 +353,38 @@ def insertPorts(port_list, target_url):
             "result": "Open"
         }
         data.append(value)
-        '''
-    else:
-        value = {
-            "service": "None",
-            "target": target_url,
-            "port": "None",
-            "result": "None"
-        }
-        data.append(value)
-        '''
-    Ports().PostPorts(json.dumps(data))
+    
+    if data:
+        result = Ports().PostPorts(json.dumps(data))
+        if result["status"] != 201:
+            print(f"[WARNING] 포트 저장 실패: {result}")
 
 
-# REST API: 주명 WebInfo
-# 맨처음에 url , data를 포함한 post 한번 먼저 실행
+# REST API: SystemInfo - 시스템 정보를 API를 통해 저장
 def postWebInfo(input_url):
+    """시스템 정보 초기 생성"""
     data = []
     value = {
         "url": input_url,
         "data": "None"
     }
     data.append(value)
-    SystemInfo().PostSystemInfo(json.dumps(data))
+    result = SystemInfo().PostSystemInfo(json.dumps(data))
+    if result["status"] != 201:
+        print(f"[WARNING] 시스템 정보 저장 실패: {result}")
 
 
-# 이후로 업데이트를 통해 data 값 갱신
 def updateWebInfo(analyst_result):
-    """ log4j 탐지 임시 코드
-    try:
-        if "Apache" in str(analyst_result) or "Java" in str(analyst_result):
-            log4j_info = dict()
-            log4j_info["Java Library"] = {"log4j": {"detect": "censys", "version": 0, "request": [], "response": [], "url": [],"icon": "log4j.png"}}
-            analyst_result += log4j_info
-    except: #Apache, Java String check
-        pass
-    """
-
+    """시스템 정보 업데이트"""
     data = []
-    # db_connect, db_table = connect("systeminfo")
     value = {
         "id": 1,
         "data": analyst_result
     }
     data.append(value)
-    # api 수정 전
-    #SystemInfo().PATCHSystemInfo(json.dumps(value))
-    # api 수정후 아래 코드로 바꾸기
-    SystemInfo().PATCHSystemInfo(json.dumps(data))
+    result = SystemInfo().PATCHSystemInfo(json.dumps(data))
+    if result["status"] != 200:
+        print(f"[WARNING] 시스템 정보 업데이트 실패: {result}")
 
 
 # 한번 방문할 때마다 실행되기 때문에 느릴거 같음.
