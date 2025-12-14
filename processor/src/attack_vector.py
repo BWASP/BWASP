@@ -2,8 +2,8 @@ from bs4 import BeautifulSoup
 import requests, json, re, base64, copy
 from urllib.parse import urlparse, unquote
 
-from Crawling.feature import func
-from Crawling.feature.keywordList import keywordCmp
+from feature import func
+from feature.keywordList import keywordCmp
 
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",
              "not properly", "db provider", "psqlexception", "query failed", "microsoft sql native"]

@@ -1,6 +1,6 @@
 import json
 from urllib.parse import urlparse
-from Crawling.feature import func
+from feature import func
 
 def start(url, req_res_packets):
     cookies_per_packet = dict()

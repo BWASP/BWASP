@@ -1,0 +1,7 @@
+BeautifulSoup4
+Selenium>=4.10.0
+webdriver-manager>=4.0.0
+selenium-wire>=5.1.0
+pyopenssl>=22.0.0
+requests
+redis

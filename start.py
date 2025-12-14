@@ -10,9 +10,9 @@ if __name__ == "__main__":
     try:
         webbrowser.open("http://localhost:20102")
         webbrowser.open("http://localhost:20002")
-        app = subprocess.Popen([sys.executable, "Web/app.py"])
-        app2 = subprocess.Popen([sys.executable, "ManualAPI/app.py"])
-        subprocess.call(["python", "RestAPI/app.py"])
+        # app = subprocess.Popen([sys.executable, "Web/app.py"])
+        # app2 = subprocess.Popen([sys.executable, "ManualAPI/app.py"])
+        # subprocess.call(["python", "RestAPI/app.py"])
     except KeyboardInterrupt:
-        app.terminate()
-        app2.terminate()
+        # app.terminate()
+        # app2.terminate()

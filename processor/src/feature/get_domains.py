@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-from Crawling.feature import func
+from feature import func
 
 def start(domains_per_page, url, cur_page_links):
     visit_url_list = list()

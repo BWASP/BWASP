@@ -6,10 +6,10 @@ from html.parser import HTMLParser
 import requests
 import copy
 
-from Crawling.feature import func
-from Crawling.attack_vector import *
-from Crawling.feature.api import *
-from Crawling.feature.keywordList import keywordCmp
+from feature import func
+from attack_vector import *
+from feature.api import *
+from feature.keywordList import keywordCmp
 
 comment = ""
 error_msg = ["error in your sql", "server error in", "fatal error", "database engine error",

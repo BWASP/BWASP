@@ -6,15 +6,15 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import re, json
 
-from Crawling import analyst
-from Crawling.feature.packet_capture import PacketCapture
-from Crawling.feature.get_res_links import GetReslinks
-from Crawling.feature.csp_evaluator import cspAnalysis
-from Crawling.feature.get_ports import GetPort
-from Crawling.feature.get_page_links import GetPageLinks
-from Crawling.feature import get_cookies, db, func
-from Crawling.feature.api import *
-from Crawling.attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing, adminPage
+import analyst
+from feature.packet_capture import PacketCapture
+from feature.get_res_links import GetReslinks
+from feature.csp_evaluator import cspAnalysis
+from feature.get_ports import GetPort
+from feature.get_page_links import GetPageLinks
+from feature import get_cookies, db, func
+from feature.api import *
+from attack_vector import attackHeader, robotsTxt, errorPage, directoryIndexing, adminPage
 
 
 def initGlobal():

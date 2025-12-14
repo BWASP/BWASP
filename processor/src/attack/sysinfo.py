@@ -4,7 +4,7 @@ from urllib.parse import urlparse, urlunparse
 from bs4 import BeautifulSoup
 from multiprocessing import Lock
 
-from Crawling.feature import func
+from feature import func
 
 
 # Main Function
