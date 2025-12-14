@@ -335,7 +335,7 @@ class dashboard {
         }
 
         let iconURL = {
-            alternative: `https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src/drivers/webextension/images/icons/${filename}`,
+            alternative: `https://raw.githubusercontent.com/BWASP/wappalyzer/refs/heads/master/src/drivers/webextension/images/icons/${filename}`,
             local: `/static/img/icons/${filename}`,
             unknown: "/static/img/icons/unknown.png"
         };
