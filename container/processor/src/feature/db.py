@@ -1,5 +1,8 @@
-import sqlalchemy as db
-import os
+"""
+BWASP Processor - Database Module
+API를 통해 데이터를 저장하는 모듈
+(직접 DB 연결 대신 REST API 사용)
+"""
 import json
 from urllib.parse import urlparse, urlunparse
 from html.parser import HTMLParser
@@ -17,20 +20,11 @@ error_msg = ["error in your sql", "server error in", "fatal error", "database en
 
 cookie = dict()
 
+
 class MyHTMLParser(HTMLParser):
     def handle_comment(self, data):
         global comment
         comment += data+"\n"
-
-
-def connect(table_name):
-    db_path = func.get_dbpath()
-    db_engine = db.create_engine(db_path)
-    db_connect = db_engine.connect()
-    db_metadata = db.MetaData()
-    db_table = db.Table(table_name, db_metadata, autoloadk=True, autoload_with=db_engine)
-
-    return db_connect, db_table
 
 
 # REST API: Packets - API를 통해 패킷 데이터 저장
@@ -66,17 +60,14 @@ def insertCSP(csp_result):
         print(f"[WARNING] CSP 저장 실패: {result}")
 
 
-# REST API: 도훈 Domains
-# TODO
-# 중복된 url 이 있을 경우, 데이터를 넣어야 하는가?
+# REST API: Domain - 도메인 분석 결과를 API를 통해 저장
 def insertDomains(req_res_packets, cookie_result, packet_indexes, target_url, analysis_data, session):
+    """도메인 분석 결과를 API를 통해 저장"""
     cmp_sql_check = False
     cmp_sql_xss_check = False
     cmp_logic_check = False
 
     attack_tmp = dict()
-
-    # db_connect, db_table = connect("domain")
 
     global error_msg
     global cookie
@@ -387,15 +378,6 @@ def updateWebInfo(analyst_result):
         print(f"[WARNING] 시스템 정보 업데이트 실패: {result}")
 
 
-# 한번 방문할 때마다 실행되기 때문에 느릴거 같음.
-# def getPacketsCount():
-#    db_connect, db_table = connect("packets")
-
-#    query = db.select([db_table])
-#    row = db_connect.execute(query).fetchall()
-
-#    return len(row)
-
-
 def getPacketIndex(packet_index, previous_packet_count):
+    """패킷 인덱스 계산"""
     return previous_packet_count + packet_index + 1
