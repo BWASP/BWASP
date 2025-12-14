@@ -1,9 +1,17 @@
-import os, requests, datetime
+import os
+import requests
+import datetime
 
 
 class Config(object):
+    """API 설정 클래스 - 환경변수 지원"""
+    
     def __init__(self):
-        self.API_URL_PREFIX = "http://localhost:20102"
+        # 환경변수에서 API 호스트와 포트를 읽어옴
+        # Docker 환경에서는 api:3000, 로컬에서는 localhost:20102
+        api_host = os.getenv("API_HOST", "api")
+        api_port = os.getenv("API_PORT", "20102")
+        self.API_URL_PREFIX = f"http://{api_host}:{api_port}"
 
     def ret_API_URL_PREFIX(self):
         return self.API_URL_PREFIX

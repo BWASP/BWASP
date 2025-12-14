@@ -11,7 +11,7 @@ from feature import func
 
 
 def loadCategory_meta():
-    file = "./Crawling/wappalyzer/categories.json"
+    file = "./wappalyzer/categories.json"
     f = open(file, "r", encoding="utf-8")
     data = json.load(f)
     f.close()
@@ -22,7 +22,7 @@ def loadCategory(category):
     return_data = {}
 
     for name in "abcdefghijklmnopqrstuvwxyz_":
-        file = "./Crawling/wappalyzer/{}.json".format(name)
+        file = "./wappalyzer/{}.json".format(name)
 
         f = open(file, "r", encoding="utf-8")
         data = json.load(f)

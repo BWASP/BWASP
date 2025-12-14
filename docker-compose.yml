@@ -8,6 +8,13 @@ services:
     environment:
       - TZ=Asia/Seoul
       - LANG=C.UTF-8
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=bwasp
     restart: always
     volumes:
       - dependency_data:/app/dependency_data
@@ -28,7 +35,7 @@ services:
     volumes:
       - dependency_data:/app/dependency_data
     depends_on:
-      - db
+      - api
       - redis
 
   db:
@@ -39,11 +46,10 @@ services:
       - TZ=Asia/Seoul
       - PGTZ=Asia/Seoul
       - LANG=C.UTF-8
-    restart: always
-    environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=bwasp
+    restart: always
     volumes:
       - ./db/postgres_data:/var/lib/postgresql/data
 
@@ -64,15 +70,37 @@ services:
     environment:
       - TZ=Asia/Seoul
       - LANG=C.UTF-8
+      - PYTHONUNBUFFERED=1
+      # Redis 설정
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      # API 설정
+      - API_HOST=api
+      - API_PORT=3000
     depends_on:
       - db
       - redis
+      - api
     volumes:
       - dependency_data:/app/dependency_data
 
 volumes:
   postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./container/db/postgres_data
   redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./container/db/redis_data
   dependency_data:
-
-networks:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./container/dependency_data

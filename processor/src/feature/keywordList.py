@@ -3,7 +3,7 @@ import re
 class keywordCmp:
     def keywordCmp_SQL(self, tag_name_list, cmp_sql_check):
         data_list = list()
-        with open("./Crawling/feature/SQLi.txt", 'r', encoding='UTF-8') as f:
+        with open("./feature/SQLi.txt", 'r', encoding='UTF-8') as f:
             while True:
                 param = f.readline().replace("\n", "")
                 if not param:
@@ -20,7 +20,7 @@ class keywordCmp:
 
     def keywordCmp_SQL_XSS(self, tag_name_list, cmp_sql_xss_check):
         data_list = list()
-        with open("./Crawling/feature/XSS.txt", 'r', encoding='UTF-8') as f:
+        with open("./feature/XSS.txt", 'r', encoding='UTF-8') as f:
             while True:
                 param = f.readline().replace("\n", "")
                 if not param:
@@ -37,7 +37,7 @@ class keywordCmp:
 
     def keywordCmp_Logic(self, tag_name_list, cmp_logic_check):
         data_list = list()
-        with open("./Crawling/feature/LOGIC.txt", 'r', encoding='UTF-8') as f:
+        with open("./feature/LOGIC.txt", 'r', encoding='UTF-8') as f:
             while True:
                 param = f.readline().replace("\n", "")
                 if not param:

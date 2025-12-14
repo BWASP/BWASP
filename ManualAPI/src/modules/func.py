@@ -99,7 +99,7 @@ def isStringAnUrl(url_string: str) -> bool:
 
 def apiKeyLoad():
     try:
-        f = open("./Crawling/config/api.json")
+        f = open("./config/api.json")
         data = json.load(f)
         return data
 

@@ -421,7 +421,7 @@ def adminPage(target_url, api_key):
     GOOGLE_ENGINE_ID = api_key["engineId"]
     GOOGLE_SEARCH_API = api_key["key"]
 
-    f = open("./Crawling/directory.json")
+    f = open("./directory.json")
     directory_list = json.load(f)
 
     for key in directory_list.keys():
