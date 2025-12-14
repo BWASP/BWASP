@@ -1,8 +1,10 @@
-#! BWASP/bin/pytho
+#! BWASP/bin/python
 
 import os, sys
 import webbrowser
 import subprocess
+
+
 
 if __name__ == "__main__":
     try:
