@@ -8,3 +8,4 @@ __pycache__/
 .venv-BWASP/
 venv/
 node_modules/
+db/

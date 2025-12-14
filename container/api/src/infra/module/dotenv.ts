@@ -1,5 +1,3 @@
-import { config } from 'dotenv';
-
 class Env {
     public readonly TZ: string;
 
@@ -12,17 +10,16 @@ class Env {
     public readonly DB_NAME: string;
 
     constructor() {
-        config();
-
         this.TZ = process.env.TZ ?? 'KST';
 
-        this.HTTP_PORT = parseInt(String(process.env.HTTP_PORT), 10) ?? 5000;
+        this.HTTP_PORT = parseInt(String(process.env.HTTP_PORT ?? '3000'), 10);
 
-        this.DB_HOST = process.env.DB_HOST ?? '';
-        this.DB_PORT = parseInt(String(process.env.DB_PORT), 10) ?? 5432;
-        this.DB_USER = process.env.DB_USER ?? '';
-        this.DB_PASS = process.env.DB_PASS ?? '';
-        this.DB_NAME = process.env.DB_NAME ?? '';
+        this.DB_HOST = process.env.DB_HOST ?? 'db';
+        this.DB_PORT = parseInt(String(process.env.DB_PORT ?? '5432'), 10);
+        this.DB_USER = process.env.DB_USER ?? 'root';
+        // docker-compose에서 DB_PASSWORD를 사용하므로 둘 다 확인
+        this.DB_PASS = process.env.DB_PASS ?? process.env.DB_PASSWORD ?? 'root';
+        this.DB_NAME = process.env.DB_NAME ?? 'bwasp';
     }
 }
 

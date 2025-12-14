@@ -6,3 +6,5 @@ pyopenssl>=22.0.0
 requests
 redis
 validators
+# blinker 1.8+에서 _saferef 모듈이 제거되어 selenium-wire와 호환 안됨
+blinker<1.8

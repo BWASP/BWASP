@@ -3,28 +3,33 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node ./dist",
+    "start": "node ./dist/index.js",
     "clean": "rm -rf ./dist",
     "compile": "npx tsc",
     "build": "npm run clean && npm run compile",
     "remove-src": "rm -rf ./src"
   },
   "dependencies": {
+    "body-parser": "^1.20.3",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "^4.22.1",
     "helmet": "^8.1.0",
     "http-errors": "~1.6.3",
-    "jade": "^0.31.2",
+    "ioredis": "^5.4.1",
     "morgan": "^1.10.1",
+    "pg": "^8.13.1",
+    "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.28"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.6",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.10",
+    "@types/node": "^22.10.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

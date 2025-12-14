@@ -1,8 +1,5 @@
 {
-  // Most ts-node options can be specified here using their programmatic names.
   "ts-node": {
-    // It is faster to skip typechecking.
-    // Remove if you want ts-node to do typechecking.
     "transpileOnly": true,
     "files": true,
     "compilerOptions": {
@@ -19,9 +16,9 @@
     }
   },
   "compilerOptions": {
-    // typescript options here
     "target": "es6",
     "outDir": "./dist",
+    "rootDir": "./src",
     "lib": ["dom", "es2015"],
     "module": "commonjs",
     "skipLibCheck": true,
@@ -31,11 +28,14 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "downlevelIteration": true,
     "moduleResolution": "node",
-    "resolveJsonModule":true,
+    "resolveJsonModule": true,
     "types": [
       "node"
-    ],
-  }
+    ]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

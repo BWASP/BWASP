@@ -49,9 +49,11 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=bwasp
+      # 서브디렉토리에 데이터 저장 (.gitkeep 문제 해결)
+      - PGDATA=/var/lib/postgresql/data/pg_data
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data/pg_data
 
   redis:
     image: redis:alpine
