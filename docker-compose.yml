@@ -1,0 +1,39 @@
+services:
+  browser_extension_api:
+    build:
+      context: ManualAPI
+      dockerfile: Dockerfile
+    ports:
+      - 20202:20202
+    volumes:
+      - ./ManualAPI/src:/app/src
+      - ./ManualAPI/requirements.txt:/app/requirements.txt
+    depends_on:
+      - database
+  
+  api:
+    build:
+      context: RestAPI
+      dockerfile: Dockerfile
+    ports:
+      - 20102:20102
+    volumes:
+      - ./RestAPI/src:/app/src
+      - ./RestAPI/requirements.txt:/app/requirements.txt
+    depends_on:
+      - database
+  
+  web:
+    build:
+      context: Web
+      dockerfile: Dockerfile
+    ports:
+      - 20002:20002
+    volumes:
+      - ./Web/src:/app/src
+      - ./Web/requirements.txt:/app/requirements.txt
+    depends_on:
+      - database
+
+  db:
+    build:

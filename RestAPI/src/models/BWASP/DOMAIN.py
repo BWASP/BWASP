@@ -24,7 +24,7 @@ class domain(DOMAIN_DB.Model):
     URL = DOMAIN_DB.Column(DOMAIN_DB.TEXT, nullable=False)
     URI = DOMAIN_DB.Column(DOMAIN_DB.TEXT, nullable=False)
     action_URL = DOMAIN_DB.Column(DOMAIN_DB.TEXT, nullable=False)  # TEXT
-    action_URL_Type = DOMAIN_DB.Column(DOMAIN_DB.TEXT, nullable=False)  # TEX T
+    action_URL_Type = DOMAIN_DB.Column(DOMAIN_DB.TEXT, nullable=False)  # TEXT
     params = DOMAIN_DB.Column(DOMAIN_DB.TEXT, nullable=False)  # TEXT
     comment = DOMAIN_DB.Column(DOMAIN_DB.TEXT, nullable=False)
     attackVector = DOMAIN_DB.Column(DOMAIN_DB.TEXT, nullable=False)
