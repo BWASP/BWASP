@@ -46,4 +46,9 @@ class Production_config(Config):
     """
         Flask Config for Production
     """
-    pass
+    # Production 환경에서도 기본 BWASP bind 필요 (Task 생성 시 덮어쓰여짐)
+    SQLALCHEMY_BINDS = {
+        "CVELIST": f'sqlite:///{os.path.join(BASE_PATH, "databases/CVELIST.db")}',
+        "TASK_MANAGER": f'sqlite:///{os.path.join(BASE_PATH, "databases/TASK_MANAGER.db")}',
+        "BWASP": f'sqlite:///{os.path.join(BASE_PATH, "databases/TEMP.db")}'
+    }

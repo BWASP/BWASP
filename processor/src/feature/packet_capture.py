@@ -80,16 +80,18 @@ class PacketCapture:
             return_data["body"] = body.decode('utf-8')
 
         except UnicodeDecodeError as e:        
+            # 이미지 등 바이너리 콘텐츠는 스킵
             if "content-type" in return_data["headers"].keys():
                 if return_data["headers"]["content-type"] in filter_content_type_list:
                     return return_data
 
-            body = decode(response.body, response.headers.get('Content-Encoding', 'identity'))
-            return_data["body"] = body.decode("ISO-8859-1")
-
-        except UnicodeDecodeError as e:
-            # [*] Do not save image data...etc..
-            print("UnicodeDecodeError: " + str(e))
+            # UTF-8 실패 시 다른 인코딩 시도
+            try:
+                body = decode(response.body, response.headers.get('Content-Encoding', 'identity'))
+                return_data["body"] = body.decode("ISO-8859-1")
+            except Exception as fallback_e:
+                # [*] Do not save image data...etc..
+                print("UnicodeDecodeError: " + str(fallback_e))
         
         return return_data
     

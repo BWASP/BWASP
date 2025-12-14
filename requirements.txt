@@ -1,6 +1,6 @@
 BeautifulSoup4==4.10.0
 Requests==2.26.0
-Selenium==3.141.0
+Selenium>=4.10.0
 regex==2021.8.28
 click==8.0.1
 Flask==2.0.1
@@ -8,10 +8,10 @@ Flask-SQLAlchemy==2.5.1
 Jinja2==3.0.1
 SQLAlchemy==1.4.25
 Werkzeug==2.0.1
-Webdriver-Manager
+webdriver-manager>=4.0.0
 flask_cors
 flask_restx
 validators
-selenium-wire==4.6.5
-pyopenssl==22.0.0
+selenium-wire>=5.1.0
+pyopenssl>=22.0.0
 packaging

@@ -2,6 +2,8 @@ from seleniumwire import webdriver
 from multiprocessing import Process, Manager
 from urllib.parse import urlparse, urljoin
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 import re, json
 
 from Crawling import analyst
@@ -84,7 +86,7 @@ def analysis(input_url, req_res_packets, cur_page_links, options, cookie_result,
     analyst.start(DETECT_LIST, LOCK, input_url, req_res_packets, cur_page_links, current_url, packet_indexes, options['info'])
     # res_req_packet index는 0 부터 시작하는데 ,  해당 index가 4인경우 realted packet에 packet_indexes[4]로 넣으면 됨     
 
-    db.insertDomains(req_res_packets, cookie_result, packet_indexes , input_url, ANALYSIS_DATA,options["cookie"]) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
+    db.insertDomains(req_res_packets, cookie_result, packet_indexes , input_url, ANALYSIS_DATA,options["Session"]) #current_url을 input_url로 바꿈 openredirect 탐지를 위해 (11-07)_
     db.updateWebInfo(DETECT_LIST[0])
     
     return 1
@@ -99,23 +101,23 @@ def visit(driver, url, depth, options):
 
     try:
         driver.get(url)
+        #keep session with cookie 
+        #options["cookie"]=""   cookie format is same with document.cookie(javascript command , remove http_only option)
+        if "=" in options["Session"]:
+            for each_session in options["Session"].split(";"):
+                split_point = each_session.index("=")
+                if split_point:
+                    driver.add_cookie({'name': each_session[0:split_point].lstrip() , 'value': each_session[split_point+1:]})
+        driver.refresh()
         alert = driver.switch_to_alert()
         alert.accept()
     except:
         pass
 
     if START_OPTIONS["check"]:
-        #keep session with cookie 
-        options["cookie"]="" #  cookie format is same with document.cookie(javascript command , remove http_only option)
-        if "=" in options["cookie"]:
-            for each_cookie in options["cookie"].split(";"):
-                split_point = each_cookie.index("=")
-                if split_point:
-                    driver.add_cookie({'name': each_cookie[0:split_point].lstrip() , 'value': each_cookie[split_point+1:]})
-        driver.refresh()
         ANALYSIS_DATA["directory_indexing"] = directoryIndexing(driver.current_url, options["API"]["google"])
         ANALYSIS_DATA["admin_page"] = adminPage(driver.current_url, options["API"]["google"])
-        ANALYSIS_DATA["http_method"], ANALYSIS_DATA["infor_vector"] = attackHeader(driver.current_url)
+        ANALYSIS_DATA["http_method"], ANALYSIS_DATA["infor_vector"] = attackHeader(driver.current_url, options["Session"])
         ANALYSIS_DATA["robots_result"] = robotsTxt(driver.current_url)
         ANALYSIS_DATA["error_result"] = errorPage(driver.current_url)
         db.postWebInfo(driver.current_url)
@@ -151,7 +153,7 @@ def visit(driver, url, depth, options):
         # page_source는 iframe 안에 있는 html을 가져오지 못함.
         # 따라서, 각각의 iframe에 접근하여 page_source 를 추출해야 함.
         count = 0
-        iframes = driver.find_elements_by_tag_name("iframe")
+        iframes = driver.find_elements(By.TAG_NAME, "iframe")
         packet_tmp = packet_obj.packets
         while True:
             cur_page_links += GetPageLinks(driver.current_url, driver.page_source).start()
@@ -260,11 +262,17 @@ def initSelenium():
         "download_restrictions": 3
     })
     # https://github.com/wkeeling/selenium-wire#in-memory-storage
-    options = {
+    seleniumwire_options = {
         "disable_encoding": True,
         'request_storage': 'memory'
     }
 
-    driver = webdriver.Chrome(ChromeDriverManager().install(), seleniumwire_options=options, chrome_options=chrome_options)
+    # Selenium 4.x: Service 클래스 사용 (Windows/Mac ARM 모두 지원)
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(
+        service=service,
+        seleniumwire_options=seleniumwire_options,
+        options=chrome_options
+    )
 
     return driver
