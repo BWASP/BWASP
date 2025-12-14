@@ -1,39 +1,33 @@
 services:
-  browser_extension_api:
-    build:
-      context: ManualAPI
-      dockerfile: Dockerfile
-    ports:
-      - 20202:20202
-    volumes:
-      - ./ManualAPI/src:/app/src
-      - ./ManualAPI/requirements.txt:/app/requirements.txt
-    depends_on:
-      - database
-  
   api:
     build:
-      context: RestAPI
+      context: container/api
       dockerfile: Dockerfile
     ports:
-      - 20102:20102
+      - 20000:3000
+    environment:
+      - TZ=Asia/Seoul
+      - LANG=C.UTF-8
     volumes:
-      - ./RestAPI/src:/app/src
-      - ./RestAPI/requirements.txt:/app/requirements.txt
+      - dependency_data:/app/dependency_data
     depends_on:
-      - database
+      - db
+      - redis
   
-  web:
+  client:
     build:
-      context: Web
+      context: container/client
       dockerfile: Dockerfile
     ports:
-      - 20002:20002
+      - 20001:3000
+    environment:
+      - TZ=Asia/Seoul
+      - LANG=C.UTF-8
     volumes:
-      - ./Web/src:/app/src
-      - ./Web/requirements.txt:/app/requirements.txt
+      - dependency_data:/app/dependency_data
     depends_on:
-      - database
+      - db
+      - redis
 
   db:
     image: postgres:16-alpine
@@ -60,6 +54,10 @@ services:
     volumes:
       - ./db/redis_data:/data
 
+
+volumes:
+  postgres_data:
+  redis_data:
+  dependency_data:
+
 networks:
-  bwasp-network:
-    driver: bridge
