@@ -73,11 +73,9 @@ services:
       - TZ=Asia/Seoul
       - LANG=C.UTF-8
       - PYTHONUNBUFFERED=1
-      # Redis 설정
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
-      # API 설정
       - API_HOST=api
       - API_PORT=3000
     depends_on:
