@@ -54,6 +54,7 @@ services:
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/pg_data
+    command: sh -c "rm -f /var/lib/postgresql/data/pg_data/.gitkeep && docker-entrypoint.sh postgres"
 
   redis:
     image: redis:alpine
