@@ -5,3 +5,4 @@ selenium-wire>=5.1.0
 pyopenssl>=22.0.0
 requests
 redis
+validators
