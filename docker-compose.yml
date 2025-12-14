@@ -8,6 +8,7 @@ services:
     environment:
       - TZ=Asia/Seoul
       - LANG=C.UTF-8
+    restart: always
     volumes:
       - dependency_data:/app/dependency_data
     depends_on:
@@ -23,6 +24,7 @@ services:
     environment:
       - TZ=Asia/Seoul
       - LANG=C.UTF-8
+    restart: always
     volumes:
       - dependency_data:/app/dependency_data
     depends_on:
@@ -37,6 +39,7 @@ services:
       - TZ=Asia/Seoul
       - PGTZ=Asia/Seoul
       - LANG=C.UTF-8
+    restart: always
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
@@ -49,11 +52,23 @@ services:
     environment:
       - TZ=Asia/Seoul
       - LANG=C.UTF-8
-    ports:
-      - 6379:6379
+    restart: always
     volumes:
       - ./db/redis_data:/data
 
+  processor:
+    build:
+      context: container/processor
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - TZ=Asia/Seoul
+      - LANG=C.UTF-8
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - dependency_data:/app/dependency_data
 
 volumes:
   postgres_data:
