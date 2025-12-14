@@ -13,7 +13,7 @@ from typing import Optional, Dict, Any, List, Union
 logger = logging.getLogger("API")
 
 
-class Config(object):
+class ApiConfig:
     """API 설정 클래스 - 환경변수 지원"""
     _instance = None
     
@@ -25,21 +25,17 @@ class Config(object):
     
     def _init_config(self):
         # Docker 환경: api:3000, 로컬: localhost:20102
-        api_host = os.getenv("API_HOST", "api")
-        api_port = os.getenv("API_PORT", "3000")
-        self.API_URL_PREFIX = f"http://{api_host}:{api_port}"
-        logger.info(f"API URL: {self.API_URL_PREFIX}")
-
-    def ret_API_URL_PREFIX(self):
-        return self.API_URL_PREFIX
+        _host = os.getenv("API_HOST", "api")
+        _port = os.getenv("API_PORT", "3000")
+        self.api_host = f"http://{_host}:{_port}"
+        logger.info(f"API URL: {self.api_host}")
 
 
-class BaseAPIClient:
+class BaseAPIClient(ApiConfig):
     """API 클라이언트 기본 클래스"""
     
     def __init__(self, endpoint: str):
-        self.URL_PREFIX = Config().ret_API_URL_PREFIX() + endpoint
-        self.requestObj = requests
+        self.api_url = self.api_host + endpoint
         self.requestHeaders = {
             "accept": "application/json",
             "Content-Type": "application/json"
@@ -50,20 +46,20 @@ class BaseAPIClient:
         """HTTP 요청을 보내고 응답을 처리"""
         try:
             if method == "GET":
-                response = self.requestObj.get(
+                response = requests.get(
                     url=url,
                     headers=self.requestHeaders,
                     timeout=self.timeout
                 )
             elif method == "POST":
-                response = self.requestObj.post(
+                response = requests.post(
                     url=url,
                     headers=self.requestHeaders,
                     data=data,
                     timeout=self.timeout
                 )
             elif method == "PATCH":
-                response = self.requestObj.patch(
+                response = requests.patch(
                     url=url,
                     headers=self.requestHeaders,
                     data=data,
@@ -113,7 +109,7 @@ class Packets(BaseAPIClient):
     
     def GetAutomationIndex(self) -> Dict[str, Any]:
         """자동화 패킷 ID 목록 조회"""
-        result = self._request("GET", f"{self.URL_PREFIX}/automation/index")
+        result = self._request("GET", f"{self.api_url}/automation/index")
         # ID 목록을 반환 (API가 [1, 2, 3, ...] 형태로 반환)
         if result["status"] == 200 and result["retData"] is not None:
             # retData가 리스트면 그대로, 아니면 id 키로 감싸서 반환
@@ -126,7 +122,7 @@ class Packets(BaseAPIClient):
     
     def GetManualIndex(self) -> Dict[str, Any]:
         """수동 패킷 ID 목록 조회"""
-        result = self._request("GET", f"{self.URL_PREFIX}/manual/index")
+        result = self._request("GET", f"{self.api_url}/manual/index")
         if result["status"] == 200 and result["retData"] is not None:
             ids = result["retData"]
             if isinstance(ids, list):
@@ -137,11 +133,11 @@ class Packets(BaseAPIClient):
     
     def PostAutomation(self, data: str) -> Dict[str, Any]:
         """자동화 패킷 생성"""
-        return self._request("POST", f"{self.URL_PREFIX}/automation", data)
+        return self._request("POST", f"{self.api_url}/automation", data)
     
     def PostManual(self, data: str) -> Dict[str, Any]:
         """수동 패킷 생성"""
-        return self._request("POST", f"{self.URL_PREFIX}/manual", data)
+        return self._request("POST", f"{self.api_url}/manual", data)
 
 
 class Domain(BaseAPIClient):
@@ -152,11 +148,11 @@ class Domain(BaseAPIClient):
     
     def PostDomain(self, data: str) -> Dict[str, Any]:
         """도메인 데이터 생성"""
-        return self._request("POST", self.URL_PREFIX, data)
+        return self._request("POST", self.api_url, data)
     
     def GetDomains(self) -> Dict[str, Any]:
         """모든 도메인 조회"""
-        return self._request("GET", self.URL_PREFIX)
+        return self._request("GET", self.api_url)
 
 
 class CSPEvaluator(BaseAPIClient):
@@ -167,7 +163,7 @@ class CSPEvaluator(BaseAPIClient):
     
     def PostCSPEvaluator(self, data: str) -> Dict[str, Any]:
         """CSP 평가 데이터 생성"""
-        return self._request("POST", self.URL_PREFIX, data)
+        return self._request("POST", self.api_url, data)
 
 
 class Job(BaseAPIClient):
@@ -178,11 +174,11 @@ class Job(BaseAPIClient):
     
     def PostJob(self, data: str) -> Dict[str, Any]:
         """작업 생성"""
-        return self._request("POST", self.URL_PREFIX, data)
+        return self._request("POST", self.api_url, data)
     
     def GetJobs(self) -> Dict[str, Any]:
         """모든 작업 조회"""
-        return self._request("GET", self.URL_PREFIX)
+        return self._request("GET", self.api_url)
 
 
 class SystemInfo(BaseAPIClient):
@@ -193,15 +189,15 @@ class SystemInfo(BaseAPIClient):
     
     def PostSystemInfo(self, data: str) -> Dict[str, Any]:
         """시스템 정보 생성"""
-        return self._request("POST", self.URL_PREFIX, data)
+        return self._request("POST", self.api_url, data)
     
     def PATCHSystemInfo(self, data: str) -> Dict[str, Any]:
         """시스템 정보 수정"""
-        return self._request("PATCH", self.URL_PREFIX, data)
+        return self._request("PATCH", self.api_url, data)
     
     def GetSystemInfo(self) -> Dict[str, Any]:
         """시스템 정보 조회"""
-        return self._request("GET", self.URL_PREFIX)
+        return self._request("GET", self.api_url)
 
 
 class Ports(BaseAPIClient):
@@ -212,8 +208,8 @@ class Ports(BaseAPIClient):
     
     def PostPorts(self, data: str) -> Dict[str, Any]:
         """포트 스캔 결과 생성"""
-        return self._request("POST", self.URL_PREFIX, data)
+        return self._request("POST", self.api_url, data)
     
     def GetPorts(self) -> Dict[str, Any]:
         """포트 스캔 결과 조회"""
-        return self._request("GET", self.URL_PREFIX)
+        return self._request("GET", self.api_url)
