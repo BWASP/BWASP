@@ -51,7 +51,7 @@ services:
       - POSTGRES_DB=bwasp
     restart: always
     volumes:
-      - ./db/postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:alpine
@@ -60,7 +60,7 @@ services:
       - LANG=C.UTF-8
     restart: always
     volumes:
-      - ./db/redis_data:/data
+      - redis_data:/data
 
   processor:
     build:
@@ -91,7 +91,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./container/db/postgres_data
+      device: ./container/db/pg_data
   redis_data:
     driver: local
     driver_opts:

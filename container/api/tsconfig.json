@@ -1,0 +1,41 @@
+{
+  // Most ts-node options can be specified here using their programmatic names.
+  "ts-node": {
+    // It is faster to skip typechecking.
+    // Remove if you want ts-node to do typechecking.
+    "transpileOnly": true,
+    "files": true,
+    "compilerOptions": {
+      "target": "es6",
+      "module": "commonjs",
+      "resolveJsonModule": true,
+      "lib": [
+        "dom",
+        "es6",
+        "es2017",
+        "esnext.asynciterable"
+      ],
+      "esModuleInterop": true
+    }
+  },
+  "compilerOptions": {
+    // typescript options here
+    "target": "es6",
+    "outDir": "./dist",
+    "lib": ["dom", "es2015"],
+    "module": "commonjs",
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "moduleResolution": "node",
+    "resolveJsonModule":true,
+    "types": [
+      "node"
+    ],
+  }
+}

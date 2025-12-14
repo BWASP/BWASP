@@ -7,3 +7,4 @@ __pycache__/
 .venv/
 .venv-BWASP/
 venv/
+node_modules/

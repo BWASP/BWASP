@@ -1,7 +1,0 @@
-Flask
-flask_cors
-flask_restx
-Flask-SQLAlchemy
-SQLAlchemy
-requests
-beautifulsoup4
