@@ -1,5 +1,6 @@
 services:
   api:
+    container_name: bwasp_api
     build:
       context: container/api
       dockerfile: Dockerfile
@@ -8,9 +9,9 @@ services:
     environment:
       - TZ=Asia/Seoul
       - LANG=C.UTF-8
-      - REDIS_HOST=redis
+      - REDIS_HOST=bwasp_redis
       - REDIS_PORT=6379
-      - DB_HOST=db
+      - DB_HOST=bwasp_db
       - DB_PORT=5432
       - DB_USER=root
       - DB_PASSWORD=root
@@ -23,6 +24,7 @@ services:
       - redis
   
   client:
+    container_name: bwasp_client
     build:
       context: container/client
       dockerfile: Dockerfile
@@ -39,6 +41,7 @@ services:
       - redis
 
   db:
+    container_name: bwasp_db
     image: postgres:16-alpine
     ports:
       - 5432:5432
@@ -50,13 +53,14 @@ services:
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=bwasp
       # 서브디렉토리에 데이터 저장 (.gitkeep 문제 해결)
-      - PGDATA=/var/lib/postgresql/data/pg_data
+      #- PGDATA=/var/lib/postgresql/data/pg_data
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data/pg_data
-    command: sh -c "rm -f /var/lib/postgresql/data/pg_data/.gitkeep && docker-entrypoint.sh postgres"
+      - postgres_data:/var/lib/postgresql/data
+    #command: sh -c "rm -f /var/lib/postgresql/data/pg_data/.gitkeep && docker-entrypoint.sh postgres"
 
   redis:
+    container_name: bwasp_redis
     image: redis:alpine
     environment:
       - TZ=Asia/Seoul
@@ -66,6 +70,7 @@ services:
       - redis_data:/data
 
   processor:
+    container_name: bwasp_processor
     build:
       context: container/processor
       dockerfile: Dockerfile
@@ -105,3 +110,7 @@ volumes:
       type: none
       o: bind
       device: ./container/dependency_data
+
+networks:
+  default:
+    name: bwasp
